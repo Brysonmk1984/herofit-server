@@ -1,12 +1,7 @@
 const UserModel = function(db, DataTypes){
   const User = db.define('Users', {
-    username : {
-      type : DataTypes.STRING,
-      unique : true,
-      validate : {
-          notEmpty :true,
-
-          }
+    latestActivityDate : {
+      type : DataTypes.TIME,
     },
     email : {
       type : DataTypes.STRING,

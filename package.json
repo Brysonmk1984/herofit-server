@@ -31,6 +31,7 @@
     "express-fileupload": "^1.1.1-alpha.1",
     "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.4.0",
+    "jwk-to-pem": "^2.0.4",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",
     "passport": "^0.4.0",
@@ -40,6 +41,7 @@
     "pg": "^6.1.5",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.42.0",
+    "verify-cognito-token": "^1.2.1",
     "web3": "^1.0.0-beta2"
   }
 }

@@ -33,7 +33,7 @@ if(process.env.NODE_ENV === 'production'){
     }
   }
   
-  dbUrl = "postgres://admin:admin@localhost/ecoAllies";
+  dbUrl = "postgres://admin:admin@localhost/stravatar";
 
 }
 db = new Sequelize(dbUrl, sequelizeSettings);

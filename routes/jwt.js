@@ -2,34 +2,29 @@ const express = require('express');
 const router = express.Router(); 
 const User = require('../db').User;
 const passport = require('passport');
+var jwt = require('jsonwebtoken');
+var jwkToPem = require('jwk-to-pem');
+var jwkJson =  require('../jwk.json');
 
-router.get('/logged-in', function(req, res, next){
+var key = jwkJson['keys'].find(key => {
+ return key.kid;
+})
+var pem = jwkToPem(key);
 
-  
-  passport.authenticate('jwt', { session : false }, (err, data) => {
-    //console.log('in jwt auth');
-    if(err){
-      console.log(err);
-      res.status(401).send('There was an error with JWT');
-      return;
-    }
-    //console.log('USER', data.dataValues);
-    const user = data.dataValues;
-    if (err) return next(err);
-    //res.header('Access-Control-Allow-Credentials', 'true');
-    //const token = jwt.sign({ email : u.email }, process.env.JWTSECRET);
+router.post('/logged-in', function(req, res, next){
+  jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
+    console.log('decoded token',decoded)
+
     res.status(200).send({
       success: true,
-      message: `You are logged in as ${user.username}`,
-      email: user.email,
-      username : user.username,
-      publicEthKey : user.publicEthKey,
-      fullAccount : user.fullAccount,
-      //token
+      message: `You are logged in as`,
+      token: decoded
     });
-    next();
-
-  })(req, res, next);
+    
+  });
+   
+   
+ 
 });
 
 module.exports = router;

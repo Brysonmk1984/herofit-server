@@ -27,14 +27,13 @@ app.listen( process.env.PORT || 3001, function () {
   app.set('trust proxy', 1);
   app.use(passport.initialize());
 
-  app.use(fileUpload());
 
   
   app.options('*', cors())
   // HTTP Routes
 
   // Protected routes
-
+  app.use('/jwt', jwtRoutes);
 });
 
 
