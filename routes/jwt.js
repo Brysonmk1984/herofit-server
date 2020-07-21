@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router(); 
-const User = require('../db').User;
-const passport = require('passport');
 var jwt = require('jsonwebtoken');
 var jwkToPem = require('jwk-to-pem');
 var jwkJson =  require('../jwk.json');
@@ -17,7 +15,7 @@ router.post('/logged-in', function(req, res, next){
 
     res.status(200).send({
       success: true,
-      message: `You are logged in as`,
+      message: `You are logged in as ${decoded['cognito:username']}`,
       token: decoded
     });
     

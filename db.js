@@ -22,6 +22,7 @@ if(process.env.NODE_ENV === 'production'){
 // DEVELOPMENT
 }else{
   sequelizeSettings = {
+    host: 'localhost',
     dialect: 'postgres',
     protocol: 'postgres',
     operatorsAliases: false,
@@ -39,7 +40,6 @@ if(process.env.NODE_ENV === 'production'){
 db = new Sequelize(dbUrl, sequelizeSettings);
 
 db.sync();
-
 
 const User = UserModel(db, Sequelize);
 
