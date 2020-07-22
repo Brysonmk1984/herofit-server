@@ -37,6 +37,7 @@ router.post('/signup-or-signin', function(req, res, next){
           success: true,
           message: `You are logged in as ${user.username}`,
           preexisting : false,
+          strava : { clientId : process.env.STRAVA_CLIENT_ID, redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, clientSecret : process.env.STRAVA_CLIENT_SECRET  },
           user
         });
       // User already exists, return data from db
@@ -45,8 +46,10 @@ router.post('/signup-or-signin', function(req, res, next){
         res.status(200).send({
           success: true,
           message: `You are logged in as ${user.username}`,
+          user,
+          // !!!these two are temp settings
           preexisting : true,
-          user
+          //strava : { clientId : process.env.STRAVA_CLIENT_ID, redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, clientSecret : process.env.STRAVA_CLIENT_SECRET },
         });
       }
       next();
@@ -54,6 +57,52 @@ router.post('/signup-or-signin', function(req, res, next){
       console.log('ERRRRROR', err);
       next();
     });
+  });
+});
+
+router.get('/strava-client-credentials', function(req, res, next){
+  console.log('HEREsss');
+  res.status(200).send({
+    success: true,
+    message: `Here are the Strava Client Credentials.`,
+    clientId: process.env.STRAVA_CLIENT_ID,
+    clientSecret: process.env.STRAVA_CLIENT_SECRET,
+    redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV
+  })
+  next();
+});
+
+
+router.post('/strava-credentials', function(req, res, next){
+  User.findOne({ where: { email: req.body.email } })
+  .then((user) =>{
+    // Check if record exists in db
+    if (user) {
+      User.update(
+        {
+          stravaAccessToken: req.body.stravaAccessToken,
+          stravaAccessTokenExpiration: req.body.stravaAccessTokenExpiration,
+          stravaRefreshToken: req.body.stravaRefreshToken,
+        },
+        {where: {
+          email: req.body.email
+        }})
+      .then(function () {
+        res.status(200).send({
+          success: true,
+          message: `User updated with strava Credentials`,
+          user : user.dataValues
+        });
+        next();
+      })
+      .catch((err)=>{
+        console.log('ERRRRROR', err);
+        next();
+      });
+    }
+  }).catch((err)=>{
+    console.log('ERRRRROR', err);
+    next();
   });
 });
 
