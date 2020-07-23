@@ -28,28 +28,39 @@ router.post('/signup-or-signin', function(req, res, next){
       }
     }).then(function(result) {
       const created = result[1];
-      const user = result[0].dataValues;
+      let user = result[0].dataValues;
       console.log('RES', user);
 
       // New user, created a new db
       if (created) {
+        user.preexisting = false;
+        user = Object.assign({}, user, {
+          preexisting : false,
+          clientId : process.env.STRAVA_CLIENT_ID, 
+          redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+          clientSecret : process.env.STRAVA_CLIENT_SECRET
+        });
         res.status(200).send({
           success: true,
           message: `You are logged in as ${user.username}`,
-          preexisting : false,
-          strava : { clientId : process.env.STRAVA_CLIENT_ID, redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, clientSecret : process.env.STRAVA_CLIENT_SECRET  },
           user
         });
       // User already exists, return data from db
       }else{
         console.log('User already exists');
+        
+        user = Object.assign({}, user, {
+          // !!!temp settings
+          preexisting : true,
+          // !!!dont need these
+          //clientId : process.env.STRAVA_CLIENT_ID, 
+          //redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+          //clientSecret : process.env.STRAVA_CLIENT_SECRET
+        });
         res.status(200).send({
           success: true,
           message: `You are logged in as ${user.username}`,
-          user,
-          // !!!these two are temp settings
-          preexisting : true,
-          //strava : { clientId : process.env.STRAVA_CLIENT_ID, redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, clientSecret : process.env.STRAVA_CLIENT_SECRET },
+          user
         });
       }
       next();
