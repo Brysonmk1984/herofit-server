@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router(); 
-const db = require('../db');
 const User = require('../db').User;
 
 var jwt = require('jsonwebtoken');
@@ -82,7 +81,6 @@ router.get('/strava-client-credentials', function(req, res, next){
   })
   next();
 });
-
 
 router.post('/strava-credentials', function(req, res, next){
   User.findOne({ where: { email: req.body.email } })

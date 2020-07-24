@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const UserModel = require('./models/user.js');
+const AvatarModel = require('./models/avatar.js');
 
 let db;
 let dbUrl;
@@ -42,5 +43,6 @@ db = new Sequelize(dbUrl, sequelizeSettings);
 db.sync();
 
 const User = UserModel(db, Sequelize);
+const Avatar = AvatarModel(db, Sequelize);
 
-module.exports = { User, db }
+module.exports = { User, Avatar, db }
