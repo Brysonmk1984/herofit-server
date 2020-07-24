@@ -15,9 +15,9 @@ router.post('/insert-avatar', function(req, res, next){
       character: req.body.character,
       power: req.body.power,
       health: req.body.health,
-      skills: req.body.skills,
-      elements: req.body.elements,
-      items: req.body.items,
+      skills: JSON.stringify(req.body.skills),
+      elements: JSON.stringify(req.body.elements),
+      items: JSON.stringify(req.body.items),
     }
   }).then((result) =>{
     const created = result[1];
@@ -28,15 +28,13 @@ router.post('/insert-avatar', function(req, res, next){
     if(created){
       response = {
         success: true,
-        message: `New Avatar Saved belonging to owner ${avatar.owner}`,
-        avatar : avatar
+        message: `New Avatar Saved belonging to owner ${avatar.owner}`
       };
     // Updated Existing Avatar
     }else{
       response = {
         success: true,
-        message: `Existing Avatar updated belonging to owner ${avatar.owner}`,
-        avatar : avatar
+        message: `Existing Avatar updated belonging to owner ${avatar.owner}`
       };
     }
     res.status(200).send(response);
@@ -50,11 +48,19 @@ router.post('/insert-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.owner } })
   .then((result) =>{
-    console.log('AVATAR result', result.dataValues);
+    const avatar = Object.assign({}, { 
+      name: result.dataValues.name,
+      character: result.dataValues.character,
+      power: result.dataValues.power,
+      health: result.dataValues.health,
+      skills : JSON.parse(result.dataValues.skills),
+      elements : JSON.parse(result.dataValues.elements),
+      items : JSON.parse(result.dataValues.items)
+    });
     res.status(200).send({
       success: true,
       message: `Found matching Avatar`,
-      avatar : result.dataValues
+      avatar
     });
     next();
   }).catch((err)=>{

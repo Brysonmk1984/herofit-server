@@ -52,9 +52,9 @@ router.post('/signup-or-signin', function(req, res, next){
           // !!!temp settings
           preexisting : true,
           // !!!dont need these
-          //clientId : process.env.STRAVA_CLIENT_ID, 
-          //redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-          //clientSecret : process.env.STRAVA_CLIENT_SECRET
+          clientId : process.env.STRAVA_CLIENT_ID, 
+          redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+          clientSecret : process.env.STRAVA_CLIENT_SECRET
         });
         res.status(200).send({
           success: true,
