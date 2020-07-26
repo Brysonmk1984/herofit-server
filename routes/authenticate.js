@@ -14,7 +14,7 @@ var pem = jwkToPem(key);
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-    //console.log('decoded token',decoded)
+    console.log('decoded token',decoded)
 
     User.findOrCreate({
       where: {
@@ -87,6 +87,7 @@ router.post('/strava-credentials', function(req, res, next){
   .then((user) =>{
     // Check if record exists in db
     if (user) {
+      console.log(11);
       User.update(
         {
           stravaAccessToken: req.body.stravaAccessToken,
@@ -96,17 +97,23 @@ router.post('/strava-credentials', function(req, res, next){
         {where: {
           email: req.body.email
         }})
-      .then(function () {
+      .then(function (data) {
+        console.log('DAAAA', data);
         res.status(200).send({
           success: true,
           message: `User updated with strava Credentials`,
-          user : user.dataValues
+          user : data.dataValues
         });
         next();
       })
       .catch((err)=>{
         console.log('ERRRRROR', err);
         next();
+      });
+    } else {
+      res.status(401).send({
+        success: false,
+        message: `User not found!`,
       });
     }
   }).catch((err)=>{
