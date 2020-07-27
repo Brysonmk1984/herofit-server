@@ -26,7 +26,6 @@ router.post('/insert-user-activities', function(req, res, next){
 });
 
 router.post('/get-user-activities', function(req, res, next){
-  console.log('HETEETTERRE');
   UserActivity.findAll({ where: { user: req.body.email },
     attributes : ['id', 'activity', 'activityDate']
   })
@@ -61,66 +60,93 @@ router.post('/get-user-activities', function(req, res, next){
   });
 });
 
-// router.post('/insert-or-update-totals', function(req, res, next){
+router.post('/instantiate-user-totals', function(req, res, next){
   
-//   UserTotal.findOrCreate({
-//     where: {
-//       user: req.body.email
-//     },
-//     // set the default properties if it doesn't exist
-//     defaults: { 
-//       email: req.body.email,
-//       run: JSON.stringify(req.body.run),
-//       walk: JSON.stringify(req.body.walk),
-//       hike: JSON.stringify(req.body.hike),
-//       cycle: JSON.stringify(req.body.cycle),
-//       yoga: JSON.stringify(req.body.yoga),
-//       weightLifting: JSON.stringify(req.body.items),
-//       stairStepper: JSON.stringify(req.body.weightLifting),
-//       elliptical: JSON.stringify(req.body.elliptical),
-//       swim: JSON.stringify(req.body.swim),
-//     }
-//   }).then((result) =>{
-//     const created = result[1];
-//     const results = result[0].dataValues;
-//     let response = results;
+  UserTotal.findOrCreate({
+    where: {
+      user: req.body.email
+    },
+    // set the default properties
+    defaults: { 
+      user: req.body.email,
+      avatarId: req.body.avatarId
+    }
+  }).then((result) =>{
+    const created = result[1];
+    const results = result[0].dataValues;
+    let response = results;
+    console.log('LOOOOK HERE', result);
+    // New user_total Created
+    if(created){
+      response = {
+        success: true,
+        message: `New user total Saved belonging to owner ${req.body.email}`,
+        results
+      };
+    // Updated Existing Avatar
+    }else{
+      response = {
+        success: true,
+        message: `Existing Avatar updated belonging to owner ${req.body.email}`,
+        results
+      };
+    }
+    res.status(200).send(response);
+    next();
+  }).catch((err) =>{
+    console.log('USER TOTAL CREATE ERROR', err);
+    next();
+  });
+});
+
+router.post('/update-user-totals', function(req, res, next){
+  console.log('UPDATE USER TOTALS' ,req.body.totals);
+  const strTotals = {};
+  for (const activity in req.body.totals) {
+    console.log(`${activity}: ${req.body.totals[activity]}`);
     
-//     // New Avatar Created
-//     if(created){
-//       response = {
-//         success: true,
-//         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
-//         results
-//       };
-//     // Updated Existing Avatar
-//     }else{
-//       response = {
-//         success: true,
-//         message: `Existing Avatar updated belonging to owner ${avatar.owner}`,
-//         results
-//       };
-//     }
-//     res.status(200).send(response);
-//     next();
-//   }).catch((err) =>{
-//     console.log('ERRRRROR', err);
-//     next();
-//   });
-// });
+    strTotals.activity = JSON.stringify(req.body.totals[activity]);
+  }
+  console.log(strTotals);
+  UserTotal.update(
+    {run : 'run!'},
+    { where: { user: req.body.email } }
+  )
+  .then(function(rowsUpdated) {
+    console.log('UPPdated!!,', rowsUpdated);
+    res.json(rowsUpdated)
+  })
+  .catch((err) =>{
+    console.log('Error updating user_total', err);
+    next();
+  });
+});
 
 
 // router.post('/get-user-totals', function(req, res, next){
 //   UserTotal.findOne({ where: { user: req.body.email } })
 //   .then((result) =>{
-//     console.log(result, result.dataValues);
-//     res.status(200).send({
-//       success: true,
-//       message: `User Totals for user ${req.body.email}`,
-//       totals : result.dataValues
-//     });
+//     console.log('AHHHHH', result);
+//     if(result){
+//       res.status(200).send({
+//         success: true,
+//         message: `User Totals for user ${req.body.email}`,
+//         totals : result.dataValues
+//       });
+//     }else{
+//       res.status(200).send({
+//         success: false,
+//         message: `No saved Cumulative Data for ${req.body.email}`,
+//       });
+//     }
 //     next();
 //   }).catch((err)=>{
 //     console.log('ERROR', err);
+//     res.status(400).send({
+//       success: false,
+//       message: `No saved Cumulative Data for ${req.body.email}`,
+//       error : err
+//     });
 //     next();
 //   });
 // });

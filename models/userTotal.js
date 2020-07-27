@@ -15,6 +15,10 @@ const UserTotalModel = function(db, DataTypes){
               notEmpty :true,
           }
       },
+      avatarId: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+      },
       lastUpdate : {
         type : DataTypes.TIME,
         defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
@@ -56,7 +60,7 @@ const UserTotalModel = function(db, DataTypes){
         type: DataTypes.TEXT,
         allowNull: true
       }
-  });
+  }, {timestamps: false});
 
       
      

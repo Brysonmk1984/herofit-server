@@ -30,14 +30,24 @@ router.post('/insert-avatar', function(req, res, next){
         success: true,
         message: `New Avatar Saved belonging to owner ${avatar.owner}`
       };
+      res.status(200).send({
+        success: true,
+        message: `Found matching Avatar`,
+        avatarId : avatar.avatarId
+      });
     // Updated Existing Avatar
     }else{
       response = {
         success: true,
         message: `Existing Avatar updated belonging to owner ${avatar.owner}`
       };
+      res.status(200).send({
+        success: true,
+        message: `Found matching Avatar`,
+        avatarId : avatar.avatarId
+      });
     }
-    res.status(200).send(response);
+    
     next();
   }).catch((err) =>{
     console.log('ERRRRROR', err);
@@ -48,6 +58,7 @@ router.post('/insert-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.owner } })
   .then((result) =>{
+    
     const avatar = Object.assign({}, { 
       name: result.dataValues.name,
       character: result.dataValues.character,
