@@ -48,7 +48,7 @@ const UserTotalModel = function(db, DataTypes){
         type: DataTypes.TEXT,
         allowNull: true
       },
-      weightLifting: {
+      weightTraining: {
         type: DataTypes.TEXT,
         allowNull: true
       },

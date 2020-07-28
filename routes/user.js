@@ -100,21 +100,28 @@ router.post('/instantiate-user-totals', function(req, res, next){
 });
 
 router.post('/update-user-totals', function(req, res, next){
-  console.log('UPDATE USER TOTALS' ,req.body.totals);
-  const strTotals = {};
-  for (const activity in req.body.totals) {
-    console.log(`${activity}: ${req.body.totals[activity]}`);
+  //console.log('UPDATE USER TOTALS' ,req.body.userTotals);
+  let strTotals = {};
+  for (const activity in req.body.userTotals) {
+    //console.log(`${activity}: ${req.body.userTotals[activity]}`);
+    if(req.body.userTotals[activity] !== null){
+      //console.log({ [activity] : JSON.stringify(req.body.userTotals[activity]) });
+      strTotals = Object.assign({}, strTotals, { [activity] : JSON.stringify(req.body.userTotals[activity]) })
+
+    }
     
-    strTotals.activity = JSON.stringify(req.body.totals[activity]);
   }
-  console.log(strTotals);
+  console.log('stringified totals',strTotals);
   UserTotal.update(
-    {run : 'run!'},
+    strTotals,
     { where: { user: req.body.email } }
   )
-  .then(function(rowsUpdated) {
-    console.log('UPPdated!!,', rowsUpdated);
-    res.json(rowsUpdated)
+  .then(function(result) {
+    console.log('UPPdated!!,', result[0]);
+    res.status(200).send({
+      success: true,
+      message: `${result[0]} record updated --- user ${req.body.email}`,
+    });
   })
   .catch((err) =>{
     console.log('Error updating user_total', err);
@@ -123,32 +130,38 @@ router.post('/update-user-totals', function(req, res, next){
 });
 
 
-// router.post('/get-user-totals', function(req, res, next){
-//   UserTotal.findOne({ where: { user: req.body.email } })
-//   .then((result) =>{
-//     console.log('AHHHHH', result);
-//     if(result){
-//       res.status(200).send({
-//         success: true,
-//         message: `User Totals for user ${req.body.email}`,
-//         totals : result.dataValues
-//       });
-//     }else{
-//       res.status(200).send({
-//         success: false,
-//         message: `No saved Cumulative Data for ${req.body.email}`,
-//       });
-//     }
-//     next();
-//   }).catch((err)=>{
-//     console.log('ERROR', err);
-//     res.status(400).send({
-//       success: false,
-//       message: `No saved Cumulative Data for ${req.body.email}`,
-//       error : err
-//     });
-//     next();
-//   });
-// });
+router.post('/get-user-totals', function(req, res, next){
+  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim'] })
+  .then((result) =>{
+    if(result){
+
+      // Parse all stringified totals before sending it back to the client
+      let parsedTotals = {}
+      for(let total in result.dataValues){
+        parsedTotals[total] =  JSON.parse(result.dataValues[total]);
+      }
+
+      res.status(200).send({
+        success: true,
+        message: `User Totals for user ${req.body.email}`,
+        userTotals : parsedTotals
+      });
+    }else{
+      res.status(200).send({
+        success: false,
+        message: `No saved Cumulative Data for ${req.body.email}`,
+      });
+    }
+    next();
+  }).catch((err)=>{
+    console.log('ERROR', err);
+    res.status(400).send({
+      success: false,
+      message: `No saved Cumulative Data for ${req.body.email}`,
+      error : err
+    });
+    next();
+  });
+});
 
 module.exports = router;
