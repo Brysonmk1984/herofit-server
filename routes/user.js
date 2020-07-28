@@ -11,12 +11,12 @@ router.post('/insert-user-activities', function(req, res, next){
     return { user : req.body.email,  activity : JSON.stringify(activity), activityDate : activity.start_date };
   });
 
-  UserActivity.bulkCreate(entries).then((result) =>{
-      console.log('INSERT USER ACTIVITIES',result.user_activities.dataValues);
+  UserActivity.bulkCreate(entries)
+    .then((result) =>{
+      console.log('INSERT USER ACTIVITIES',result);
       res.status(200).send({
         success: true,
-        message: `Activities added for user ${req.body.email}`,
-        activities : result.dataValues
+        message: `Activities added for user ${req.body.email}`
       });
       next();
     }).catch((err)=>{
@@ -30,28 +30,37 @@ router.post('/get-user-activities', function(req, res, next){
     attributes : ['id', 'activity', 'activityDate']
   })
   .then((results) =>{
-    //console.log('GET USER ACTIVITIES RESULTS', results[0].user_activities);
-  
-    const datesArray = results.map((result, i) =>{
-      return result.dataValues.activityDate;
-    });
+    if(results.length){
+      console.log('GET USER ACTIVITIES RESULTS', results, results[0].user_activities);
+    
+      const datesArray = results.map((result, i) =>{
+        return result.dataValues.activityDate;
+      });
 
-    let moments = datesArray.map(d => moment(d)),
-    maxDate = moment.max(moments).format('YYYY-MM-DD HH:mm:ss');
-    //console.log(maxDate);
-    const activities = results.map((result, i) =>{
-      return JSON.parse(result.dataValues.activity);
-    });
+      let moments = datesArray.map(d => moment(d)),
+      maxDate = moment.max(moments).format('YYYY-MM-DD HH:mm:ss');
+      //console.log(maxDate);
+      const activities = results.map((result, i) =>{
+        return JSON.parse(result.dataValues.activity);
+      });
 
 
-    //console.log('ACT ARRAY', activities, latestActivityDate);
-    res.status(200).send({
-      success: true,
-      message: `Activities for user ${req.body.email}`,
-      activities : activities,
-      latestActivityDate : maxDate
-    });
-    next();
+      res.status(200).send({
+        success: true,
+        message: `Activities for user ${req.body.email}`,
+        activities : activities,
+        latestActivityDate : maxDate
+      });
+      next();
+    }else{
+      console.log('DIDNT MAKE IT');
+      res.status(200).send({
+        success: true,
+        message: `No activities for user ${req.body.email}`
+      });
+      next()
+    }
+    
     
   })
    .catch((err)=>{
@@ -117,7 +126,6 @@ router.post('/update-user-totals', function(req, res, next){
     { where: { user: req.body.email } }
   )
   .then(function(result) {
-    console.log('UPPdated!!,', result[0]);
     res.status(200).send({
       success: true,
       message: `${result[0]} record updated --- user ${req.body.email}`,

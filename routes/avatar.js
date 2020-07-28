@@ -4,36 +4,33 @@ const Avatar = require('../db').Avatar;
 
 
 router.post('/insert-avatar', function(req, res, next){
+  console.log('INSERTING AV', req.body.avatar);
   Avatar.findOrCreate({
     where: {
       owner: req.body.owner
     },
     // set the default properties if it doesn't exist
     defaults: { 
-      email: req.body.email,
-      name: req.body.name,
-      character: req.body.character,
-      power: req.body.power,
-      health: req.body.health,
-      skills: JSON.stringify(req.body.skills),
-      elements: JSON.stringify(req.body.elements),
-      items: JSON.stringify(req.body.items),
+      owner: req.body.email,
+      name: req.body.avatar.name,
+      character: req.body.avatar.character,
+      power: req.body.avatar.power,
+      health: req.body.avatar.health,
+      skills: JSON.stringify(req.body.avatar.skills),
+      elements: JSON.stringify(req.body.avatar.elements),
+      items: JSON.stringify(req.body.avatar.items),
     }
   }).then((result) =>{
     const created = result[1];
     const avatar = result[0].dataValues;
     let response = {};
-    
+    console.log('CREATED AVATAR', avatar);
     // New Avatar Created
     if(created){
-      response = {
-        success: true,
-        message: `New Avatar Saved belonging to owner ${avatar.owner}`
-      };
       res.status(200).send({
         success: true,
-        message: `Found matching Avatar`,
-        avatarId : avatar.avatarId
+        message: `New Avatar Saved belonging to owner ${avatar.owner}`,
+        avatarId : avatar.id
       });
     // Updated Existing Avatar
     }else{
@@ -44,7 +41,7 @@ router.post('/insert-avatar', function(req, res, next){
       res.status(200).send({
         success: true,
         message: `Found matching Avatar`,
-        avatarId : avatar.avatarId
+        avatarId : avatar.id
       });
     }
     
@@ -56,9 +53,9 @@ router.post('/insert-avatar', function(req, res, next){
 });
 
 router.post('/get-avatar', function(req, res, next){
-  Avatar.findOne({ where: { owner: req.body.owner } })
+  Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
-    
+    console.log('RESULTING AVATAR',result);
     const avatar = Object.assign({}, { 
       name: result.dataValues.name,
       character: result.dataValues.character,

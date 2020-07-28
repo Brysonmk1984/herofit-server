@@ -12,7 +12,7 @@ const fileUpload = require('express-fileupload');
 // COMMON
 const jwtRoutes = require('./routes/jwt');
 const authenticateRoutes = require('./routes/authenticate');
-const avatarRoutes = require('./routes/avatars');
+const avatarRoutes = require('./routes/avatar');
 const userRoutes = require('./routes/user');
 
   // http server
@@ -37,7 +37,7 @@ app.listen( process.env.PORT || 3001, function () {
   // Protected routes
   app.use('/jwt', jwtRoutes);
   app.use('/authenticate', authenticateRoutes);
-  app.use('/avatars', avatarRoutes);
+  app.use('/avatar', avatarRoutes);
   app.use('/user', userRoutes);
 });
 
