@@ -31,7 +31,7 @@ router.post('/get-user-activities', function(req, res, next){
   })
   .then((results) =>{
     if(results.length){
-      console.log('GET USER ACTIVITIES RESULTS', results, results[0].user_activities);
+      //console.log('GET USER ACTIVITIES RESULTS', results, results[0].user_activities);
     
       const datesArray = results.map((result, i) =>{
         return result.dataValues.activityDate;
