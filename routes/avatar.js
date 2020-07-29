@@ -30,7 +30,8 @@ router.post('/insert-avatar', function(req, res, next){
       res.status(200).send({
         success: true,
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
-        avatarId : avatar.id
+        avatarId : avatar.id,
+        avatar
       });
     // Updated Existing Avatar
     }else{
@@ -48,6 +49,30 @@ router.post('/insert-avatar', function(req, res, next){
     next();
   }).catch((err) =>{
     console.log('ERRRRROR', err);
+    next();
+  });
+});
+
+router.post('/update-avatar', function(req, res, next){
+  console.log('BODYR', req.body);
+  Avatar.update(
+    {
+    power : req.body.avatar.power,
+    health : req.body.avatar.health,
+    skills: JSON.stringify(req.body.avatar.skills),
+    elements: JSON.stringify(req.body.avatar.elements),
+    items: JSON.stringify(req.body.avatar.items),
+    },
+    { where: { owner: req.body.email } }
+  )
+  .then(function(result) {
+    res.status(200).send({
+      success: true,
+      message: `${result[0]} record updated --- avatar ${req.body.id}`,
+    });
+  })
+  .catch((err) =>{
+    console.log('Error updating avatar', err);
     next();
   });
 });
