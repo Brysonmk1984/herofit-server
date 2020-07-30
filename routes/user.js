@@ -16,7 +16,8 @@ router.post('/insert-user-activities', function(req, res, next){
       console.log('INSERT USER ACTIVITIES',result);
       res.status(200).send({
         success: true,
-        message: `Activities added for user ${req.body.email}`
+        message: `Activities added for user ${req.body.email}`,
+        activities : req.body.activities
       });
       next();
     }).catch((err)=>{
