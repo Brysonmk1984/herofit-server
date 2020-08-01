@@ -14,17 +14,16 @@ router.post('/insert-user-activities', function(req, res, next){
   UserActivity.bulkCreate(entries)
     .then((result) =>{
       console.log('INSERT USER ACTIVITIES',result);
-      res.status(200).send({
-        success: true,
+      res.status(200).json({
         message: `Activities added for user ${req.body.email}`,
         activities : req.body.activities
       });
       next();
     }).catch((err)=>{
-      console.log(`Error bulk inserting user activities for ${req.body.email}`);
-      res.status(400).send({
-        success: false,
+      console.log(`Error bulk inserting user activities for ${req.body.email} DEBUG: ${err}`);
+      res.status(400).json({
         message: `Error bulk inserting user activities for ${req.body.email}`,
+        debug : err
       });
       next();
     });
@@ -49,8 +48,7 @@ router.post('/get-user-activities', function(req, res, next){
         return JSON.parse(result.dataValues.activity);
       });
 
-      res.status(200).send({
-        success: true,
+      res.status(200).json({
         message: `Activities for user ${req.body.email}`,
         activities : activities,
         latestActivityDate : maxDate
@@ -58,18 +56,17 @@ router.post('/get-user-activities', function(req, res, next){
       next();
     }else{
       console.log('DIDNT MAKE IT');
-      res.status(200).send({
-        success: true,
+      res.status(200).json({
         message: `No activities for user ${req.body.email}`
       });
       next()
     }
   })
    .catch((err)=>{
-    console.log(`Error getting saved user activities for ${req.body.email}, ERROR MESSAGE: ${err}`);
-    res.status(400).send({
-      success: false,
-      message: `Error getting saved user activities for ${req.body.email}, ERROR MESSAGE: ${err}`
+    console.log(`Error getting saved user activities for ${req.body.email}, DEBUG : ${err}`);
+    res.status(400).json({
+      message: `Error getting saved user activities for ${req.body.email}`,
+      debug : err
     });
     next();
   });
@@ -94,25 +91,23 @@ router.post('/instantiate-user-totals', function(req, res, next){
     // New user_total Created
     if(created){
       response = {
-        success: true,
         message: `New user total Saved belonging to owner ${req.body.email}`,
         results
       };
     // Updated Existing Avatar
     }else{
       response = {
-        success: true,
         message: `Existing Avatar updated belonging to owner ${req.body.email}`,
         results
       };
     }
-    res.status(200).send(response);
+    res.status(200).json(response);
     next();
   }).catch((err) =>{
-    console.log(`Error Instantiating user total for ${req.body.email}, ERROR MESSAGE: ${err}`);
-    res.status(400).send({
-      success: false,
-      message: `Error Instantiating user total for ${req.body.email}, ERROR MESSAGE: ${err}`
+    console.log(`Error Instantiating user total for ${req.body.email}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Error Instantiating user total for ${req.body.email}`,
+      debug : err
     });
     next();
   });
@@ -136,16 +131,15 @@ router.post('/update-user-totals', function(req, res, next){
     { where: { user: req.body.email } }
   )
   .then(function(result) {
-    res.status(200).send({
-      success: true,
+    res.status(200).json({
       message: `${result[0]} record updated --- user ${req.body.email}`,
     });
   })
   .catch((err) =>{
-    console.log(`Error updating user total for ${req.body.email}, ERROR MESSAGE: ${err}`);
-    res.status(400).send({
-      success: false,
-      message: `Error updating user total for ${req.body.email}, ERROR MESSAGE: ${err}`
+    console.log(`Error updating user total for ${req.body.email}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Error updating user total for ${req.body.email}`,
+      debug : err
     });
     next();
   });
@@ -163,23 +157,21 @@ router.post('/get-user-totals', function(req, res, next){
         parsedTotals[total] =  JSON.parse(result.dataValues[total]);
       }
 
-      res.status(200).send({
-        success: true,
+      res.status(200).json({
         message: `User Totals for user ${req.body.email}`,
         userTotals : parsedTotals
       });
     }else{
-      res.status(200).send({
-        success: false,
+      res.status(200).json({
         message: `No saved Cumulative Data for ${req.body.email}`,
       });
     }
     next();
   }).catch((err)=>{
-    console.log(`No saved Cumulative Data for ${req.body.email}, ERROR MESSAGE: ${err}`);
-    res.status(400).send({
-      success: false,
-      message: `No saved Cumulative Data for ${req.body.email}, ERROR MESSAGE: ${err}`,
+    console.log(`No saved Cumulative Data for ${req.body.email}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `No saved Cumulative Data for ${req.body.email}`,
+      debug : err
     });
     next();
   });

@@ -39,8 +39,7 @@ router.post('/signup-or-signin', function(req, res, next){
           redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
           clientSecret : process.env.STRAVA_CLIENT_SECRET
         });
-        res.status(200).send({
-          success: true,
+        res.status(200).json({
           message: `You are logged in as ${user.username}`,
           user
         });
@@ -56,18 +55,17 @@ router.post('/signup-or-signin', function(req, res, next){
           redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
           clientSecret : process.env.STRAVA_CLIENT_SECRET
         });
-        res.status(200).send({
-          success: true,
+        res.status(200).json({
           message: `You are logged in as ${user.username}`,
           user
         });
       }
       next();
     }).catch((err)=>{
-      console.log(`Couldn't find or create user ${decoded['cognito:username']}, ERROR MESSAGE: ${err}`);
-      res.status(400).send({
-        success: false,
-        message: `Couldn't find or create user ${decoded['cognito:username']}, ERROR MESSAGE: ${err}`,
+      console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
+      res.status(400).json({
+        message: `Couldn't find or create user ${decoded['cognito:username']}`,
+        debug : err
       });
       next();
     });
@@ -76,13 +74,12 @@ router.post('/signup-or-signin', function(req, res, next){
 
 router.get('/strava-client-credentials', function(req, res, next){
   console.log('HEREsss');
-  res.status(200).send({
-    success: true,
+  res.status(200).json({
     message: `Here are the Strava Client Credentials.`,
     clientId: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
     redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV
-  })
+  });
   next();
 });
 
@@ -101,33 +98,31 @@ router.post('/strava-credentials', function(req, res, next){
           email: req.body.email
         }})
       .then(function (data) {
-        res.status(200).send({
-          success: true,
+        res.status(200).json({
           message: `User updated with strava Credentials`,
           user : data.dataValues
         });
         next();
       })
       .catch((err)=>{
-        console.log(`Couldn't update Strava tokens for user ${req.body.email}, ERROR MESSAGE: ${err}`);
-        res.status(400).send({
-          success: false,
-          message: `Couldn't update Strava tokens for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+        console.log(`Couldn't update Strava tokens for user ${req.body.email}, DEBUG: ${err}`);
+        res.status(400).json({
+          message: `Couldn't update Strava tokens for user ${req.body.email}`,
+          debug : err
         });
         next();
       });
     } else {
       console.log('User not found!');
-      res.status(401).send({
-        success: false,
+      res.status(401).json({
         message: `User not found!`,
       });
     }
   }).catch((err)=>{
-    console.log(`Couldn't find user ${req.body.email} to update their Strava, ERROR MESSAGE: ${err}`);
-    res.status(400).send({
-      success: false,
-      message: `Couldn't find user ${req.body.email} to update their Strava, ERROR MESSAGE: ${err}`,
+    console.log(`Couldn't find user ${req.body.email} to update their Strava, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't find user ${req.body.email}`,
+      debug : err
     });
     next();
   });

@@ -41,9 +41,10 @@ router.post('/insert-avatar', function(req, res, next){
     
     next();
   }).catch((err) =>{
-    console.log(`Couldn't insert Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    console.log(`Couldn't insert Avatar for user ${req.body.email}, DEBUG: ${err}`);
     res.status(400).json({
-      message: `Couldn't insert Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+      message: `Couldn't insert Avatar for user ${req.body.email}`,
+      debug : err
     });
     next();
   });
@@ -66,9 +67,10 @@ router.post('/update-avatar', function(req, res, next){
     });
   })
   .catch((err) =>{
-    console.log(`Error updating avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
     res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+      message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : err
     });
     next();
   });
@@ -77,8 +79,9 @@ router.post('/update-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   // res.status(400).json({
   //   message: `Couldn't get Avatar for user , ERROR MESSAGE: `,
+  //   debug: 'CAKE'
   // });
-  //next();
+  // next();
   Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
     const avatar = Object.assign({}, { 
@@ -91,15 +94,15 @@ router.post('/get-avatar', function(req, res, next){
       items : JSON.parse(result.dataValues.items)
     });
     res.status(200).json({
-
       message: `Found matching Avatar`,
       avatar
     });
     next();
   }).catch((err)=>{
-    console.log(`Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
     res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+      message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : err
     });
     next();
   });
