@@ -21,7 +21,11 @@ router.post('/insert-user-activities', function(req, res, next){
       });
       next();
     }).catch((err)=>{
-      console.log('ERROR', err);
+      console.log(`Error bulk inserting user activities for ${req.body.email}`);
+      res.status(400).send({
+        success: false,
+        message: `Error bulk inserting user activities for ${req.body.email}`,
+      });
       next();
     });
 });
@@ -45,7 +49,6 @@ router.post('/get-user-activities', function(req, res, next){
         return JSON.parse(result.dataValues.activity);
       });
 
-
       res.status(200).send({
         success: true,
         message: `Activities for user ${req.body.email}`,
@@ -61,11 +64,13 @@ router.post('/get-user-activities', function(req, res, next){
       });
       next()
     }
-    
-    
   })
    .catch((err)=>{
-    console.log('ERROR', err);
+    console.log(`Error getting saved user activities for ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).send({
+      success: false,
+      message: `Error getting saved user activities for ${req.body.email}, ERROR MESSAGE: ${err}`
+    });
     next();
   });
 });
@@ -104,7 +109,11 @@ router.post('/instantiate-user-totals', function(req, res, next){
     res.status(200).send(response);
     next();
   }).catch((err) =>{
-    console.log('USER TOTAL CREATE ERROR', err);
+    console.log(`Error Instantiating user total for ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).send({
+      success: false,
+      message: `Error Instantiating user total for ${req.body.email}, ERROR MESSAGE: ${err}`
+    });
     next();
   });
 });
@@ -133,7 +142,11 @@ router.post('/update-user-totals', function(req, res, next){
     });
   })
   .catch((err) =>{
-    console.log('Error updating user_total', err);
+    console.log(`Error updating user total for ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).send({
+      success: false,
+      message: `Error updating user total for ${req.body.email}, ERROR MESSAGE: ${err}`
+    });
     next();
   });
 });
@@ -163,11 +176,10 @@ router.post('/get-user-totals', function(req, res, next){
     }
     next();
   }).catch((err)=>{
-    console.log('ERROR', err);
+    console.log(`No saved Cumulative Data for ${req.body.email}, ERROR MESSAGE: ${err}`);
     res.status(400).send({
       success: false,
-      message: `No saved Cumulative Data for ${req.body.email}`,
-      error : err
+      message: `No saved Cumulative Data for ${req.body.email}, ERROR MESSAGE: ${err}`,
     });
     next();
   });

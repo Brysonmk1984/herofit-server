@@ -23,38 +23,33 @@ router.post('/insert-avatar', function(req, res, next){
   }).then((result) =>{
     const created = result[1];
     const avatar = result[0].dataValues;
-    let response = {};
-    console.log('CREATED AVATAR', avatar);
+
     // New Avatar Created
     if(created){
-      res.status(200).send({
-        success: true,
+      res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
         avatar
       });
     // Updated Existing Avatar
     }else{
-      response = {
-        success: true,
-        message: `Existing Avatar updated belonging to owner ${avatar.owner}`
-      };
-      res.status(200).send({
-        success: true,
-        message: `Found matching Avatar`,
+      res.status(200).json({
+        message: `Existing Avatar updated belonging to owner ${avatar.owner}`,
         avatarId : avatar.id
       });
     }
     
     next();
   }).catch((err) =>{
-    console.log('ERRRRROR', err);
+    console.log(`Couldn't insert Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).json({
+      message: `Couldn't insert Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+    });
     next();
   });
 });
 
 router.post('/update-avatar', function(req, res, next){
-  console.log('BODYR', req.body);
   Avatar.update(
     {
     power : req.body.avatar.power,
@@ -66,21 +61,26 @@ router.post('/update-avatar', function(req, res, next){
     { where: { owner: req.body.email } }
   )
   .then(function(result) {
-    res.status(200).send({
-      success: true,
+    res.status(200).json({
       message: `${result[0]} record updated --- avatar ${req.body.id}`,
     });
   })
   .catch((err) =>{
-    console.log('Error updating avatar', err);
+    console.log(`Error updating avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+    });
     next();
   });
 });
 
 router.post('/get-avatar', function(req, res, next){
+  // res.status(400).json({
+  //   message: `Couldn't get Avatar for user , ERROR MESSAGE: `,
+  // });
+  //next();
   Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
-    console.log('RESULTING AVATAR',result);
     const avatar = Object.assign({}, { 
       name: result.dataValues.name,
       character: result.dataValues.character,
@@ -90,14 +90,17 @@ router.post('/get-avatar', function(req, res, next){
       elements : JSON.parse(result.dataValues.elements),
       items : JSON.parse(result.dataValues.items)
     });
-    res.status(200).send({
-      success: true,
+    res.status(200).json({
+
       message: `Found matching Avatar`,
       avatar
     });
     next();
   }).catch((err)=>{
-    console.log('ERRRRROR', err);
+    console.log(`Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get Avatar for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+    });
     next();
   });
 });

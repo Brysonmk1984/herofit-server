@@ -14,7 +14,7 @@ var pem = jwkToPem(key);
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-    console.log('decoded token',decoded)
+    //console.log('decoded token',decoded)
 
     User.findOrCreate({
       where: {
@@ -28,7 +28,7 @@ router.post('/signup-or-signin', function(req, res, next){
     }).then(function(result) {
       const created = result[1];
       let user = result[0].dataValues;
-      console.log('RES', user);
+      //console.log('RES', user);
 
       // New user, created a new db
       if (created) {
@@ -64,7 +64,11 @@ router.post('/signup-or-signin', function(req, res, next){
       }
       next();
     }).catch((err)=>{
-      console.log('ERRRRROR', err);
+      console.log(`Couldn't find or create user ${decoded['cognito:username']}, ERROR MESSAGE: ${err}`);
+      res.status(400).send({
+        success: false,
+        message: `Couldn't find or create user ${decoded['cognito:username']}, ERROR MESSAGE: ${err}`,
+      });
       next();
     });
   });
@@ -87,7 +91,6 @@ router.post('/strava-credentials', function(req, res, next){
   .then((user) =>{
     // Check if record exists in db
     if (user) {
-      console.log(11);
       User.update(
         {
           stravaAccessToken: req.body.stravaAccessToken,
@@ -98,7 +101,6 @@ router.post('/strava-credentials', function(req, res, next){
           email: req.body.email
         }})
       .then(function (data) {
-        console.log('DAAAA', data);
         res.status(200).send({
           success: true,
           message: `User updated with strava Credentials`,
@@ -107,17 +109,26 @@ router.post('/strava-credentials', function(req, res, next){
         next();
       })
       .catch((err)=>{
-        console.log('ERRRRROR', err);
+        console.log(`Couldn't update Strava tokens for user ${req.body.email}, ERROR MESSAGE: ${err}`);
+        res.status(400).send({
+          success: false,
+          message: `Couldn't update Strava tokens for user ${req.body.email}, ERROR MESSAGE: ${err}`,
+        });
         next();
       });
     } else {
+      console.log('User not found!');
       res.status(401).send({
         success: false,
         message: `User not found!`,
       });
     }
   }).catch((err)=>{
-    console.log('ERRRRROR', err);
+    console.log(`Couldn't find user ${req.body.email} to update their Strava, ERROR MESSAGE: ${err}`);
+    res.status(400).send({
+      success: false,
+      message: `Couldn't find user ${req.body.email} to update their Strava, ERROR MESSAGE: ${err}`,
+    });
     next();
   });
 });
