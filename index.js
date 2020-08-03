@@ -15,7 +15,7 @@ const avatarRoutes = require('./routes/avatar');
 const userRoutes = require('./routes/user');
 
   // http server
-app.listen( process.env.PORT || 3001, function () {
+//app.listen( process.env.PORT || 3001, function () {
     
   console.log('Listening on port ' + (process.env.PORT || 3001));
   // Middleware
@@ -37,6 +37,6 @@ app.listen( process.env.PORT || 3001, function () {
   app.use('/authenticate', authenticateRoutes);
   app.use('/avatar', avatarRoutes);
   app.use('/user', userRoutes);
-});
-
+//});
+module.exports = app;
 

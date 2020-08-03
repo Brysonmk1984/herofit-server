@@ -1,12 +1,16 @@
 {
-  "name": "eco-allies-login",
+  "name": "stravat-cognito",
   "version": "1.0.0",
   "description": "Handles login for Eco Allies",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
-    "test": "eslint index.js && mocha",
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development nodemon index.js"
+    "test": "jest",
+    "test:watch": "jest --watch --silent",
+    "start": "NODE_ENV=production node start.js",
+    "dev": "NODE_ENV=development nodemon start.js"
+  },
+  "jest":{
+    "testEnvironment" : "node"
   },
   "author": "Bryson Kruk",
   "license": "MIT",
@@ -18,6 +22,7 @@
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "jest": "^26.2.2",
     "mocha": "^5.2.0",
     "nodemon": "^2.0.4",
     "supertest": "^3.4.2"

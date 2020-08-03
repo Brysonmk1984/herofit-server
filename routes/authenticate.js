@@ -73,7 +73,7 @@ router.post('/signup-or-signin', function(req, res, next){
 });
 
 router.get('/strava-client-credentials', function(req, res, next){
-  console.log('HEREsss');
+
   res.status(200).json({
     message: `Here are the Strava Client Credentials.`,
     clientId: process.env.STRAVA_CLIENT_ID,
@@ -129,3 +129,4 @@ router.post('/strava-credentials', function(req, res, next){
 });
 
 module.exports = router;
+
