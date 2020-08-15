@@ -59,7 +59,19 @@ const UserTotalModel = function(db, DataTypes){
       elliptical: {
         type: DataTypes.TEXT,
         allowNull: true
-      }
+      },
+      standUpPaddling: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
+      crossfit: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
+      rowing: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
   }, {timestamps: false});
 
       

@@ -55,7 +55,6 @@ router.post('/get-user-activities', function(req, res, next){
       });
       next();
     }else{
-      console.log('DIDNT MAKE IT');
       res.status(200).json({
         message: `No activities for user ${req.body.email}`
       });
@@ -147,7 +146,7 @@ router.post('/update-user-totals', function(req, res, next){
 
 
 router.post('/get-user-totals', function(req, res, next){
-  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim'] })
+  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling'] })
   .then((result) =>{
     if(result){
 
