@@ -128,5 +128,24 @@ router.post('/strava-credentials', function(req, res, next){
   });
 });
 
+router.post('/check-strava-refresh-token', function(req, res, next){
+  User.findOne({ where: { email: req.body.email },
+    attributes : ['stravaRefreshToken']
+  }).then((results) =>{
+    if(results.dataValues && results.dataValues.stravaRefreshToken){
+      res.status(200).json({
+        message: `Refresh Token Exists for ${req.body.email}`,
+        stravaRefreshToken : results.dataValues.stravaRefreshToken,
+      });
+      next();
+    }else{
+      res.status(400).json({
+        message: `No Strava refresh token in account ${req.body.email}`
+      });
+      next()
+    }
+  });
+});
+
 module.exports = router;
 

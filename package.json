@@ -9,8 +9,8 @@
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js"
   },
-  "jest":{
-    "testEnvironment" : "node"
+  "jest": {
+    "testEnvironment": "node"
   },
   "author": "Bryson Kruk",
   "license": "MIT",
@@ -34,7 +34,7 @@
     "cors": "^2.8.3",
     "dotenv": "^6.2.0",
     "express": "^4.15.2",
-    "express-fileupload": "^1.1.1-alpha.1",
+    "express-fileupload": "^1.2.0",
     "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.4.0",
     "jwk-to-pem": "^2.0.4",

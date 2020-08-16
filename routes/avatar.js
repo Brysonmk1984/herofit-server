@@ -84,13 +84,20 @@ router.post('/get-avatar', function(req, res, next){
   // next();
   Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
+    let elements = JSON.parse(result.dataValues.elements);
+    console.log(elements);
+    elements.air = parseFloat(elements.air);
+    elements.earth = parseFloat(elements.earth);
+    elements.fire = parseFloat(elements.fire);
+    elements.water = parseFloat(elements.water);
+
     const avatar = Object.assign({}, { 
       name: result.dataValues.name,
       character: result.dataValues.character,
       power: result.dataValues.power,
       health: result.dataValues.health,
       skills : JSON.parse(result.dataValues.skills),
-      elements : JSON.parse(result.dataValues.elements),
+      elements,
       items : JSON.parse(result.dataValues.items)
     });
     res.status(200).json({
