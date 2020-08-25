@@ -12,6 +12,7 @@ if(process.env.NODE_ENV === 'production'){
   sequelizeSettings = {
     dialect: 'postgres',
     protocol: 'postgres',
+    timezone: 'utc',
     operatorsAliases: false,
         //host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {

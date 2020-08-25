@@ -4,7 +4,7 @@ const Avatar = require('../db').Avatar;
 
 
 router.post('/insert-avatar', function(req, res, next){
-  console.log('INSERTING AV', req.body.avatar);
+  //console.log('INSERTING AV', req.body.avatar);
   Avatar.findOrCreate({
     where: {
       owner: req.body.owner
@@ -12,6 +12,7 @@ router.post('/insert-avatar', function(req, res, next){
     // set the default properties if it doesn't exist
     defaults: { 
       owner: req.body.email,
+      ownerUsername: req.body.username,
       name: req.body.avatar.name,
       character: req.body.avatar.character,
       power: req.body.avatar.power,
@@ -58,6 +59,7 @@ router.post('/update-avatar', function(req, res, next){
     skills: JSON.stringify(req.body.avatar.skills),
     elements: JSON.stringify(req.body.avatar.elements),
     items: JSON.stringify(req.body.avatar.items),
+    hasBeenUpgraded : req.body.avatar.hasBeenUpgraded
     },
     { where: { owner: req.body.email } }
   )
@@ -98,7 +100,11 @@ router.post('/get-avatar', function(req, res, next){
       health: result.dataValues.health,
       skills : JSON.parse(result.dataValues.skills),
       elements,
-      items : JSON.parse(result.dataValues.items)
+      items : JSON.parse(result.dataValues.items),
+      hasBeenUpgraded : result.dataValues.hasBeenUpgraded,
+      ownerUsername : result.dataValues.ownerUsername,
+      updatedAt : result.dataValues.updatedAt,
+      createdAt : result.dataValues.createdAt
     });
     res.status(200).json({
       message: `Found matching Avatar`,
@@ -109,6 +115,32 @@ router.post('/get-avatar', function(req, res, next){
     console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
     res.status(400).json({
       message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+});
+
+
+router.post('/get-all-avatars', function(req, res, next){
+
+  // next();
+  Avatar.findAll()
+  .then((results) =>{
+      const avatars= results.map((result, i) =>{
+        result.dataValues.elements = JSON.parse(result.dataValues.elements);
+        return result.dataValues;
+      });
+
+    res.status(200).json({
+      message: `Found matching Avatar`,
+      avatars
+    });
+    next();
+  }).catch((err)=>{
+    console.log(`Couldn't get all Avatars DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get All Avatars`,
       debug : err
     });
     next();

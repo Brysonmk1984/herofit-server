@@ -14,61 +14,70 @@ var pem = jwkToPem(key);
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-    //console.log('decoded token',decoded)
-
-    User.findOrCreate({
-      where: {
-        email: decoded.email
-      },
-      // set the default properties if it doesn't exist
-      defaults: { 
-        email: decoded.email,
-        username : decoded['cognito:username'],
-      }
-    }).then(function(result) {
-      const created = result[1];
-      let user = result[0].dataValues;
-      //console.log('RES', user);
-
-      // New user, created a new db
-      if (created) {
-        user.preexisting = false;
-        user = Object.assign({}, user, {
-          preexisting : false,
-          clientId : process.env.STRAVA_CLIENT_ID, 
-          redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-          clientSecret : process.env.STRAVA_CLIENT_SECRET
-        });
-        res.status(200).json({
-          message: `You are logged in as ${user.username}`,
-          user
-        });
-      // User already exists, return data from db
-      }else{
-        console.log('User already exists');
-        
-        user = Object.assign({}, user, {
-          // !!!temp settings
-          preexisting : true,
-          // !!!dont need these
-          clientId : process.env.STRAVA_CLIENT_ID, 
-          redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-          clientSecret : process.env.STRAVA_CLIENT_SECRET
-        });
-        res.status(200).json({
-          message: `You are logged in as ${user.username}`,
-          user
-        });
-      }
-      next();
-    }).catch((err)=>{
-      console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
-      res.status(400).json({
-        message: `Couldn't find or create user ${decoded['cognito:username']}`,
+    if(err){
+      res.status(401).json({
+        message: `Token no longer valid`,
         debug : err
       });
       next();
-    });
+    }else{
+      User.findOrCreate({
+        where: {
+          email: decoded.email
+        },
+        // set the default properties if it doesn't exist
+        defaults: { 
+          email: decoded.email,
+          username : decoded['cognito:username'],
+        }
+      }).then(function(result) {
+        const created = result[1];
+        let user = result[0].dataValues;
+        console.log('USERNAMEE', user.username);
+
+        // New user, created a new db
+        if (created) {
+          user.preexisting = false;
+          user = Object.assign({}, user, {
+            preexisting : false,
+            clientId : process.env.STRAVA_CLIENT_ID, 
+            redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+            clientSecret : process.env.STRAVA_CLIENT_SECRET,
+
+          });
+          res.status(200).json({
+            message: `You are logged in as ${user.username}`,
+            user
+          });
+        // User already exists, return data from db
+        }else{
+          console.log('User already exists', user.createdAt);
+          
+          user = Object.assign({}, user, {
+            // !!!temp settings
+            preexisting : true,
+            // !!!dont need these
+            clientId : process.env.STRAVA_CLIENT_ID, 
+            redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+            clientSecret : process.env.STRAVA_CLIENT_SECRET,
+
+          });
+          res.status(200).json({
+            message: `You are logged in as ${user.username}`,
+            user
+          });
+        }
+        next();
+      }).catch((err)=>{
+        console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
+        res.status(400).json({
+          message: `Couldn't find or create user ${decoded['cognito:username']}`,
+          debug : err
+        });
+        next();
+      });
+    }
+
   });
 });
 
