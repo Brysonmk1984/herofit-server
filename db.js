@@ -7,14 +7,15 @@ const UserTotalModel = require('./models/userTotal.js');
 let db;
 let dbUrl;
 let sequelizeSettings;
+console.log(process.env.NODE_ENV);
 // PRODUCTION or Locally running backend through PROXY
-if(process.env.NODE_ENV === 'production'){
+if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
   sequelizeSettings = {
     dialect: 'postgres',
     protocol: 'postgres',
     timezone: 'utc',
     operatorsAliases: false,
-        //host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
+    host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {
       max: 5,
       min: 0,
@@ -22,8 +23,9 @@ if(process.env.NODE_ENV === 'production'){
       idle: 10000
     }
   }
-  dbUrl = process.env.DATABASE_URL;
-// DEVELOPMENT
+  dbUrl = "postgres://obaaqsoomtxodz:4e224740983ccbba758836f6a0bcc47467f7e4edcb347869a8e2028f9f92777c@ec2-52-204-20-42.compute-1.amazonaws.com:5432/ddo9unls7gumi4";
+
+  // DEVELOPMENT
 }else{
   sequelizeSettings = {
     host: 'localhost',
@@ -37,12 +39,11 @@ if(process.env.NODE_ENV === 'production'){
       idle: 10000
     }
   }
-  
   dbUrl = "postgres://admin:admin@localhost/stravatar";
 
 }
-db = new Sequelize(dbUrl, sequelizeSettings);
 
+db = new Sequelize(dbUrl, sequelizeSettings);
 db.sync();
 
 const User = UserModel(db, Sequelize);
