@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
-
+const AppMode = require('../appConfig').config.mode;
 
 router.post('/insert-avatar', function(req, res, next){
-  //console.log('INSERTING AV', req.body.avatar);
+  console.log('INSERTING AV', req.body.avatar);
+
+  if(AppMode === 'Alpha'){console.log('HAS PET');
+    req.body.avatar.items.push({type : 'pet', name: 'Alpha Dog', description: 'Reward for being an Alpha Tester'})
+  }
+
   Avatar.findOrCreate({
     where: {
       owner: req.body.owner
@@ -24,7 +29,9 @@ router.post('/insert-avatar', function(req, res, next){
   }).then((result) =>{
     const created = result[1];
     const avatar = result[0].dataValues;
-
+    avatar.items = JSON.parse(avatar.items);
+    avatar.elements = JSON.parse(avatar.elements);
+    avatar.skills = JSON.parse(avatar.skills);
     // New Avatar Created
     if(created){
       res.status(200).json({
@@ -129,6 +136,8 @@ router.post('/get-all-avatars', function(req, res, next){
   .then((results) =>{
       const avatars= results.map((result, i) =>{
         result.dataValues.elements = JSON.parse(result.dataValues.elements);
+        result.dataValues.items = JSON.parse(result.dataValues.items);
+        result.dataValues.skills = JSON.parse(result.dataValues.skills);
         return result.dataValues;
       });
 
