@@ -37,13 +37,15 @@ router.post('/insert-avatar', function(req, res, next){
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
-        avatar
+        avatar,
+        hasAvatar : true
       });
     // Updated Existing Avatar
     }else{
       res.status(200).json({
         message: `Existing Avatar updated belonging to owner ${avatar.owner}`,
-        avatarId : avatar.id
+        avatarId : avatar.id,
+        hasAvatar : true
       });
     }
     
@@ -93,8 +95,14 @@ router.post('/get-avatar', function(req, res, next){
   // next();
   Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
+    if(!result){
+      console.log('NO RESULTS! Sending user a 204');
+      res.status(204).json({
+        message: `No Avatar associated with user ${req.body.email}`
+      });
+      return;
+    }
     let elements = JSON.parse(result.dataValues.elements);
-    console.log(elements);
     elements.air = parseFloat(elements.air);
     elements.earth = parseFloat(elements.earth);
     elements.fire = parseFloat(elements.fire);

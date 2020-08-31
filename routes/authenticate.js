@@ -11,6 +11,15 @@ var key = jwkJson['keys'].find(key => {
 })
 var pem = jwkToPem(key);
 
+// GET COGNITO CLIENT ID
+router.get('/cognito-client-credentials', function(req, res, next){
+  res.status(200).json({
+    message: `Here are the Strava Client Credentials.`,
+    cognitoClientId: process.env.COGNITO_CLIENT_ID,
+  });
+  next();
+});
+
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
@@ -37,9 +46,7 @@ router.post('/signup-or-signin', function(req, res, next){
 
         // New user, created a new db
         if (created) {
-          user.preexisting = false;
           user = Object.assign({}, user, {
-            preexisting : false,
             clientId : process.env.STRAVA_CLIENT_ID, 
             redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
             clientSecret : process.env.STRAVA_CLIENT_SECRET,
@@ -54,8 +61,6 @@ router.post('/signup-or-signin', function(req, res, next){
           console.log('User already exists', user.createdAt);
           
           user = Object.assign({}, user, {
-            // !!!temp settings
-            preexisting : true,
             // !!!dont need these
             clientId : process.env.STRAVA_CLIENT_ID, 
             redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
