@@ -6,7 +6,7 @@ const AppMode = require('../appConfig').config.mode;
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
-  if(AppMode === 'Alpha'){console.log('HAS PET');
+  if(AppMode === 'alpha'){console.log('HAS PET');
     req.body.avatar.items.push({type : 'pet', name: 'Alpha Dog', description: 'Reward for being an Alpha Tester'})
   }
 

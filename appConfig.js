@@ -1,5 +1,5 @@
 const config = {
-  mode : 'Alpha'
+  mode : 'alpha'
 };
 
 module.exports = { config };

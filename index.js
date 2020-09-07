@@ -13,6 +13,7 @@ const fileUpload = require('express-fileupload');
 const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
 const userRoutes = require('./routes/user');
+const emailRoutes = require('./routes/email');
 
   // http server
 //app.listen( process.env.PORT || 3001, function () {
@@ -37,6 +38,7 @@ const userRoutes = require('./routes/user');
   app.use('/authenticate', authenticateRoutes);
   app.use('/avatar', avatarRoutes);
   app.use('/user', userRoutes);
+  app.use('/email', emailRoutes);
 //});
 module.exports = app;
 

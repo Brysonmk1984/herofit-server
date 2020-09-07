@@ -1,0 +1,74 @@
+const nodemailer = require('nodemailer');
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = false /*process.env.NODE_ENV === 'development'*/ ? 
+    nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+          user: 'vhrks3qs5lf6x3rg@ethereal.email',
+          pass: '1AAZg6Z86MYFBPPYwu'
+      }
+    })
+  :
+    nodemailer.createTransport({
+      host: 'mail.brysonkruk.com',
+      port: 465,
+      secure: true,
+      auth: {
+          user: 'info@ecoalliesofgaia.com',
+          pass: '***thebhpass***'
+      }
+    });
+
+
+const sendContactEmail = function(formData, resolve, reject){
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: formData.email,
+      to: 'bryson.kruk@protonmail.com',
+      subject: 'Ecoallies - A user submitted a form message.', 
+      text: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      html: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      console.log('Message sent: %s', info.messageId);
+      // Preview only available when sending through an Ethereal account
+      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+const sendSurveyEmail = function(formData, resolve, reject){
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: formData.email,
+      to: 'bryson.kruk@protonmail.com',
+      subject: 'Stravatar - A user submitted a survey!', 
+      text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      console.log(info);
+      // console.log('Message sent: %s', info.messageId);
+      // // Preview only available when sending through an Ethereal account
+      // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+
+module.exports = { sendContactEmail, sendSurveyEmail };
