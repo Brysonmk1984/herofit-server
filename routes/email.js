@@ -40,27 +40,26 @@ router.post('/survey-data', function(req, res, next){
       debug : error
     });
     next();
-  })
+  });
 });
 
 router.post('/contact-form', function(req, res, next){
   new Promise((resolve, reject) => {
     sendContactEmail({ email : req.body.email, message : req.body.message, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
-  }).then((data) =>{
-
+  }).then((data) =>{console.log('in response');
     res.json({
       success : true,
       requestType : 'POST',
       info : data
     });
     next();
-  }).catch((error) =>{
+  }).catch((error) =>{console.log('in error');
     res.status(401).json({
       message: `Email could not be sent`,
       debug : error
     });
     next();
-  })
+  });
 });
 
 module.exports = router;

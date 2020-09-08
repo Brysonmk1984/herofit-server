@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = process.env.NODE_ENV === 'development' ? 
+  let transporter = false ? 
     nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -47,7 +47,8 @@ const sendContactEmail = function(formData, resolve, reject){
 };
 
 const sendSurveyEmail = function(formData, resolve, reject){
-
+  console.log(1111);
+  console.log(formData, resolve, reject)
   // setup email data with unicode symbols
   let mailOptions = {
       from: 'info@stravatar.life',
@@ -56,12 +57,12 @@ const sendSurveyEmail = function(formData, resolve, reject){
       text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
       html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
   };
-
+  console.log(2222);
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
+  transporter.sendMail(mailOptions, (error, info) => {console.log(3333);
+      if (error) {console.log(44444);
         reject(console.log(error));
-      }
+      }console.log(555555);
       console.log(info);
       // console.log('Message sent: %s', info.messageId);
       // // Preview only available when sending through an Ethereal account
