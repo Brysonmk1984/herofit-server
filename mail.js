@@ -13,12 +13,12 @@ const nodemailer = require('nodemailer');
     })
   :
     nodemailer.createTransport({
-      host: 'mail.brysonkruk.com',
+      host: `${process.env.MAIL_PROVIDER}`,
       port: 465,
       secure: true,
       auth: {
-          user: 'info@ecoalliesofgaia.com',
-          pass: '***thebhpass***'
+          user: `${process.env.INFO_EMAIL}`,
+          pass: `${process.env.EMAIL_PASSWORD}`
       }
     });
 
@@ -28,7 +28,7 @@ const sendContactEmail = function(formData, resolve, reject){
   // setup email data with unicode symbols
   let mailOptions = {
       from: formData.email,
-      to: 'bryson.kruk@protonmail.com',
+      to: 'info@stravatar.life',
       subject: 'Ecoallies - A user submitted a form message.', 
       text: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
       html: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
@@ -50,8 +50,8 @@ const sendSurveyEmail = function(formData, resolve, reject){
 
   // setup email data with unicode symbols
   let mailOptions = {
-      from: formData.email,
-      to: 'bryson.kruk@protonmail.com',
+      from: 'info@stravatar.life',
+      to: 'info@stravatar.life',
       subject: 'Stravatar - A user submitted a survey!', 
       text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
       html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
