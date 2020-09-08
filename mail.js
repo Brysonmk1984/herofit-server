@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = process.env.NODE_ENV === 'development'? 
+  let transporter = process.env.NODE_ENV === 'development' ? 
     nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -29,9 +29,9 @@ const sendContactEmail = function(formData, resolve, reject){
   let mailOptions = {
       from: formData.email,
       to: 'info@stravatar.life',
-      subject: 'Ecoallies - A user submitted a form message.', 
-      text: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
-      html: `Someone has a question or comment about Eco Allies, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
+      subject: 'STRAVATAR - A user submitted a form message.', 
+      text: `Someone has a question or comment about STRAVATAR, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      html: `Someone has a question or comment about STRAVATAR, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
   };
 
   // send mail with defined transport object
