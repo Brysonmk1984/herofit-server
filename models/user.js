@@ -66,6 +66,10 @@ const UserModel = function(db, DataTypes){
           length : 40,
           allowNull: true
       },
+      featurePreferenceSubmitted : {
+        type : DataTypes.BOOLEAN,
+        allowNull: true
+    }
   });
 
       

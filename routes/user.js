@@ -1,16 +1,43 @@
 const express = require('express');
 const router = express.Router(); 
+const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
 const moment = require('moment');
-let m = moment();
 
 router.post('/insert-user-activities', function(req, res, next){
-  // Front end is determining which activities are new, so everything passed here can be added to db.
+  // Need latest Activity to be added to user's account
+  let latestActivityUpdate = null;
   const entries = req.body.activities.map((activity) =>{
+    const activityDate = moment.utc(activity.start_date);
+    // Check for latest activity (doesn't include DB activities)
+    if(latestActivityUpdate === null){
+      latestActivityUpdate = activity.start_date;
+    }else if( activityDate.isAfter(moment.utc(latestActivityUpdate)) ){
+      latestActivityUpdate = activity.start_date;
+
+    }
     return { user : req.body.email,  activity : JSON.stringify(activity), activityDate : activity.start_date };
   });
 
+  // Add latestActivityUpdate to DB for user
+  User.update(
+    {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
+    { where: { email: req.body.email } }
+  ).then(() => {
+    next();
+  }).catch((err)=>{
+    console.log(`Error updating latest activity to user table for user ${req.body.email} DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Error updating latest activity to user table for user  ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+
+
+
+  // Front end is determining which activities are new, so everything passed here can be added to db.
   UserActivity.bulkCreate(entries)
     .then((result) =>{
       console.log('INSERT USER ACTIVITIES',result);
