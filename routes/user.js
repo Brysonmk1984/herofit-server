@@ -25,20 +25,9 @@ router.post('/insert-user-activities', function(req, res, next){
     {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
     { where: { email: req.body.email } }
   ).then(() => {
-    next();
-  }).catch((err)=>{
-    console.log(`Error updating latest activity to user table for user ${req.body.email} DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Error updating latest activity to user table for user  ${req.body.email}`,
-      debug : err
-    });
-    next();
-  });
-
-
-
-  // Front end is determining which activities are new, so everything passed here can be added to db.
-  UserActivity.bulkCreate(entries)
+    console.log('ENTRIESS', entries);
+    // Front end is determining which activities are new, so everything passed here can be added to db.
+    UserActivity.bulkCreate(entries)
     .then((result) =>{
       console.log('INSERT USER ACTIVITIES',result);
       res.status(200).json({
@@ -54,6 +43,21 @@ router.post('/insert-user-activities', function(req, res, next){
       });
       next();
     });
+
+
+
+  }).catch((err)=>{
+    console.log(`Error updating latest activity to user table for user ${req.body.email} DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Error updating latest activity to user table for user  ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+
+
+
+
 });
 
 router.post('/get-user-activities', function(req, res, next){
@@ -74,7 +78,7 @@ router.post('/get-user-activities', function(req, res, next){
       const activities = results.map((result, i) =>{
         return JSON.parse(result.dataValues.activity);
       });
-
+      console.log('ACTSSS', activities);
       res.status(200).json({
         message: `Activities for user ${req.body.email}`,
         activities : activities,

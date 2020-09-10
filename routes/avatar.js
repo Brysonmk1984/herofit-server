@@ -23,15 +23,22 @@ router.post('/insert-avatar', function(req, res, next){
       power: req.body.avatar.power,
       health: req.body.avatar.health,
       skills: JSON.stringify(req.body.avatar.skills),
-      elements: JSON.stringify(req.body.avatar.elements),
       items: JSON.stringify(req.body.avatar.items),
+      fire : req.body.avatar.fire,
+      earth : req.body.avatar.earth,
+      air : req.body.avatar.air,
+      water : req.body.avatar.water
     }
   }).then((result) =>{
     const created = result[1];
     const avatar = result[0].dataValues;
     avatar.items = JSON.parse(avatar.items);
-    avatar.elements = JSON.parse(avatar.elements);
     avatar.skills = JSON.parse(avatar.skills);
+    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+    avatar.fire = JSON.parse(avatar.fire);
+    avatar.earth = JSON.parse(avatar.earth);
+    avatar.air = JSON.parse(avatar.air);
+    avatar.water = JSON.parse(avatar.water);
     // New Avatar Created
     if(created){
       res.status(200).json({
@@ -66,8 +73,11 @@ router.post('/update-avatar', function(req, res, next){
     power : req.body.avatar.power,
     health : req.body.avatar.health,
     skills: JSON.stringify(req.body.avatar.skills),
-    elements: JSON.stringify(req.body.avatar.elements),
     items: JSON.stringify(req.body.avatar.items),
+    fire : req.body.avatar.fire,
+    earth : req.body.avatar.earth,
+    air : req.body.avatar.air,
+    water : req.body.avatar.water,
     hasBeenUpgraded : req.body.avatar.hasBeenUpgraded
     },
     { where: { owner: req.body.email } }
@@ -88,11 +98,6 @@ router.post('/update-avatar', function(req, res, next){
 });
 
 router.post('/get-avatar', function(req, res, next){
-  // res.status(400).json({
-  //   message: `Couldn't get Avatar for user , ERROR MESSAGE: `,
-  //   debug: 'CAKE'
-  // });
-  // next();
   Avatar.findOne({ where: { owner: req.body.email } })
   .then((result) =>{
     if(!result){
@@ -102,25 +107,23 @@ router.post('/get-avatar', function(req, res, next){
       });
       return;
     }
-    let elements = JSON.parse(result.dataValues.elements);
-    elements.air = parseFloat(elements.air);
-    elements.earth = parseFloat(elements.earth);
-    elements.fire = parseFloat(elements.fire);
-    elements.water = parseFloat(elements.water);
 
     const avatar = Object.assign({}, { 
       name: result.dataValues.name,
       character: result.dataValues.character,
       power: result.dataValues.power,
       health: result.dataValues.health,
+      fire : JSON.parse(result.dataValues.fire),
+      earth : JSON.parse(result.dataValues.earth),
+      air : JSON.parse(result.dataValues.air),
+      water : JSON.parse(result.dataValues.water),
       skills : JSON.parse(result.dataValues.skills),
-      elements,
       items : JSON.parse(result.dataValues.items),
       hasBeenUpgraded : result.dataValues.hasBeenUpgraded,
       ownerUsername : result.dataValues.ownerUsername,
       updatedAt : result.dataValues.updatedAt,
       createdAt : result.dataValues.createdAt
-    });
+    });console.log('AVATAR', avatar);
     res.status(200).json({
       message: `Found matching Avatar`,
       avatar
@@ -143,7 +146,6 @@ router.post('/get-all-avatars', function(req, res, next){
   Avatar.findAll()
   .then((results) =>{
       const avatars= results.map((result, i) =>{
-        result.dataValues.elements = JSON.parse(result.dataValues.elements);
         result.dataValues.items = JSON.parse(result.dataValues.items);
         result.dataValues.skills = JSON.parse(result.dataValues.skills);
         return result.dataValues;

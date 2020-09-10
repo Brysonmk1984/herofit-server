@@ -65,10 +65,33 @@ const AvatarModel = function(db, DataTypes){
           length : 250,
           allowNull: true
       },
-      elements: {
-        type: DataTypes.CHAR,
-        length : 100,
-        allowNull: true
+      fire: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      earth: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      air: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      water: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
       },
       items: {
         type: DataTypes.CHAR,
