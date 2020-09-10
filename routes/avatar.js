@@ -148,6 +148,10 @@ router.post('/get-all-avatars', function(req, res, next){
       const avatars= results.map((result, i) =>{
         result.dataValues.items = JSON.parse(result.dataValues.items);
         result.dataValues.skills = JSON.parse(result.dataValues.skills);
+        result.dataValues.fire = JSON.parse(result.dataValues.fire);
+        result.dataValues.earth = JSON.parse(result.dataValues.earth);
+        result.dataValues.air = JSON.parse(result.dataValues.air);
+        result.dataValues.water = JSON.parse(result.dataValues.water);
         return result.dataValues;
       });
 
