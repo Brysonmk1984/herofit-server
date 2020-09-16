@@ -28,10 +28,10 @@ const sendContactEmail = function(formData, resolve, reject){
   // setup email data with unicode symbols
   let mailOptions = {
       from: formData.email,
-      to: 'info@stravatar.life',
-      subject: 'STRAVATAR - A user submitted a form message.', 
-      text: `Someone has a question or comment about STRAVATAR, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
-      html: `Someone has a question or comment about STRAVATAR, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
+      to: `${process.env.INFO_EMAIL}`,
+      subject: 'HEROFIT - A user submitted a form message.', 
+      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      html: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
   };
 
   // send mail with defined transport object
@@ -49,9 +49,9 @@ const sendContactEmail = function(formData, resolve, reject){
 const sendSurveyEmail = function(formData, resolve, reject){
   // setup email data with unicode symbols
   let mailOptions = {
-      from: 'info@stravatar.life',
-      to: 'info@stravatar.life',
-      subject: 'Stravatar - A user submitted a survey!', 
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: 'HEROFIT - A user submitted a survey!', 
       text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
       html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
   };
