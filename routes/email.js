@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../db').User;
 const sendSurveyEmail = require('../mail.js').sendSurveyEmail;
 const sendContactEmail = require('../mail.js').sendContactEmail;
+const sendAppErrorEmail = require('../mail.js').sendAppErrorEmail;
 
 router.post('/survey-data', function(req, res, next){
   let surveyData = JSON.parse(req.body.surveyData);
@@ -61,5 +62,26 @@ router.post('/contact-form', function(req, res, next){
     next();
   });
 });
+
+router.post('/app-error', function(req, res, next){
+  new Promise((resolve, reject) => {
+    sendAppErrorEmail({ status : req.body.status, message : req.body.message, debug : req.body.debug, version : req.body.version, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+  }).then((data) =>{
+    res.json({
+      success : true,
+      requestType : 'POST',
+      info : data
+    });
+    next();
+  }).catch((error) =>{
+    res.status(401).json({
+      message: `Email could not be sent`,
+      debug : error
+    });
+    next();
+  });
+});
+
+
 
 module.exports = router;

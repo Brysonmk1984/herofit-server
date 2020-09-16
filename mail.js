@@ -69,5 +69,24 @@ const sendSurveyEmail = function(formData, resolve, reject){
   });
 };
 
+const sendAppErrorEmail = function(formData, resolve, reject){
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HEROFIT - ${formData.status} APPLICATION ERROR - version ${formData.version}`, 
+      text: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
+      html: `<div>An Error occured in HeroFit Production - ${formData.status}:  ${formData.message}</div><br /><br /> <p>${formData.debug}</p><br/><br/> <div>APP VERSION: ${formData.version}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+  };
 
-module.exports = { sendContactEmail, sendSurveyEmail };
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+
+module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail };
