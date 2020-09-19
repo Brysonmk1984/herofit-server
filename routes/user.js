@@ -25,7 +25,7 @@ router.post('/insert-user-activities', function(req, res, next){
     {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
     { where: { email: req.body.email } }
   ).then(() => {
-    console.log('ENTRIESS', entries);
+
     // Front end is determining which activities are new, so everything passed here can be added to db.
     UserActivity.bulkCreate(entries)
     .then((result) =>{
@@ -78,7 +78,6 @@ router.post('/get-user-activities', function(req, res, next){
       const activities = results.map((result, i) =>{
         return JSON.parse(result.dataValues.activity);
       });
-      console.log('ACTSSS', activities);
       res.status(200).json({
         message: `Activities for user ${req.body.email}`,
         activities : activities,

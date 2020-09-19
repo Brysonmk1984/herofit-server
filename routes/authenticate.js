@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const User = require('../db').User;
-
+const moment = require('moment');
 var jwt = require('jsonwebtoken');
 var jwkToPem = require('jwk-to-pem');
 var jwkJson =  require('../jwk.json');
@@ -16,73 +16,90 @@ router.get('/cognito-client-credentials', function(req, res, next){
   res.status(200).json({
     message: `Here are the Strava Client Credentials.`,
     cognitoClientId: process.env.COGNITO_CLIENT_ID,
+    cognitoUserPoolId: process.env.COGNITO_USER_POOL_ID,
   });
   next();
 });
 
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
+
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
     if(err){
       res.status(401).json({
-        message: `Token no longer valid`,
+        message: `Token failed validation, see debug for error description`,
         debug : err
       });
       next();
     }else{
-      User.findOrCreate({
-        where: {
-          email: decoded.email
-        },
-        // set the default properties if it doesn't exist
-        defaults: { 
-          email: decoded.email,
-          username : decoded['cognito:username'],
-        }
-      }).then(function(result) {
-        const created = result[1];
-        let user = result[0].dataValues;
-        console.log('USERNAMEE', user.username);
-
-        // New user, created a new db
-        if (created) {
-          user = Object.assign({}, user, {
-            clientId : process.env.STRAVA_CLIENT_ID, 
-            redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-            clientSecret : process.env.STRAVA_CLIENT_SECRET,
-
-          });
-          res.status(200).json({
-            message: `You are logged in as ${user.username}`,
-            user
-          });
-        // User already exists, return data from db
-        }else{
-          console.log('User already exists', user.createdAt);
-          
-          user = Object.assign({}, user, {
-            // !!!dont need these
-            clientId : process.env.STRAVA_CLIENT_ID, 
-            redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-            clientSecret : process.env.STRAVA_CLIENT_SECRET,
-
-          });
-          res.status(200).json({
-            message: `You are logged in as ${user.username}`,
-            user
-          });
-        }
-        next();
-      }).catch((err)=>{
-        console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
-        res.status(400).json({
-          message: `Couldn't find or create user ${decoded['cognito:username']}`,
-          debug : err
+      // TOKEN has Expired
+      if (Date.now() >= decoded.exp * 1000) {
+        res.status(401).json({
+          message: `COGNITO TOKEN EXPIRED`,
+          debug : `Token Expiration: ${moment.utc(decoded.exp)}, Evaluation Date: ${moment.utc(Date.now())}`
         });
         next();
-      });
+      // AUDIENCE in token different from Client ID
+      }else if(decoded.aud !== process.env.COGNITO_CLIENT_ID){
+        res.status(401).json({
+          message: `AUD / CLIENT ID MISMATCH`,
+          debug : `AUD : ${decoded.aud}, CLIENT ID: ${process.env.COGNITO_CLIENT_ID}`
+        });
+      // TOKEN IS LEGIT
+      }else{
+        User.findOrCreate({
+          where: {
+            email: decoded.email
+          },
+          // set the default properties if it doesn't exist
+          defaults: { 
+            email: decoded.email,
+            username : decoded['cognito:username'],
+          }
+        }).then(function(result) {
+          const created = result[1];
+          let user = result[0].dataValues;
+          console.log('USERNAMEE', user.username);
+  
+          // New user, created a new db
+          if (created) {
+            user = Object.assign({}, user, {
+              clientId : process.env.STRAVA_CLIENT_ID, 
+              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+              clientSecret : process.env.STRAVA_CLIENT_SECRET,
+  
+            });
+            res.status(200).json({
+              message: `You are logged in as ${user.username}`,
+              user
+            });
+          // User already exists, return data from db
+          }else{
+            console.log('User already exists', user.createdAt);
+            
+            user = Object.assign({}, user, {
+              // !!!dont need these
+              clientId : process.env.STRAVA_CLIENT_ID, 
+              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+              clientSecret : process.env.STRAVA_CLIENT_SECRET,
+  
+            });
+            res.status(200).json({
+              message: `You are logged in as ${user.username}`,
+              user
+            });
+          }
+          next();
+        }).catch((err)=>{
+          console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
+          res.status(400).json({
+            message: `Couldn't find or create user ${decoded['cognito:username']}`,
+            debug : err
+          });
+          next();
+        });
+      }
     }
-
   });
 });
 
