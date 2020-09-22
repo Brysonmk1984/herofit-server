@@ -7,7 +7,7 @@ router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
   if(AppMode === 'alpha'){console.log('HAS PET');
-    req.body.avatar.items.push({type : 'pet', name: 'Alpha Dog', description: 'Reward for being an Alpha Tester'})
+    req.body.avatar.pets.push({type : 'passive', name: 'Alpha Dog', description: 'Reward for being an Alpha Tester'})
   }
 
   Avatar.findOrCreate({
@@ -24,6 +24,8 @@ router.post('/insert-avatar', function(req, res, next){
       health: req.body.avatar.health,
       skills: JSON.stringify(req.body.avatar.skills),
       items: JSON.stringify(req.body.avatar.items),
+      titles: JSON.stringify(req.body.avatar.titles),
+      pets: JSON.stringify(req.body.avatar.pets),
       fire : req.body.avatar.fire,
       earth : req.body.avatar.earth,
       air : req.body.avatar.air,
@@ -34,6 +36,8 @@ router.post('/insert-avatar', function(req, res, next){
     const avatar = result[0].dataValues;
     avatar.items = JSON.parse(avatar.items);
     avatar.skills = JSON.parse(avatar.skills);
+    avatar.titles = JSON.parse(avatar.titles);
+    avatar.pets = JSON.parse(avatar.pets);
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar.fire = JSON.parse(avatar.fire);
     avatar.earth = JSON.parse(avatar.earth);
@@ -74,6 +78,8 @@ router.post('/update-avatar', function(req, res, next){
     health : req.body.avatar.health,
     skills: JSON.stringify(req.body.avatar.skills),
     items: JSON.stringify(req.body.avatar.items),
+    titles: JSON.stringify(req.body.avatar.titles),
+    pets: JSON.stringify(req.body.avatar.pets),
     fire : req.body.avatar.fire,
     earth : req.body.avatar.earth,
     air : req.body.avatar.air,
@@ -119,6 +125,8 @@ router.post('/get-avatar', function(req, res, next){
       water : JSON.parse(result.dataValues.water),
       skills : JSON.parse(result.dataValues.skills),
       items : JSON.parse(result.dataValues.items),
+      titles : JSON.parse(result.dataValues.titles),
+      pets : JSON.parse(result.dataValues.pets),
       hasBeenUpgraded : result.dataValues.hasBeenUpgraded,
       ownerUsername : result.dataValues.ownerUsername,
       updatedAt : result.dataValues.updatedAt,
@@ -148,6 +156,8 @@ router.post('/get-all-avatars', function(req, res, next){
       const avatars= results.map((result, i) =>{
         result.dataValues.items = JSON.parse(result.dataValues.items);
         result.dataValues.skills = JSON.parse(result.dataValues.skills);
+        result.dataValues.titles = JSON.parse(result.dataValues.titles);
+        result.dataValues.pets = JSON.parse(result.dataValues.pets);
         result.dataValues.fire = JSON.parse(result.dataValues.fire);
         result.dataValues.earth = JSON.parse(result.dataValues.earth);
         result.dataValues.air = JSON.parse(result.dataValues.air);

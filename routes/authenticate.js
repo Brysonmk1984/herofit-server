@@ -11,16 +11,6 @@ var key = jwkJson['keys'].find(key => {
 })
 var pem = jwkToPem(key);
 
-// GET COGNITO CLIENT ID
-router.get('/cognito-client-credentials', function(req, res, next){
-  res.status(200).json({
-    message: `Here are the Strava Client Credentials.`,
-    cognitoClientId: process.env.COGNITO_CLIENT_ID,
-    cognitoUserPoolId: process.env.COGNITO_USER_POOL_ID,
-  });
-  next();
-});
-
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
 
@@ -47,6 +37,18 @@ router.post('/signup-or-signin', function(req, res, next){
         });
       // TOKEN IS LEGIT
       }else{
+        console.log('DECODED', decoded);
+        let username;
+        // Must have unique username, low priority bug possible here.
+        if(decoded['custom:first_name']){
+          username = decoded['custom:first_name'];
+          if(decoded['custom:last_name']){
+            username += ` ${decoded['custom:last_name']}`;
+          }
+        }else{
+          username = decoded['cognito:username'];
+        }
+
         User.findOrCreate({
           where: {
             email: decoded.email
@@ -54,7 +56,9 @@ router.post('/signup-or-signin', function(req, res, next){
           // set the default properties if it doesn't exist
           defaults: { 
             email: decoded.email,
-            username : decoded['cognito:username'],
+            username : username,
+            firstName : decoded['custom:first_name'] || null,
+            lastName : decoded['custom:last_name'] || null
           }
         }).then(function(result) {
           const created = result[1];
@@ -91,9 +95,9 @@ router.post('/signup-or-signin', function(req, res, next){
           }
           next();
         }).catch((err)=>{
-          console.log(`Couldn't find or create user ${decoded['cognito:username']}, DEBUG: ${err}`);
+          console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${err}`);
           res.status(400).json({
-            message: `Couldn't find or create user ${decoded['cognito:username']}`,
+            message: `Couldn't find or create user ${decoded.email}`,
             debug : err
           });
           next();

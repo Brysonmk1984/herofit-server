@@ -13,12 +13,9 @@ const UserModel = function(db, DataTypes){
           allowNull: false
       },
       username : {
-          type : DataTypes.STRING,
-          unique : true,
-          validate : {
-              notEmpty :true,
-          }
-      },
+        type : DataTypes.STRING,
+        allowNull: true,
+        },
       email : {
           type : DataTypes.STRING,
           unique : true,
@@ -48,6 +45,14 @@ const UserModel = function(db, DataTypes){
               }
           }
       },
+      firstName : {
+            type : DataTypes.STRING,
+            allowNull: true,
+        },
+        lastName : {
+            type : DataTypes.STRING,
+            allowNull: true,
+        },
       latestActivityUpdate : {
           type : DataTypes.TIME,
           allowNull: true

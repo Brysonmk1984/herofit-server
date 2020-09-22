@@ -32,16 +32,14 @@ const AvatarModel = function(db, DataTypes){
           allowNull: false
       },
       name : {
-        type : DataTypes.CHAR,
+        type : DataTypes.STRING,
         unique : true,
-        length : 40,
         validate : {
             notEmpty :true,
         }
       },
       character : {
-        type : DataTypes.CHAR,
-        length : 40,
+        type : DataTypes.STRING,
         validate : {
             notEmpty :true,
         }
@@ -62,7 +60,6 @@ const AvatarModel = function(db, DataTypes){
       },
       skills: {
           type: DataTypes.CHAR,
-          length : 250,
           allowNull: true
       },
       fire: {
@@ -95,7 +92,14 @@ const AvatarModel = function(db, DataTypes){
       },
       items: {
         type: DataTypes.CHAR,
-        length : 250,
+        allowNull: true
+      },
+      titles: {
+        type: DataTypes.CHAR,
+        allowNull: true
+      },
+      pets: {
+        type: DataTypes.CHAR,
         allowNull: true
       },
   });
