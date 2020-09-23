@@ -85,6 +85,8 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   if(adminData){
     html += `<br/><br/>`;
     html += `<div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`;
+  }else{
+    html += `<br/><br/><p>User not logged in.</p>`;
   }
   html += `<br/><br/><div>APP VERSION: ${formData.version}</div>`;
 
