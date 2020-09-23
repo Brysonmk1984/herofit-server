@@ -70,13 +70,32 @@ const sendSurveyEmail = function(formData, resolve, reject){
 };
 
 const sendAppErrorEmail = function(formData, resolve, reject){
+  const adminData = formData.admin;
+  const debug = formData.debug;
+
+  let html = `<div>An Error occured in HeroFit Production - `;
+  // error status and message
+  html += `${formData.status}:  ${formData.message}`;
+  
+  if(debug){
+    html += `<br/><br/>`;
+    html += `<br/><br/><p>` + formData.debug + `</p>`;
+  }
+
+  if(adminData){
+    html += `<br/><br/>`;
+    html += `<div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`;
+  }
+  html += `<br/><br/><div>APP VERSION: ${formData.version}</div>`;
+
+
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${formData.status} APPLICATION ERROR - version ${formData.version}`, 
       text: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
-      html: `<div>An Error occured in HeroFit Production - ${formData.status}:  ${formData.message}</div><br /><br /> <p>${formData.debug}</p><br/><br/> <div>APP VERSION: ${formData.version}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+      html
   };
 
   // send mail with defined transport object
