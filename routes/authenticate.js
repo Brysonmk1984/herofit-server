@@ -63,7 +63,6 @@ router.post('/signup-or-signin', function(req, res, next){
         }).then(function(result) {
           const created = result[1];
           let user = result[0].dataValues;
-          console.log('USERNAMEE', user.username);
   
           // New user, created a new db
           if (created) {
@@ -94,14 +93,42 @@ router.post('/signup-or-signin', function(req, res, next){
             });
           }
           next();
-        }).catch((err)=>{
-          console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${err}`);
-          res.status(400).json({
-            message: `Couldn't find or create user ${decoded.email}`,
-            debug : err
-          });
-          next();
-        });
+        }).catch((error)=>{
+          // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
+          if(error && error.original.code === '23505'){
+            User.create({
+                email: decoded.email,
+                username : `${decoded['custom:first_name']} ${decoded['custom:last_name']} - ${moment().format("MM DD, YYYY")}`,
+                firstName : decoded['custom:first_name'] || null,
+                lastName : decoded['custom:last_name'] || null
+            })
+            .then((result) =>{
+              let user = result.dataValues;
+                user = Object.assign({}, user, {
+                  clientId : process.env.STRAVA_CLIENT_ID, 
+                  redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+                  clientSecret : process.env.STRAVA_CLIENT_SECRET,
+                });
+                res.status(200).json({
+                  message: `You are logged in as ${user.username}`,
+                  user
+                });
+            })
+            .catch((error) =>{console.log('error', error);
+              res.status(400).json({
+                message: `Couldn't find or create user, but second attempt in catch ${decoded.email}`,
+                debug : error
+              });
+            })
+          }else{
+            console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
+            res.status(400).json({
+              message: `Couldn't find or create user ${decoded.email}`,
+              debug : error
+            });
+            next();
+          }
+        })
       }
     }
   });
