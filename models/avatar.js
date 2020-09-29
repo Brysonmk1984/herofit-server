@@ -58,6 +58,7 @@ const AvatarModel = function(db, DataTypes){
             notEmpty :true,
         }
       },
+      
       skills: {
           type: DataTypes.CHAR,
           allowNull: true
@@ -87,6 +88,30 @@ const AvatarModel = function(db, DataTypes){
         type: DataTypes.NUMERIC,
         precision : 7,
         scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      armor: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      recovery: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      xp: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
