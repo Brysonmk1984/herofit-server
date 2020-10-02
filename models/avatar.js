@@ -105,12 +105,57 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
+      qpFire: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpEarth: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpWater: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpAir: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpRecovery: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpArmor: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpPower: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpItems: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       qp: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
-      xp: {
+      activityXP: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      battleXP: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,

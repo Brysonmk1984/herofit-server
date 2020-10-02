@@ -29,7 +29,20 @@ router.post('/insert-avatar', function(req, res, next){
       fire : req.body.avatar.fire,
       earth : req.body.avatar.earth,
       air : req.body.avatar.air,
-      water : req.body.avatar.water
+      water : req.body.avatar.water,
+      recovery : req.body.avatar.recovery,
+      armor : req.body.avatar.armor,
+      activityXP : req.body.avatar.activityXP,
+      battleXP : req.body.avatar.battleXP,
+      qp : req.body.avatar.qp,
+      qpFire : req.body.avatar.qpFire,
+      qpEarth : req.body.avatar.qpEarth,
+      qpWater : req.body.avatar.qpWater,
+      qpAir : req.body.avatar.qpAir,
+      qpRecovery : req.body.avatar.qpRecovery,
+      qpPower : req.body.avatar.qpPower,
+      qpArmor : req.body.avatar.qpArmor,
+      qpItems : req.body.avatar.qpItems,
     }
   }).then((result) =>{
     const created = result[1];
@@ -43,6 +56,8 @@ router.post('/insert-avatar', function(req, res, next){
     avatar.earth = JSON.parse(avatar.earth);
     avatar.air = JSON.parse(avatar.air);
     avatar.water = JSON.parse(avatar.water);
+    avatar.recovery = JSON.parse(avatar.recovery);
+    avatar.armor = JSON.parse(avatar.armor);
     // New Avatar Created
     if(created){
       res.status(200).json({
@@ -74,17 +89,30 @@ router.post('/insert-avatar', function(req, res, next){
 router.post('/update-avatar', function(req, res, next){
   Avatar.update(
     {
-    power : req.body.avatar.power,
-    health : req.body.avatar.health,
-    skills: JSON.stringify(req.body.avatar.skills),
-    items: JSON.stringify(req.body.avatar.items),
-    titles: JSON.stringify(req.body.avatar.titles),
-    pets: JSON.stringify(req.body.avatar.pets),
-    fire : req.body.avatar.fire,
-    earth : req.body.avatar.earth,
-    air : req.body.avatar.air,
-    water : req.body.avatar.water,
-    hasBeenUpgraded : req.body.avatar.hasBeenUpgraded
+      power : req.body.avatar.power,
+      health : req.body.avatar.health,
+      skills: JSON.stringify(req.body.avatar.skills),
+      items: JSON.stringify(req.body.avatar.items),
+      titles: JSON.stringify(req.body.avatar.titles),
+      pets: JSON.stringify(req.body.avatar.pets),
+      fire : req.body.avatar.fire,
+      earth : req.body.avatar.earth,
+      air : req.body.avatar.air,
+      water : req.body.avatar.water,
+      recovery : req.body.avatar.recovery,
+      armor : req.body.avatar.armor,
+      hasBeenUpgraded : req.body.avatar.hasBeenUpgraded,
+      activityXP : req.body.avatar.activityXP,
+      battleXP : req.body.avatar.battleXP,
+      qp : req.body.avatar.qp,
+      qpRecovery : req.body.avatar.qpRecovery,
+      qpArmor : req.body.avatar.qpArmor,
+      qpPower : req.body.avatar.qpPower,
+      qpItems : req.body.avatar.qpItems,
+      qpFire : req.body.avatar.qpFire,
+      qpEarth : req.body.avatar.qpEarth,
+      qpWater : req.body.avatar.qpWater,
+      qpAir : req.body.avatar.qpAir,
     },
     { where: { owner: req.body.email } }
   )
@@ -127,6 +155,19 @@ router.post('/get-avatar', function(req, res, next){
       items : JSON.parse(result.dataValues.items),
       titles : JSON.parse(result.dataValues.titles),
       pets : JSON.parse(result.dataValues.pets),
+      recovery : JSON.parse(result.dataValues.recovery),
+      armor : JSON.parse(result.dataValues.armor),
+      qp: result.dataValues.qp,
+      qpRecovery : result.dataValues.qpRecovery,
+      qpArmor : result.dataValues.qpArmor,
+      qpPower : result.dataValues.qpPower,
+      qpItems : result.dataValues.qpItems,
+      qpFire : result.dataValues.qpFire,
+      qpEarth : result.dataValues.qpEarth,
+      qpWater : result.dataValues.qpWater,
+      qpAir : result.dataValues.qpAir,
+      activityXP: result.dataValues.activityXP,
+      battleXP: result.dataValues.battleXP,
       hasBeenUpgraded : result.dataValues.hasBeenUpgraded,
       ownerUsername : result.dataValues.ownerUsername,
       updatedAt : result.dataValues.updatedAt,
