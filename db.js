@@ -44,6 +44,8 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
 
 }
 
+
+
 db = new Sequelize(dbUrl, sequelizeSettings);
 db.sync();
 

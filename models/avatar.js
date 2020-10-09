@@ -1,5 +1,3 @@
-
-
 const AvatarModel = function(db, DataTypes){
   const Avatar = db.define('avatars', {
       id: {
@@ -11,6 +9,9 @@ const AvatarModel = function(db, DataTypes){
           type: DataTypes.TIME,
           defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
           allowNull: false
+      },
+      isFake : {
+        type : DataTypes.BOOLEAN,
       },
       owner : {
           type : DataTypes.STRING,

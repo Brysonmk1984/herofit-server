@@ -14,6 +14,7 @@ const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
 const userRoutes = require('./routes/user');
 const emailRoutes = require('./routes/email');
+const mockDataRoutes = require('./routes/mockData');
 
   // http server
 //app.listen( process.env.PORT || 3001, function () {
@@ -39,6 +40,7 @@ const emailRoutes = require('./routes/email');
   app.use('/avatar', avatarRoutes);
   app.use('/user', userRoutes);
   app.use('/email', emailRoutes);
+  app.use('/mock-data', mockDataRoutes);
 //});
 module.exports = app;
 

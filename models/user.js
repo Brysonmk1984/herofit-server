@@ -30,6 +30,9 @@ const UserModel = function(db, DataTypes){
             type : DataTypes.STRING,
             allowNull: true,
         },
+    isFake : {
+        type : DataTypes.BOOLEAN,
+        },
       latestActivityUpdate : {
           type : DataTypes.TIME,
           allowNull: true
