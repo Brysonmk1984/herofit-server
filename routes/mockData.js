@@ -320,20 +320,30 @@ router.post('/insert-random-avatar', function(req,res,next){
   // Elemental bonus
   randomHero[elmRandom] += 5;
 
-  // Randomly spend QP
 
   const attrArray = ['Power','Recovery','Armor','Fire', 'Earth', 'Water', 'Air'];
-  const randomSpentQpNum = shuffleArray([1,2,3,4,5,6,7,8,9,10,0,0,0,0])[0];
+  const spendQPArray = [1,2,3,4,5,6,7,8,9,10,0,0,0,0,0,0,0,0,0,0];
 
+  // Set random starting xp
+  randomHero.activityXP = Math.floor(Math.random() * (370 - 0));
+  const isLevel = randomHero.activityXP < 228 ? 2 : randomHero.activityXP < 370 ? 3 : 1;
+  if(isLevel === 2){
+    spendQPArray.push(11,12,13,14,15);
+  }else if(isLevel === 3){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20);
+  }
+  
+  // Randomly spend QP
+  const randomSpentQpNum = shuffleArray(spendQPArray)[0];
   for(let i = 0; i < randomSpentQpNum; i++){
     const attr = shuffleArray(attrArray)[0];
     randomHero[attr.toLowerCase()] += 1;
     randomHero[`qp${attr}`] += 1;
   }
 
-  if(AppMode === 'beta'){
+  //if(AppMode === 'beta'){
     randomHero.pets.push({type : 'passive', name: 'Beta Fish', description: 'Reward for being an Beta Tester'});
-  }
+  //}
 
   console.log('INSERTING AV', randomHero);
 
