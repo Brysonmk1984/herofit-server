@@ -302,6 +302,7 @@ router.post('/insert-random-avatar', function(req,res,next){
     character : selection.character,
     power : 100,
     health : 100,
+    maxHealth : 100,
     skills : [],
     items : [],
     pets : [],
@@ -315,7 +316,7 @@ router.post('/insert-random-avatar', function(req,res,next){
     activityXP : 0,
     battleXP : 0,
     qp : 0,
-    qpRecovery : 0,qpArmor : 0,qpPower : 0,qpItems : 0,qpFire : 0,qpEarth : 0,qpWater : 0,qpAir : 0,
+    qpRecovery : 0,qpArmor : 0,qpPower : 0,qpItems : 0,qpFire : 0,qpEarth : 0,qpWater : 0,qpAir : 0, qpHealth : 0,
   };
   // Elemental bonus
   randomHero[elmRandom] += 5;

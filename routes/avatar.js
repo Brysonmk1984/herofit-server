@@ -91,6 +91,7 @@ router.post('/update-avatar', function(req, res, next){
     {
       power : req.body.avatar.power,
       health : req.body.avatar.health,
+      maxHealth : req.body.avatar.maxHealth,
       skills: JSON.stringify(req.body.avatar.skills),
       items: JSON.stringify(req.body.avatar.items),
       titles: JSON.stringify(req.body.avatar.titles),
@@ -113,6 +114,7 @@ router.post('/update-avatar', function(req, res, next){
       qpEarth : req.body.avatar.qpEarth,
       qpWater : req.body.avatar.qpWater,
       qpAir : req.body.avatar.qpAir,
+      qpHealth : req.body.avatar.qpHealth,
     },
     { where: { owner: req.body.email } }
   )
@@ -147,6 +149,7 @@ router.post('/get-avatar', function(req, res, next){
       character: result.dataValues.character,
       power: result.dataValues.power,
       health: result.dataValues.health,
+      maxHealth: result.dataValues.maxHealth,
       fire : JSON.parse(result.dataValues.fire),
       earth : JSON.parse(result.dataValues.earth),
       air : JSON.parse(result.dataValues.air),
@@ -158,6 +161,7 @@ router.post('/get-avatar', function(req, res, next){
       recovery : JSON.parse(result.dataValues.recovery),
       armor : JSON.parse(result.dataValues.armor),
       qp: result.dataValues.qp,
+      qpHealth : result.dataValues.qpHealth,
       qpRecovery : result.dataValues.qpRecovery,
       qpArmor : result.dataValues.qpArmor,
       qpPower : result.dataValues.qpPower,

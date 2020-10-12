@@ -72,6 +72,10 @@ const UserTotalModel = function(db, DataTypes){
         type: DataTypes.TEXT,
         allowNull: true
       },
+      workout: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      },
   }, {timestamps: false});
 
       

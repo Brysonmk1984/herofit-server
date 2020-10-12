@@ -59,7 +59,11 @@ const AvatarModel = function(db, DataTypes){
             notEmpty :true,
         }
       },
-      
+      maxHealth: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 100,
+      },
       skills: {
           type: DataTypes.CHAR,
           allowNull: true
@@ -142,6 +146,11 @@ const AvatarModel = function(db, DataTypes){
         defaultValue: 0,
       },
       qpItems: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpHealth: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
