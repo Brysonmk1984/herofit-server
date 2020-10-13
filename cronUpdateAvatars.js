@@ -52,6 +52,6 @@ new Promise((resolve, reject) =>{
   return sendTestEmail(resolve, reject);
 }).then((data) =>{
   console.log(data);
-}).error((error) =>{
+}).catch((error) =>{
   console.log(error);
 });
