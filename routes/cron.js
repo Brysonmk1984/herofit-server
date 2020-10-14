@@ -5,7 +5,7 @@ const db = require('../db').db;
 const { col } = require("sequelize");
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const GAME_CONST = require('../gameConstants');
+const { REGENERATION_RATE } = require('../gameConstants');
 const { sendAppErrorEmail } = require('../mail');
 
 router.get('/regenerate-health', function(req, res, next){
@@ -19,10 +19,10 @@ router.get('/regenerate-health', function(req, res, next){
       let h = result.health;
       const mH = result.maxHealth;
 
-      if((h + GAME_CONST.REGENERATION_RATE) > mH){
+      if((h + REGENERATION_RATE) > mH){
         result.health = mH;
       }else{
-        result.health += GAME_CONST.REGENERATION_RATE;
+        result.health += REGENERATION_RATE;
       }
 
       console.log(`updating Avatar health - ${result.name}`);

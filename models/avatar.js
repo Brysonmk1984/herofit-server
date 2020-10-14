@@ -13,6 +13,16 @@ const AvatarModel = function(db, DataTypes){
       isFake : {
         type : DataTypes.BOOLEAN,
       },
+      status: {
+        type: DataTypes.TEXT,
+        defaultValue: 'Rested',
+        allowNull: false
+      },
+      goToBattle: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       owner : {
           type : DataTypes.STRING,
           unique : true,
@@ -20,13 +30,14 @@ const AvatarModel = function(db, DataTypes){
               notEmpty :true,
           }
       },
+      
       ownerUsername : {
         type : DataTypes.STRING,
         unique : true,
         validate : {
             notEmpty :true,
         }
-    },
+      },
       hasBeenUpgraded : {
         type: DataTypes.BOOLEAN,
           defaultValue: false,

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const AppMode = require('../appConfig').config.mode;
-
+const { RESTED_THRESHOLD } = require('../gameConstants');
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
@@ -115,6 +115,8 @@ router.post('/update-avatar', function(req, res, next){
       qpWater : req.body.avatar.qpWater,
       qpAir : req.body.avatar.qpAir,
       qpHealth : req.body.avatar.qpHealth,
+      rested : (req.body.health / req.body.maxHealth) > RESTED_THRESHOLD ? 'Rested' : 'Recovering',
+      goToBattle : req.body.avatar.goToBattle
     },
     { where: { owner: req.body.email } }
   )
@@ -175,8 +177,10 @@ router.post('/get-avatar', function(req, res, next){
       hasBeenUpgraded : result.dataValues.hasBeenUpgraded,
       ownerUsername : result.dataValues.ownerUsername,
       updatedAt : result.dataValues.updatedAt,
-      createdAt : result.dataValues.createdAt
-    });console.log('AVATAR', avatar);
+      createdAt : result.dataValues.createdAt,
+      goToBattle : result.dataValues.goToBattle,
+      status : result.dataValues.status
+    });
     res.status(200).json({
       message: `Found matching Avatar`,
       avatar
@@ -219,6 +223,37 @@ router.post('/get-all-avatars', function(req, res, next){
     console.log(`Couldn't get all Avatars DEBUG: ${err}`);
     res.status(400).json({
       message: `Couldn't get All Avatars`,
+      debug : err
+    });
+    next();
+  });
+});
+
+router.post('/go-to-battle', function(req, res, next){
+  console.log('RB', req.body);
+  Avatar.update({ 
+    goToBattle : req.body.goToBattle,
+    status : req.body.status
+  },{ where: { owner: req.body.email }, raw: true })
+  .then((result) =>{
+    if(!result){
+      console.log('NO RESULTS! Sending user a 204');
+      res.status(204).json({
+        message: `No Avatar associated with user ${req.body.email}`
+      });
+      return;
+    }
+
+    res.status(200).json({
+      message : 'Avatar set for battle',
+      goToBattle : req.body.goToBattle,
+      status : req.body.status
+    });
+    next();
+  }).catch((err)=>{
+    console.log(`Couldn't Send Avatar to battle: ${err}`);
+    res.status(400).json({
+      message: `Couldn't send avatar to battle`,
       debug : err
     });
     next();
