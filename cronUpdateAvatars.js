@@ -1,57 +1,39 @@
-const nodemailer = require('nodemailer');
-console.log('TEST!');
-  // create reusable transporter object using the default SMTP transport
-  let transporter = process.env.NODE_ENV === 'development' ? 
-    nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-          user: 'vhrks3qs5lf6x3rg@ethereal.email',
-          pass: '1AAZg6Z86MYFBPPYwu'
-      }
-    })
-  :
-    nodemailer.createTransport({
-      host: `${process.env.MAIL_PROVIDER}`,
-      port: 465,
-      secure: true,
-      auth: {
-          user: `${process.env.INFO_EMAIL}`,
-          pass: `${process.env.EMAIL_PASSWORD}`
-      }
-    });
 
+const Avatar = require('../db').Avatar;
+const db = require('../db').db;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+const GAME_CONST = require('../gameConstants');
+const { sendAppErrorEmail } = require('../mail');
 
-const sendTestEmail = function(resolve, reject){
+console.log('*** RUNNING CRON UPDATE AVATARS');
 
-  // setup email data with unicode symbols
-  let mailOptions = {
-      from: "brysonmk1984@getMaxListeners.com",
-      to: `${process.env.INFO_EMAIL}`,
-      subject: 'HEROFIT - CRON TEST', 
-      text: `TEST EMAIL: THIS IS A TEST`,
-      html: `TEST EMAIL:  \n \n THIS IS A TEST`
-  };
+Avatar.findAll(
+  { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
+).then((results) => {
+  // Loop over each avatar and add up to 5 health
+  results.forEach((result) =>{
+    let h = result.health;
+    const mH = result.maxHealth;
 
-  // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        reject(console.log(error));
-      }
-      console.log('Message sent: %s', info.messageId);
-      // Preview only available when sending through an Ethereal account
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-      resolve(nodemailer.getTestMessageUrl(info));
+    if((h + GAME_CONST.REGENERATION_RATE) > mH){
+      result.health = mH;
+    }else{
+      result.health += GAME_CONST.REGENERATION_RATE;
+    }
+
+    console.log(`updating Avatar health - ${result.name}`);
+    Avatar.update(
+      {health : result.health},
+      { where: { owner: result.owner } }
+    )
   });
-};
 
-
-
-new Promise((resolve, reject) =>{
-  return sendTestEmail(resolve, reject);
-}).then((data) =>{
-  console.log(data);
 }).catch((error) =>{
-  console.log(error);
+  new Promise((resolve, reject) =>{
+    sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+  }).catch((error) =>{
+    console.log('couldn\'t send error email for error - ', error);
+  });
+
 });
