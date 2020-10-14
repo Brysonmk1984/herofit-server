@@ -1,12 +1,12 @@
 
-const Avatar = require('../db').Avatar;
-const db = require('../db').db;
+const Avatar = require('./db').Avatar;
+const db = require('./db').db;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const GAME_CONST = require('../gameConstants');
-const { sendAppErrorEmail } = require('../mail');
+const GAME_CONST = require('./gameConstants');
+const { sendAppErrorEmail } = require('./mail');
 
-console.log('*** RUNNING CRON UPDATE AVATARS');
+console.log('*** RUNNING CRON UPDATE AVATARS ***');
 
 Avatar.findAll(
   { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
