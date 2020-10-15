@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const AppMode = require('../appConfig').config.mode;
-const { RESTED_THRESHOLD } = require('../gameConstants');
+const { RESTED_THRESHOLD } = require('../game/constants');
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 

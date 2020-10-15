@@ -1,5 +1,0 @@
-
-const REGENERATION_RATE = 5;
-const RESTED_THRESHOLD = .8;
-
-module.exports = { REGENERATION_RATE, RESTED_THRESHOLD};

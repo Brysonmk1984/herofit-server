@@ -3,7 +3,7 @@ const Avatar = require('./db').Avatar;
 const db = require('./db').db;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const { REGENERATION_RATE } = require('./gameConstants');
+const { REGENERATION_RATE } = require('./game/constants');
 const { sendAppErrorEmail } = require('./mail');
 
 console.log('*** RUNNING CRON UPDATE AVATARS *//**');
