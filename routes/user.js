@@ -61,22 +61,21 @@ router.post('/insert-user-activities', function(req, res, next){
 });
 
 router.post('/get-user-activities', function(req, res, next){
-  UserActivity.findAll({ where: { user: req.body.email },
+  UserActivity.findAll({ where: { user: req.body.email }, raw: true,
     attributes : ['id', 'activity', 'activityDate']
   })
   .then((results) =>{
     if(results.length){
-      //console.log('GET USER ACTIVITIES RESULTS', results, results[0].user_activities);
     
       const datesArray = results.map((result, i) =>{
-        return result.dataValues.activityDate;
+        return result.activityDate;
       });
 
       let moments = datesArray.map(d => moment(d)),
       maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
       //console.log(maxDate);
       const activities = results.map((result, i) =>{
-        return JSON.parse(result.dataValues.activity);
+        return result.activity;
       });
       res.status(200).json({
         message: `Activities for user ${req.body.email}`,
@@ -176,19 +175,12 @@ router.post('/update-user-totals', function(req, res, next){
 
 
 router.post('/get-user-totals', function(req, res, next){
-  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling'] })
-  .then((result) =>{
-    if(result){
-
-      // Parse all stringified totals before sending it back to the client
-      let parsedTotals = {}
-      for(let total in result.dataValues){
-        parsedTotals[total] =  JSON.parse(result.dataValues[total]);
-      }
-
+  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout'], raw : true })
+  .then((userTotals) =>{
+    if(userTotals){
       res.status(200).json({
         message: `User Totals for user ${req.body.email}`,
-        userTotals : parsedTotals
+        userTotals
       });
     }else{
       res.status(200).json({

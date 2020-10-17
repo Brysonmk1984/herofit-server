@@ -3,6 +3,7 @@ const UserModel = require('./models/user.js');
 const AvatarModel = require('./models/avatar.js');
 const UserActivityModel = require('./models/userActivity.js');
 const UserTotalModel = require('./models/userTotal.js');
+const BattleModel = require('./models/battle.js');
 
 let db;
 let dbUrl;
@@ -53,5 +54,6 @@ const User = UserModel(db, Sequelize);
 const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
 const UserTotal = UserTotalModel(db, Sequelize);
+const Battle = BattleModel(db, Sequelize);
 
-module.exports = { User, Avatar, UserActivity, UserTotal, db }
+module.exports = { User, Avatar, UserActivity, UserTotal, Battle, db }

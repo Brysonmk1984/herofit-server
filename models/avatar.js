@@ -75,10 +75,6 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 100,
       },
-      skills: {
-          type: DataTypes.CHAR,
-          allowNull: true
-      },
       fire: {
         type: DataTypes.NUMERIC,
         precision : 7,
@@ -182,17 +178,21 @@ const AvatarModel = function(db, DataTypes){
         defaultValue: 0,
       },
       items: {
-        type: DataTypes.CHAR,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       titles: {
-        type: DataTypes.CHAR,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       pets: {
-        type: DataTypes.CHAR,
+        type: DataTypes.JSONB,
         allowNull: true
       },
+      skills: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      }
   });
 
   return Avatar;

@@ -29,7 +29,7 @@ function _calcOverallMirrorReduction(aDamage, rResistance){
   let r = rResistance;
 
   const dr = (r*10)/((r*10)+(9*d));
-  return (d - (d * dr));
+  return { reduction : (d * dr), netDamage : (d - (d * dr)) };
 }
 
 function _determineElmMatchups(elm){
@@ -87,6 +87,14 @@ function _calcElementDamage(attacker, receiver){
     total : 0
   };
 
+  const overallElmDamagePrevented = {
+    fire : 0,
+    earth : 0,
+    water : 0,
+    air : 0,
+    total : 0
+  }
+
   // EACH ELEMENT GETS CALCULATED AGAINST EACH FOE ELEMENT INDIVIDUALLY
   for (const elm in attackerElms) {
     const elmDamageDone = {
@@ -121,7 +129,7 @@ function _calcElementDamage(attacker, receiver){
       let sumElmDamageToEachElm = 0;
       let elmCount = 0;
       for(let e in elmDamageDone){
-        console.log(`D to ${e}`,elmDamageDone[e]);
+        //console.log(`D to ${e}`,elmDamageDone[e]);
         if(elmDamageDone[e] > 0){
           sumElmDamageToEachElm += elmDamageDone[e];
           elmCount += 1;
@@ -132,13 +140,15 @@ function _calcElementDamage(attacker, receiver){
       // then reduce the total value by the Damage Reduction Formula, considering the foes resistance (mirror elm)
       const average = sumElmDamageToEachElm / elmCount;
       //console.log('AVERAGE - ', average);
-      const reducedAverage = _calcOverallMirrorReduction(average, receiverElms[mirror[0]]);
-      overallElmDamageDone[elm] = Math.floor(reducedAverage);
-      overallElmDamageDone.total += Math.floor(reducedAverage);
+      const { reduction, netDamage } = _calcOverallMirrorReduction(average, receiverElms[mirror[0]]);
+      overallElmDamageDone[elm] = Math.floor(netDamage);
+      overallElmDamageDone.total += Math.floor(netDamage);
+      overallElmDamagePrevented[elm] = Math.floor(reduction);
+      overallElmDamagePrevented.total += Math.floor(reduction);
     }
   }
   //console.log('ENDING ATTACKER ELM DAMAGE :', overallElmDamageDone);
-  return overallElmDamageDone;
+  return { overallElmDamageDone, overallElmDamagePrevented };
 }
 
 // Calculates damage done against an element's counter element (F on E)
@@ -150,11 +160,11 @@ function _calcArmorDR(aPower, rArmor){
   }
   // Reduced damage based on amount of resistance
   const dr = (r*10)/ ((r*10)+(3*d));
-  return d - (d * dr);
+  return { reduction : parseFloat((d * dr).toFixed(2)), netDamage : Math.floor(d - (d * dr)) };
 }
 
 function _calcDamage(aPower, rArmor){
-  return Math.floor(_calcArmorDR(aPower, rArmor));
+  return _calcArmorDR(aPower, rArmor);
 }
 
 
@@ -175,27 +185,31 @@ function _determineOutcome(aHealth, fHealth){
 }
 
 function doBattle(avatar, foe){
-  // foe.fire = 24;
-  // foe.water = 12;
-  // foe.air = 1;
-  // foe.earth=9;
+  // Physical damage
+  const { netDamage : avPhysicalDamage, reduction : foePhysicalReduction } = _calcDamage(avatar.power, foe.armor);
+  const { netDamage : foePhysicalDamage, reduction : avPhysicalReduction } = _calcDamage(foe.power, avatar.armor);
 
+  // Elemental Damage and Resist
+  const avatarAttack = _calcElementDamage(avatar, foe);
+  const foeAttack = _calcElementDamage(foe, avatar);
 
-  const avPhysicalDamage = _calcDamage(avatar.power, foe.armor);
-  const foePhysicalDamage = _calcDamage(foe.power, avatar.armor);
-  const avElmDamage = _calcElementDamage(avatar, foe);
-  const foeElmDamage = _calcElementDamage(foe, avatar);
-
-  const avHealthRemaining = Math.floor(avatar.health - (foePhysicalDamage + foeElmDamage.total));
-  const foeHealthRemaining = Math.floor(foe.health - (avPhysicalDamage + avElmDamage.total));
+  /* 
+  Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
+  */
+  const avHealthRemaining = Math.floor(avatar.health - (foePhysicalDamage + foeAttack.overallElmDamageDone.total));
+  const foeHealthRemaining = Math.floor(foe.health - (avPhysicalDamage + avatarAttack.overallElmDamageDone.total));
 
   const outcome = _determineOutcome(avHealthRemaining, foeHealthRemaining);
 
   const results = {
-    avElmDamage,
-    foeElmDamage,
+    avElmDamage : avatarAttack.overallElmDamageDone,
+    //foePreventedElmFromAvatar : avatarAttack.overallElmDamagePrevented,
+    foeElmDamage : foeAttack.overallElmDamageDone,
+    //avatarPreventedElmFromFoe : foeAttack.overallElmDamagePrevented,
     avPhysicalDamage,
+    foePhysicalReduction,
     foePhysicalDamage,
+    avPhysicalReduction,
     avHealthRemaining,
     foeHealthRemaining,
     outcome

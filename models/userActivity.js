@@ -8,7 +8,7 @@ const UserActivityModel = function(db, DataTypes){
           autoIncrement: true
       },
       activity: {
-          type: DataTypes.TEXT,
+          type: DataTypes.JSONB,
           allowNull: false
       },
       activityDate: {
@@ -17,11 +17,7 @@ const UserActivityModel = function(db, DataTypes){
         },
       user : {
           type : DataTypes.STRING,
-          unique : true,
           allowNull: false,
-          validate : {
-              notEmpty :true,
-          }
       },
       createdAt : {
           type : DataTypes.TIME,

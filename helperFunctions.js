@@ -1,3 +1,14 @@
+
+function parseAvatarProperties(avatar){
+   avatar.fire = JSON.parse(avatar.fire);
+   avatar.earth = JSON.parse(avatar.earth);
+   avatar.air = JSON.parse(avatar.air);
+   avatar.water = JSON.parse(avatar.water);
+   avatar.recovery = JSON.parse(avatar.recovery);
+   avatar.armor = JSON.parse(avatar.armor);
+   return avatar;
+}
+
 function cloneObj(obj, deep=false){
   var result = {};
   for(let key in obj){
@@ -21,4 +32,4 @@ function cloneObj(obj, deep=false){
   return result
 }
 
-module.exports = { cloneObj };
+module.exports = { cloneObj, parseAvatarProperties };

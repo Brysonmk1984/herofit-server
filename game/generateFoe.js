@@ -26,9 +26,9 @@ function generateFoe(avatar){
 
   console.log('AV', avatar);
   const baseFoeXP = Math.floor(xp * FOE_MOD.XP);
-  const baseFoeHealth = Math.floor(health * FOE_MOD.HEALTH);
+  const baseFoeHealth = 100; //Math.floor(health * FOE_MOD.HEALTH);
   const baseForQp = Math.floor(qp * FOE_MOD.QP);
-  const baseFoePower = Math.floor(power * FOE_MOD.POWER);
+  const baseFoePower = 100; //Math.floor(power * FOE_MOD.POWER);
 
   const foe = {
     xp : randomizer(baseFoeXP),
@@ -47,13 +47,21 @@ function generateFoe(avatar){
   const propIncludingElms = ["health","power","armor","fire","earth","water","air"];
 
   for(let points = foe.qp; points > 0; points-- ){
-    const attr = properties[Math.floor(Math.random() * properties.length)];
+    const attr = propIncludingElms[Math.floor(Math.random() * propIncludingElms.length)];
     if(attr === "power"){
       foe.power += 3;
     }else if(attr === "health"){
       foe.health += 1;
     }else if(attr === "armor"){
       foe.armor += 1;
+    }else if(attr === "fire"){
+      foe.fire += 1;
+    }else if(attr === "earth"){
+      foe.earth += 1;
+    }else if(attr === "water"){
+      foe.water += 1;
+    }else if(attr === "air"){
+      foe.air += 1;
     }
   }
 

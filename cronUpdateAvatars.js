@@ -3,10 +3,10 @@ const Avatar = require('./db').Avatar;
 const db = require('./db').db;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const { REGENERATION_RATE } = require('./game/constants');
+const { REGENERATION_RATE, RESTED_THRESHOLD } = require('./game/constants');
 const { sendAppErrorEmail } = require('./mail');
 
-console.log('*** RUNNING CRON UPDATE AVATARS *//**');
+console.log('*** RUNNING CRON UPDATE AVATARS ***');
 
 Avatar.findAll(
   { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
@@ -21,6 +21,11 @@ Avatar.findAll(
     }else{
       result.health += REGENERATION_RATE;
     }
+
+    if(result.status === 'Recovering'){
+      result.status = (h / mh) > RESTED_THRESHOLD ? 'Rested' : 'Recovering';
+    }
+
 
     console.log(`updating Avatar health - ${result.name}`);
     Avatar.update(

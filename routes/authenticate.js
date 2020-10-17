@@ -78,7 +78,7 @@ router.post('/signup-or-signin', function(req, res, next){
             });
           // User already exists, return data from db
           }else{
-            console.log('User already exists', user.createdAt);
+            console.log('User already exists', user);
             
             user = Object.assign({}, user, {
               // !!!dont need these

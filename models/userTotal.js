@@ -11,9 +11,6 @@ const UserTotalModel = function(db, DataTypes){
           type : DataTypes.STRING,
           unique : true,
           allowNull: false,
-          validate : {
-              notEmpty :true,
-          }
       },
       avatarId: {
           type: DataTypes.INTEGER,
@@ -25,23 +22,23 @@ const UserTotalModel = function(db, DataTypes){
         allowNull: false
       },
       run: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       hike: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       walk: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       ride: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       swim: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       yoga: {
@@ -49,31 +46,31 @@ const UserTotalModel = function(db, DataTypes){
         allowNull: true
       },
       weightTraining: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       stairStepper: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       elliptical: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       standUpPaddling: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       crossfit: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       rowing: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       workout: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
   }, {timestamps: false});

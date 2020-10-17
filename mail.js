@@ -109,5 +109,25 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   });
 };
 
+const sendBattleReportEmail = function(formData, resolve, reject){
 
-module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail };
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HeroFit - Battle Report`, 
+      text: `Number of Avatar Battles: ${formData.count}. \n\n Battle Report Tally: ${formData.tally}`,
+      html: `Number of Avatar Battles: ${formData.count}. \n\n Battle Report Tally: ${formData.tally}`,
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+
+module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail, sendBattleReportEmail };
