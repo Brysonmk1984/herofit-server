@@ -48,7 +48,7 @@ const BATTLE_SCENARIOS = [{
 const FOE_MOD = {
   XP : .7,
   HEALTH : 1,
-  QP : .9,
+  QP : .7,
   POWER : 1
 };
 

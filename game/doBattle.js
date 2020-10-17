@@ -156,11 +156,11 @@ function _calcArmorDR(aPower, rArmor){
   let d = aPower;
   let r = rArmor;
   if(r === 0){
-    return d;
+    return { reduction : r, netDamage : d };
   }
   // Reduced damage based on amount of resistance
   const dr = (r*10)/ ((r*10)+(3*d));
-  return { reduction : parseFloat((d * dr).toFixed(2)), netDamage : Math.floor(d - (d * dr)) };
+ return { reduction : parseFloat((d * dr).toFixed(2)), netDamage : Math.floor(d - (d * dr)) };
 }
 
 function _calcDamage(aPower, rArmor){
@@ -185,34 +185,34 @@ function _determineOutcome(aHealth, fHealth){
 }
 
 function doBattle(avatar, foe){
-  // Physical damage
-  const { netDamage : avPhysicalDamage, reduction : foePhysicalReduction } = _calcDamage(avatar.power, foe.armor);
-  const { netDamage : foePhysicalDamage, reduction : avPhysicalReduction } = _calcDamage(foe.power, avatar.armor);
+  // Physical damage  
+  const avatarPhyAttack = _calcDamage(avatar.power, foe.armor);
+  const foePhyAttack = _calcDamage(foe.power, avatar.armor);
 
   // Elemental Damage and Resist
-  const avatarAttack = _calcElementDamage(avatar, foe);
-  const foeAttack = _calcElementDamage(foe, avatar);
+  const avatarElmAttack = _calcElementDamage(avatar, foe);
+  const foeElmAttack = _calcElementDamage(foe, avatar);
 
   /* 
   Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
   */
-  const avHealthRemaining = Math.floor(avatar.health - (foePhysicalDamage + foeAttack.overallElmDamageDone.total));
-  const foeHealthRemaining = Math.floor(foe.health - (avPhysicalDamage + avatarAttack.overallElmDamageDone.total));
+  const aHealthRemaining = Math.floor(avatar.health - (foePhyAttack.netDamage + foeElmAttack.overallElmDamageDone.total));
+  const fHealthRemaining = Math.floor(foe.health - (avatarPhyAttack.netDamage + avatarElmAttack.overallElmDamageDone.total));
 
-  const outcome = _determineOutcome(avHealthRemaining, foeHealthRemaining);
+  const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
 
   const results = {
-    avElmDamage : avatarAttack.overallElmDamageDone,
-    //foePreventedElmFromAvatar : avatarAttack.overallElmDamagePrevented,
-    foeElmDamage : foeAttack.overallElmDamageDone,
-    //avatarPreventedElmFromFoe : foeAttack.overallElmDamagePrevented,
-    avPhysicalDamage,
-    foePhysicalReduction,
-    foePhysicalDamage,
-    avPhysicalReduction,
-    avHealthRemaining,
-    foeHealthRemaining,
-    outcome
+    avElmDamage : avatarPhyAttack.overallElmDamageDone,
+    fElmReduction : avatarElmAttack.overallElmDamagePrevented,
+    foeElmDamage : foePhyAttack.overallElmDamageDone,
+    aElmReduction : foeElmAttack.overallElmDamagePrevented,
+    aPhyDamage : avatarPhyAttack.netDamage,
+    fPhyReduction : avatarPhyAttack.reduction,
+    fPhyDamage : foePhyAttack.netDamage,
+    aPhyReduction : foePhyAttack.reduction,
+    aHealthRemaining,
+    fHealthRemaining,
+    outcomeData
   }
   return results;
 }

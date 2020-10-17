@@ -14,8 +14,9 @@ const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
 const userRoutes = require('./routes/user');
 const emailRoutes = require('./routes/email');
+const battleRoutes = require('./routes/battle');
 const mockDataRoutes = require('./routes/mockData');
-const cronRoutes = require('./routes/cron');
+const mockCronRoutes = require('./routes/mockCronEndpoints');
 
   // http server
 //app.listen( process.env.PORT || 3001, function () {
@@ -41,8 +42,9 @@ const cronRoutes = require('./routes/cron');
   app.use('/avatar', avatarRoutes);
   app.use('/user', userRoutes);
   app.use('/email', emailRoutes);
+  app.use('/battle', battleRoutes);
   app.use('/mock-data', mockDataRoutes);
-  app.use('/cron', cronRoutes);
+  app.use('/mock-cron', mockCronRoutes);
 //});
 module.exports = app;
 

@@ -73,6 +73,7 @@ router.post('/update-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
   .then((avatar) =>{
+    console.log('TYPEE', typeof avatar, avatar);
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
 
@@ -118,35 +119,6 @@ router.post('/get-all-avatars', function(req, res, next){
     console.log(`Couldn't get all Avatars DEBUG: ${err}`);
     res.status(400).json({
       message: `Couldn't get All Avatars`,
-      debug : err
-    });
-    next();
-  });
-});
-
-router.post('/go-to-battle', function(req, res, next){
-  console.log('RB', req.body);
-  Avatar.update({ 
-    goToBattle : req.body.goToBattle,
-    status : req.body.status
-  },{ where: { owner: req.body.email }, raw: true })
-  .then((result) =>{
-    if(!result){
-      res.status(204).json({
-        message: `No Avatar associated with user ${req.body.email}`
-      });
-      return;
-    }
-    res.status(200).json({
-      message : 'Avatar set for battle',
-      goToBattle : req.body.goToBattle,
-      status : req.body.status
-    });
-    next();
-  }).catch((err)=>{
-    console.log(`Couldn't Send Avatar to battle: ${err}`);
-    res.status(400).json({
-      message: `Couldn't send avatar to battle`,
       debug : err
     });
     next();

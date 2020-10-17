@@ -10,7 +10,10 @@ function generateFoe(avatar){
 
     return Math.floor(currentLevel) + 1;
   }
+
+  //avatar = JSON.parse(avatar);
   const { activityXP, battleXP, health, power } = avatar;
+
   const xp = activityXP + battleXP;
   const level = currentLevel(xp);
   const qp = (level * 5) - 5;
@@ -24,7 +27,6 @@ function generateFoe(avatar){
 
   }
 
-  console.log('AV', avatar);
   const baseFoeXP = Math.floor(xp * FOE_MOD.XP);
   const baseFoeHealth = 100; //Math.floor(health * FOE_MOD.HEALTH);
   const baseForQp = Math.floor(qp * FOE_MOD.QP);
@@ -41,13 +43,12 @@ function generateFoe(avatar){
     water : 0,
     air : 0
   }
-  console.log(qp);
 
   const properties = ["health","power","armor"];
-  const propIncludingElms = ["health","power","armor","fire","earth","water","air"];
+  //const properties = ["health","power","armor","fire","earth","water","air"];
 
   for(let points = foe.qp; points > 0; points-- ){
-    const attr = propIncludingElms[Math.floor(Math.random() * propIncludingElms.length)];
+    const attr = properties[Math.floor(Math.random() * properties.length)];
     if(attr === "power"){
       foe.power += 3;
     }else if(attr === "health"){
