@@ -1,5 +1,5 @@
 const Avatar = require('../db').Avatar;
-import { REVIVE_PERCENT } from '../game/constants';
+const { REVIVE_PERCENT } = require('../game/constants');
 
 console.log('*** RUNNING CRON REVIVE ***');
 
