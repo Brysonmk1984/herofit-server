@@ -118,7 +118,7 @@ Battle.findAll(
         { where: { id: battleID }, raw : true }
       ).then(() => {
 
-        if(battle.aHealthRemaining < 0){
+        if(b.aHealthRemaining < 0){
           b.aHealthRemaining = 0;
         }
 

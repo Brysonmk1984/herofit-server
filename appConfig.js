@@ -1,5 +1,5 @@
 const config = {
-  mode : 'alpha'
+  mode : 'beta'
 };
 
 module.exports = { config };

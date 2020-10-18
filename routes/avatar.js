@@ -7,8 +7,8 @@ const { parseAvatarProperties } = require('../helperFunctions');
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
-  if(AppMode === 'alpha'){console.log('HAS PET');
-    req.body.avatar.pets.push({type : 'passive', name: 'Alpha Dog', description: 'Reward for being an Alpha Tester'})
+  if(AppMode === 'beta'){
+    req.body.avatar.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being a Beta Tester'})
   }
 
   Avatar.findOrCreate({

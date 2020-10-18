@@ -29,7 +29,7 @@ Avatar.findAll(
 
     console.log(`updating Avatar health - ${result.name}`);
     Avatar.update(
-      {health : result.health},
+      {health : result.health, status : result.status},
       { where: { owner: result.owner } }
     )
   });
