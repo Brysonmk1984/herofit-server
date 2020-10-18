@@ -58,6 +58,8 @@ router.post('/generate-foe', function(req, res, next){
   });
 });
 
+
+
 // DO A SINGLE INSTANCE OF BATTLE with passed in Avatar
 router.post('/do-battle-mock', function(req, res, next){
   // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
@@ -285,10 +287,7 @@ router.post('/do-battle', function(req, res, next){
 
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const battleResults = doBattle(BRA, BRF);
-        
-        
-        
-        
+
         // SAVE DATA
 
         const b = battleResults;
@@ -353,10 +352,8 @@ router.post('/do-battle', function(req, res, next){
             // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
             res.status(200).json({
               avatar,
-              //avatarPrep,
               BRA,
               BRF,
-              //foePrep,
               scenario,
               battleResults,
               xpGain
