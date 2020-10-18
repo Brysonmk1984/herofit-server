@@ -252,7 +252,7 @@ router.post('/do-battle', function(req, res, next){
     const battleID = battle.id;
     console.log('THEBATTLE - ', battle);
 
-    Avatar.findOne(
+    return Avatar.findOne(
       { where : { id : avatarID }, raw : true }
     ).then((avatar) =>{
         // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
@@ -285,27 +285,38 @@ router.post('/do-battle', function(req, res, next){
 
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const battleResults = doBattle(BRA, BRF);
+        
+        
+        
+        
+        // SAVE DATA
+
         const b = battleResults;
         let xpGain;
 
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
             xpGain = OUTCOME_XP.win;
+            avatar.battleWins = avatar.battleWins + 1;
             break;
           case "Foe Wins":
             xpGain = OUTCOME_XP.loss;
+            avatar.battlelosses = avatar.battlelosses + 1;
             break;
           case "Draw":
             xpGain = OUTCOME_XP.draw;
+            avatar.battleDraws = avatar.battleDraws + 1;
             break;
           case "Double KO":
             xpGain = OUTCOME_XP.dko;
+            avatar.battleDkos = avatar.battleDkos + 1;
             break;
           default:
         }
 
         // SAVE RESULTS TO DB
-        Battle.update({
+        return Battle.update({
+          scenario : scenario.id,
           outcome : b.outcomeData.outcome,
           aStatus : b.outcomeData.avatarStatus,
           aPhyDamage : b.aPhyDamage,
@@ -324,18 +335,17 @@ router.post('/do-battle', function(req, res, next){
           aElmReduction : b.aElmReduction,
         },
         { where: { id: battleID }, raw : true }
-      ).then((battle) => {
-        console.log('Just updated battle', battle, avatarID);
+      ).then(() => {
+
         if(battle.aHealthRemaining < 0){
-          battle.aHealthRemaining = 0;
+          b.aHealthRemaining = 0;
         }
 
-
-        console.log(avatar.battleXP, xpGain, avatar.battleXP + xpGain);
+        avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP = avatar.battleXP + xpGain;
-        
-        Avatar.update(
-          { health : battle.aHealthRemaining, status : battle.aStatus, battleXP : avatar.battleXP},
+
+        return Avatar.update(
+          { goToBattle : false, health : b.aHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
           { where: { id: avatarID } }
           ).then((avatar) =>{
             console.log('finished updating avatar', avatar);
@@ -354,20 +364,37 @@ router.post('/do-battle', function(req, res, next){
 
         }).catch((error) =>{
           console.log('ERROR UPDATING AV AFTER BATTLE - ', error);
+          res.status(400).json({
+            message: `ERROR UPDATING AV AFTER BATTLE`,
+            debug : err
+          });
+          next();
         });
 
       }).catch((error) =>{
         console.log('INDIVIDUAL BATTLE ERROR - ', error);
+        res.status(400).json({
+          message: `INDIVIDUAL BATTLE ERROR`,
+          debug : err
+        });
+        next();
       });
 
     }).catch((error) =>{
       console.log('ERROR RETRIEVING AVATAR FOR BATTLE - ', error);
+      res.status(400).json({
+        message: `ERROR RETRIEVING AVATAR FOR BATTLE`,
+        debug : err
+      });
+      next();
     });
-
-
-
   }).catch((error) =>{
     console.log('ERROR RETRIEVING BATTLE - ', error);
+    res.status(400).json({
+      message: `ERROR RETRIEVING BATTLE`,
+      debug : err
+    });
+    next();
   });
   
 });

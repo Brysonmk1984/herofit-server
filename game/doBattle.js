@@ -202,9 +202,9 @@ function doBattle(avatar, foe){
   const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
 
   const results = {
-    avElmDamage : avatarPhyAttack.overallElmDamageDone,
+    aElmDamage : avatarPhyAttack.overallElmDamageDone,
     fElmReduction : avatarElmAttack.overallElmDamagePrevented,
-    foeElmDamage : foePhyAttack.overallElmDamageDone,
+    fElmDamage : foePhyAttack.overallElmDamageDone,
     aElmReduction : foeElmAttack.overallElmDamagePrevented,
     aPhyDamage : avatarPhyAttack.netDamage,
     fPhyReduction : avatarPhyAttack.reduction,

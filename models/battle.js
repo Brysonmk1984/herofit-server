@@ -10,6 +10,10 @@ const BattleModel = function(db, DataTypes){
       unique : true,
       allowNull: false,
     },
+    scenario : {
+      type : DataTypes.INTEGER,
+      allowNull: true
+    },
     outcome : {
       type : DataTypes.STRING,
       allowNull: false,

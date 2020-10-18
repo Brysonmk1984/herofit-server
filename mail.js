@@ -109,6 +109,44 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   });
 };
 
+const sendBattleErrorEmail = function(formData, resolve, reject){
+  const errorTally = formData.errorTally;
+  
+  let html = `<div>Error(s) occured in Battle Hour `;
+  // error status and message
+  html += `${formData.status}:  ${formData.message}`;
+  
+  if(debug){
+    html += `<br/><br/>`;
+    html += `<br/><br/><p>` + formData.debug + `</p>`;
+  }
+
+  const errorString = '';
+
+
+  errorTally.errors.forEach((error) =>{
+    errorString += (error + "\n\n");
+  });
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HEROFIT - ${formData.status} BATTLE HOUR ERROR`, 
+      text: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${errorTally} \n\n ERRORS: ${errorString}`,
+      html: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${errorTally} \n\n ERRORS: ${errorString}`
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+
 const sendBattleReportEmail = function(formData, resolve, reject){
 
   // setup email data with unicode symbols
@@ -130,4 +168,4 @@ const sendBattleReportEmail = function(formData, resolve, reject){
 };
 
 
-module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail, sendBattleReportEmail };
+module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail, sendBattleReportEmail, sendBattleErrorEmail };

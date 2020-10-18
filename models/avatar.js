@@ -192,7 +192,27 @@ const AvatarModel = function(db, DataTypes){
       skills: {
         type: DataTypes.JSONB,
         allowNull: true
-      }
+      },
+      battleWins: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      battleLosses: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      battleDraws: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      battleDkos: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
   });
 
   return Avatar;
