@@ -68,7 +68,7 @@ router.post('/signup-or-signin', function(req, res, next){
           if (created) {
             user = Object.assign({}, user, {
               clientId : process.env.STRAVA_CLIENT_ID, 
-              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
               clientSecret : process.env.STRAVA_CLIENT_SECRET,
   
             });
@@ -83,7 +83,7 @@ router.post('/signup-or-signin', function(req, res, next){
             user = Object.assign({}, user, {
               // !!!dont need these
               clientId : process.env.STRAVA_CLIENT_ID, 
-              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
               clientSecret : process.env.STRAVA_CLIENT_SECRET,
   
             });

@@ -24,7 +24,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
       idle: 10000
     }
   }
-  dbUrl = "postgres://obaaqsoomtxodz:4e224740983ccbba758836f6a0bcc47467f7e4edcb347869a8e2028f9f92777c@ec2-52-204-20-42.compute-1.amazonaws.com:5432/ddo9unls7gumi4";
+  dbUrl = process.env.DATABASE_URL;
 
 
   // DEVELOPMENTS
@@ -41,7 +41,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
       idle: 10000
     }
   }
-  dbUrl = "postgres://admin:admin@localhost/stravatar";
+  dbUrl = process.env.DATABASE_URL_LOCAL;
 
 }
 
