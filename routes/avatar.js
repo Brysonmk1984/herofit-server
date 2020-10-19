@@ -73,7 +73,7 @@ router.post('/update-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
   .then((avatar) =>{
-    console.log('TYPEE', typeof avatar, avatar);
+
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
 

@@ -15,14 +15,14 @@ Avatar.findAll(
   results.forEach((result) =>{
     let h = result.health;
     const mH = result.maxHealth;
-
+    console.log('RESULT', result);
     if((h + REGENERATION_RATE) > mH){
       result.health = mH;
     }else{
       result.health += REGENERATION_RATE;
     }
 
-    if(result.status === 'Recovering'){
+    if(result.status === 'Recovering'){console.log('RECOVERING = ',result.status === 'Recovering');
       result.status = (h / mh) > RESTED_THRESHOLD ? 'Rested' : 'Recovering';
     }
 
