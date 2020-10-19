@@ -5,9 +5,9 @@ const Battle = require('../db').Battle;
 const db = require('../db').db;
 const { Op } = require("sequelize");
 const { sendAppErrorEmail } = require('../mail');
-const { cloneObj } = require('../helperFunctions');
-const { REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP } = require('../game/constants');
-const generateFoe = require('../game/generateFoe');
+const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
+const { REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
+const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
@@ -52,7 +52,7 @@ router.get('/regenerate-health', function(req, res, next){
 
 // RANDOMLY GENERATE A FOE
 router.post('/generate-foe', function(req, res, next){
-  const foe = generateFoe(req.body.avatar);
+  const foe = generateFoeStats(req.body.avatar);
   res.status(200).json({
     foe
   });
@@ -67,7 +67,7 @@ router.post('/do-battle-mock', function(req, res, next){
  
   const itemsUsed = req.body.itemsUsed;
   const actionsChosen = req.body.actionsChosen;
-  let foe = generateFoe(avatar);
+  let foe = generateFoeStats(avatar);
 
   // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe));
@@ -79,14 +79,14 @@ router.post('/do-battle-mock', function(req, res, next){
   // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
   
   if(itemsUsed || actionsChosen){
-    if(scenario.id !== 4){
+    if(scenario.id !== AVATAR_NON_ACTION){
       BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
     }
   }
 
   // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
   if(false){
-    if(scenario.id !== 1){
+    if(scenario.id !== FOE_NON_ACTION){
       BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
     }
   }
@@ -177,7 +177,7 @@ router.post('/do-battle-sims', function(req, res, next){
     let avatar = req.body.avatar;
     const itemsUsed = req.body.itemsUsed;
     const actionsChosen = req.body.actionsChosen;
-    let foe = generateFoe(avatar);
+    let foe = generateFoeStats(avatar);
   
     // // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe), SCENARIO.id);
@@ -188,14 +188,14 @@ router.post('/do-battle-sims', function(req, res, next){
 
     // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
     if(itemsUsed || actionsChosen){
-      if(scenario.id !== 4){
+      if(scenario.id !== AVATAR_NON_ACTION){
         BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
       }
     }
 
     // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
     if(false){
-      if(scenario.id !== 1){
+      if(scenario.id !== FOE_NON_ACTION){
         BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
       }
     }
@@ -255,33 +255,49 @@ router.post('/do-battle', function(req, res, next){
     console.log('THEBATTLE - ', battle);
 
     return Avatar.findOne(
-      { where : { id : avatarID }, raw : true }
+      { where : { id : avatarID }, raw : true, attributes: ['health','power','armor','fire','air','water','earth','status', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ).then((avatar) =>{
         // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
-        console.log('FOUND AVATAR!', avatar);
+
+        
+        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+        avatar = parseAvatarProperties(avatar);
+        
         const itemsUsed = req.body.itemsUsed;
         const actionsChosen = req.body.actionsChosen;
-        let foe = generateFoe(avatar);
-
+        const foeTemplate = selectFoeTemplate();
+        const foe = {
+          id : foeTemplate.id,
+          type : foeTemplate.type,
+          name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+          ability : foeTemplate.ability
+        }
+        console.log('foe', foe);
+        const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
+        console.log('foe w stats', foeWithStats);
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe));
+        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
         
         // avatar and foe to be used for battle
         let BRA = Object.assign({}, sAvatar);
         let BRF = Object.assign({}, sFoe);
-
+        
         // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
         
         if(itemsUsed || actionsChosen){
-          if(scenario.id !== 4){
-            BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+          if(scenario.id !== AVATAR_NON_ACTION){
+            const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+            BRA = avBP.avatar;
+            BRF = avBP.foe;
           }
         }
 
         // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-        if(false){
-          if(scenario.id !== 1){
-            BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+        if(foeWithStats.ability){
+          if(scenario.id !== FOE_NON_ACTION){
+            const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+            BRF = foeBP.foe;
+            BRA = foeBP.avatar;
           }
         }
 
@@ -325,7 +341,7 @@ router.post('/do-battle', function(req, res, next){
           xpGain,
           aHealthRemaining : b.aHealthRemaining,
           fHealthRemaining : b.fHealthRemaining,
-          foe,
+          foe : Object.assign({}, foe, foeWithStats),
           bra : BRA,
           brf : BRF,
           aElmDamage : b.aElmDamage,
@@ -335,23 +351,21 @@ router.post('/do-battle', function(req, res, next){
         },
         { where: { id: battleID }, raw : true }
       ).then(() => {
-
-        if(b.aHealthRemaining < 0){
-          b.aHealthRemaining = 0;
-        }
+        const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
 
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP = avatar.battleXP + xpGain;
 
         return Avatar.update(
-          { goToBattle : false, health : b.aHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
+          { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
           { where: { id: avatarID } }
-          ).then((avatar) =>{
+          ).then((result) =>{
             console.log('finished updating avatar', avatar);
             
             // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
             res.status(200).json({
               avatar,
+              foe : Object.assign({}, foe, foeWithStats),
               BRA,
               BRF,
               scenario,
@@ -363,7 +377,6 @@ router.post('/do-battle', function(req, res, next){
           console.log('ERROR UPDATING AV AFTER BATTLE - ', error);
           res.status(400).json({
             message: `ERROR UPDATING AV AFTER BATTLE`,
-            debug : err
           });
           next();
         });
@@ -372,7 +385,6 @@ router.post('/do-battle', function(req, res, next){
         console.log('INDIVIDUAL BATTLE ERROR - ', error);
         res.status(400).json({
           message: `INDIVIDUAL BATTLE ERROR`,
-          debug : err
         });
         next();
       });
@@ -381,15 +393,13 @@ router.post('/do-battle', function(req, res, next){
       console.log('ERROR RETRIEVING AVATAR FOR BATTLE - ', error);
       res.status(400).json({
         message: `ERROR RETRIEVING AVATAR FOR BATTLE`,
-        debug : err
       });
       next();
     });
   }).catch((error) =>{
     console.log('ERROR RETRIEVING BATTLE - ', error);
     res.status(400).json({
-      message: `ERROR RETRIEVING BATTLE`,
-      debug : err
+      message : `ERROR RETRIEVING BATTLE - ${error}`,
     });
     next();
   });

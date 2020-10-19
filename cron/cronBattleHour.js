@@ -1,8 +1,8 @@
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
-const { cloneObj } = require('../helperFunctions');
-const generateFoe = require('../game/generateFoe');
+const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
+const { generateFoeStats } = require('../game/foeFunctions');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 
@@ -30,19 +30,25 @@ Battle.findAll(
   battles.forEach((battle) =>{
     const battleID = battle.id;
     console.log('THEBATTLE - ', battle);
+    let foe = battle.foe;
 
     return Avatar.findOne(
       { where : { id : avatarID }, raw : true }
     ).then((avatar) =>{
-
-        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
         console.log('FOUND AVATAR!', avatar);
+        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+        avatar = parseAvatarProperties(avatar);
+        
+        
+        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
+        
+        
         const itemsUsed = req.body.itemsUsed;
         const actionsChosen = req.body.actionsChosen;
-        let foe = generateFoe(avatar);
-
+        const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
+        console.log('generated foe - ', foeWithStats);
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe));
+        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats, true));
         
         // avatar and foe to be used for battle
         let BRA = Object.assign({}, sAvatar);
@@ -57,9 +63,11 @@ Battle.findAll(
         }
 
         // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-        if(false){
+        if(foeWithStats.ability){
           if(scenario.id !== 1){
-            BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+            const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+            BRF = foeBP.foe;
+            BRA = foeBP.avatar;
           }
         }
 
@@ -107,7 +115,7 @@ Battle.findAll(
           xpGain,
           aHealthRemaining : b.aHealthRemaining,
           fHealthRemaining : b.fHealthRemaining,
-          foe,
+          foe : Object.assign({}, foe, foeWithStats),
           bra : BRA,
           brf : BRF,
           aElmDamage : b.aElmDamage,

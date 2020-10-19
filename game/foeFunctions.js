@@ -1,6 +1,11 @@
 const { FOE_MOD } = require('./constants'); 
+const villains = require('./villains.json');
 
-function generateFoe(avatar){
+function selectFoeTemplate(){
+  return villains.spirits[Math.floor(Math.random() * villains.spirits.length)];
+}
+
+function generateFoeStats(avatar){
 
   // GIVES CURRENT LEVEL based on XP input
   function currentLevel(xp){
@@ -27,15 +32,11 @@ function generateFoe(avatar){
 
   }
 
-  const baseFoeXP = Math.floor(xp * FOE_MOD.XP);
-  const baseFoeHealth = 100; //Math.floor(health * FOE_MOD.HEALTH);
-  const baseForQp = Math.floor(qp * FOE_MOD.QP);
-  const baseFoePower = 100; //Math.floor(power * FOE_MOD.POWER);
+  const baseFoeHealth = Math.floor(health * FOE_MOD.HEALTH);
+  const baseFoePower = Math.floor(power * FOE_MOD.POWER);
 
   const foe = {
-    xp : randomizer(baseFoeXP),
     health : randomizer(baseFoeHealth),
-    qp : randomizer(baseForQp),
     power : randomizer(baseFoePower),
     armor : 0,
     fire : 0,
@@ -46,8 +47,9 @@ function generateFoe(avatar){
 
   const properties = ["health","power","armor"];
   //const properties = ["health","power","armor","fire","earth","water","air"];
+  const baseFoeQp = randomizer(Math.floor(qp * FOE_MOD.QP));
 
-  for(let points = foe.qp; points > 0; points-- ){
+  for(let points = baseFoeQp; points > 0; points-- ){
     const attr = properties[Math.floor(Math.random() * properties.length)];
     if(attr === "power"){
       foe.power += 3;
@@ -70,4 +72,4 @@ function generateFoe(avatar){
 
 }
 
-module.exports = generateFoe;
+module.exports = { generateFoeStats, selectFoeTemplate };

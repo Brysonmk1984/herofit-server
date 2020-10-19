@@ -1,0 +1,139 @@
+{
+  "spirits": [{
+      "id": 0,
+      "type" : "Shade",
+      "foe": [
+        "Kerrim",
+        "Thames",
+        "Kedron",
+        "Sidero",
+        "Kshipa",
+        "Marduk"
+      ],
+      "ability": {
+        "name" : "From the Shadows",
+        "effect" : "Bonus Power"
+      },
+      "color": "#000000"
+    },
+    {
+      "id": 1,
+      "type": "Apparition",
+      "foe": [
+        "Githinji",
+        "Mardochaios",
+        "Medeia",
+        "Edana",
+        "Tamisra",
+        "Colvin"
+      ],
+      "ability": {
+        "name" : "Intimidation",
+        "effect" : "Power Reduction"
+      },
+      "color": "#0D0D0D"
+    },
+    {
+      "id": 2,
+      "type": "Phantasm",
+      "foe": [
+        "Fridtjof",
+        "Nyx",
+        "Megedagik",
+        "Qarinah",
+        "Mrithun",
+        "Lailah"
+      ],
+      "ability": {
+        "name" : "Armor Barter",
+        "effect" : "Armor Trade"
+      },
+      "color": "#080808"
+    },
+    {
+      "id": 3,
+      "type" : "Phantom",
+      "foe": [
+        "Seth",
+        "Ambrosia",
+        "Laren",
+        "Keres",
+        "Chax",
+        "Damian"
+      ],
+      "ability": {
+        "name" : "Unseen Swap",
+        "effect" : "Power Trade"
+      },
+      "color": "#232323"
+    },
+    {
+      "id": 4,
+      "type": "Wraith",
+      "foe": [
+        "Methuselah",
+        "Mohandas",
+        "Vlasta",
+        "Azrail",
+        "Fia",
+        "Mercurius"
+      ],
+      "ability": {
+        "name" : "Can't Hide from Me",
+        "effect" : "Armor Break"
+      },
+      "color": "#383838"
+    },
+    {
+      "id": 5,
+      "type": "Poltergeist",
+      "foe": [
+        "Phobus",
+        "Herod",
+        "Alastor",
+        "Abaddon",
+        "Hraefn",
+        "Keiran"
+    ],
+      "ability": {
+        "name" : "Shadowy Influx",
+        "effect" : "Bonus Health"
+      },
+      "color": "#676767"
+    },
+    {
+      "id": 6,
+      "type" : "Specter",
+      "foe": [
+        "Brody",
+        "Raven",
+        "Zilla",
+        "Blagden",
+        "Quella",
+        "Busiris"
+      ],
+      "ability": {
+        "name" : "Breath Bane",
+        "effect" : "Health Reduction"
+      },
+      "color": "#4f4f4f"
+    },
+    {
+      "id": 7,
+      "type": "Banshee",
+      "foe": [
+        "Laverna",
+        "Melania",
+        "Aerona",
+        "Gwyn",
+        "Mallory",
+        "Lamia"
+      ],
+      "ability": {
+        "name" : "Unholy Health",
+        "effect" : "Health Trade"
+      },
+      "color": "#000000"
+    }
+  ]
+}

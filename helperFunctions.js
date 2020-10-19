@@ -1,11 +1,13 @@
 
 function parseAvatarProperties(avatar){
-   avatar.fire = JSON.parse(avatar.fire);
-   avatar.earth = JSON.parse(avatar.earth);
-   avatar.air = JSON.parse(avatar.air);
-   avatar.water = JSON.parse(avatar.water);
-   avatar.recovery = JSON.parse(avatar.recovery);
-   avatar.armor = JSON.parse(avatar.armor);
+   const attrsToBeParsed = ['fire', 'earth', 'air', 'water', 'armor', 'recovery'];
+   let toBeParsed;
+   for(let attr in avatar){
+      toBeParsed = attrsToBeParsed.includes(attr);
+      if(toBeParsed){
+         avatar[attr] = JSON.parse(avatar[attr]);
+      }
+   }
    return avatar;
 }
 

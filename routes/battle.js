@@ -2,13 +2,22 @@ const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
+const { selectFoeTemplate } = require('../game/foeFunctions');
+
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
+  const foeTemplate = selectFoeTemplate();
+  const foe = {
+    id : foeTemplate.id,
+    type : foeTemplate.type,
+    name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+  }
   Battle.create({
     owner: req.body.email,
     avatarID: req.body.avatarID,
     avatarName: req.body.avatarName,
+    foe,
     outcome: "TBD"
   }, 
   {raw : true}
