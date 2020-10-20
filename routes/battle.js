@@ -104,9 +104,15 @@ router.post('/fetch-battle-report', function(req, res, next){
     order: [ [ 'createdAt', 'DESC' ]],
     raw : true
   }).then((result) =>{
-    console.log(result);
+    res.status(200).json({
+      message : 'Retrieved Latest Battle Results',
+      result : result[0]
+    });
+    next();
   }).catch((error) =>{
-    console.log('ERROR REMOVING battle', error);
+    res.status(400).json({
+      message: `Couldn't retrieve latest Battle Results - ${error}`,
+    });
   });
 });
 
