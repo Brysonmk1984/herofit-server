@@ -24,11 +24,11 @@ Avatar.findAll(
     }else{
       result.health += REGENERATION_RATE;
     }
-
+    console.log('RSS', result.status)
     if(result.status === 'Recovering'){
       console.log('RECOVERING = ',result.status === 'Recovering', RESTED_THRESHOLD);
-      result["status"] = (h / mh) > RESTED_THRESHOLD ? 'Rested' : 'Recovering';
-      console.log('RS', result["status"])
+      result.status = 'Recovering';
+      console.log('RSS2', result["status"])
     }
 
 
@@ -40,13 +40,13 @@ Avatar.findAll(
       console.log('UPDATED!', updateConfirm);
     }).catch((error) => {
       console.log('ERRROR', err);
-      return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject);
+      return sendAppErrorEmail(error,resolve, reject);
     });
   });
 
 }).catch((error) =>{
   new Promise((resolve, reject) =>{
-    return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject);
+    return sendAppErrorEmail(error ,resolve, reject);
   }).catch((err) =>{
     console.log('couldn\'t send error email for error - ', err);
   });
