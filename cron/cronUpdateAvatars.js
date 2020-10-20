@@ -1,15 +1,16 @@
 
 const Avatar = require('../db').Avatar;
-// const db = require('../db').db;
-// const Sequelize = require('sequelize');
-// const Op = Sequelize.Op;
+const db = require('../db').db;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
  const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
  const { sendAppErrorEmail } = require('../mail');
 
 console.log('*** RUNNING CRON UPDATE AVATARS ***', Avatar);
 
+
 Avatar.findAll(
-  // { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
+  { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
 ).then((results) => {console.log('inside findALL', results);
   // Loop over each avatar and add up to 5 health
   
