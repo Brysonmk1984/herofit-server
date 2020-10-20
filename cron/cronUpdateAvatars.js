@@ -26,12 +26,14 @@ Avatar.findAll(
     let updatedStatus;
     if(result.status === 'Recovering'){
       updatedStatus = 'Recovering';
+      console.log(h, mh, (h / mh) > RESTED_THRESHOLD)
       if((h / mh) > RESTED_THRESHOLD){
         updatedStatus = 'Rested';
       }
     }
+    console.log(updatedStatus);
     return Avatar.update(
-      {health : result.health, status : updatedStatus},
+      {health : result.health, "status" : updatedStatus},
       { where: { owner: result.owner } }
     ).then((updateConfirm) =>{
     }).catch((error) => {

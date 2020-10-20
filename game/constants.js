@@ -34,7 +34,7 @@ const BATTLE_SCENARIOS = [{
   description : "Foe attacked defending avatar",
   avatarPowerMod : 0,
   avatarHealthMod : .03,
-  foePowerMod : .02,
+  foePowerMod : 0,
   foeHealthMod : 0,
 },{
   id : 5,
