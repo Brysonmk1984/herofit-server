@@ -23,14 +23,15 @@ Avatar.findAll(
     }else{
       result.health += REGENERATION_RATE;
     }
-
+    let updatedStatus;
     if(result.status === 'Recovering'){
+      updatedStatus = 'Recovering';
       if((h / mh) > RESTED_THRESHOLD){
-        result["status"] = 'Rested';
+        updatedStatus = 'Rested';
       }
     }
     return Avatar.update(
-      {health : result.health, status : result["status"]},
+      {health : result.health, status : updatedStatus},
       { where: { owner: result.owner } }
     ).then((updateConfirm) =>{
     }).catch((error) => {
