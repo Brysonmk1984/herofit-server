@@ -1,8 +1,8 @@
 
 const Avatar = require('../db').Avatar;
-const db = require('../db').db;
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
+// const db = require('../db').db;
+// const Sequelize = require('sequelize');
+// const Op = Sequelize.Op;
  const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
  const { sendAppErrorEmail } = require('../mail');
 

@@ -96,4 +96,18 @@ router.post('/remove-battle', function(req, res, next){
   });
 });
 
+// USER Logs in after a battle, or clicks button to retrieve report
+router.post('/fetch-battle-report', function(req, res, next){
+  Battle.findAll({
+    limit: 1,
+    where: { avatarID: req.body.avatarID },
+    order: [ [ 'createdAt', 'DESC' ]],
+    raw : true
+  }).then((result) =>{
+    console.log(result);
+  }).catch((error) =>{
+    console.log('ERROR REMOVING battle', error);
+  });
+});
+
 module.exports = router;

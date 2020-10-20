@@ -1,6 +1,6 @@
 const Avatar = require('../db').Avatar;
 const { REVIVE_PERCENT } = require('../game/constants');
-
+const { sendAppErrorEmail} = require('../mail');
 console.log('*** RUNNING CRON REVIVE ***');
 
 Avatar.findAll(
