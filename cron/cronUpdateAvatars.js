@@ -12,7 +12,7 @@ Avatar.findAll(
   { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
 ).then((results) => {console.log('inside findALL');
   // Loop over each avatar and add up to 5 health
-  results.forEach((result) =>{
+  return results.forEach((result) =>{
     let h = result.health;
     const mH = result.maxHealth;
     console.log('RESULT', result);
