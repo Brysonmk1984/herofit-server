@@ -25,7 +25,9 @@ Avatar.findAll(
     }
 
     if(result.status === 'Recovering'){
-      result.status = 'Recovering';
+      if((h / mh) > RESTED_THRESHOLD){
+        result["status"] = 'Rested';
+      }
     }
     return Avatar.update(
       {health : result.health, status : result["status"]},

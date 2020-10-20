@@ -248,14 +248,19 @@ module.exports = router;
 router.post('/do-battle', function(req, res, next){
   const avatarID = req.body.avatarID;
 
-  Battle.findOne(
-    { where : { avatarID }, raw : true}
-  ).then((battle) =>{
+  Battle.findAll({
+    limit: 1,
+    where: { avatarID },
+    order: [ [ 'createdAt', 'DESC' ]],
+    raw : true
+  }).then((battle) =>{
+    battle = battle[0];
+    foe = battle.foe;
     const battleID = battle.id;
     console.log('THEBATTLE - ', battle);
 
     return Avatar.findOne(
-      { where : { id : avatarID }, raw : true, attributes: ['health','power','armor','fire','air','water','earth','status', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+      { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ).then((avatar) =>{
         // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
@@ -265,13 +270,7 @@ router.post('/do-battle', function(req, res, next){
         
         const itemsUsed = req.body.itemsUsed;
         const actionsChosen = req.body.actionsChosen;
-        const foeTemplate = selectFoeTemplate();
-        const foe = {
-          id : foeTemplate.id,
-          type : foeTemplate.type,
-          name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
-          ability : foeTemplate.ability
-        }
+
         console.log('foe', foe);
         const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
         console.log('foe w stats', foeWithStats);
