@@ -59,6 +59,10 @@ const BattleModel = function(db, DataTypes){
       type : DataTypes.INTEGER,
       allowNull: true
     },
+    avatar : {
+      type : DataTypes.JSONB,
+      allowNull: true
+    },
     foe : {
       type : DataTypes.JSONB,
       allowNull: true

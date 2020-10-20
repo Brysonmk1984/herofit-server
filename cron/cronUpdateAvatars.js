@@ -6,7 +6,7 @@ const Op = Sequelize.Op;
  const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
  const { sendAppErrorEmail } = require('../mail');
 
-console.log('*** RUNNING CRON UPDATE AVATARS ***', Avatar);
+console.log('*** RUNNING CRON UPDATE AVATARS ***');
 
 
 Avatar.findAll(
@@ -14,7 +14,6 @@ Avatar.findAll(
 ).then((results) => {
   // Loop over each avatar and add up to 5 health
 
-  
   return results.forEach((result) =>{
     let h = result.health;
     const mH = result.maxHealth;
@@ -24,20 +23,14 @@ Avatar.findAll(
     }else{
       result.health += REGENERATION_RATE;
     }
-    console.log('RSS', result.status)
+
     if(result.status === 'Recovering'){
-      console.log('RECOVERING = ',result.status === 'Recovering', RESTED_THRESHOLD);
       result.status = 'Recovering';
-      console.log('RSS2', result["status"])
     }
-
-
-    console.log(`updating Avatar health - ${result.name}`);
     return Avatar.update(
       {health : result.health, status : result["status"]},
       { where: { owner: result.owner } }
     ).then((updateConfirm) =>{
-      console.log('UPDATED!', updateConfirm);
     }).catch((error) => {
       console.log('ERRROR', err);
       return sendAppErrorEmail(error,resolve, reject);

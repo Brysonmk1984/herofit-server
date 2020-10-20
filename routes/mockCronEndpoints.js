@@ -342,6 +342,7 @@ router.post('/do-battle', function(req, res, next){
           aHealthRemaining : b.aHealthRemaining,
           fHealthRemaining : b.fHealthRemaining,
           foe : Object.assign({}, foe, foeWithStats),
+          avatar : avatar,
           bra : BRA,
           brf : BRF,
           aElmDamage : b.aElmDamage,
