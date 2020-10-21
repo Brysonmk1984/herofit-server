@@ -52,7 +52,7 @@ function generateFoeStats(avatar){
   for(let points = baseFoeQp; points > 0; points-- ){
     const attr = properties[Math.floor(Math.random() * properties.length)];
     if(attr === "power"){
-      foe.power += 3;
+      foe.power += 1;
     }else if(attr === "health"){
       foe.health += 1;
     }else if(attr === "armor"){

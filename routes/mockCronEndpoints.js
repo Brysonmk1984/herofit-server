@@ -328,7 +328,7 @@ router.post('/do-battle', function(req, res, next){
     console.log('THEBATTLE - ', battle);
 
     return Avatar.findOne(
-      { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+      { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ).then((avatar) =>{
         // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
@@ -339,9 +339,8 @@ router.post('/do-battle', function(req, res, next){
         const itemsUsed = req.body.itemsUsed;
         const actionsChosen = req.body.actionsChosen;
 
-        console.log('foe', foe);
         const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
-        console.log('foe w stats', foeWithStats);
+
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
         const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
         
@@ -367,7 +366,7 @@ router.post('/do-battle', function(req, res, next){
             BRA = foeBP.avatar;
           }
         }
-        console.log('BRF', BRF);
+
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const battleResults = doBattle(BRA, BRF);
 
@@ -430,7 +429,7 @@ router.post('/do-battle', function(req, res, next){
           ).then((result) =>{
             console.log('finished updating avatar', avatar);
             
-            // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
+            
             res.status(200).json({
               avatar,
               foe : Object.assign({}, foe, foeWithStats),

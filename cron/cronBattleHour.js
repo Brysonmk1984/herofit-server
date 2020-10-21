@@ -33,38 +33,37 @@ Battle.findAll(
     let foe = battle.foe;
 
     return Avatar.findOne(
-      { where : { id : avatarID }, raw : true }
+      { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ).then((avatar) =>{
-        console.log('FOUND AVATAR!', avatar);
+        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
+
         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
         avatar = parseAvatarProperties(avatar);
-        
-        
-        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
-        
-        
+
         const itemsUsed = req.body.itemsUsed;
         const actionsChosen = req.body.actionsChosen;
         const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
-        console.log('generated foe - ', foeWithStats);
+ 
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats, true));
-        
+        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
+          
         // avatar and foe to be used for battle
         let BRA = Object.assign({}, sAvatar);
         let BRF = Object.assign({}, sFoe);
-
+        
         // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
         
         if(itemsUsed || actionsChosen){
-          if(scenario.id !== 4){
-            BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+          if(scenario.id !== AVATAR_NON_ACTION){
+            const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+            BRA = avBP.avatar;
+            BRF = avBP.foe;
           }
         }
 
         // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
         if(foeWithStats.ability){
-          if(scenario.id !== 1){
+          if(scenario.id !== FOE_NON_ACTION){
             const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
             BRF = foeBP.foe;
             BRA = foeBP.avatar;
@@ -73,13 +72,9 @@ Battle.findAll(
 
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const battleResults = doBattle(BRA, BRF);
-        
-        
-        
-        // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
-
 
         // SAVE DATA
+
         const b = battleResults;
         let xpGain;
 
@@ -105,7 +100,7 @@ Battle.findAll(
 
         // SAVE RESULTS TO DB
         return Battle.update({
-          scenario : b.scenario.id,
+          scenario : scenario.id,
           outcome : b.outcomeData.outcome,
           aStatus : b.outcomeData.avatarStatus,
           aPhyDamage : b.aPhyDamage,
@@ -126,18 +121,14 @@ Battle.findAll(
         },
         { where: { id: battleID }, raw : true }
       ).then(() => {
-
-        if(b.aHealthRemaining < 0){
-          b.aHealthRemaining = 0;
-        }
-
+        const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP = avatar.battleXP + xpGain;
 
         return Avatar.update(
-          { goToBattle : false, health : b.aHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
+          { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
           { where: { id: avatarID } }
-          ).then((avatar) =>{
+          ).then((result) =>{
             console.log('finished updating avatar', avatar);
         }).catch((error) =>{
           console.log('ERROR UPDATING AV AFTER BATTLE - ', error);

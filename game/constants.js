@@ -49,10 +49,9 @@ const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  XP : .7,
-  HEALTH : 1,
+  HEALTH : .5,
   QP : .5,
-  POWER : 1
+  POWER : .5
 };
 
 const OUTCOME_XP = {
