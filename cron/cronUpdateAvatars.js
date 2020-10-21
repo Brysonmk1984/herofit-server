@@ -17,7 +17,7 @@ Avatar.findAll(
   return results.forEach((result) =>{
     let h = result.health;
     const mH = result.maxHealth;
-    console.log('RESULT', result);
+    console.log('RESULT', result, h);
     if((h + REGENERATION_RATE) > mH){
       result.health = mH;
     }else{
@@ -27,7 +27,7 @@ Avatar.findAll(
     if(result.status === 'Recovering'){
       updatedStatus = 'Recovering';
       console.log('JUST BEFORE');
-      console.log(h, mh);
+      console.log(mh);
       console.log((h / mh) > RESTED_THRESHOLD);
 
       if((h / mh) > RESTED_THRESHOLD){

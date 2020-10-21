@@ -299,7 +299,7 @@ router.post('/do-battle', function(req, res, next){
             BRA = foeBP.avatar;
           }
         }
-
+        console.log('BRF', BRF);
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const battleResults = doBattle(BRA, BRF);
 
