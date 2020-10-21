@@ -27,10 +27,10 @@ Avatar.findAll(
     if(result.status === 'Recovering'){
       updatedStatus = 'Recovering';
       console.log('JUST BEFORE');
-      console.log(mh);
-      console.log((h / mh) > RESTED_THRESHOLD);
+      console.log(mH);
+      console.log((h / mH) > RESTED_THRESHOLD);
 
-      if((h / mh) > RESTED_THRESHOLD){
+      if((h / mH) > RESTED_THRESHOLD){
         updatedStatus = 'Rested';
       }
     }
