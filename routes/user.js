@@ -17,7 +17,7 @@ router.post('/insert-user-activities', function(req, res, next){
       latestActivityUpdate = activity.start_date;
 
     }
-    return { user : req.body.email,  activity : JSON.stringify(activity), activityDate : activity.start_date };
+    return { user : req.body.email,  activity, activityDate : activity.start_date };
   });
 
   // Add latestActivityUpdate to DB for user
@@ -147,13 +147,12 @@ router.post('/update-user-totals', function(req, res, next){
   for (const activity in req.body.userTotals) {
     //console.log(`${activity}: ${req.body.userTotals[activity]}`);
     if(req.body.userTotals[activity] !== null){
-      //console.log({ [activity] : JSON.stringify(req.body.userTotals[activity]) });
-      strTotals = Object.assign({}, strTotals, { [activity] : JSON.stringify(req.body.userTotals[activity]) })
+      strTotals = Object.assign({}, strTotals, { [activity] : req.body.userTotals[activity] })
 
     }
     
   }
-  console.log('stringified totals',strTotals);
+
   UserTotal.update(
     strTotals,
     { where: { user: req.body.email } }

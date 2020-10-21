@@ -6,49 +6,118 @@ const db = require('../db').db;
 const { Op } = require("sequelize");
 const { sendAppErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
-const { REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
+const { REVIVE_AMOUNT, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 
+// { where: { health: { [Op.lt]: db.col('maxHealth') } }
+
+
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
 router.get('/regenerate-health', function(req, res, next){
-  Avatar.findAll(
-    { where: { health: { [Op.lt]: db.col('maxHealth') } }, raw: true },
-  ).then((results) => {
-
-    // Loop over each avatar and add up to 5 health
+  // Get all avatars who aren't at full health
+  return Avatar.findAll(
+    { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
+  ).then((results) => {console.log('ress', results);
+  
+    // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
     results.forEach((result) =>{
+      result = parseAvatarProperties(result);
+      
       let h = result.health;
       const mH = result.maxHealth;
-
-      if((h + REGENERATION_RATE) > mH){
+      const adjRegenRate = REGENERATION_RATE + result.recovery;
+    
+      if((h + adjRegenRate) > mH){
         result.health = mH;
       }else{
-        result.health += REGENERATION_RATE;
+        result.health += adjRegenRate;
       }
-
-      console.log(`updating Avatar health - ${result.name}`);
-      Avatar.update(
-        {health : result.health},
+      // Update status if over 'Rested' threshold
+      let updatedStatus = 'Recovering';
+      if((result.health / mH) >= RESTED_THRESHOLD){
+        updatedStatus = 'Rested';
+      }
+      return Avatar.update(
+        {health : result.health, status : updatedStatus},
         { where: { owner: result.owner } }
       )
     });
 
-    next();
   }).catch((error) =>{
-    new Promise((resolve, reject) =>{
-      sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
-    }).then(() =>{
-      next();
+      console.log('THEE ERROR', error);
+    return new Promise((resolve, reject) =>{
+      return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
     }).catch((error) =>{
       console.log('couldn\'t send error email for error - ', error);
+      res.status(400);
       next();
     });
-
   });
 });
+
+
+
+// FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS
+router.get('/try-recovery', function(req, res, next){
+  // Get all avatars who are KOed
+  return Avatar.findAll(
+    { where: { status: "Knocked Out" }, raw: true, attributes: ['health', 'recovery','status', 'owner'] },
+  ).then((results) => {
+
+    const recoveredAvatars = []
+
+    // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
+    results.forEach((result, i) =>{
+      result = parseAvatarProperties(result);
+      const recoveryChance = result.recovery >= 100 ? 100 : result.recovery;
+
+      // THESE ARE THE NUMBERS THAT IF MATCHED IN THE WHILE LOOP, WILL ALLOW AVATAR TO RECOVER EARLY
+      const recoveryWinners = [];
+      for(let i = 0; i < recoveryChance; i++){
+        recoveryWinners.push(Math.floor(Math.random() * 100));
+      }
+      const winningNum = Math.floor(Math.random() * 100);
+      const found = recoveryWinners.includes(winningNum);
+      
+      // Revive avatar to the REVIVE_AMOUNT in constants.js
+      if(found){
+        return recoveredAvatars.push(result.owner);
+      }
+      return null;
+
+    });
+    return Avatar.update(
+      { health : REVIVE_AMOUNT, status : 'Recovering' },
+      { where: { owner: { [Op.in]: recoveredAvatars } }}
+    ).then(()=>{
+      res.status(200);
+    }).catch((error)=>{
+      console.log('ERROR', error);
+      res.status(400);
+    });
+
+  }).catch((error) =>{
+      console.log('THEE ERROR', error);
+    return new Promise((resolve, reject) =>{
+      return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+    }).catch((error) =>{
+      console.log('couldn\'t send error email for error - ', error);
+      res.status(400);
+      next();
+    });
+  });
+});
+
+
+
+
+
+
+
+
 
 // RANDOMLY GENERATE A FOE
 router.post('/generate-foe', function(req, res, next){
@@ -241,7 +310,6 @@ router.post('/do-battle-sims', function(req, res, next){
     tally
   });
 });
-module.exports = router;
 
 
 // DO A SINGLE INSTANCE OF BATTLE with passed in Avatar
@@ -405,3 +473,5 @@ router.post('/do-battle', function(req, res, next){
   });
   
 });
+
+module.exports = router;

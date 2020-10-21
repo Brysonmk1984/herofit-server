@@ -7,6 +7,8 @@ const AppMode = require('../appConfig').config.mode;
 const mockAccounts = require('../mockData/mockCognitoAccounts');
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
+const { parseAvatarProperties } = require('../helperFunctions');
+
 const heroList = require('../heroList');
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
@@ -38,12 +40,12 @@ const shuffleArray = function(array) {
 router.post('/insert-mock-activities', function(req,res,next){
 const count = req.body.count;
 const activities = shuffleArray(mockActivities).slice(0,count);
-
+  console.log('INSERTING THIS MANY ACTS - ',activities.length, 'mock acts - ', mockActivities.length, 'couunt', count);
   const entries = activities.map((activity) =>{
     activity.start_date = moment.utc().format('YYYY-MM-DDTHH:mm:ss');
     activity.start_date_local = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
-    return { user : req.body.email,  activity : JSON.stringify(activity), activityDate : activity.start_date };
+    return { user : req.body.email,  activity, activityDate : activity.start_date };
   });
 
   // Add latestActivityUpdate to DB for user
@@ -463,6 +465,24 @@ router.post('/check-admin-password', function(req,res,next){
     });
     next();
   }
+});
+
+router.post('/set-avatar-health-and-status', function(req, res, next){
+  return Avatar.update(
+    { health : req.body.health, status : req.body.status },
+    { where: { id: req.body.id }, returning : true, raw : true }
+  ).then((avatar) =>{console.log('REW',avatar[1]);
+    res.status(200).json({
+      avatar : parseAvatarProperties(avatar[1][0])
+    });
+  }).catch((error) =>{
+    console.log('ERROR UPDATING AVATAR', error);
+    res.status(400).json({
+      message : `ERROR UPDATING AVATAR - ${error}`,
+    });
+    next();
+  });
+
 });
 
 

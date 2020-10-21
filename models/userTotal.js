@@ -42,7 +42,7 @@ const UserTotalModel = function(db, DataTypes){
         allowNull: true
       },
       yoga: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSONB,
         allowNull: true
       },
       weightTraining: {
