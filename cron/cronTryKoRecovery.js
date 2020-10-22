@@ -3,7 +3,6 @@ const { Op } = require("sequelize");
 const { REVIVE_AMOUNT } = require('../game/constants');
 const { sendAppErrorEmail} = require('../mail');
 
-
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 
 // Get all avatars who are KOed
@@ -36,6 +35,8 @@ Avatar.findAll(
     { health : REVIVE_AMOUNT, status : 'Recovering' },
     { where: { owner: { [Op.in]: recoveredAvatars } }}
   );
+}).then(()=>{
+  console.log('SHOULD HAVE ATTEMPTED KO RECOVERY');
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
   return new Promise((resolve, reject) =>{

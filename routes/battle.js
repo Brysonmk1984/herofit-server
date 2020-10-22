@@ -27,7 +27,6 @@ router.post('/insert-battle', function(req, res, next){
 
     Avatar.update({ 
       goToBattle : true,
-      status : 'Awaiting Battle'
     },{ where: { owner: req.body.email }, raw: true })
     .then((result) =>{
       if(!result){
@@ -39,7 +38,6 @@ router.post('/insert-battle', function(req, res, next){
       res.status(200).json({
         message : 'Avatar set for battle',
         goToBattle : true,
-        status : 'Awaiting Battle'
       });
       next();
     }).catch((err)=>{
