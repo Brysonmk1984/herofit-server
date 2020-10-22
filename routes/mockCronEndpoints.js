@@ -3,7 +3,8 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const db = require('../db').db;
-const { Op } = require("sequelize");
+const { Op, literal, col, fn, QueryTypes } = require("sequelize");
+const sequelize = require("sequelize");
 const { sendAppErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
@@ -16,12 +17,15 @@ const doBattle = require('../game/doBattle');
 
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
-router.get('/regenerate-health', function(req, res, next){
-  // Get all avatars who aren't at full health
+router.get('/regenerate-health', async function(req, res, next){
+    
+  //Get all avatars who aren't at full health
   return Avatar.findAll(
     { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
   ).then((results) => {console.log('ress', results);
-  
+    
+    const allPromises = []
+    
     // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
     results.forEach((result) =>{
       result = parseAvatarProperties(result);
@@ -40,11 +44,15 @@ router.get('/regenerate-health', function(req, res, next){
       if((result.health / mH) >= RESTED_THRESHOLD){
         updatedStatus = 'Rested';
       }
-      return Avatar.update(
+      allPromises.push(Avatar.update(
         {health : result.health, status : updatedStatus},
-        { where: { owner: result.owner } }
-      )
+        { where: { owner: result.owner },
+        returning: true,
+        raw: true, 
+        plain: true
+      }));
     });
+    return Promise.all(allPromises);
 
   }).catch((error) =>{
       console.log('THEE ERROR', error);
@@ -52,7 +60,10 @@ router.get('/regenerate-health', function(req, res, next){
       return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
     }).catch((error) =>{
       console.log('couldn\'t send error email for error - ', error);
-      res.status(400);
+      res.status(400).json({
+        status:400,
+        eInside : error
+      });
       next();
     });
   });
