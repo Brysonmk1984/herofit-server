@@ -71,7 +71,9 @@ const sendSurveyEmail = function(formData, resolve, reject){
 
 const sendAppErrorEmail = function(formData, resolve, reject){
   const adminData = formData.admin;
-  const debug = formData.debug;
+  const debug = formData.debug || formData.message;
+  const status = formData.status || formData.name;
+  const version = formData.version || 'Alpha';
 
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
@@ -95,8 +97,8 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
-      subject: `HEROFIT - ${formData.status} APPLICATION ERROR - version ${formData.version}`, 
-      text: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
+      subject: `HEROFIT - ${status} APPLICATION ERROR - version ${formData.version}`, 
+      text: `An Error occured in HeroFit Production - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
       html
   };
 

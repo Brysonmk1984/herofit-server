@@ -55,9 +55,9 @@ router.get('/regenerate-health', async function(req, res, next){
     return Promise.all(allPromises);
 
   }).catch((error) =>{
-      console.log('THEE ERROR', error);
+    console.log('ERROR DOING BULK HEALTH UPDATE', error);
     return new Promise((resolve, reject) =>{
-      return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+      return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
     }).catch((error) =>{
       console.log('couldn\'t send error email for error - ', error);
       res.status(400).json({
@@ -326,6 +326,9 @@ router.post('/do-battle-sims', function(req, res, next){
 // DO A SINGLE INSTANCE OF BATTLE with passed in Avatar
 router.post('/do-battle', function(req, res, next){
   const avatarID = req.body.avatarID;
+  let battleID;
+  let avatar;
+  let foe;
 
   Battle.findAll({
     limit: 1,
@@ -335,146 +338,133 @@ router.post('/do-battle', function(req, res, next){
   }).then((battle) =>{
     battle = battle[0];
     foe = battle.foe;
-    const battleID = battle.id;
+    battleID = battle.id;
     console.log('THEBATTLE - ', battle);
 
     return Avatar.findOne(
       { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
-    ).then((avatar) =>{
-        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
+    )
+  }).then((av)=>{
+    // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
+    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+    avatar = parseAvatarProperties(av);
+    
+    const itemsUsed = req.body.itemsUsed;
+    const actionsChosen = req.body.actionsChosen;
+
+    const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
+
+    // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
+    const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
+    
+    // avatar and foe to be used for battle
+    let BRA = Object.assign({}, sAvatar);
+    let BRF = Object.assign({}, sFoe);
+    
+    // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
+    
+    if(itemsUsed || actionsChosen){
+      if(scenario.id !== AVATAR_NON_ACTION){
+        const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+        BRA = avBP.avatar;
+        BRF = avBP.foe;
+      }
+    }
+
+    // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
+    if(foeWithStats.ability){
+      if(scenario.id !== FOE_NON_ACTION){
+        const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+        BRF = foeBP.foe;
+        BRA = foeBP.avatar;
+      }
+    }
+
+    // BATTLE STEP 5 - EXCHANGE DAMAGE
+    const battleResults = doBattle(BRA, BRF);
+
+    // SAVE DATA
+
+    const b = battleResults;
+    let xpGain;
+
+    switch(b.outcomeData.outcome){
+      case "Avatar Wins":
+        xpGain = OUTCOME_XP.win;
+        avatar.battleWins = avatar.battleWins + 1;
+        break;
+      case "Foe Wins":
+        xpGain = OUTCOME_XP.loss;
+        avatar.battlelosses = avatar.battlelosses + 1;
+        break;
+      case "Draw":
+        xpGain = OUTCOME_XP.draw;
+        avatar.battleDraws = avatar.battleDraws + 1;
+        break;
+      case "Double KO":
+        xpGain = OUTCOME_XP.dko;
+        avatar.battleDkos = avatar.battleDkos + 1;
+        break;
+      default:
+    }
+
+    // SAVE RESULTS TO DB
+    return Battle.update({
+      scenario : scenario.id,
+      outcome : b.outcomeData.outcome,
+      aStatus : b.outcomeData.avatarStatus,
+      aPhyDamage : b.aPhyDamage,
+      fPhyReduction : b.fPhyReduction,
+      fPhyDamage : b.fPhyDamage,
+      aPhyReduction : b.aPhyReduction,
+      xpGain,
+      aHealthRemaining : b.aHealthRemaining,
+      fHealthRemaining : b.fHealthRemaining,
+      foe : Object.assign({}, foe, foeWithStats),
+      avatar : avatar,
+      bra : BRA,
+      brf : BRF,
+      aElmDamage : b.aElmDamage,
+      fElmReduction : b.fElmReduction,
+      fElmDamage : b.fElmDamage,
+      aElmReduction : b.aElmReduction,
+    },
+    { where: { id: battleID }, raw : true }
+  ).then(() => {
+    const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
+
+    avatar.status = b.outcomeData.avatarStatus;
+    avatar.battleXP = avatar.battleXP + xpGain;
+
+    return Avatar.update(
+      { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
+      { where: { id: avatarID } }
+      ).then((result) =>{
+        console.log('finished updating avatar', avatar);
         
-        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-        avatar = parseAvatarProperties(avatar);
         
-        const itemsUsed = req.body.itemsUsed;
-        const actionsChosen = req.body.actionsChosen;
-
-        const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar));
-
-        // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
-        
-        // avatar and foe to be used for battle
-        let BRA = Object.assign({}, sAvatar);
-        let BRF = Object.assign({}, sFoe);
-        
-        // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
-        
-        if(itemsUsed || actionsChosen){
-          if(scenario.id !== AVATAR_NON_ACTION){
-            const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
-            BRA = avBP.avatar;
-            BRF = avBP.foe;
-          }
-        }
-
-        // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-        if(foeWithStats.ability){
-          if(scenario.id !== FOE_NON_ACTION){
-            const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
-            BRF = foeBP.foe;
-            BRA = foeBP.avatar;
-          }
-        }
-
-        // BATTLE STEP 5 - EXCHANGE DAMAGE
-        const battleResults = doBattle(BRA, BRF);
-
-        // SAVE DATA
-
-        const b = battleResults;
-        let xpGain;
-
-        switch(b.outcomeData.outcome){
-          case "Avatar Wins":
-            xpGain = OUTCOME_XP.win;
-            avatar.battleWins = avatar.battleWins + 1;
-            break;
-          case "Foe Wins":
-            xpGain = OUTCOME_XP.loss;
-            avatar.battlelosses = avatar.battlelosses + 1;
-            break;
-          case "Draw":
-            xpGain = OUTCOME_XP.draw;
-            avatar.battleDraws = avatar.battleDraws + 1;
-            break;
-          case "Double KO":
-            xpGain = OUTCOME_XP.dko;
-            avatar.battleDkos = avatar.battleDkos + 1;
-            break;
-          default:
-        }
-
-        // SAVE RESULTS TO DB
-        return Battle.update({
-          scenario : scenario.id,
-          outcome : b.outcomeData.outcome,
-          aStatus : b.outcomeData.avatarStatus,
-          aPhyDamage : b.aPhyDamage,
-          fPhyReduction : b.fPhyReduction,
-          fPhyDamage : b.fPhyDamage,
-          aPhyReduction : b.aPhyReduction,
-          xpGain,
-          aHealthRemaining : b.aHealthRemaining,
-          fHealthRemaining : b.fHealthRemaining,
+        res.status(200).json({
+          avatar,
           foe : Object.assign({}, foe, foeWithStats),
-          avatar : avatar,
-          bra : BRA,
-          brf : BRF,
-          aElmDamage : b.aElmDamage,
-          fElmReduction : b.fElmReduction,
-          fElmDamage : b.fElmDamage,
-          aElmReduction : b.aElmReduction,
-        },
-        { where: { id: battleID }, raw : true }
-      ).then(() => {
-        const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
-
-        avatar.status = b.outcomeData.avatarStatus;
-        avatar.battleXP = avatar.battleXP + xpGain;
-
-        return Avatar.update(
-          { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
-          { where: { id: avatarID } }
-          ).then((result) =>{
-            console.log('finished updating avatar', avatar);
-            
-            
-            res.status(200).json({
-              avatar,
-              foe : Object.assign({}, foe, foeWithStats),
-              BRA,
-              BRF,
-              scenario,
-              battleResults,
-              xpGain
-            });
-
-        }).catch((error) =>{
-          console.log('ERROR UPDATING AV AFTER BATTLE - ', error);
-          res.status(400).json({
-            message: `ERROR UPDATING AV AFTER BATTLE`,
-          });
-          next();
+          BRA,
+          BRF,
+          scenario,
+          battleResults,
+          xpGain
         });
-
-      }).catch((error) =>{
-        console.log('INDIVIDUAL BATTLE ERROR - ', error);
-        res.status(400).json({
-          message: `INDIVIDUAL BATTLE ERROR`,
-        });
-        next();
-      });
 
     }).catch((error) =>{
-      console.log('ERROR RETRIEVING AVATAR FOR BATTLE - ', error);
+      console.log('ERROR UPDATING AV AFTER BATTLE - ', error);
       res.status(400).json({
-        message: `ERROR RETRIEVING AVATAR FOR BATTLE`,
+        message: `ERROR UPDATING AV AFTER BATTLE`,
       });
       next();
     });
-  }).catch((error) =>{
+  })
+  })
+  
+  .catch((error) =>{
     console.log('ERROR RETRIEVING BATTLE - ', error);
     res.status(400).json({
       message : `ERROR RETRIEVING BATTLE - ${error}`,

@@ -2,6 +2,7 @@
 const Avatar = require('../db').Avatar;
  const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
  const { sendAppErrorEmail } = require('../mail');
+ const { parseAvatarProperties } = require('../helperFunctions');
 
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
@@ -43,7 +44,7 @@ return Avatar.findAll(
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
   return new Promise((resolve, reject) =>{
-    return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+    return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for error - ', error);
     next();
