@@ -1,6 +1,8 @@
 const Avatar = require('../db').Avatar;
+const { Op } = require("sequelize");
 const { REVIVE_AMOUNT } = require('../game/constants');
 const { sendAppErrorEmail} = require('../mail');
+
 
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 
@@ -35,8 +37,9 @@ Avatar.findAll(
     { where: { owner: { [Op.in]: recoveredAvatars } }}
   );
 }).catch((error) =>{
-  new Promise((resolve, reject) =>{
-    return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+  console.log('ERROR TRYING TO DO KO REVIVES', error);
+  return new Promise((resolve, reject) =>{
+    return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for error - ', error);
   });

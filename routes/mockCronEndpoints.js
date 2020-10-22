@@ -430,8 +430,8 @@ router.post('/do-battle', function(req, res, next){
       fElmDamage : b.fElmDamage,
       aElmReduction : b.aElmReduction,
     },
-    { where: { id: battleID }, raw : true }
-  ).then(() => {
+    { where: { id: battleID }, raw : true })
+    .then(() => {
     const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
 
     avatar.status = b.outcomeData.avatarStatus;
@@ -439,39 +439,26 @@ router.post('/do-battle', function(req, res, next){
 
     return Avatar.update(
       { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
-      { where: { id: avatarID } }
-      ).then((result) =>{
-        console.log('finished updating avatar', avatar);
-        
-        
-        res.status(200).json({
-          avatar,
-          foe : Object.assign({}, foe, foeWithStats),
-          BRA,
-          BRF,
-          scenario,
-          battleResults,
-          xpGain
-        });
-
-    }).catch((error) =>{
-      console.log('ERROR UPDATING AV AFTER BATTLE - ', error);
-      res.status(400).json({
-        message: `ERROR UPDATING AV AFTER BATTLE`,
-      });
-      next();
+      { where: { id: avatarID } });
+  }).then((result) =>{
+    console.log('finished updating avatar', avatar);
+    return res.status(200).json({
+      avatar,
+      foe : Object.assign({}, foe, foeWithStats),
+      BRA,
+      BRF,
+      scenario,
+      battleResults,
+      xpGain
     });
-  })
-  })
-  
-  .catch((error) =>{
-    console.log('ERROR RETRIEVING BATTLE - ', error);
+  }).catch((error) =>{
+    console.log('ERROR SOMEWHERE IN BATTLE PROCESS - ', error);
     res.status(400).json({
-      message : `ERROR RETRIEVING BATTLE - ${error}`,
+      message : `ERROR SOMEWHERE IN BATTLE PROCESS- ${error}`,
     });
     next();
   });
-  
+  });
 });
 
 module.exports = router;
