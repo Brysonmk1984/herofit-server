@@ -47,6 +47,5 @@ return Avatar.findAll(
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for error - ', error);
-    next();
   });
 });

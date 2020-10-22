@@ -140,7 +140,7 @@ const sendBattleErrorEmail = function(formData, resolve, reject){
   };
 
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }
