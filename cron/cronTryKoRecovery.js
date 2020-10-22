@@ -1,5 +1,6 @@
 const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
+const { parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT } = require('../game/constants');
 const { sendAppErrorEmail} = require('../mail');
 

@@ -7,7 +7,6 @@ const BattleModel = function(db, DataTypes){
     },
     avatarID : {
       type : DataTypes.STRING,
-      unique : true,
       allowNull: false,
     },
     scenario : {
@@ -20,7 +19,6 @@ const BattleModel = function(db, DataTypes){
     },
     aStatus : {
       type : DataTypes.STRING,
-      unique : true,
       allowNull: true,
     },
     aPhyDamage : {
