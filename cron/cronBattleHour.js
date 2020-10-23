@@ -36,7 +36,7 @@ Battle.findAll({
     ));
   })
 
-  return Promise.all(allAvatarPromises);
+  return Promise.allSettled(allAvatarPromises);
 
 }).then((avatars) =>{
 
@@ -143,10 +143,11 @@ Battle.findAll({
     allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[i],{ where: { id: allAvatarIds[i] } }));
   });
 
-  return Promise.all(allUpdateAvatarPromises);
+  return Promise.allSettled(allUpdateAvatarPromises);
   
-}).then(() => {
-  console.log('ALL AVATARS UPDATED');
+}).then((results) => {
+  console.log('Ending Promise Results',results.length);
+  return results.forEach((result) => console.log('All battle Promise Results - ', result.status))
 }).catch((error)=>{
   console.log('error in cronBattleHour', error);
 });

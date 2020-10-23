@@ -1,9 +1,8 @@
 
 const Avatar = require('../db').Avatar;
- const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
- const { sendAppErrorEmail } = require('../mail');
- const { parseAvatarProperties } = require('../helperFunctions');
-
+const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
+const { sendAppErrorEmail } = require('../mail');
+const { parseAvatarProperties } = require('../helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health
@@ -14,9 +13,9 @@ return Avatar.findAll(
   const allPromises = []
   
   // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
-  results.forEach((result) =>{
+  results.forEach((result) =>{console.log('avatar result', result);
     result = parseAvatarProperties(result);
-    
+
     let h = result.health;
     const mH = result.maxHealth;
     const adjRegenRate = REGENERATION_RATE + result.recovery;
@@ -39,8 +38,11 @@ return Avatar.findAll(
       plain: true
     }));
   });
-  return Promise.all(allPromises);
+  return Promise.allSettled(allPromises);
 
+}).then((results) => {
+  console.log(results.length);
+  return results.forEach((result) => console.log('All Regenerate Results - ', result.status))
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
   return new Promise((resolve, reject) =>{

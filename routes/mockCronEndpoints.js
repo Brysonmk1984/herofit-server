@@ -22,14 +22,14 @@ router.get('/regenerate-health', async function(req, res, next){
   //Get all avatars who aren't at full health
   return Avatar.findAll(
     { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
-  ).then((results) => {console.log('ress', results);
+  ).then((results) => {
     
     const allPromises = []
     
     // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
     results.forEach((result) =>{
-      result = parseAvatarProperties(result);
-      
+    result = parseAvatarProperties(result);
+
       let h = result.health;
       const mH = result.maxHealth;
       const adjRegenRate = REGENERATION_RATE + result.recovery;
@@ -44,6 +44,8 @@ router.get('/regenerate-health', async function(req, res, next){
       if((result.health / mH) >= RESTED_THRESHOLD){
         updatedStatus = 'Rested';
       }
+
+
       allPromises.push(Avatar.update(
         {health : result.health, status : updatedStatus},
         { where: { owner: result.owner },
@@ -52,8 +54,11 @@ router.get('/regenerate-health', async function(req, res, next){
         plain: true
       }));
     });
-    return Promise.all(allPromises);
+    return Promise.allSettled(allPromises);
 
+  }).then((results) => {
+    console.log(results.length);
+    return results.forEach((result) => console.log('All Regenerate Results - ', result.status))
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     return new Promise((resolve, reject) =>{
