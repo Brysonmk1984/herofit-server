@@ -21,17 +21,17 @@ Avatar.findAll(
     const adjRegenRate = REGENERATION_RATE + result.recovery;
     let finalHealth;
     if((h + adjRegenRate) > mH){
-      finalHealth = mH;
+      result.health = mH;
     }else{
-      finalHealth = h + adjRegenRate;
-    }
+      result.health = h + adjRegenRate;
+    }console.log('FINAL HEALTH',result.health);
     // Update status if over 'Rested' threshold
     let updatedStatus = 'Recovering';
-    if((finalHealth / mH) >= RESTED_THRESHOLD){
+    if((result.health / mH) >= RESTED_THRESHOLD){
       updatedStatus = 'Rested';
     }
     allPromises.push(Avatar.update(
-      {health : finalHealth, status : updatedStatus},
+      {health : result.health, status : updatedStatus},
       { where: { owner: result.owner },
       returning: true,
       raw: true, 
