@@ -23,8 +23,8 @@ Avatar.findAll(
     if((h + adjRegenRate) > mH){
       result.health = mH;
     }else{
-      result.health = h + adjRegenRate;
-    }console.log('FINAL HEALTH',result.health);
+      result.health += adjRegenRate;
+    }console.log('FINAL HEALTH2',result.health);
     // Update status if over 'Rested' threshold
     let updatedStatus = 'Recovering';
     if((result.health / mH) >= RESTED_THRESHOLD){
