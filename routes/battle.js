@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
+const { Op } = require("sequelize");
+const moment = require("moment");
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { selectFoeTemplate } = require('../game/foeFunctions');
@@ -91,15 +93,29 @@ router.post('/remove-battle', function(req, res, next){
 router.post('/fetch-battle-report', function(req, res, next){
   Battle.findAll({
     limit: 1,
-    where: { avatarID: req.body.avatarID },
+    where: { 
+      avatarID: req.body.avatarID,
+      outcome: {
+        [Op.not]: 'TBD'
+      }
+    },
     order: [ [ 'createdAt', 'DESC' ]],
     raw : true
   }).then((result) =>{
-    res.status(200).json({
-      message : 'Retrieved Latest Battle Results',
-      result : result[0]
-    });
-    next();
+    if(result.length){
+      const withinLastDay =  moment.utc().subtract(1,"day").isBefore(result[0].updatedAt);
+      if(withinLastDay){
+        res.status(200).json({
+          message : 'Retrieved Latest Battle Results',
+          result : result[0]
+        });
+      }else{
+        throw new Error('Data Error','Outdated Results');
+      }
+    }else{
+      throw new Error('Data Error','No Battle Results');
+    }
+
   }).catch((error) =>{
     res.status(400).json({
       message: `Couldn't retrieve latest Battle Results - ${error}`,
