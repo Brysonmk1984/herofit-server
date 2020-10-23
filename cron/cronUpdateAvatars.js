@@ -15,23 +15,23 @@ Avatar.findAll(
   // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
   results.forEach((result) =>{console.log('avatar result', result);
     result = parseAvatarProperties(result);
-
+    
     let h = result.health;
     const mH = result.maxHealth;
     const adjRegenRate = REGENERATION_RATE + result.recovery;
-  
+    let finalHealth;
     if((h + adjRegenRate) > mH){
-      result.health = mH;
+      finalHealth = mH;
     }else{
-      result.health += adjRegenRate;
+      finalHealth = h + adjRegenRate;
     }
     // Update status if over 'Rested' threshold
     let updatedStatus = 'Recovering';
-    if((result.health / mH) >= RESTED_THRESHOLD){
+    if((finalHealth / mH) >= RESTED_THRESHOLD){
       updatedStatus = 'Rested';
     }
     allPromises.push(Avatar.update(
-      {health : result.health, status : updatedStatus},
+      {health : finalHealth, status : updatedStatus},
       { where: { owner: result.owner },
       returning: true,
       raw: true, 
