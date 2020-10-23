@@ -9,7 +9,7 @@ console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 // Get all avatars who are KOed
 Avatar.findAll(
   { where: { status: "Knocked Out" }, raw: true, attributes: ['health', 'recovery','status', 'owner'] },
-).then((results) => {
+).then((results) => {console.log('all results');
   const recoveredAvatars = []
 
   // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
@@ -27,17 +27,19 @@ Avatar.findAll(
     
     // Revive avatar to the REVIVE_AMOUNT in constants.js
     if(found){
+      console.log('Found!', result.owner);
       return recoveredAvatars.push(result.owner);
     }
     return null;
 
   });
+  console.log('recovered avs', recoveredAvatars);
   return Avatar.update(
     { health : REVIVE_AMOUNT, status : 'Recovering' },
     { where: { owner: { [Op.in]: recoveredAvatars } }}
   );
-}).then(()=>{
-  console.log('SHOULD HAVE ATTEMPTED KO RECOVERY');
+}).then((avUpdate)=>{
+  console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
   return new Promise((resolve, reject) =>{
