@@ -35,7 +35,7 @@ const sendContactEmail = function(formData, resolve, reject){
   };
 
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }
@@ -57,7 +57,7 @@ const sendSurveyEmail = function(formData, resolve, reject){
   };
 
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }
@@ -103,7 +103,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   };
 
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }
@@ -161,7 +161,7 @@ const sendBattleReportEmail = function(formData, resolve, reject){
   };
 
   // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }

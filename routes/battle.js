@@ -64,35 +64,27 @@ router.post('/remove-battle', function(req, res, next){
   ).then((result) =>{
     console.log('BATTLE REMOVED', result);
     
-    Avatar.update({ 
+    return Avatar.update({ 
       goToBattle : false,
-      status : 'Rested'
-    },{ where: { owner: req.body.email }, raw: true })
-    .then((result) =>{
-      if(!result){
-        res.status(204).json({
-          message: `No Avatar associated with user ${req.body.email}`
-        });
-        return;
-      }
-      res.status(200).json({
-        message : 'Avatar removed from battle',
-        goToBattle : false,
-        status : 'Rested'
-      });
-      next();
-    }).catch((err)=>{
-      console.log(`Couldn't Remove AVATAR from Battle: ${err}`);
-      res.status(400).json({
-        message: `Couldn't remove AVATAR from Battle`,
-        debug : err
-      });
-      next();
+    },{ where: { owner: req.body.email }, raw: true });
+    
+  }).then((result) =>{
+    if(!result){
+      throw new CustomError('Unable to Remove Battle',`No Avatar associated with user ${req.body.email}`);
+    }
+    res.status(200).json({
+      message : 'Avatar removed from battle',
+      goToBattle : false,
     });
-
-  }).catch((error) =>{
-    console.log('ERROR REMOVING battle', error);
-  });
+    next();
+  }).catch((err)=>{
+    console.log(`Couldn't Remove AVATAR from Battle: ${err}`);
+    res.status(400).json({
+      message: `Couldn't remove AVATAR from Battle`,
+      debug : err
+    });
+    next();
+  })
 });
 
 // USER Logs in after a battle, or clicks button to retrieve report

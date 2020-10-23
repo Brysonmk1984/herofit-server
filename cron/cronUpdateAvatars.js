@@ -6,7 +6,7 @@ const { parseAvatarProperties } = require('../helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health
-return Avatar.findAll(
+Avatar.findAll(
   { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
 ).then((results) => {
   
