@@ -25,7 +25,7 @@ router.post('/insert-battle', function(req, res, next){
   }, 
   {raw : true}
   ).then((result) =>{
-    console.log('BATTLE INSERTED', result);
+    console.log('BATTLE INSERTED!!', result);
 
     Avatar.update({ 
       goToBattle : true,
