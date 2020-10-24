@@ -117,8 +117,9 @@ router.post('/fetch-battle-report', function(req, res, next){
     }
 
   }).catch((error) =>{
-    res.status(400).json({
-      message: `Couldn't retrieve latest Battle Results - ${error}`,
+    res.status(200).json({
+      message: `No Results`,
+      result : []
     });
   });
 });
