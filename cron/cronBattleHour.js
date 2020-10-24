@@ -6,6 +6,7 @@ const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
+const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const doBattle = require('../game/doBattle');
 
 console.log('*** RUNNING CRON AVATAR BATTLES ***');
