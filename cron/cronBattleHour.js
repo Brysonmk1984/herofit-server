@@ -4,6 +4,7 @@ const { Op } = require("sequelize");
 const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
+const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 
