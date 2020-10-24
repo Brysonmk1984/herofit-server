@@ -16,6 +16,7 @@ router.post('/insert-battle', function(req, res, next){
     name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
     ability : foeTemplate.ability
   }
+  console.log('FOE!', foe, req.body.email, req.body.avatarID, req.body.avatarName)
   Battle.create({
     owner: req.body.email,
     avatarID: req.body.avatarID,
