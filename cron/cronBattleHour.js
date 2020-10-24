@@ -34,9 +34,9 @@ Battle.findAll({
   where: { outcome : 'TBD' },
   raw : true
 }).then((battles) =>{
-
+  console.log('BATTLES!!', battles);
   battles.forEach((battle) =>{
-    battles = battle[0];
+    console.log('BATTLEFOE - ', battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
@@ -55,12 +55,12 @@ Battle.findAll({
 
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
-
+    
     const itemsUsed = null;
     const actionsChosen = null;
 
     const foeWithStats = Object.assign({}, allFoes[i], generateFoeStats(avatar));
-    console.log('SCENBONUS - ', doScenarioAndBonus);
+    console.log('FWS - ', foeWithStats);
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
     

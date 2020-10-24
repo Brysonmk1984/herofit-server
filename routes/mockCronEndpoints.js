@@ -505,9 +505,8 @@ router.get('/do-all-battles', function(req, res, next){
     where: { outcome : 'TBD' },
     raw : true
   }).then((battles) =>{
-
+    console.log('BATTLES!', battles);
     battles.forEach((battle) =>{
-      battles = battle[0];
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
       allFoes.push(battle.foe);
@@ -646,7 +645,7 @@ router.get('/do-all-battles', function(req, res, next){
       return sendBattleReportEmail(tally, resolve, reject);
     });
   }).then((data) =>{
-    console.log('Result Tally email sent successfully', data);
+    console.log('Result Tally email sent successfully',data);
   }).catch((error)=>{
     console.log('error in cronBattleHour', error);
   });
