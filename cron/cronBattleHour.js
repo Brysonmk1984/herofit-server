@@ -54,8 +54,8 @@ Battle.findAll({
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
 
-    const itemsUsed = req.body.itemsUsed || null;
-    const actionsChosen = req.body.actionsChosen || null;
+    const itemsUsed = null;
+    const actionsChosen = null;
 
     const foeWithStats = Object.assign({}, allFoes[i], generateFoeStats(avatar));
 
