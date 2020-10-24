@@ -85,8 +85,7 @@ router.post('/get-avatar', function(req, res, next){
     }
     res.status(200).json({
       message: `Found matching Avatar`,
-      avatar,
-      cake : true
+      avatar
     });
     next();
   }).catch((err)=>{

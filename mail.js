@@ -149,15 +149,31 @@ const sendBattleErrorEmail = function(formData, resolve, reject){
 };
 
 
-const sendBattleReportEmail = function(formData, resolve, reject){
+const sendBattleReportEmail = function(tally, resolve, reject){
 
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HeroFit - Battle Report`, 
-      text: `Number of Avatar Battles: ${formData.count}. \n\n Battle Report Tally: ${formData.tally}`,
-      html: `Number of Avatar Battles: ${formData.count}. \n\n Battle Report Tally: ${formData.tally}`,
+      text: `Number of Avatar Battles: ${tally.total}. \n\n Battle Report Tally:\n\n
+      Avatar Wins: ${tally.avatarWins}\n
+      Foe Wins: ${tally.foeWins}\n
+      Draw: ${tally.draw}\n
+      Double KO: ${tally.doubleKO}\n
+      Avatar win%: ${tally.avWinPercent * 100}%\n
+      Avatar win% overall: ${tally.avWinPercentOverall * 100}%\n
+      Tie win%: ${tally.tiePercent * 100}%\n
+      `,
+      html: `Number of Avatar Battles: ${tally.total}. <br/><br/> Battle Report Tally:\n\n
+      Avatar Wins: ${tally.avatarWins}<br/>
+      Foe Wins: ${tally.foeWins}<br/>
+      Draw: ${tally.draw}<br/>
+      Double KO: ${tally.doubleKO}<br/>
+      Avatar win%: ${tally.avWinPercent * 100}%<br/>
+      Avatar win% overall: ${tally.avWinPercentOverall * 100}%<br/>
+      Tie win%: ${tally.tiePercent * 100}%<br/>
+      `,
   };
 
   // send mail with defined transport object

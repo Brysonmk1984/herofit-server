@@ -5,7 +5,7 @@ const Battle = require('../db').Battle;
 const db = require('../db').db;
 const { Op, literal, col, fn, QueryTypes } = require("sequelize");
 const sequelize = require("sequelize");
-const { sendAppErrorEmail } = require('../mail');
+const { sendAppErrorEmail, sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
@@ -489,6 +489,17 @@ router.get('/do-all-battles', function(req, res, next){
   let avatarUpdates = [];
   //let allUpdateAvatarPromises = [];
 
+ const tally= {
+    foeWins : 0,
+    avatarWins : 0,
+    draw : 0,
+    doubleKO : 0,
+    total : 0,
+    avWinPercent : 0,
+    avWinPercentOverall : 0,
+    tiePercent : 0
+  };
+
 
   Battle.findAll({
     where: { outcome : 'TBD' },
@@ -546,7 +557,7 @@ router.get('/do-all-battles', function(req, res, next){
           BRA = foeBP.avatar;
         }
       }
-      console.log(BRA);
+
       // BATTLE STEP 5 - EXCHANGE DAMAGE
       const battleResults = doBattle(BRA, BRF);
 
@@ -558,21 +569,30 @@ router.get('/do-all-battles', function(req, res, next){
         case "Avatar Wins":
           xpGain = OUTCOME_XP.win;
           avatar.battleWins = avatar.battleWins + 1;
+          // for email tally
+          tally.avatarWins += 1;
           break;
         case "Foe Wins":
           xpGain = OUTCOME_XP.loss;
           avatar.battleLosses = avatar.battleLosses + 1;
+          // for email tally
+          tally.foeWins += 1;
           break;
         case "Draw":
           xpGain = OUTCOME_XP.draw;
           avatar.battleDraws = avatar.battleDraws + 1;
+          // for email tally
+          tally.draw += 1;
           break;
         case "Double KO":
           xpGain = OUTCOME_XP.dko;
           avatar.battleDkos = avatar.battleDkos + 1;
+          // for email tally
+          tally.doubleKO += 1;
           break;
         default:
       }
+      
 
       allBattlePromises.push(Battle.update({
         scenario : scenario.id,
@@ -617,6 +637,16 @@ router.get('/do-all-battles', function(req, res, next){
     
   }).then(() => {
     console.log('ALL AVATARS UPDATED');
+    tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
+    tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
+    tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
+    tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
+    console.log('tally', tally);
+    return new Promise((resolve, reject) =>{
+      return sendBattleReportEmail(tally, resolve, reject);
+    });
+  }).then((data) =>{
+    console.log('Result Tally email sent successfully', data);
   }).catch((error)=>{
     console.log('error in cronBattleHour', error);
   });

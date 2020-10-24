@@ -19,6 +19,16 @@ let allBattlePromises = [];
 let avatarUpdates = [];
 //let allUpdateAvatarPromises = [];
 
+const tally= {
+  foeWins : 0,
+  avatarWins : 0,
+  draw : 0,
+  doubleKO : 0,
+  total : 0,
+  avWinPercent : 0,
+  avWinPercentOverall : 0,
+  tiePercent : 0
+};
 
 Battle.findAll({
   where: { outcome : 'TBD' },
@@ -88,18 +98,26 @@ Battle.findAll({
       case "Avatar Wins":
         xpGain = OUTCOME_XP.win;
         avatar.battleWins = avatar.battleWins + 1;
+        // for email tally
+        tally.avatarWins += 1;
         break;
       case "Foe Wins":
         xpGain = OUTCOME_XP.loss;
         avatar.battleLosses = avatar.battleLosses + 1;
+        // for email tally
+        tally.foeWins += 1;
         break;
       case "Draw":
         xpGain = OUTCOME_XP.draw;
         avatar.battleDraws = avatar.battleDraws + 1;
+        // for email tally
+        tally.draw += 1;
         break;
       case "Double KO":
         xpGain = OUTCOME_XP.dko;
         avatar.battleDkos = avatar.battleDkos + 1;
+        // for email tally
+        tally.doubleKO += 1;
         break;
       default:
     }
@@ -148,6 +166,18 @@ Battle.findAll({
 }).then((results) => {
   console.log('Ending Promise Results',results.length);
   return results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+}).then(() => {
+  console.log('ALL AVATARS UPDATED');
+  tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
+  tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
+  tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
+  tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
+  console.log('tally', tally);
+  return new Promise((resolve, reject) =>{
+    return sendBattleReportEmail(tally, resolve, reject);
+  });
+}).then((data) =>{
+  console.log('Result Tally email sent successfully', data);
 }).catch((error)=>{
   console.log('error in cronBattleHour', error);
 });
