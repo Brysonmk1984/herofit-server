@@ -55,11 +55,12 @@ Battle.findAll({
 
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
-    
+    console.log('AVATARPARSED - ', avatar);
     const itemsUsed = null;
     const actionsChosen = null;
-
-    const foeWithStats = Object.assign({}, allFoes[i], generateFoeStats(avatar));
+    const generatedFoe = generateFoeStats(avatar);
+    console.log('Generated - ', generatedFoe);
+    const foeWithStats = Object.assign({}, allFoes[i], generatedFoe);
     console.log('FWS - ', foeWithStats);
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
