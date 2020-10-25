@@ -181,12 +181,14 @@ Battle.findAll({
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
   tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
   console.log('THE DB INSTANCE!', db);
+  db.connectionManager.close();
   return new Promise((resolve, reject) =>{
     return sendBattleReportEmail(tally, resolve, reject);
   });
 
-}).then((data) =>{
 
+}).then((data) =>{
+  
 }).catch((error)=>{
 
 });
