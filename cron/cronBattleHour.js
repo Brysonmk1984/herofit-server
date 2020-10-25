@@ -172,10 +172,7 @@ Battle.findAll({
   return Promise.allSettled(allUpdateAvatarPromises);
   
 }).then((results) => {
-
-  return results.forEach((result) => console.log('All battle Promise Results - ', result.status))
-}).then(() => {
-
+  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
@@ -185,10 +182,6 @@ Battle.findAll({
   return new Promise((resolve, reject) =>{
     return sendBattleReportEmail(tally, resolve, reject);
   });
-
-
-}).then((data) =>{
-  
 }).catch((error)=>{
-
+  console.log('THEERROR - ', error);
 });
