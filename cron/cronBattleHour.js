@@ -181,8 +181,10 @@ Battle.findAll({
   });
 }).then((data) =>{
   console.log('Result Tally email sent successfully', data);
-  db.close().then(() => console.log('shut down gracefully'));
+  Avatar.close().then(() => console.log('shut down gracefully'));
+  Battle.close().then(() => console.log('shut down gracefully'));
 }).catch((error)=>{
   console.log('error in cronBattleHour', error, 'db - ', db);
-  db.close().then(() => console.log('shut down gracefully'));
+  Avatar.close().then(() => console.log('shut down gracefully'));
+  Battle.close().then(() => console.log('shut down gracefully'));
 });
