@@ -1,5 +1,5 @@
 const Avatar = require('../db').Avatar;
-const { Op, connectionManager } = require("sequelize");
+const { Op, close } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT } = require('../game/constants');
 const { sendAppErrorEmail} = require('../mail');
@@ -40,10 +40,10 @@ Avatar.findAll(
   );
 }).then((avUpdate)=>{
   console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
-  connectionManager.close().then(() => console.log('shut down gracefully'));
+  close().then(() => console.log('shut down gracefully'));
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
-  connectionManager.close().then(() => console.log('shut down gracefully'));
+  close().then(() => console.log('shut down gracefully'));
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{

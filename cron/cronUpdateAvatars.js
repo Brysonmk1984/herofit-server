@@ -1,7 +1,7 @@
 
 const Avatar = require('../db').Avatar;
 const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
-const {connectionManager } = require("sequelize");
+const {close } = require("sequelize");
 const { sendAppErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
@@ -46,7 +46,7 @@ Avatar.findAll(
   return connectionManager.close().then(() => console.log('shut down gracefully'));
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    connectionManager.close().then(() => console.log('shut down gracefully'));
+    close().then(() => console.log('shut down gracefully'));
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{

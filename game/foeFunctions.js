@@ -16,11 +16,7 @@ function generateFoeStats(avatar){
     return Math.floor(currentLevel) + 1;
   }
 
-  //avatar = JSON.parse(avatar);
-  const { activityXP, battleXP, health, power } = avatar;
-
-  const xp = activityXP + battleXP;
-  const level = currentLevel(xp);
+  const level = currentLevel(avatar.xp);
   const qp = (level * 5) - 5;
 
   function randomizer(stat){
@@ -31,10 +27,12 @@ function generateFoeStats(avatar){
     return Math.floor(modifiedStat);
 
   }
-  console.log('HHEALTH -',health, FOE_MOD.HEALTH);
-  const baseFoeHealth = Math.floor(health * FOE_MOD.HEALTH);
-  const baseFoePower = Math.floor(power * FOE_MOD.POWER);
+  console.log('HHEALTH -',avatar.health, FOE_MOD.HEALTH);
+
+  const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
+  const baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
   console.log('BBASEHEALTH - ', baseFoeHealth);
+
   const foe = {
     health : randomizer(baseFoeHealth),
     power : randomizer(baseFoePower),
