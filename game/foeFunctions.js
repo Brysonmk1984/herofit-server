@@ -27,12 +27,11 @@ function generateFoeStats(avatar){
     return Math.floor(modifiedStat);
 
   }
-  console.log('AVATARINSIDE', avatar);
-  console.log('HHEALTH -',avatar.health, FOE_MOD.HEALTH);
+
 
   const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
   const baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
-  console.log('BBASEHEALTH - ', baseFoeHealth);
+
 
   const foe = {
     health : randomizer(baseFoeHealth),
@@ -43,7 +42,7 @@ function generateFoeStats(avatar){
     water : 0,
     air : 0
   }
-  console.log('FOEHEALTH - ', foe.health);
+
   const properties = ["health","power","armor"];
   //const properties = ["health","power","armor","fire","earth","water","air"];
   const baseFoeQp = randomizer(Math.floor(qp * FOE_MOD.QP));
@@ -66,7 +65,7 @@ function generateFoeStats(avatar){
       foe.air += 1;
     }
   }
-  console.log('LLASTHEALTH', foe.health);
+
   return(foe);
 
 }

@@ -61,9 +61,9 @@ Battle.findAll({
     const itemsUsed = null;
     const actionsChosen = null;
     const generatedFoe = generateFoeStats(avatar);
-    console.log('Generated - ', generatedFoe);
+
     const foeWithStats = Object.assign({}, allFoes[i], generatedFoe);
-    console.log('FWS - ', foeWithStats);
+
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
     
@@ -102,25 +102,25 @@ Battle.findAll({
         xpGain = OUTCOME_XP.win;
         avatar.battleWins = avatar.battleWins + 1;
         // for email tally
-        tally.avatarWins += 1;
+        tally.avatarWins = tally.avatarWins + 1;
         break;
       case "Foe Wins":
         xpGain = OUTCOME_XP.loss;
         avatar.battleLosses = avatar.battleLosses + 1;
         // for email tally
-        tally.foeWins += 1;
+        tally.foeWins = tally.foeWins + 1;
         break;
       case "Draw":
         xpGain = OUTCOME_XP.draw;
         avatar.battleDraws = avatar.battleDraws + 1;
         // for email tally
-        tally.draw += 1;
+        tally.draw = tally.draw + 1;
         break;
       case "Double KO":
         xpGain = OUTCOME_XP.dko;
         avatar.battleDkos = avatar.battleDkos + 1;
         // for email tally
-        tally.doubleKO += 1;
+        tally.doubleKO = tally.doubleKO + 1;
         break;
       default:
     }
@@ -170,7 +170,7 @@ Battle.findAll({
   console.log('Ending Promise Results',results.length);
   return results.forEach((result) => console.log('All battle Promise Results - ', result.status))
 }).then(() => {
-  console.log('ALL AVATARS UPDATED');
+  console.log('ALL AVATARS UPDATED', tally);
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
