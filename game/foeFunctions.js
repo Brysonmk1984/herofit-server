@@ -16,7 +16,7 @@ function generateFoeStats(avatar){
     return Math.floor(currentLevel) + 1;
   }
 
-  const level = currentLevel(avatar.xp);
+  const level = currentLevel(avatar.activityXP + avatar.battleXP);
   const qp = (level * 5) - 5;
 
   function randomizer(stat){
