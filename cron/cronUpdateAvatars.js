@@ -43,11 +43,11 @@ Avatar.findAll(
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
-  db.close();
+  //db.close();
   return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    db.close();
+    //db.close();
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{

@@ -10,9 +10,9 @@ return Avatar.update(
     { where: { status: 'Knocked Out' }}
 ).then(()=>{
   console.log('REVIVED ALL KOED');
-  db.close();
+  //db.close();
 }).catch((error) =>{
-  db.close();
+  //db.close();
   new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
   }).catch((error) =>{

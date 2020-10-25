@@ -40,10 +40,10 @@ Avatar.findAll(
   );
 }).then((avUpdate)=>{
   console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
-  db.close();
+  //db.close();
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
-  db.close();
+  //db.close();
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
