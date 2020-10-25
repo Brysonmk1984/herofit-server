@@ -43,11 +43,9 @@ Avatar.findAll(
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
-  results.forEach((result) => console.log('All Regenerate Results - ', result.status));
-  return sequelize.close().then(() => console.log('shut down gracefully'));
+  return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    sequelize.close().then(() => console.log('shut down gracefully'));
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
