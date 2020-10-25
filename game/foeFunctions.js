@@ -27,6 +27,7 @@ function generateFoeStats(avatar){
     return Math.floor(modifiedStat);
 
   }
+  console.log('AVATARINSIDE', avatar);
   console.log('HHEALTH -',avatar.health, FOE_MOD.HEALTH);
 
   const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);

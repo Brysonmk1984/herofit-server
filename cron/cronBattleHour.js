@@ -1,7 +1,7 @@
-const db = require('../db');
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { Op } = require("sequelize");
+const sequelize = require("sequelize");
 const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
@@ -55,7 +55,7 @@ Battle.findAll({
     // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    avatar = parseAvatarProperties(avatar);
+    //avatar = parseAvatarProperties(avatar);
     console.log('AVATARPARSED - ', avatar);
     const itemsUsed = null;
     const actionsChosen = null;
@@ -180,8 +180,8 @@ Battle.findAll({
   });
 }).then((data) =>{
   console.log('Result Tally email sent successfully', data);
-  db.close().then(() => console.log('shut down gracefully'));
+  sequelize.close().then(() => console.log('shut down gracefully'));
 }).catch((error)=>{
   console.log('error in cronBattleHour', error);
-  db.close().then(() => console.log('shut down gracefully'));
+  sequelize.close().then(() => console.log('shut down gracefully'));
 });
