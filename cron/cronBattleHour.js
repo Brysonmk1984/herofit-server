@@ -20,7 +20,7 @@ let allBattlePromises = [];
 let avatarUpdates = [];
 //let allUpdateAvatarPromises = [];
 
-const tally= {
+let tally= {
   foeWins : 0,
   avatarWins : 0,
   draw : 0,
@@ -35,9 +35,9 @@ Battle.findAll({
   where: { outcome : 'TBD' },
   raw : true
 }).then((battles) =>{
-  console.log('BATTLES!!', battles);
+
   battles.forEach((battle) =>{
-    console.log('BATTLEFOE - ', battle.foe);
+
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
@@ -92,7 +92,7 @@ Battle.findAll({
 
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const battleResults = doBattle(BRA, BRF);
-
+    console.log('EARLY TALLY', tally, tally.doubleKO);
     // SAVE DATA
     const b = battleResults;
     let xpGain;
@@ -102,25 +102,30 @@ Battle.findAll({
         xpGain = OUTCOME_XP.win;
         avatar.battleWins = avatar.battleWins + 1;
         // for email tally
+        
         tally.avatarWins = tally.avatarWins + 1;
+        console.log(tally.avatarWins);
         break;
       case "Foe Wins":
         xpGain = OUTCOME_XP.loss;
         avatar.battleLosses = avatar.battleLosses + 1;
         // for email tally
         tally.foeWins = tally.foeWins + 1;
+        console.log(tally.foeWins);
         break;
       case "Draw":
         xpGain = OUTCOME_XP.draw;
         avatar.battleDraws = avatar.battleDraws + 1;
         // for email tally
         tally.draw = tally.draw + 1;
+        console.log(tally.draw);
         break;
       case "Double KO":
         xpGain = OUTCOME_XP.dko;
         avatar.battleDkos = avatar.battleDkos + 1;
         // for email tally
         tally.doubleKO = tally.doubleKO + 1;
+        console.log(tally.doubleKO);
         break;
       default:
     }
@@ -157,7 +162,7 @@ Battle.findAll({
 
   return Promise.all(allBattlePromises);
 }).then(() => {
-  console.log('UPDATED ALL BATTLES');
+  console.log('UPDATED ALL BATTLES', tally);
   
   const allUpdateAvatarPromises = [];
   allAvatarIds.forEach((avatarId, i) =>{
@@ -167,7 +172,7 @@ Battle.findAll({
   return Promise.allSettled(allUpdateAvatarPromises);
   
 }).then((results) => {
-  console.log('Ending Promise Results',results.length);
+
   return results.forEach((result) => console.log('All battle Promise Results - ', result.status))
 }).then(() => {
   console.log('ALL AVATARS UPDATED', tally);
@@ -181,10 +186,9 @@ Battle.findAll({
   });
 }).then((data) =>{
   console.log('Result Tally email sent successfully', data);
-  Avatar.close().then(() => console.log('shut down gracefully'));
-  Battle.close().then(() => console.log('shut down gracefully'));
+
+  db.sequelize.close().then(() => console.log('shut down gracefully'));
 }).catch((error)=>{
   console.log('error in cronBattleHour', error, 'db - ', db);
-  Avatar.close().then(() => console.log('shut down gracefully'));
-  Battle.close().then(() => console.log('shut down gracefully'));
+  db.sequelize.close().then(() => console.log('shut down gracefully'));
 });
