@@ -2,7 +2,7 @@
 const db = = require('../db');
 const Avatar = require('../db').Avatar;
 const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
-const sequelize = require("sequelize");
+const db = require('../db').db;
 const { sendAppErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
@@ -43,9 +43,11 @@ Avatar.findAll(
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
+  db.close();
   return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
+    db.close();
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
