@@ -1,6 +1,7 @@
+const db = require('../db');
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
-const { Op, close } = require("sequelize");
+const { Op } = require("sequelize");
 const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
@@ -179,8 +180,8 @@ Battle.findAll({
   });
 }).then((data) =>{
   console.log('Result Tally email sent successfully', data);
-  close().then(() => console.log('shut down gracefully'));
+  db.close().then(() => console.log('shut down gracefully'));
 }).catch((error)=>{
   console.log('error in cronBattleHour', error);
-  close().then(() => console.log('shut down gracefully'));
+  db.close().then(() => console.log('shut down gracefully'));
 });

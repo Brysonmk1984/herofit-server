@@ -1,3 +1,4 @@
+const db = require('../db');
 const Avatar = require('../db').Avatar;
 const { Op, close } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
@@ -40,10 +41,10 @@ Avatar.findAll(
   );
 }).then((avUpdate)=>{
   console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
-  close().then(() => console.log('shut down gracefully'));
+  db.close().then(() => console.log('shut down gracefully'));
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
-  close().then(() => console.log('shut down gracefully'));
+  db.close().then(() => console.log('shut down gracefully'));
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
