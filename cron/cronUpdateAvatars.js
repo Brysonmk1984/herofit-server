@@ -1,8 +1,6 @@
-
-const db = = require('../db');
 const Avatar = require('../db').Avatar;
 const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
-const db = require('../db').db;
+//const db = require('../db').db;
 const { sendAppErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');

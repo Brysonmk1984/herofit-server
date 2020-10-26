@@ -1,7 +1,7 @@
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { Op } = require("sequelize");
-const db = require('../db').db;
+//const db = require('../db').db;
 const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
@@ -177,11 +177,9 @@ Battle.findAll({
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
   tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
-  //console.log('THE DB INSTANCE!', db.connectionManager);
-  db.close();
   return new Promise((resolve, reject) =>{
     return sendBattleReportEmail(tally, resolve, reject);
   });
 }).catch((error)=>{
-  db.close();
+  console.log('Error in BattleHour'. error);
 });

@@ -1,7 +1,7 @@
 [{
   "active" : true,
   "character" : "Chrono Guy",
-  "alias" : "Time Traveler",
+  "alias" : "Chrono Guy",
   "elms" : {"fire":0,"water":0,"air":10,"earth":0},
   "skills" : ["Time Freeze", "Quantum Teleportation", "Cognitive Flash Forward", "Entropy Ray", "Slow Speed Field"],
   "ultimate" : "Timeline Shift",
@@ -27,7 +27,7 @@
 {
   "active" : true,
   "character" : "Filtron Five",
-  "alias" : "A.I. Robot",
+  "alias" : "Filtron Five",
   "elms" : {"fire":0,"water":5,"air":5,"earth":0},
   "skills" : ["Alkalize & Purify", "Corrosive Toxicity", "Hot Air Hot Head", "pH Paralysis", "Problematic Plumbing"],
   "ultimate" : "Reverse Osmosis Psychosis",
@@ -53,7 +53,7 @@
 {
   "active" : true,
   "character" : "Boulder Bro",
-  "alias" : "Rock Elemental",
+  "alias" : "Boulder Bro",
   "elms" : {"fire":0,"water":0,"air":0,"earth":10},
   "skills" : ["Seismic Slam","Rubble Rouser","Party Hardy","Sentiment of the Sediment", "Muddy Slippery Slide"],
   "ultimate" : "The Aggro Crag",
@@ -92,7 +92,7 @@
 {
   "active" : true,
   "character" : "Timber Terror",
-  "alias" : "Forest Elemental",
+  "alias" : "Timber Terror",
   "elms" : {"fire":2,"water":3,"air":3,"earth":2},
   "skills" : ["Surprise Saprolings", "Ten Ton Stomp","Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
   "ultimate" : "Purify by Chlorophyll",

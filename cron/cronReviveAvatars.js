@@ -2,7 +2,7 @@
 const Avatar = require('../db').Avatar;
 const { REVIVE_AMOUNT } = require('../game/constants');
 const { sendAppErrorEmail} = require('../mail');
-const db = require('../db').db;
+//const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ***');
 
 return Avatar.update(
