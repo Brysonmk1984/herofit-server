@@ -120,7 +120,7 @@ router.post('/fetch-battle-report', function(req, res, next){
   }).catch((error) =>{
     res.status(200).json({
       message: `No Results`,
-      result : []
+      result : null
     });
   });
 });
