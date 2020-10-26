@@ -5,7 +5,7 @@ const moment = require("moment");
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { selectFoeTemplate } = require('../game/foeFunctions');
-
+const villains = require('../game/villains.json');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
@@ -123,6 +123,44 @@ router.post('/fetch-battle-report', function(req, res, next){
       result : null
     });
   });
+});
+
+// USER Logs in after a battle, or clicks button to retrieve report
+router.get('/villain-list', function(req, res, next){
+  if(villains){
+    res.status(200).json({
+      villains
+    });
+  }else{
+    res.status(400).json({
+      debug : "couldn't retrieve villain list"
+    });
+  }
+});
+
+router.post('/fetch-battles-fought', function(req, res, next){
+  
+  Battle.findAll({ 
+      where : { 
+        avatarID: req.body.avatarID, 
+        [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }] 
+      }, 
+      raw : true, 
+      attributes: ['outcome', 'foe'] 
+  }).then((battles) =>{
+    if(battles){
+      res.status(200).json({
+        battles
+      });
+    }else{
+      res.status(400).json({
+        debug : "couldn't retrieve villain list"
+      });
+    }
+  }).catch(() =>{
+
+  })
+
 });
 
 module.exports = router;

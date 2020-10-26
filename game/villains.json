@@ -1,5 +1,5 @@
 {
-  "spirits": [{
+  "Spirits": [{
       "id": 0,
       "type" : "Shade",
       "foe": [

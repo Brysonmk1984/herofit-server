@@ -8,11 +8,11 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
   switch(actionsChosen.name){
     case "From the Shadows":
       // Increased Power
-      foe.power = Math.floor(foe.power + (foe.power * .1));
+      foe.power = Math.floor(foe.power + (foe.power * .2));
       break;
     case "Intimidation":
       // Power Reduction
-      avatar.power = Math.floor(avatar.power - (avatar.power * .1));
+      avatar.power = Math.floor(avatar.power - (avatar.power * .2));
       break;
     case "Unseen Swap":
       // Power Trade
@@ -34,11 +34,11 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
       break;
     case "Shadowy Influx":
       // Health Bonus
-      foe.health = Math.floor(foe.health + (foe.health * .1));
+      foe.health = Math.floor(foe.health + (foe.health * .2));
       break;
     case "Breath Bane":
       // Health Reduction
-      avatar.health = Math.floor(avatar.power - (avatar.power * .1));
+      avatar.health = Math.floor(avatar.power - (avatar.power * .2));
       break;
     case "Unholy Health":
       // Health Trade

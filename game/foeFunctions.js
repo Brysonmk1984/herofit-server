@@ -2,7 +2,7 @@ const { FOE_MOD } = require('./constants');
 const villains = require('./villains.json');
 
 function selectFoeTemplate(){
-  return villains.spirits[Math.floor(Math.random() * villains.spirits.length)];
+  return villains.Spirits[Math.floor(Math.random() * villains.Spirits.length)];
 }
 
 function generateFoeStats(avatar){

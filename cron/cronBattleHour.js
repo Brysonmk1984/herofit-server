@@ -43,7 +43,7 @@ Battle.findAll({
     allFoes.push(battle.foe);
     
     allAvatarPromises.push(Avatar.findOne(
-      { where : { id: { [Op.in]: allAvatarIds }}, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+      { where : { id: battle.avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ));
   })
 
