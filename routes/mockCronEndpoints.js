@@ -529,8 +529,7 @@ router.get('/do-all-battles', function(req, res, next){
       const itemsUsed = req.body.itemsUsed || null;
       const actionsChosen = req.body.actionsChosen || null;
       console.log(allFoes[i]);
-      const foeWithStats = Object.assign({}, allFoes[i], generateFoeStats(avatar));
-      console.log(foeWithStats);
+      const foeWithStats = allFoes[i];
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
       const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
       

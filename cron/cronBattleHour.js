@@ -62,7 +62,7 @@ Battle.findAll({
     const actionsChosen = null;
     const generatedFoe = generateFoeStats(avatar);
 
-    const foeWithStats = Object.assign({}, allFoes[i], generatedFoe);
+    const foeWithStats = allFoes[i];
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));

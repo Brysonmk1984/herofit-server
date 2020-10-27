@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
-const { selectFoeTemplate } = require('../game/foeFunctions');
+const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 
 // USER CLICKED 'GO TO BATTLE'
@@ -16,12 +16,14 @@ router.post('/insert-battle', function(req, res, next){
     name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
     ability : foeTemplate.ability
   }
-  console.log('FOE!', foe, req.body.email, req.body.avatarID, req.body.avatarName)
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar));
+
+  console.log('FOE!', foe, req.body.email, req.body.avatar)
   Battle.create({
     owner: req.body.email,
-    avatarID: req.body.avatarID,
-    avatarName: req.body.avatarName,
-    foe,
+    avatarID: req.body.avatar.id,
+    avatarName: req.body.avatar.name,
+    foe : foeWithStats,
     outcome: "TBD"
   }, 
   {raw : true}
@@ -41,6 +43,7 @@ router.post('/insert-battle', function(req, res, next){
       res.status(200).json({
         message : 'Avatar set for battle',
         goToBattle : true,
+        foe : foeWithStats
       });
       next();
     }).catch((err)=>{
@@ -161,4 +164,30 @@ router.post('/fetch-battles-fought', function(req, res, next){
 
 });
 
+router.post('/fetch-upcoming-foe', function(req, res, next){
+  console.log(req.body)
+  Battle.findOne({ 
+      where : { 
+        avatarID: req.body.avatarID, 
+        outcome: "TBD" 
+      }, 
+      raw : true, 
+      attributes: ['foe'] 
+  }).then((battle) =>{
+    if(battle){
+      res.status(200).json({
+        foe : battle.foe
+      });
+    }else{
+      res.status(422).json({
+        debug : "couldn't retrieve foe for upcoming battle!"
+      });
+    }
+  }).catch((error) =>{console.log('THE ERR', error);
+    res.status(400).json({
+      debug : "couldn't retrieve foe for upcoming battle!",
+      error
+    });
+  })
+});
 module.exports = router;

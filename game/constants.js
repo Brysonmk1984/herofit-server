@@ -18,40 +18,40 @@ const BATTLE_SCENARIOS = [{
 },{
   id : 2,
   description : "Avatar and Foe met on open field",
-  avatarPowerMod : .02,
+  avatarPowerMod : .05,
   avatarHealthMod : 0,
-  foePowerMod : .02,
+  foePowerMod : .05,
   foeHealthMod : 0,
 },{
   id : 3,
   description : "Foe attacked unprepared avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : -.03,
-  foePowerMod : .03,
+  avatarHealthMod : -.05,
+  foePowerMod : .05,
   foeHealthMod : 0,
 },{
   id : 4,
   description : "Foe attacked defending avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : .03,
+  avatarHealthMod : .05,
   foePowerMod : 0,
   foeHealthMod : 0,
 },{
   id : 5,
   description : "Both avatar and foe fought defensively",
   avatarPowerMod : 0,
-  avatarHealthMod : .01,
+  avatarHealthMod : .05,
   foePowerMod : 0,
-  foeHealthMod : .01,
+  foeHealthMod : .05,
 }];
 
 const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  HEALTH : 1,
-  QP : .7,
-  POWER : .4
+  HEALTH : 1.1,
+  QP : .8,
+  POWER : .35
 };
 
 const OUTCOME_XP = {
