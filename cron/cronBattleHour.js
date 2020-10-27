@@ -37,7 +37,7 @@ Battle.findAll({
 }).then((battles) =>{
 
   battles.forEach((battle) =>{
-
+    console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
