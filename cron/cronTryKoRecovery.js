@@ -41,12 +41,17 @@ Avatar.findAll(
 }).then((avUpdate)=>{
   console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
   //db.close();
+  process.exit();
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
   //db.close();
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
-  }).catch((error) =>{
-    console.log('couldn\'t send error email for error - ', error);
+  }).then(()=>{
+    process.exit();
+  })
+  .catch((error) =>{
+    console.log('couldn\'t send error email TRY KO RECOVERY - ', error);
+    process.exit();
   });
 });

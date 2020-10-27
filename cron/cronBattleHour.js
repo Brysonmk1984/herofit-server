@@ -180,6 +180,9 @@ Battle.findAll({
   return new Promise((resolve, reject) =>{
     return sendBattleReportEmail(tally, resolve, reject);
   });
+}).then(() =>{
+  process.exit();
 }).catch((error)=>{
   console.log('Error in BattleHour'. error);
+  process.exit();
 });

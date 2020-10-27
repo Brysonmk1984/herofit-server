@@ -43,12 +43,15 @@ Avatar.findAll(
 }).then((results) => {
   //db.close();
   return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
+}).then(() =>{
+  process.exit();
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     //db.close();
   return new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).catch((error) =>{
-    console.log('couldn\'t send error email for error - ', error);
+    console.log('couldn\'t send error email for UPDATE AVATAR CRON - ', error);
+    process.exit();
   });
 });

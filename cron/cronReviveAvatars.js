@@ -10,13 +10,13 @@ return Avatar.update(
     { where: { status: 'Knocked Out' }}
 ).then(()=>{
   console.log('REVIVED ALL KOED');
-  //db.close();
+  process.exit();
 }).catch((error) =>{
-  //db.close();
+
   new Promise((resolve, reject) =>{
     return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
   }).catch((error) =>{
-    
-    console.log('couldn\'t send error email for error - ', error);
+    console.log('couldn\'t send error email for REVIVE AVATARS - ', error);
+    process.exit();
   });
 });

@@ -96,9 +96,7 @@ router.post('/fetch-battle-report', function(req, res, next){
     limit: 1,
     where: { 
       avatarID: req.body.avatarID,
-      outcome: {
-        [Op.not]: 'TBD'
-      }
+      [Op.not]: { outcome: "TBD" }
     },
     order: [ [ 'createdAt', 'DESC' ]],
     raw : true
