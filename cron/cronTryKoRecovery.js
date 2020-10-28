@@ -9,7 +9,7 @@ console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 // Get all avatars who are KOed
 Avatar.findAll(
   { where: { status: "Knocked Out" }, raw: true, attributes: ['health', 'recovery','status', 'owner'] },
-).then((results) => {console.log('all results');
+).then((results) => {console.log('all KO results', results);
   const recoveredAvatars = []
 
   // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
