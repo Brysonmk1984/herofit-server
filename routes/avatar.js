@@ -23,7 +23,7 @@ router.post('/insert-avatar', function(req, res, next){
     avatar = parseAvatarProperties(avatar);
 
     // New Avatar Created
-    if(avatar){
+    if(avatar){console.log('RETURNIONG THIS - ', avatar);
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
@@ -73,7 +73,6 @@ router.post('/update-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
   .then((avatar) =>{
-
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     avatar = parseAvatarProperties(avatar);
 
