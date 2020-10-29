@@ -12,6 +12,7 @@ const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
+const xpCalc = require('../game/upgrades/xpCalc');
 
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
@@ -512,7 +513,7 @@ router.get('/do-all-battles', function(req, res, next){
       allFoes.push(battle.foe);
       
       allAvatarPromises.push(Avatar.findOne(
-        { where : { id: battle.avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+        { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
       ));
     })
 
@@ -591,6 +592,10 @@ router.get('/do-all-battles', function(req, res, next){
         default:
       }
       
+      // Check for lvl up
+      const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
+      const { leveledUp, qpEarned } = checkLevelUp(xpGain);
+      console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
 
       allBattlePromises.push(Battle.update({
         scenario : scenario.id,
@@ -601,6 +606,7 @@ router.get('/do-all-battles', function(req, res, next){
         fPhyDamage : b.fPhyDamage,
         aPhyReduction : b.aPhyReduction,
         xpGain,
+        leveledUp : leveledUp,
         aHealthRemaining : b.aHealthRemaining,
         fHealthRemaining : b.fHealthRemaining,
         foe : Object.assign({}, allFoes[i], foeWithStats),
@@ -617,8 +623,10 @@ router.get('/do-all-battles', function(req, res, next){
       const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
       avatar.status = b.outcomeData.avatarStatus;
       avatar.battleXP = avatar.battleXP + xpGain;
-
-      avatarUpdates.push({ goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
+      
+      // Get QP earned from battle
+      avatar.qp += qpEarned;
+      avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
       // End Avatar for each
     });
 

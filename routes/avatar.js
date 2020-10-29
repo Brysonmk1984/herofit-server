@@ -77,6 +77,7 @@ router.post('/update-avatar', function(req, res, next){
 router.post('/buff-and-update-avatar', function(req, res, next){
   let ut;
   let prevActivityXP = req.body.prevActivityXP;
+  let aXPDiff, lvlUp, lvls;
 
   // First, retrieve userTotals AND avatar from DB
   UserTotal.findOne(
@@ -84,7 +85,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
   ).then((userTotals) =>{
     ut = userTotals;
     return Avatar.findOne(
-      { where: { owner: req.body.email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir'], raw : true }
+      { where: { owner: req.body.email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qp'], raw : true }
     );
   }).then((avatar) =>{
     console.log('AVATAR', avatar);
@@ -95,17 +96,33 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
-    const aXPDiff = aXP - prevActivityXP;
-  
+    aXPDiff = aXP - prevActivityXP;
+
     const { leveledUp, levels, qpEarned } = checkLevelUp(prevActivityXP, aXP);
+    lvlUp = leveledUp;
+    lvls = levels;
 
     const updatedPower = updatePower();
 
-    const updatedElements = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
+    const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     
-    // res.status(200).json({
-    //   message: `${result} record updated --- avatar ${req.body.id}`,
-    // });
+    const updatedAvatar = Object.assign({}, avatar, { qp: avatar.qp + qpEarned, power : updatedPower, fire, earth, water, air });
+    
+    // Finally, Update Avatar in DB
+    return Avatar.update(
+      {...updatedAvatar},
+      { where: { owner: req.body.email }, raw : true, returning: true, plain: true }
+    );
+
+  }).then((result) =>{
+    console.log('UPDATED AV RESULT - ', result);
+    res.status(200).json({
+      message: `AVATAR record updated --- for ${req.body.email}`,
+      //avatar : updatedAvatar,
+      leveledUp : lvlUp,
+      levels : lvls,
+      xpGain : aXPDiff
+    });
   }).catch((err) =>{
     console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
     res.status(400).json({
@@ -115,28 +132,6 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     next();
   });
 
-
-
-
-
-  // Finally, Update Avatar in DB
-  Avatar.update(
-    {...req.body.avatar},
-    { where: { owner: req.body.email }, raw : true }
-  )
-  .then(function(result) {
-    res.status(200).json({
-      message: `${result} record updated --- avatar ${req.body.id}`,
-    });
-  })
-  .catch((err) =>{
-    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}`,
-      debug : err
-    });
-    next();
-  });
 });
 
 router.post('/get-avatar', function(req, res, next){
