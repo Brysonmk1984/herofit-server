@@ -9,13 +9,13 @@ function xpCalc(activityXP, battleXP){
   bXP = battleXP,
   tXP = aXP + bXP;
 
-  return {
+  return xpReturn = {
 
     // GIVES NEXT LEVEL BASED ON DB VALUES
     getNextLevel : function (){
       const exponent = LEVEL_CURVE;
       const baseXP = 99;
-      const currentLevel = this.getCurrentLevel()
+      const currentLevel = xpReturn.getCurrentLevel()
       return Math.floor(baseXP * (Math.pow(currentLevel, exponent))) + 1;
     },
 
@@ -36,8 +36,8 @@ function xpCalc(activityXP, battleXP){
     // Calculate whether a user leveled up, and how many times. Uses existing tXP calculated from the DB
     // as well as the xp gained from either new activites or a battle.
     checkLevelUp : function (xpGained = 0){
-      const startingLevel = this.getCurrentLevel();
-      const endingLevel = this.currentLevelByInput(tXP + xpGained);
+      const startingLevel = xpReturn.getCurrentLevel();
+      const endingLevel = xpReturn.currentLevelByInput(tXP + xpGained);
       const levelsGained = (endingLevel - startingLevel);
       const leveledUp = levelsGained > 0;
       const qpEarned = (levelsGained * QP_PER_LEVEL);
@@ -68,11 +68,11 @@ function xpCalc(activityXP, battleXP){
       const newActivityXP = effortMinutes;
       return Math.floor(newActivityXP);
  
-    }
+    },
 
     /**** 
      * 
-     The Methods below are for testing purposes. The upgrade algorithim uses only the functions above,
+     The Methods below are MOSTLY for testing purposes, but not always. 'checkLevelUpByInput' is used on avatars.js route. The upgrade algorithim uses only the functions above,
      which use the players XP directly from the DB as input.
      * 
      ****/ 
@@ -106,4 +106,4 @@ function xpCalc(activityXP, battleXP){
   }
 }
 
-modules.export = xpCalc;
+module.exports = xpCalc;
