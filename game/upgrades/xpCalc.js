@@ -1,6 +1,7 @@
-const { LEVEL_CURVE, XP_BASE_LEVEL } = require('./constants.js');
+const { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL } = require('../constants.js');
 //let LEVEL_CURVE = 1.2;
-//let XP_BASE_LEVEL99;
+//let XP_BASE_LEVEL = 99;
+//let QP_PER_LEVEL = 5;
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP){
@@ -39,8 +40,9 @@ function xpCalc(activityXP, battleXP){
       const endingLevel = this.currentLevelByInput(tXP + xpGained);
       const levelsGained = (endingLevel - startingLevel);
       const leveledUp = levelsGained > 0;
-    
-      return { leveledUp, levels : levelsGained };
+      const qpEarned = (levelsGained * QP_PER_LEVEL);
+
+      return { leveledUp, levels : levelsGained, qpEarned };
     },
 
     // GIVEN NEW XP FROM ACTIVITIES OR BATTLES, CALCULATE NEW TOTAL XPs
@@ -51,6 +53,22 @@ function xpCalc(activityXP, battleXP){
 
       return { aXP : newAXP, bXP : newBXP, tXP : newTXP }
     },
+
+    calcNewActivityXPFromUt : function(userTotals){
+
+      let totalDuration = 0;
+      for(const activity in userTotals){
+        if(userTotals[activity]){
+          totalDuration += userTotals[activity].duration;
+        }
+      }
+      const effortSeconds = totalDuration;
+      const effortMinutes = effortSeconds / 60;
+  
+      const newActivityXP = effortMinutes;
+      return Math.floor(newActivityXP);
+ 
+    }
 
     /**** 
      * 

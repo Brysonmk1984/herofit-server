@@ -2,6 +2,10 @@
 // FOR LEVEL UPS
 const LEVEL_CURVE = 2;
 const XP_BASE_LEVEL = 99;
+const QP_PER_LEVEL = 5;
+
+// FOR AVATARS
+const BASE_POWER = 100;
 
 // ACTIVITIES
 const ACTIVITY_MAP = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout' };
@@ -74,4 +78,4 @@ const OUTCOME_XP = {
 const REVIVE_AMOUNT = 1;
 
 
-module.exports = { LEVEL_CURVE, XP_BASE_LEVEL, ACTIVITY_MAP, COMPETITIVE_ACTIVITIES, REGENERATION_RATE, RESTED_THRESHOLD, BATTLE_SCENARIOS, FOE_MOD, OUTCOME_XP, REVIVE_AMOUNT, FOE_NON_ACTION, AVATAR_NON_ACTION };
+module.exports = { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, BASE_POWER, ACTIVITY_MAP, COMPETITIVE_ACTIVITIES, REGENERATION_RATE, RESTED_THRESHOLD, BATTLE_SCENARIOS, FOE_MOD, OUTCOME_XP, REVIVE_AMOUNT, FOE_NON_ACTION, AVATAR_NON_ACTION };

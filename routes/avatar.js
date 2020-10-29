@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
+const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
 const { parseAvatarProperties } = require('../helperFunctions');
+const moment = require('moment');
+const avCalc = require('../game/upgrades/avCalc');
+const xpCalc = require('../game/upgrades/xpCalc');
 
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
@@ -51,6 +55,71 @@ router.post('/insert-avatar', function(req, res, next){
 });
 
 router.post('/update-avatar', function(req, res, next){
+  Avatar.update(
+    {...req.body.avatar},
+    { where: { owner: req.body.email }, raw : true }
+  )
+  .then(function(result) {
+    res.status(200).json({
+      message: `${result} record updated --- avatar ${req.body.id}`,
+    });
+  })
+  .catch((err) =>{
+    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+});
+
+router.post('/buff-and-update-avatar', function(req, res, next){
+  let ut;
+  let prevActivityXP = req.body.prevActivityXP;
+
+  // First, retrieve userTotals AND avatar from DB
+  UserTotal.findOne(
+    { where: { user: req.body.email }, raw : true }
+  ).then((userTotals) =>{
+    ut = userTotals;
+    return Avatar.findOne(
+      { where: { owner: req.body.email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir'], raw : true }
+    );
+  }).then((avatar) =>{
+    console.log('AVATAR', avatar);
+    // Then, Update Avatar Totals
+    const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.avatar.battleXP);
+    const { updatePower, updateElements } = avCalc(ut);
+    
+    
+    // Updated aXP
+    const aXP = calcNewActivityXPFromUt(ut);
+    const aXPDiff = aXP - prevActivityXP;
+  
+    const { leveledUp, levels, qpEarned } = checkLevelUp(prevActivityXP, aXP);
+
+    const updatedPower = updatePower();
+
+    const updatedElements = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
+    
+    // res.status(200).json({
+    //   message: `${result} record updated --- avatar ${req.body.id}`,
+    // });
+  }).catch((err) =>{
+    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+
+
+
+
+
+  // Finally, Update Avatar in DB
   Avatar.update(
     {...req.body.avatar},
     { where: { owner: req.body.email }, raw : true }

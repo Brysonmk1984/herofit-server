@@ -3,7 +3,9 @@ const router = express.Router();
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
+//const db = require('../db').db;
 const moment = require('moment');
+const utCalc = require('../game/upgrades/utCalc');
 
 router.post('/insert-user-activities', function(req, res, next){
   // Need latest Activity to be added to user's account
@@ -144,26 +146,32 @@ router.post('/instantiate-user-totals', function(req, res, next){
 router.post('/update-user-totals', function(req, res, next){
 
   // First, retrieve userTotals from DB
+  UserTotal.findOne(
+    { where: { user: req.body.email }, raw : true }
+  ).then(function(utData){
+    // Then Update userTotals
+    const { update, initialUpdate } = utCalc(utData);
+    const activities = req.body.activities;
 
-  // Then Update userTotals
-
-  // Finally, save to DB
-  UserTotal.update(
-    req.body.userTotals,
-    { where: { user: req.body.email } }
-  )
-  .then(function(result) {
+    // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
+    const updatedUT = req.body.hasBeenUpgraded ? update(activities) : initialUpdate(activities, req.body.accountDate);
+    // Finally, save to DB
+    return UserTotal.update(
+      updatedUT,
+      { where: { user: req.body.email } }
+    );
+  
+  }).then((result) =>{
+    console.log('Update result - ', result);
     res.status(200).json({
-      message: `${result[0]} record updated --- user ${req.body.email}`,
+      totalsUpdated : true,
+      result
     });
-  })
-  .catch((err) =>{
-    console.log(`Error updating user total for ${req.body.email}, DEBUG: ${err}`);
+  }).catch((error) =>{
     res.status(400).json({
-      message: `Error updating user total for ${req.body.email}`,
-      debug : err
+      debug : `Error updating user total for ${req.body.email}`,
+      error
     });
-    next();
   });
 });
 
