@@ -142,19 +142,14 @@ router.post('/instantiate-user-totals', function(req, res, next){
 });
 
 router.post('/update-user-totals', function(req, res, next){
-  //console.log('UPDATE USER TOTALS' ,req.body.userTotals);
-  let strTotals = {};
-  for (const activity in req.body.userTotals) {
-    //console.log(`${activity}: ${req.body.userTotals[activity]}`);
-    if(req.body.userTotals[activity] !== null){
-      strTotals = Object.assign({}, strTotals, { [activity] : req.body.userTotals[activity] })
 
-    }
-    
-  }
+  // First, retrieve userTotals from DB
 
+  // Then Update userTotals
+
+  // Finally, save to DB
   UserTotal.update(
-    strTotals,
+    req.body.userTotals,
     { where: { user: req.body.email } }
   )
   .then(function(result) {

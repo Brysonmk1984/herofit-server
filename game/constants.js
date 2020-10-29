@@ -1,7 +1,12 @@
 
-//FOR LEVEL UPS
+// FOR LEVEL UPS
 const LEVEL_CURVE = 2;
 const XP_BASE_LEVEL = 99;
+
+// ACTIVITIES
+const ACTIVITY_MAP = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout' };
+const COMPETITIVE_ACTIVITIES = ['run', 'hike', 'ride', 'walk'];
+const NONCOMPETITIVE_ACTIVITIES = ['stairStepper', 'elliptical', 'swim', 'weightTraining', 'yoga', 'rowing', 'crossfit', 'standUpPaddling'];
 
 // FOR BATTLES
 const REGENERATION_RATE = 5;
@@ -69,4 +74,4 @@ const OUTCOME_XP = {
 const REVIVE_AMOUNT = 1;
 
 
-module.exports = { REGENERATION_RATE, RESTED_THRESHOLD, BATTLE_SCENARIOS, FOE_MOD, OUTCOME_XP, REVIVE_AMOUNT, FOE_NON_ACTION, AVATAR_NON_ACTION };
+module.exports = { LEVEL_CURVE, XP_BASE_LEVEL, ACTIVITY_MAP, COMPETITIVE_ACTIVITIES, REGENERATION_RATE, RESTED_THRESHOLD, BATTLE_SCENARIOS, FOE_MOD, OUTCOME_XP, REVIVE_AMOUNT, FOE_NON_ACTION, AVATAR_NON_ACTION };
