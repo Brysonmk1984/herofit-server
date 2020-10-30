@@ -41,7 +41,7 @@ function xpCalc(activityXP, battleXP){
       const levelsGained = (endingLevel - startingLevel);
       const leveledUp = levelsGained > 0;
       const qpEarned = (levelsGained * QP_PER_LEVEL);
-
+      console.log('XPSTUFF - ', xpGained, startingLevel, endingLevel, levelsGained, leveledUp, qpEarned);
       return { leveledUp, levels : levelsGained, qpEarned };
     },
 

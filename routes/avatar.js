@@ -21,31 +21,36 @@ router.post('/insert-avatar', function(req, res, next){
     where: {
       owner: req.body.owner
     },
-    raw : true,
     // set the default properties if it doesn't exist
     defaults : Object.assign({},{ ...req.body.avatar }, { ownerUsername: req.body.ownerUsername, owner: req.body.email })
-  }).then((avatar) =>{
-    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    avatar = parseAvatarProperties(avatar);
-
-    // New Avatar Created
-    if(avatar){console.log('RETURNIONG THIS - ', avatar);
+  }).then((result) =>{
+    const created = result[1];
+    // Avatar from results, parse properties that are strings that need to be numbers
+    avatar = parseAvatarProperties(result[0].dataValues);
+    console.log('LOOOOK HERE', avatar);
+    // Avatar Created
+    if(created){
+      console.log('AVATAR CREATED - ', avatar);
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
         avatar,
         hasAvatar : true
       });
-    // Updated Existing Avatar
-    }else{
+      next();
+    // Avatar Already exists, using existing instead
+    }else if(!created){
+      console.log('AVATAR ALREADY EXISTS - ', avatar);
       res.status(200).json({
-        message: `Existing Avatar updated belonging to owner ${avatar.owner}`,
+        message: `Existing avatar for ${avatar.owner}`,
         avatarId : avatar.id,
+        avatar,
         hasAvatar : true
       });
+      next();
+    }else{
+      throw new Error("Couldn't find or create avatar");
     }
-    
-    next();
   }).catch((err) =>{
     console.log(`Couldn't insert Avatar for user ${req.body.email}, DEBUG: ${err}`);
     res.status(400).json({
@@ -99,23 +104,24 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
+    console.log('aXP1 - ', aXP);
     aXPDiff = aXP - prevActivityXP;
 
-    const { leveledUp, qpEarned } = checkLevelUp(prevActivityXP, aXP);
+    const { leveledUp, qpEarned } = checkLevelUp(aXPDiff);
     lvlUp = leveledUp;
     reachedLevel = currentLevelByInput(aXP + avatar.battleXP);
-
+    console.log('XPP - ', aXP, aXPDiff, reachedLevel );
     const updatedPower = updatePower();
-    console.log('UPP - ',updatedPower);
+
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     console.log({ fire, earth, water, air });
     console.log('QP = ', avatar.qp, qpEarned);
-    const updatedAvatar = Object.assign({}, avatar, { qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air });
+    const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
     
     // Finally, Update Avatar in DB
     return Avatar.update(
       {...updatedAvatar},
-      { where: { owner: req.body.email }, raw : true, returning: true, plain: true }
+      { where: { owner: req.body.email }, returning: true, plain: true }
     );
 
   }).then((result) =>{

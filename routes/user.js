@@ -31,7 +31,7 @@ router.post('/insert-user-activities', function(req, res, next){
     // Front end is determining which activities are new, so everything passed here can be added to db.
     UserActivity.bulkCreate(entries)
     .then((result) =>{
-      console.log('INSERT USER ACTIVITIES',result);
+      console.log('INSERT USER ACTIVITIES',req.body.activities);
       res.status(200).json({
         message: `Activities added for user ${req.body.email}`,
         activities : req.body.activities
@@ -112,27 +112,32 @@ router.post('/instantiate-user-totals', function(req, res, next){
     defaults: { 
       user: req.body.email,
       avatarId: req.body.avatarId
-    }
-  }).then((result) =>{
+    },
+    raw : true
+  }).then((result) =>{console.log('INSTANTIATION RESULT - ', result);
     const created = result[1];
     const results = result[0].dataValues;
-    let response = results;
-    console.log('LOOOOK HERE', result);
+
+    console.log('RESS!!', created, results);
+
     // New user_total Created
     if(created){
-      response = {
+      res.status(200).json({
         message: `New user total Saved belonging to owner ${req.body.email}`,
         results
-      };
+      });
+      next();
     // Updated Existing Avatar
-    }else{
-      response = {
-        message: `Existing Avatar updated belonging to owner ${req.body.email}`,
+    }else if(!created){
+      res.status(200).json({
+        message: `Existing User Totals belonging to owner ${req.body.email}`,
         results
-      };
+      });
+      next();
+    }else{
+      throw new Error("Couldn't Instantiate user totals.");
     }
-    res.status(200).json(response);
-    next();
+
   }).catch((err) =>{
     console.log(`Error Instantiating user total for ${req.body.email}, DEBUG: ${err}`);
     res.status(400).json({
@@ -144,15 +149,19 @@ router.post('/instantiate-user-totals', function(req, res, next){
 });
 
 router.post('/update-user-totals', function(req, res, next){
-
+  console.log('EMAIL:', req.body.email);
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: req.body.email }, raw : true }
   ).then(function(utData){
+    if(!utData){
+      throw new Error(`No User Totals for user ${req.body.email}`);
+    }
+    console.log('UT DATA - ', utData);
     // Then Update userTotals
     const { update, initialUpdate } = utCalc(utData);
     const activities = req.body.activities;
-
+    console.log('ABEFORE - ', req.body.hasBeenUpgraded);
     // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
     const updatedUT = req.body.hasBeenUpgraded ? update(activities) : initialUpdate(activities, req.body.accountDate);
     // Finally, save to DB
@@ -167,7 +176,7 @@ router.post('/update-user-totals', function(req, res, next){
       totalsUpdated : true,
       result
     });
-  }).catch((error) =>{
+  }).catch((error) =>{console.log('Whats the error? - ', error);
     res.status(400).json({
       debug : `Error updating user total for ${req.body.email}`,
       error

@@ -22,7 +22,8 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
       min: 0,
       acquire: 30000,
       idle: 5000
-    }
+    },
+    query:{raw:true}
   }
   dbUrl = process.env.DATABASE_URL;
 
@@ -39,7 +40,8 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
       min: 0,
       acquire: 30000,
       idle: 10000
-    }
+    },
+    query:{raw:true}
   }
   dbUrl = process.env.DATABASE_URL_LOCAL;
 

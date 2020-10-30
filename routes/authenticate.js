@@ -60,33 +60,31 @@ router.post('/signup-or-signin', function(req, res, next){
             firstName : decoded['custom:first_name'] || null,
             lastName : decoded['custom:last_name'] || null
           }
-        }).then(function(result) {
+        }).then(function(result) {console.log('RRR - ', result);
           const created = result[1];
-          let user = result[0].dataValues;
-  
+          let user = result[0].dataValues ? result[0].dataValues : result[0];
+
+          console.log('signup-or-signin RESULT! - ', created, user);
           // New user, created a new db
           if (created) {
-            user = Object.assign({}, user, {
-              clientId : process.env.STRAVA_CLIENT_ID, 
-              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
-              clientSecret : process.env.STRAVA_CLIENT_SECRET,
+            // user = Object.assign({}, user, {
+            //   clientId : process.env.STRAVA_CLIENT_ID, 
+            //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
+            //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
   
-            });
+            // });
             res.status(200).json({
               message: `You are logged in as ${user.username}`,
               user
             });
           // User already exists, return data from db
           }else{
-            console.log('User already exists', user);
-            
-            user = Object.assign({}, user, {
-              // !!!dont need these
-              clientId : process.env.STRAVA_CLIENT_ID, 
-              redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
-              clientSecret : process.env.STRAVA_CLIENT_SECRET,
-  
-            });
+            //console.log('User already exists', user);
+            // user = Object.assign({}, user, {
+            //   clientId : process.env.STRAVA_CLIENT_ID, 
+            //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
+            //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
+            // });
             res.status(200).json({
               message: `You are logged in as ${user.username}`,
               user
@@ -95,7 +93,7 @@ router.post('/signup-or-signin', function(req, res, next){
           next();
         }).catch((error)=>{
           // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
-          if(error && error.original.code === '23505'){
+          if(error && error.original && error.original.code === '23505'){
             User.create({
                 email: decoded.email,
                 username : `${decoded['custom:first_name']} ${decoded['custom:last_name']} - ${moment().format("MM DD, YYYY")}`,
@@ -104,11 +102,11 @@ router.post('/signup-or-signin', function(req, res, next){
             })
             .then((result) =>{
               let user = result.dataValues;
-                user = Object.assign({}, user, {
-                  clientId : process.env.STRAVA_CLIENT_ID, 
-                  redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-                  clientSecret : process.env.STRAVA_CLIENT_SECRET,
-                });
+                // user = Object.assign({}, user, {
+                //   clientId : process.env.STRAVA_CLIENT_ID, 
+                //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+                //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
+                // });
                 res.status(200).json({
                   message: `You are logged in as ${user.username}`,
                   user

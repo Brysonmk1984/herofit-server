@@ -1,9 +1,10 @@
-//const defaultTotals = require('./defaultTotals');
+const defaultTotals = require('../../common/defaultTotals.json');
 const { ACTIVITY_MAP, COMPETITIVE_ACTIVITIES } = require('../constants');
+
 const moment = require('moment');
 
 // Only use userTotals data from the DB as parameter
-const userTotals = function(userTotals){
+const utCalc = function(userTotals){
   const actMap = ACTIVITY_MAP;
   const compActs = COMPETITIVE_ACTIVITIES;
   //const actMap = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout' };
@@ -14,11 +15,15 @@ const userTotals = function(userTotals){
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
     update : function(activities){
-      
+      //console.log('ACTSS - ', activities);
     // loop over each new activity sent from client
       activities.forEach((activity, i) =>{
         // Converts Strava formatted activity to camelCase;
         const a = actMap[activity.type];
+        
+        if(ut[a] === null){
+          ut[a] = defaultTotals[a];
+        }
 
         // All activities track instance count, duration, and average heart rate
         ut[a] = {
@@ -40,14 +45,14 @@ const userTotals = function(userTotals){
     initialUpdate : function(activities, accountDate){
       accountDate = moment(accountDate);
       let actBeforeAccCounter = 0;
-
+      let actsToInclude = [];
       // loop over each new activity sent from client
       activities.forEach((activity, i) =>{
         const activityDate = moment(activity.start_date);
         // Load 10 that happened before Account creation 
         if(activityDate.isBefore(accountDate)){
           if(actBeforeAccCounter < 10){
-          utReturn.update(activity);
+            actsToInclude.push(activity);
             ++actBeforeAccCounter;
           }
         }else{
@@ -55,12 +60,13 @@ const userTotals = function(userTotals){
           // This happends when a new user registers, but doesn't upgrade right away
           // They come back later with new activities. We want to count these new
           // Activities in addition to the 10 before they signed up
-          utReturn.update([activity]);
+          actsToInclude.push(activity);
         }
       });
+      utReturn.update(actsToInclude);
       return ut;
     }
   }
 }
 
-module.exports = userTotals;
+module.exports = utCalc;
