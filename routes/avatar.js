@@ -27,10 +27,8 @@ router.post('/insert-avatar', function(req, res, next){
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
     avatar = parseAvatarProperties(result[0].dataValues);
-    console.log('LOOOOK HERE', avatar);
     // Avatar Created
     if(created){
-      console.log('AVATAR CREATED - ', avatar);
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
@@ -83,8 +81,11 @@ router.post('/update-avatar', function(req, res, next){
 
 router.post('/buff-and-update-avatar', function(req, res, next){
   let ut;
-  let prevActivityXP = req.body.prevActivityXP;
-  let aXPDiff, lvlUp, lvls;
+  let avStatSnapshot;
+  let aXPDiff;
+  let lvlUp;
+  let lvlAfterBuff;
+  let qpe;
 
   // First, retrieve userTotals AND avatar from DB
   UserTotal.findOne(
@@ -96,7 +97,8 @@ router.post('/buff-and-update-avatar', function(req, res, next){
       { where: { owner: req.body.email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qp'], raw : true }
     );
   }).then((avatar) =>{
-    console.log('AVATAR', avatar);
+    avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
+    
     // Then, Update Avatar Totals
     const { checkLevelUp, calcNewActivityXPFromUt, currentLevelByInput } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { updatePower, updateElements } = avCalc(ut);
@@ -104,18 +106,15 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
-    console.log('aXP1 - ', aXP);
-    aXPDiff = aXP - prevActivityXP;
+    aXPDiff = aXP - avStatSnapshot.activityXP;
 
-    const { leveledUp, qpEarned } = checkLevelUp(aXPDiff);
+    const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
     lvlUp = leveledUp;
-    reachedLevel = currentLevelByInput(aXP + avatar.battleXP);
-    console.log('XPP - ', aXP, aXPDiff, reachedLevel );
-    const updatedPower = updatePower();
+    lvlAfterBuff = endingLevel;
+    qpe = qpEarned;
 
+    const updatedPower = updatePower();
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
-    console.log({ fire, earth, water, air });
-    console.log('QP = ', avatar.qp, qpEarned);
     const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
     
     // Finally, Update Avatar in DB
@@ -125,13 +124,24 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     );
 
   }).then((result) =>{
-    console.log('UPDATED AV RESULT - ', result[1]);
+    let avatar = parseAvatarProperties(result[1]);
+    
+    // Calc gains here to be displayed on frontend
+    const improvements = {
+      power : Math.floor(avatar.power - avStatSnapshot.power),
+      air : Math.floor(avatar.air - avStatSnapshot.air),
+      water : Math.floor(avatar.water - avStatSnapshot.water),
+      fire : Math.floor(avatar.fire - avStatSnapshot.fire),
+      earth : Math.floor(avatar.earth - avStatSnapshot.earth),
+    };
+    console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
+
     res.status(200).json({
-      message: `AVATAR record updated --- for ${req.body.email}`,
-      avatar : parseAvatarProperties(result[1]),
-      leveledUp : lvlUp,
-      reachedLevel,
-      xpGain : aXPDiff
+      avatar,
+      improvements,
+      reachedLevel : lvlUp ? lvlAfterBuff : null,
+      qpEarned : qpe,
+      xpGain : aXPDiff,
     });
   }).catch((err) =>{
     console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);

@@ -149,7 +149,6 @@ router.post('/instantiate-user-totals', function(req, res, next){
 });
 
 router.post('/update-user-totals', function(req, res, next){
-  console.log('EMAIL:', req.body.email);
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: req.body.email }, raw : true }
@@ -157,11 +156,9 @@ router.post('/update-user-totals', function(req, res, next){
     if(!utData){
       throw new Error(`No User Totals for user ${req.body.email}`);
     }
-    console.log('UT DATA - ', utData);
     // Then Update userTotals
     const { update, initialUpdate } = utCalc(utData);
     const activities = req.body.activities;
-    console.log('ABEFORE - ', req.body.hasBeenUpgraded);
     // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
     const updatedUT = req.body.hasBeenUpgraded ? update(activities) : initialUpdate(activities, req.body.accountDate);
     // Finally, save to DB
@@ -176,7 +173,8 @@ router.post('/update-user-totals', function(req, res, next){
       totalsUpdated : true,
       result
     });
-  }).catch((error) =>{console.log('Whats the error? - ', error);
+  }).catch((error) =>{
+    console.log('Error - ', error);
     res.status(400).json({
       debug : `Error updating user total for ${req.body.email}`,
       error

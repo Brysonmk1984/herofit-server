@@ -1,5 +1,6 @@
 const { BASE_POWER, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM } = require('../constants');
 const moment = require('moment');
+const { cloneObj } = require('../../helperFunctions');
 const avatarList = require('../../heroList.json');
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
@@ -7,7 +8,7 @@ function avCalc(userTotals){
   
   return avReturn = {
     updatePower : function(){
-      console.log('UT - ', userTotals);
+      //console.log('UT - ', userTotals);
       let totalDuration = 0;
       for(const activity in userTotals){
         if(userTotals[activity]){
@@ -21,25 +22,23 @@ function avCalc(userTotals){
   
       // One extra power earned for every 30 minutes of workout
       const totalPower = BASE_POWER + effortHalfHours;
-      console.log('totalDuration - ', totalDuration, effortMinutes,  Math.floor(effortMinutes / MINUTES_PER_POWER));
       return totalPower;
     },
     updateElements : function(character, qpSpent, dateOfCreation){
 
       // Need to calculate the default elms each time the avatar is buffed, otherwise it will reset the original values are not accounted for
-      const avatarBasics = avatarList.find((av)=> {
+      const avatarBasics = cloneObj(avatarList.find((av)=> {
         return character === av.character;
-      });
-
+      }), true);
+      //console.log('CB elms - ', avatarBasics.elms);
       const e = avReturn._determineAstrologyBonus(avatarBasics.elms, dateOfCreation);
-      console.log('eee - ', e, qpSpent);
+      
+      //console.log('CB elms AND astro bonus - ', e);
       // Loop over each activity saved in userTotals and do a fresh calculation of what the element values are
-      // Then get added to the defaultElement congifuration above
-      for(const activity in userTotals){
-        //console.log(activity, userTotals[activity]);
-        let activityMinutes = userTotals[activity] ? (userTotals[activity].duration / 60) : 0;
-        const activityType = activity;
-
+      // Then they get added to the defaultElement congifuration above
+      for(const activityType in userTotals){
+        let activityMinutes = userTotals[activityType] ? (userTotals[activityType].duration / 60) : 0;
+        //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes);
         switch (activityType){
           case 'run':
           case 'crossfit':
@@ -71,7 +70,8 @@ function avCalc(userTotals){
             break;
         }
       }
-
+      //console.log('E after activities - ', e);
+      //console.log('qp spent on elms - ', qpSpent);
       // round the elements down to nearest hundreth and add back in the qp points spent on each element
       const updatedElms = {
         earth : parseFloat(e.earth.toFixed(2)) + qpSpent.qpEarth,
@@ -79,7 +79,7 @@ function avCalc(userTotals){
         fire : parseFloat(e.fire.toFixed(2)) + qpSpent.qpFire,
         water : parseFloat(e.water.toFixed(2)) + qpSpent.qpWater
       }
-      console.log('updatedElms - ', updatedElms);
+      //console.log('combined, updated elms - ', updatedElms);
       return updatedElms;
     },
     

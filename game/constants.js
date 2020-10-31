@@ -1,6 +1,6 @@
 
 // FOR LEVEL UPS
-const LEVEL_CURVE = 2;
+const LEVEL_CURVE = 1.2;
 const XP_BASE_LEVEL = 99;
 const QP_PER_LEVEL = 5;
 

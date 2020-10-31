@@ -15,8 +15,7 @@ const utCalc = function(userTotals){
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
     update : function(activities){
-      //console.log('ACTSS - ', activities);
-    // loop over each new activity sent from client
+      // loop over each new activity sent from client
       activities.forEach((activity, i) =>{
         // Converts Strava formatted activity to camelCase;
         const a = actMap[activity.type];

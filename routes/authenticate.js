@@ -37,7 +37,7 @@ router.post('/signup-or-signin', function(req, res, next){
         });
       // TOKEN IS LEGIT
       }else{
-        console.log('DECODED', decoded);
+        //console.log('DECODED', decoded);
         let username;
         // Must have unique username, low priority bug possible here.
         if(decoded['custom:first_name']){
@@ -60,11 +60,10 @@ router.post('/signup-or-signin', function(req, res, next){
             firstName : decoded['custom:first_name'] || null,
             lastName : decoded['custom:last_name'] || null
           }
-        }).then(function(result) {console.log('RRR - ', result);
+        }).then(function(result) {
           const created = result[1];
           let user = result[0].dataValues ? result[0].dataValues : result[0];
 
-          console.log('signup-or-signin RESULT! - ', created, user);
           // New user, created a new db
           if (created) {
             // user = Object.assign({}, user, {
