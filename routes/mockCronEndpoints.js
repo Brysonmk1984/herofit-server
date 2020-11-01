@@ -178,11 +178,10 @@ router.post('/do-battle-mock', function(req, res, next){
   }
 
   // BATTLE STEP 5 - EXCHANGE DAMAGE
-  const battleResults = doBattle(BRA, BRF);
-  const b = battleResults;
+  const b = doBattle(BRA, BRF);
   let xpGain;
 
-  switch(battleResults.outcomeData.outcome){
+  switch(b.outcomeData.outcome){
     case "Avatar Wins":
       xpGain = OUTCOME_XP.win;
       break;
@@ -235,7 +234,7 @@ router.post('/do-battle-mock', function(req, res, next){
     BRF,
     //foePrep,
     scenario,
-    battleResults,
+    battleResults : b,
     xpGain
   });
 
@@ -508,6 +507,7 @@ router.get('/do-all-battles', function(req, res, next){
   }).then((battles) =>{
     console.log('BATTLES!', battles);
     battles.forEach((battle) =>{
+      //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
       allFoes.push(battle.foe);
@@ -529,7 +529,7 @@ router.get('/do-all-battles', function(req, res, next){
 
       const itemsUsed = req.body.itemsUsed || null;
       const actionsChosen = req.body.actionsChosen || null;
-      console.log(allFoes[i]);
+
       const foeWithStats = allFoes[i];
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
       const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));

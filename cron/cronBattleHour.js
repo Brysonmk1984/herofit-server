@@ -36,9 +36,9 @@ Battle.findAll({
   where: { outcome : 'TBD' },
   raw : true
 }).then((battles) =>{
-
+  console.log('BATTLES!', battles);
   battles.forEach((battle) =>{
-    console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
+    //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
@@ -61,7 +61,7 @@ Battle.findAll({
 
     const itemsUsed = null;
     const actionsChosen = null;
-    const generatedFoe = generateFoeStats(avatar);
+
 
     const foeWithStats = allFoes[i];
 
@@ -92,10 +92,9 @@ Battle.findAll({
     }
 
     // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const battleResults = doBattle(BRA, BRF);
+    const b = doBattle(BRA, BRF);
 
     // SAVE DATA
-    const b = battleResults;
     let xpGain;
 
     switch(b.outcomeData.outcome){
@@ -103,30 +102,25 @@ Battle.findAll({
         xpGain = OUTCOME_XP.win;
         avatar.battleWins = avatar.battleWins + 1;
         // for email tally
-        
         tally.avatarWins = tally.avatarWins + 1;
-
         break;
       case "Foe Wins":
         xpGain = OUTCOME_XP.loss;
         avatar.battleLosses = avatar.battleLosses + 1;
         // for email tally
         tally.foeWins = tally.foeWins + 1;
-
         break;
       case "Draw":
         xpGain = OUTCOME_XP.draw;
         avatar.battleDraws = avatar.battleDraws + 1;
         // for email tally
         tally.draw = tally.draw + 1;
-
         break;
       case "Double KO":
         xpGain = OUTCOME_XP.dko;
         avatar.battleDkos = avatar.battleDkos + 1;
         // for email tally
         tally.doubleKO = tally.doubleKO + 1;
-
         break;
       default:
     }
@@ -135,7 +129,7 @@ Battle.findAll({
     const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { leveledUp, qpEarned } = checkLevelUp(xpGain);
     console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
-
+    console.log('BR - ', b);
 
     allBattlePromises.push(Battle.update({
       scenario : scenario.id,
@@ -166,7 +160,6 @@ Battle.findAll({
     
     // Get QP earned from battle
     avatar.qp += qpEarned;
-    
     avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
     // End Avatar for each
   });
