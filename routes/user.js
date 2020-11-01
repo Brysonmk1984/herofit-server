@@ -149,11 +149,10 @@ router.post('/instantiate-user-totals', function(req, res, next){
 });
 
 router.post('/update-user-totals', function(req, res, next){
-  console.log('REQBODY - ', req.body.email);
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: req.body.email }, raw : true }
-  ).then(function(utData){console.log('UTDATA - ', utData);
+  ).then(function(utData){
     if(!utData){
       throw new Error(`No User Totals for user ${req.body.email}`);
     }
