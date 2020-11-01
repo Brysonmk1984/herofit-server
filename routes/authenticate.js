@@ -66,26 +66,14 @@ router.post('/signup-or-signin', function(req, res, next){
 
           // New user, created a new db
           if (created) {
-            // user = Object.assign({}, user, {
-            //   clientId : process.env.STRAVA_CLIENT_ID, 
-            //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
-            //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
-  
-            // });
             res.status(200).json({
-              message: `You are logged in as ${user.username}`,
+              message: `New user created, logged in as ${user.username}`,
               user
             });
           // User already exists, return data from db
           }else{
-            //console.log('User already exists', user);
-            // user = Object.assign({}, user, {
-            //   clientId : process.env.STRAVA_CLIENT_ID, 
-            //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ? process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV, 
-            //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
-            // });
             res.status(200).json({
-              message: `You are logged in as ${user.username}`,
+              message: `Existing user, logged in as ${user.username}`,
               user
             });
           }

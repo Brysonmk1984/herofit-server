@@ -1,3 +1,5 @@
+const { ARMOR_DRF } = require('./constants');
+
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage){
   return aDamage;
@@ -159,7 +161,7 @@ function _calcArmorDR(aPower, rArmor){
     return { reduction : r, netDamage : d };
   }
   // Reduced damage based on amount of resistance
-  const dr = (r*10)/ ((r*10)+(3*d));
+  const dr = (r*10)/ ((r*10)+(ARMOR_DRF*d));
  return { reduction : parseFloat((d * dr).toFixed(2)), netDamage : Math.floor(d - (d * dr)) };
 }
 
@@ -192,7 +194,8 @@ function doBattle(avatar, foe){
   // Elemental Damage and Resist
   const avatarElmAttack = _calcElementDamage(avatar, foe);
   const foeElmAttack = _calcElementDamage(foe, avatar);
-
+  console.log('AV ELM ATTACK - ', avatarElmAttack);
+  console.log('Foe ELM ATTACK - ', foeElmAttack);
   /* 
   Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
   */
@@ -202,9 +205,9 @@ function doBattle(avatar, foe){
   const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
 
   const results = {
-    aElmDamage : avatarPhyAttack.overallElmDamageDone,
+    aElmDamage : avatarElmAttack.overallElmDamageDone,
     fElmReduction : avatarElmAttack.overallElmDamagePrevented,
-    fElmDamage : foePhyAttack.overallElmDamageDone,
+    fElmDamage : foeElmAttack.overallElmDamageDone,
     aElmReduction : foeElmAttack.overallElmDamagePrevented,
     aPhyDamage : avatarPhyAttack.netDamage,
     fPhyReduction : avatarPhyAttack.reduction,

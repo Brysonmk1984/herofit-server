@@ -106,6 +106,9 @@ router.post('/fetch-battle-report', function(req, res, next){
   }).then((result) =>{
     if(result.length){
       const withinLastDay =  moment.utc().subtract(1,"day").isBefore(result[0].updatedAt);
+      adjResult = result[0];
+      adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
+      adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
       if(withinLastDay){
         res.status(200).json({
           message : 'Retrieved Latest Battle Results',
