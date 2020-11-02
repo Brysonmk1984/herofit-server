@@ -27,6 +27,7 @@ router.post('/insert-avatar', function(req, res, next){
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
     avatar = parseAvatarProperties(result[0].dataValues);
+    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     // Avatar Created
     if(created){
       res.status(200).json({
@@ -60,6 +61,7 @@ router.post('/insert-avatar', function(req, res, next){
 });
 
 router.post('/update-avatar', function(req, res, next){
+  delete req.body.restedEnough;
   Avatar.update(
     {...req.body.avatar},
     { where: { owner: req.body.email }, raw : true }
@@ -86,7 +88,8 @@ router.post('/buff-and-update-avatar', function(req, res, next){
   let lvlUp;
   let lvlAfterBuff;
   let qpe;
-
+  delete req.body.restedEnough;
+  
   // First, retrieve userTotals AND avatar from DB
   UserTotal.findOne(
     { where: { user: req.body.email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true }
@@ -125,7 +128,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
 
   }).then((result) =>{
     let avatar = parseAvatarProperties(result[1]);
-    
+    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     // Calc gains here to be displayed on frontend
     const improvements = {
       power : Math.floor(avatar.power - avStatSnapshot.power),
@@ -157,19 +160,21 @@ router.post('/buff-and-update-avatar', function(req, res, next){
 router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
   .then((avatar) =>{
-    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    avatar = parseAvatarProperties(avatar);
-
     if(!avatar){
       res.status(204).json({
         message: `No Avatar associated with user ${req.body.email}`
       });
       return;
+    }else{
+      // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+      avatar = parseAvatarProperties(avatar);
+      avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+      res.status(200).json({
+        message: `Found matching Avatar`,
+        avatar
+      });
     }
-    res.status(200).json({
-      message: `Found matching Avatar`,
-      avatar
-    });
+      
     next();
   }).catch((err)=>{
     console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
