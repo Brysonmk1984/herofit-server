@@ -73,7 +73,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const adminData = formData.admin;
   const debug = formData.debug || formData.message;
   const status = formData.status || formData.name;
-  const version = formData.version || 'Alpha';
+  const version = formData.version || 'Beta';
 
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
@@ -163,7 +163,7 @@ const sendBattleReportEmail = function(tally, resolve, reject){
       Double KO: ${tally.doubleKO}\n
       Avatar win%: ${tally.avWinPercent * 100}%\n
       Avatar win% overall: ${tally.avWinPercentOverall * 100}%\n
-      Tie win%: ${tally.tiePercent * 100}%\n
+      Tie%: ${tally.tiePercent * 100}%\n
       `,
       html: `Number of Avatar Battles: ${tally.total}. <br/><br/> Battle Report Tally:\n\n
       Avatar Wins: ${tally.avatarWins}<br/>

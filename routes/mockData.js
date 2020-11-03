@@ -344,9 +344,9 @@ router.post('/insert-random-avatar', function(req,res,next){
     randomHero[`qp${attr}`] += 1;
   }
 
-  //if(AppMode === 'beta'){
-    randomHero.pets.push({type : 'passive', name: 'Beta Fish', description: 'Reward for being an Beta Tester'});
-  //}
+  if(AppMode === 'beta'){
+    randomHero.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being an Beta Tester'});
+  }
 
   console.log('INSERTING AV', randomHero);
 

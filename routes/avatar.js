@@ -161,6 +161,7 @@ router.post('/get-avatar', function(req, res, next){
   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
   .then((avatar) =>{
     if(!avatar){
+      console.log('NO AV ASSOCIATED WITH EMAIL');
       res.status(204).json({
         message: `No Avatar associated with user ${req.body.email}`
       });

@@ -157,9 +157,8 @@ Battle.findAll({
     const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
     avatar.status = b.outcomeData.avatarStatus;
     avatar.battleXP = avatar.battleXP + xpGain;
-    
-    // Get QP earned from battle
     avatar.qp += qpEarned;
+    
     avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
     // End Avatar for each
   });

@@ -41,7 +41,6 @@ Avatar.findAll(
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
-  //db.close();
   return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
 }).then(() =>{
   process.exit();

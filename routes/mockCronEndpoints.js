@@ -58,8 +58,7 @@ router.get('/regenerate-health', async function(req, res, next){
     return Promise.allSettled(allPromises);
 
   }).then((results) => {
-    console.log(results.length);
-    return results.forEach((result) => console.log('All Regenerate Results - ', result.status))
+    return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     return new Promise((resolve, reject) =>{
@@ -76,62 +75,57 @@ router.get('/regenerate-health', async function(req, res, next){
 });
 
 
-
 // FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS
 router.get('/try-recovery', function(req, res, next){
   // Get all avatars who are KOed
   return Avatar.findAll(
     { where: { status: "Knocked Out" }, raw: true, attributes: ['health', 'recovery','status', 'owner'] },
-  ).then((results) => {
-
+  ).then((results) => {console.log('all KO results', results);
     const recoveredAvatars = []
+    
+    if(results.length){
+      // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
+      results.forEach((result, i) =>{
+        result = parseAvatarProperties(result);
+        const recoveryChance = result.recovery >= 100 ? 100 : result.recovery;
 
-    // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
-    results.forEach((result, i) =>{
-      result = parseAvatarProperties(result);
-      const recoveryChance = result.recovery >= 100 ? 100 : result.recovery;
+        // THESE ARE THE NUMBERS THAT IF MATCHED IN THE WHILE LOOP, WILL ALLOW AVATAR TO RECOVER EARLY
+        const recoveryWinners = [];
+        for(let i = 0; i < recoveryChance; i++){
+          recoveryWinners.push(Math.floor(Math.random() * 100));
+        }
+        const winningNum = Math.floor(Math.random() * 100);
+        const found = recoveryWinners.includes(winningNum);
+        
+        // Revive avatar to the REVIVE_AMOUNT in constants.js
+        if(found){
+          console.log('Found & Recovering!', result.owner);
+          return recoveredAvatars.push(result.owner);
+        }
+        return null;
 
-      // THESE ARE THE NUMBERS THAT IF MATCHED IN THE WHILE LOOP, WILL ALLOW AVATAR TO RECOVER EARLY
-      const recoveryWinners = [];
-      for(let i = 0; i < recoveryChance; i++){
-        recoveryWinners.push(Math.floor(Math.random() * 100));
-      }
-      const winningNum = Math.floor(Math.random() * 100);
-      const found = recoveryWinners.includes(winningNum);
-      
-      // Revive avatar to the REVIVE_AMOUNT in constants.js
-      if(found){
-        return recoveredAvatars.push(result.owner);
-      }
-      return null;
-
-    });
-    return Avatar.update(
-      { health : REVIVE_AMOUNT, status : 'Recovering' },
-      { where: { owner: { [Op.in]: recoveredAvatars } }}
-    ).then(()=>{
+      });
+      console.log('recovered avs', recoveredAvatars);
+      return Avatar.update(
+        { health : REVIVE_AMOUNT, status : 'Recovering' },
+        { where: { owner: { [Op.in]: recoveredAvatars } }}
+      );
+    }else{
+      console.log('No Avs to Recover');
       res.status(200);
-    }).catch((error)=>{
-      console.log('ERROR', error);
-      res.status(400);
-    });
-
+      next();
+    }
+  }).then(()=>{
+    console.log('SHOULD HAVE ATTEMPTED KO RECOVERY');
+    res.status(200);
+    next();
   }).catch((error) =>{
-      console.log('THEE ERROR', error);
+      console.log('ERROR TRYING TO DO KO REVIVES', error);
     return new Promise((resolve, reject) =>{
       return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
-    }).catch((error) =>{
-      console.log('couldn\'t send error email for error - ', error);
-      res.status(400);
-      next();
     });
   });
 });
-
-
-
-
-
 
 
 
@@ -150,20 +144,19 @@ router.post('/generate-foe', function(req, res, next){
 router.post('/do-battle-mock', function(req, res, next){
   // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
   let avatar = req.body.avatar;
- 
+ console.log('AV1', avatar);
   const itemsUsed = req.body.itemsUsed;
   const actionsChosen = req.body.actionsChosen;
-  let foe = generateFoeStats(avatar);
+  let foeWithStats = generateFoeStats(avatar);
 
   // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-  const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe));
+  const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
   
   // avatar and foe to be used for battle
   let BRA = Object.assign({}, sAvatar);
   let BRF = Object.assign({}, sFoe);
 
   // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
-  
   if(itemsUsed || actionsChosen){
     if(scenario.id !== AVATAR_NON_ACTION){
       BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
@@ -171,11 +164,14 @@ router.post('/do-battle-mock', function(req, res, next){
   }
 
   // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-  if(false){
+  if(foeWithStats.ability){
     if(scenario.id !== FOE_NON_ACTION){
-      BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+      const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+      BRF = foeBP.foe;
+      BRA = foeBP.avatar;
     }
   }
+
 
   // BATTLE STEP 5 - EXCHANGE DAMAGE
   const b = doBattle(BRA, BRF);
@@ -196,35 +192,6 @@ router.post('/do-battle-mock', function(req, res, next){
       break;
     default:
   }
-  
-  // SAVE RESULTS TO DB
-  Battle.update({
-    outcome : b.outcomeData.outcome,
-    aStatus : b.avatarStatus,
-    aPhyDamage : b.aPhyDamage,
-    fPhyReduction : b.fPhyReduction,
-    fPhyDamage : b.fPhyDamage,
-    aPhyReduction : b.aPhyReduction,
-    xpGain,
-    aHealthRemaining : b.aHealthRemaining,
-    fHealthRemaining : b.fHealthRemaining,
-    foe,
-    bra : BRA,
-    brf : BRF,
-    aElmDamage : b.aElmDamage,
-    fElmReduction : b.fElmReduction,
-    fElmDamage : b.fElmDamage,
-    aElmReduction : b.aElmReduction,
-  },
-  { where: { id: battleId } }
-).then((battles) => {
-  // Avatar.update(
-  //   {health : result.health},
-  //   { where: { owner: result.owner } }
-  // )
-}).catch((error) =>{
-  console.log('INDIVIDUAL BATTLE ERROR - ', error);
-});
 
   // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
   res.status(200).json({
@@ -237,8 +204,12 @@ router.post('/do-battle-mock', function(req, res, next){
     battleResults : b,
     xpGain
   });
-
+  next();
 });
+
+
+
+
 
 // SIMULATE 100 BATTLES FOR EACH OF THE 6 SCENARIOS
 router.post('/do-battle-sims', function(req, res, next){
@@ -262,10 +233,10 @@ router.post('/do-battle-sims', function(req, res, next){
     let avatar = req.body.avatar;
     const itemsUsed = req.body.itemsUsed;
     const actionsChosen = req.body.actionsChosen;
-    let foe = generateFoeStats(avatar);
-  
+    let foeWithStats = generateFoeStats(avatar);
+
     // // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foe), SCENARIO.id);
+    const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), SCENARIO.id);
 
     // avatar and foe to be used for battle
     let BRA = Object.assign({}, sAvatar);
@@ -279,9 +250,11 @@ router.post('/do-battle-sims', function(req, res, next){
     }
 
     // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-    if(false){
+    if(foeWithStats.ability){
       if(scenario.id !== FOE_NON_ACTION){
-        BRF = doFoeBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+        const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+        BRF = foeBP.foe;
+        BRA = foeBP.avatar;
       }
     }
 
@@ -323,14 +296,9 @@ router.post('/do-battle-sims', function(req, res, next){
 
   // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
   res.status(200).json({
-    tally
+    tally,
   });
 });
-
-
-
-
-
 
 
 // DO A SINGLE INSTANCE OF BATTLE with passed in Avatar
@@ -473,11 +441,6 @@ router.post('/do-battle', function(req, res, next){
 
 
 
-
-
-
-
-
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
 router.get('/do-all-battles', function(req, res, next){
   
@@ -558,10 +521,9 @@ router.get('/do-all-battles', function(req, res, next){
       }
 
       // BATTLE STEP 5 - EXCHANGE DAMAGE
-      const battleResults = doBattle(BRA, BRF);
+      const b = doBattle(BRA, BRF);
 
       // SAVE DATA
-      const b = battleResults;
       let xpGain;
 
       switch(b.outcomeData.outcome){
@@ -623,9 +585,8 @@ router.get('/do-all-battles', function(req, res, next){
       const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
       avatar.status = b.outcomeData.avatarStatus;
       avatar.battleXP = avatar.battleXP + xpGain;
-      
-      // Get QP earned from battle
       avatar.qp += qpEarned;
+
       avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
       // End Avatar for each
     });
@@ -639,7 +600,7 @@ router.get('/do-all-battles', function(req, res, next){
       allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[i],{ where: { id: avatarId } }));
     });
 
-    return Promise.all(allUpdateAvatarPromises);
+    return Promise.allSettled(allUpdateAvatarPromises);
     
   }).then(() => {
     console.log('ALL AVATARS UPDATED');

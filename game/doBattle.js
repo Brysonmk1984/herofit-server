@@ -194,8 +194,7 @@ function doBattle(avatar, foe){
   // Elemental Damage and Resist
   const avatarElmAttack = _calcElementDamage(avatar, foe);
   const foeElmAttack = _calcElementDamage(foe, avatar);
-  console.log('AV ELM ATTACK - ', avatarElmAttack);
-  console.log('Foe ELM ATTACK - ', foeElmAttack);
+
   /* 
   Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
   */
