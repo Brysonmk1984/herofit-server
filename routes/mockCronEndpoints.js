@@ -144,7 +144,6 @@ router.post('/generate-foe', function(req, res, next){
 router.post('/do-battle-mock', function(req, res, next){
   // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
   let avatar = req.body.avatar;
- console.log('AV1', avatar);
   const itemsUsed = req.body.itemsUsed;
   const actionsChosen = req.body.actionsChosen;
   let foeWithStats = generateFoeStats(avatar);

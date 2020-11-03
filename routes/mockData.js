@@ -363,10 +363,10 @@ router.post('/insert-random-avatar', function(req,res,next){
       character: randomHero.character,
       power: randomHero.power,
       health: randomHero.health,
-      skills: JSON.stringify(randomHero.skills),
-      items: JSON.stringify(randomHero.items),
-      titles: JSON.stringify(randomHero.titles),
-      pets: JSON.stringify(randomHero.pets),
+      skills: randomHero.skills,
+      items: randomHero.items,
+      titles: randomHero.titles,
+      pets: randomHero.pets,
       fire : randomHero.fire,
       earth : randomHero.earth,
       air : randomHero.air,
@@ -387,18 +387,9 @@ router.post('/insert-random-avatar', function(req,res,next){
     }
   }).then((result) =>{
     const created = result[1];
-    const avatar = result[0].dataValues;
-    avatar.items = JSON.parse(avatar.items);
-    avatar.skills = JSON.parse(avatar.skills);
-    avatar.titles = JSON.parse(avatar.titles);
-    avatar.pets = JSON.parse(avatar.pets);
+    let avatar = result[0].dataValues;
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    avatar.fire = JSON.parse(avatar.fire);
-    avatar.earth = JSON.parse(avatar.earth);
-    avatar.air = JSON.parse(avatar.air);
-    avatar.water = JSON.parse(avatar.water);
-    avatar.recovery = JSON.parse(avatar.recovery);
-    avatar.armor = JSON.parse(avatar.armor);
+    avatar = parseAvatarProperties(avatar);
     // New Avatar Created
     if(created){
       // Need to remove name used for avatar
