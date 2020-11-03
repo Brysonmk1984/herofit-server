@@ -1,7 +1,7 @@
 
 const Avatar = require('../db').Avatar;
 const { REVIVE_AMOUNT } = require('../game/constants');
-const { sendAppErrorEmail} = require('../mail');
+const { sendCronErrorEmail } = require('../mail');
 //const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ***');
 
@@ -14,7 +14,7 @@ return Avatar.update(
 }).catch((error) =>{
 
   new Promise((resolve, reject) =>{
-    return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+    return sendCronErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for REVIVE AVATARS - ', error);
     process.exit();

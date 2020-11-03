@@ -69,6 +69,46 @@ const sendSurveyEmail = function(formData, resolve, reject){
   });
 };
 
+const sendCronErrorEmail = function({status, name, message, debug, version}, resolve, reject){
+
+  let html = `<div>An Error occured in a HeroFit Production CRON JOB- `;
+  // error status and message
+  html += `${status}:  ${message}`;
+  
+  if(debug){
+    html += `<br/><br/>`;
+    html += `<br/><br/><p>` + debug + `</p>`;
+  }
+
+  if(adminData){
+    html += `<br/><br/>`;
+    html += `<div>ACCOUNT DATA: ${JSON.stringify(accountInfo)}</div></div>`;
+  }else{
+    html += `<br/><br/><p>User not logged in.</p>`;
+  }
+  html += `<br/><br/><div>APP VERSION: ${version}</div>`;
+
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
+      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA: \n \n ${JSON.stringify(accountInfo)}`,
+      html
+  };
+
+  // send mail with defined transport object
+  return transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
+
+
 const sendAppErrorEmail = function(formData, resolve, reject){
   const adminData = formData.admin;
   const debug = formData.debug || formData.message;
@@ -111,44 +151,6 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   });
 };
 
-const sendBattleErrorEmail = function(formData, resolve, reject){
-  const errorTally = formData.errorTally;
-  
-  let html = `<div>Error(s) occured in Battle Hour `;
-  // error status and message
-  html += `${formData.status}:  ${formData.message}`;
-  
-  if(debug){
-    html += `<br/><br/>`;
-    html += `<br/><br/><p>` + formData.debug + `</p>`;
-  }
-
-  const errorString = '';
-
-
-  errorTally.errors.forEach((error) =>{
-    errorString += (error + "\n\n");
-  });
-
-  // setup email data with unicode symbols
-  let mailOptions = {
-      from: `${process.env.INFO_EMAIL}`,
-      to: `${process.env.INFO_EMAIL}`,
-      subject: `HEROFIT - ${formData.status} BATTLE HOUR ERROR`, 
-      text: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${errorTally} \n\n ERRORS: ${errorString}`,
-      html: `An Error occured in HeroFit Production - ${formData.status}:  ${formData.message} \n \n ${errorTally} \n\n ERRORS: ${errorString}`
-  };
-
-  // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        reject(console.log(error));
-      }
-      resolve(nodemailer.getTestMessageUrl(info));
-  });
-};
-
-
 const sendBattleReportEmail = function(tally, resolve, reject){
 
   // setup email data with unicode symbols
@@ -186,4 +188,4 @@ const sendBattleReportEmail = function(tally, resolve, reject){
 };
 
 
-module.exports = { sendContactEmail, sendSurveyEmail, sendAppErrorEmail, sendBattleReportEmail, sendBattleErrorEmail };
+module.exports = { sendContactEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail };

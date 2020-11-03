@@ -2,7 +2,7 @@ const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { Op } = require("sequelize");
 //const db = require('../db').db;
-const { sendBattleReportEmail, sendAppErrorEmail, sendBattleErrorEmail } = require('../mail');
+const { sendBattleReportEmail, sendCronErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties } = require('../helperFunctions');
 const { generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
@@ -186,6 +186,10 @@ Battle.findAll({
 }).then(() =>{
   process.exit();
 }).catch((error)=>{
-  console.log('Error in BattleHour'. error);
-  process.exit();
+  new Promise((resolve, reject) =>{
+    return sendCronErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+  }).catch((error) =>{
+    console.log('couldn\'t send error email for REVIVE AVATARS - ', error);
+    process.exit();
+  });
 });

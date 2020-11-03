@@ -2,7 +2,7 @@ const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT } = require('../game/constants');
-const { sendAppErrorEmail} = require('../mail');
+const { sendCronErrorEmail } = require('../mail');
 const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 
@@ -41,8 +41,7 @@ Avatar.findAll(
     );
   }else{
     console.log('No Avs to Recover');
-    res.status(200);
-    next();
+    process.exit();
   }
 }).then((avUpdate)=>{
   console.log('SHOULD HAVE ATTEMPTED KO RECOVERY', avUpdate);
@@ -50,7 +49,7 @@ Avatar.findAll(
 }).catch((error) =>{
   console.log('ERROR TRYING TO DO KO REVIVES', error);
   return new Promise((resolve, reject) =>{
-    return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
+    return sendCronErrorEmail({ message : error.message, name : error.name },resolve, reject)
   }).then(()=>{
     process.exit();
   })
