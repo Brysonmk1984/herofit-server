@@ -38,7 +38,7 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
       break;
     case "Breath Bane":
       // Health Reduction
-      avatar.health = Math.floor(avatar.power - (avatar.power * .2));
+      avatar.health = Math.floor(avatar.health - (avatar.health * .2));
       break;
     case "Unholy Health":
       // Health Trade

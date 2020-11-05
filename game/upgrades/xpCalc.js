@@ -11,12 +11,12 @@ function xpCalc(activityXP, battleXP){
 
   return xpReturn = {
 
-    // GIVES NEXT LEVEL BASED ON DB VALUES
-    getNextLevel : function (){
+    // GIVES XP REQUIRED FOR NEXT LEVEL BASED ON DB VALUES
+    getNextLevel : function (levelsAway = 0){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
       const currentLevel = xpReturn.getCurrentLevel()
-      return Math.floor(baseXP * (Math.pow(currentLevel, exponent))) + 1;
+      return Math.floor(baseXP * (Math.pow(currentLevel + levelsAway, exponent))) + 1;
     },
 
     // GIVES CURRENT LEVEL BASED ON DB VALUES
@@ -99,8 +99,8 @@ function xpCalc(activityXP, battleXP){
 
     // Calculate whether a user leveled up, and how many times based on XP input
     checkLevelUpByInput : function (startingXP, endingXP){
-      const level = currentLevel(startingXP);
-      const endingLevel = currentLevel(endingXP);
+      const level = xpReturn.currentLevelByInput(startingXP);
+      const endingLevel = xpReturn.currentLevelByInput(endingXP);
       const levelsGained = (endingLevel - level);
       const leveledUp = levelsGained > 0;
     

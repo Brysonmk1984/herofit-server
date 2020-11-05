@@ -174,7 +174,7 @@ const sendBattleReportEmail = function(tally, resolve, reject){
       Double KO: ${tally.doubleKO}<br/>
       Avatar win%: ${tally.avWinPercent * 100}%<br/>
       Avatar win% overall: ${tally.avWinPercentOverall * 100}%<br/>
-      Tie win%: ${tally.tiePercent * 100}%<br/>
+      Tie%: ${tally.tiePercent * 100}%<br/>
       `,
   };
 

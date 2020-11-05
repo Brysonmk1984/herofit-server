@@ -4,7 +4,6 @@ const Avatar = require('../db').Avatar;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
 const { parseAvatarProperties } = require('../helperFunctions');
-const moment = require('moment');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/constants');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
@@ -167,9 +166,18 @@ router.post('/get-avatar', function(req, res, next){
       });
       return;
     }else{
+      const { getCurrentLevel, getNextLevel, } = xpCalc(avatar.activityXP, avatar.battleXP);
+      const level = getCurrentLevel();
+      const nextLevelStartXp = getNextLevel();
+      const thisLevelStartXp = getNextLevel(-1);
+
+      avatar.level = level;
+      avatar.nextLevelStartXp = nextLevelStartXp;
+      avatar.thisLevelStartXp = thisLevelStartXp;
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
       avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+
       res.status(200).json({
         message: `Found matching Avatar`,
         avatar
@@ -196,6 +204,10 @@ router.post('/get-all-avatars', function(req, res, next){
     avatars.forEach((avatar) =>{
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
+
+      const { currentLevelByInput } = xpCalc();
+      avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+      
     })
     
     // IN THE FUTURE, TRIM AVATAR FIELDS,  DONT NEED ALL OF THEM FOR RANKING PAGE

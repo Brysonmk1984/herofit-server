@@ -85,12 +85,12 @@ function avCalc(userTotals){
     
     // ADDS 5 TO WHICHEVER ELEMENT OF THE SIGN OF THE SEASON WHEN ACCOUNT WAS CREATED
     _determineAstrologyBonus : function(defaultelms, dateOfCreation){
-      const bonusElement = avReturn._determineAstrologySeason(dateOfCreation).element.toLowerCase();
-      defaultelms[bonusElement] += 5
+      const bonusElement = avReturn.determineAstrologySeason(dateOfCreation).element.toLowerCase();
+      defaultelms[bonusElement] += 5;
       return defaultelms;
     },
 
-    _determineAstrologySeason : function(dateOfCreation){
+    determineAstrologySeason : function(dateOfCreation = null){
 
       const date = dateOfCreation ? moment.utc(dateOfCreation) : moment.utc(new Date());
     
@@ -139,6 +139,7 @@ function avCalc(userTotals){
           return {sign : 'Capricorn', element : 'Earth'};
       }
     }
+
 
   }
 }
