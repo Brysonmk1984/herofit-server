@@ -127,7 +127,13 @@ router.post('/buff-and-update-avatar', function(req, res, next){
 
   }).then((result) =>{
     let avatar = parseAvatarProperties(result[1]);
+    const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+    avatar.level = getCurrentLevel();
+    avatar.nextLevelStartXp = getNextLevel();
+    avatar.thisLevelStartXp = getNextLevel(-1);
+    
     // Calc gains here to be displayed on frontend
     const improvements = {
       power : Math.floor(avatar.power - avStatSnapshot.power),
@@ -166,14 +172,11 @@ router.post('/get-avatar', function(req, res, next){
       });
       return;
     }else{
-      const { getCurrentLevel, getNextLevel, } = xpCalc(avatar.activityXP, avatar.battleXP);
-      const level = getCurrentLevel();
-      const nextLevelStartXp = getNextLevel();
-      const thisLevelStartXp = getNextLevel(-1);
+      const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
 
-      avatar.level = level;
-      avatar.nextLevelStartXp = nextLevelStartXp;
-      avatar.thisLevelStartXp = thisLevelStartXp;
+      avatar.level = getCurrentLevel();
+      avatar.nextLevelStartXp = getNextLevel();
+      avatar.thisLevelStartXp = getNextLevel(-1);
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
       avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
