@@ -329,11 +329,17 @@ router.post('/insert-random-avatar', function(req,res,next){
 
   // Set random starting xp
   randomHero.activityXP = Math.floor(Math.random() * (370 - 0));
-  const isLevel = randomHero.activityXP < 228 ? 2 : randomHero.activityXP < 370 ? 3 : 1;
+  const isLevel = randomHero.activityXP < 228 ? 2 : randomHero.activityXP < 370 ? 3 : randomHero.activityXP < 523 ? 4 : randomHero.activityXP < 683 ? 5 :randomHero.activityXP < 850 ? 6 : 1;
   if(isLevel === 2){
     spendQPArray.push(11,12,13,14,15);
   }else if(isLevel === 3){
     spendQPArray.push(11,12,13,14,15,16,17,18,19,20);
+  }else if(isLevel === 4){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25);
+  }else if(isLevel === 5){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
+  }else if(isLevel === 6){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
   }
   
   // Randomly spend QP
