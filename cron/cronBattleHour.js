@@ -180,9 +180,13 @@ Battle.findAll({
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
   tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
-  return new Promise((resolve, reject) =>{
-    return sendBattleReportEmail(tally, resolve, reject);
-  });
+  if(tally.total){
+    return new Promise((resolve, reject) =>{
+      return sendBattleReportEmail(tally, resolve, reject);
+    });
+  }else{
+    resolve()
+  }
 }).then(() =>{
   process.exit();
 }).catch((error)=>{
