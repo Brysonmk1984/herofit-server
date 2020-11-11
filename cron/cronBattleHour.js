@@ -36,7 +36,7 @@ Battle.findAll({
   where: { outcome : 'TBD' },
   raw : true
 }).then((battles) =>{
-  console.log('BATTLES!', battles);
+  //console.log('BATTLES!', battles);
   battles.forEach((battle) =>{
     //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
@@ -128,8 +128,8 @@ Battle.findAll({
     // Check for lvl up
     const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-    console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
-    console.log('BR - ', b);
+    //console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
+    //console.log('BR - ', b);
 
     allBattlePromises.push(Battle.update({
       scenario : scenario.id,
@@ -175,11 +175,12 @@ Battle.findAll({
   return Promise.allSettled(allUpdateAvatarPromises);
   
 }).then((results) => {
-  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+  //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
   tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
+  console.log('tally', tally);
   if(tally.total){
     return new Promise((resolve, reject) =>{
       return sendBattleReportEmail(tally, resolve, reject);

@@ -316,7 +316,7 @@ router.post('/do-battle', function(req, res, next){
     battle = battle[0];
     foe = battle.foe;
     battleID = battle.id;
-    console.log('THEBATTLE - ', battle);
+    //console.log('THEBATTLE - ', battle);
 
     return Avatar.findOne(
       { where : { id : avatarID }, raw : true, attributes: ['name','character','health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
@@ -418,7 +418,7 @@ router.post('/do-battle', function(req, res, next){
       { goToBattle : false, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos},
       { where: { id: avatarID } });
   }).then((result) =>{
-    console.log('finished updating avatar', avatar);
+    //console.log('finished updating avatar', avatar);
     return res.status(200).json({
       avatar,
       foe : Object.assign({}, foe, foeWithStats),
@@ -429,7 +429,7 @@ router.post('/do-battle', function(req, res, next){
       xpGain
     });
   }).catch((error) =>{
-    console.log('ERROR SOMEWHERE IN BATTLE PROCESS - ', error);
+    //console.log('ERROR SOMEWHERE IN BATTLE PROCESS - ', error);
     res.status(400).json({
       message : `ERROR SOMEWHERE IN BATTLE PROCESS- ${error}`,
     });
@@ -467,7 +467,7 @@ router.get('/do-all-battles', function(req, res, next){
     where: { outcome : 'TBD' },
     raw : true
   }).then((battles) =>{
-    console.log('BATTLES!', battles);
+    //console.log('BATTLES!', battles);
     battles.forEach((battle) =>{
       //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
       allBattleIds.push(battle.id);
@@ -556,7 +556,7 @@ router.get('/do-all-battles', function(req, res, next){
       // Check for lvl up
       const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-      console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
+      //console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
 
       allBattlePromises.push(Battle.update({
         scenario : scenario.id,
@@ -592,7 +592,7 @@ router.get('/do-all-battles', function(req, res, next){
 
     return Promise.all(allBattlePromises);
   }).then(() => {
-    console.log('UPDATED ALL BATTLES');
+    //console.log('UPDATED ALL BATTLES');
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
@@ -602,7 +602,7 @@ router.get('/do-all-battles', function(req, res, next){
     return Promise.allSettled(allUpdateAvatarPromises);
     
   }).then(() => {
-    console.log('ALL AVATARS UPDATED');
+    //console.log('ALL AVATARS UPDATED');
     tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
     tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
     tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;

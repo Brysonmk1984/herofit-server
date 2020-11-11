@@ -80,12 +80,8 @@ const sendCronErrorEmail = function({status, name, message, debug, version}, res
     html += `<br/><br/><p>` + debug + `</p>`;
   }
 
-  if(adminData){
-    html += `<br/><br/>`;
-    html += `<div>ACCOUNT DATA: ${JSON.stringify(accountInfo)}</div></div>`;
-  }else{
-    html += `<br/><br/><p>User not logged in.</p>`;
-  }
+
+  html += `<br/><br/><p>User not logged in.</p>`;
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
 
