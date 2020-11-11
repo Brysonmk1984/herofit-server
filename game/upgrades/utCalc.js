@@ -7,10 +7,7 @@ const moment = require('moment');
 const utCalc = function(userTotals){
   const actMap = ACTIVITY_MAP;
   const compActs = COMPETITIVE_ACTIVITIES;
-  //const actMap = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout' };
-  //const compActs = ['run', 'hike', 'ride', 'walk']; 
   const ut = userTotals;
-  const cachedThis = this;
   return utReturn = {
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
@@ -18,7 +15,12 @@ const utCalc = function(userTotals){
       // loop over each new activity sent from client
       activities.forEach((activity, i) =>{
         // Converts Strava formatted activity to camelCase;
-        const a = actMap[activity.type];
+        let a;
+        if(actMap[activity.type]){
+          a = actMap[activity.type];
+        }else{
+          a = 'workout';
+        }
         
         if(ut[a] === null){
           ut[a] = defaultTotals[a];
