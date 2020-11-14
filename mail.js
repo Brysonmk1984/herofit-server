@@ -148,7 +148,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
 };
 
 const sendBattleReportEmail = function(tally){
-  console.log('info email - ',process.env.INFO_EMAIL);
+  console.log('tally', tally);
   
   return new Promise((resolve, reject) =>{
     // setup email data with unicode symbols
@@ -175,9 +175,9 @@ const sendBattleReportEmail = function(tally){
       Tie%: ${tally.tiePercent * 100}%<br/>
       `,
   };
-
+  console.log('MO - ', mailOptions);
   // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {console.log('ERROR - ', error, info);
+  return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(console.log(error));
       }
