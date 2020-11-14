@@ -467,7 +467,7 @@ router.get('/do-all-battles', function(req, res, next){
     where: { outcome : 'TBD' },
     raw : true
   }).then((battles) =>{
-    //console.log('BATTLES!', battles);
+    console.log('BATTLES!', battles);
     battles.forEach((battle) =>{
       //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
       allBattleIds.push(battle.id);
@@ -482,7 +482,7 @@ router.get('/do-all-battles', function(req, res, next){
     return Promise.all(allAvatarPromises);
 
   }).then((avatars) =>{
-
+console.log('AVS - ', avatars);
     avatars.forEach((avatar, i) =>{
       // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
@@ -592,7 +592,7 @@ router.get('/do-all-battles', function(req, res, next){
 
     return Promise.all(allBattlePromises);
   }).then(() => {
-    //console.log('UPDATED ALL BATTLES');
+    console.log('UPDATED ALL BATTLES');
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
@@ -602,7 +602,7 @@ router.get('/do-all-battles', function(req, res, next){
     return Promise.allSettled(allUpdateAvatarPromises);
     
   }).then(() => {
-    //console.log('ALL AVATARS UPDATED');
+    console.log('ALL AVATARS UPDATED');
     tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
     tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
     tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
