@@ -147,10 +147,12 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   });
 };
 
-const sendBattleReportEmail = function(tally, resolve, reject){
+const sendBattleReportEmail = function(tally){
   console.log('info email - ',process.env.INFO_EMAIL);
-  // setup email data with unicode symbols
-  let mailOptions = {
+  
+  return new Promise((resolve, reject) =>{
+    // setup email data with unicode symbols
+    let mailOptions = { 
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HeroFit - Battle Report`, 
@@ -181,6 +183,8 @@ const sendBattleReportEmail = function(tally, resolve, reject){
       }
       resolve(nodemailer.getTestMessageUrl(info));
   });
+  });
+
 };
 
 

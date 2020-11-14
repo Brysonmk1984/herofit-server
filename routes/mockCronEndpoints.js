@@ -608,9 +608,9 @@ console.log('AVS - ', avatars);
     tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
     tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
     console.log('tally', tally);
-    return new Promise((resolve, reject) =>{
-      return sendBattleReportEmail(tally, resolve, reject);
-    });
+
+    return sendBattleReportEmail(tally);
+
   }).then((data) =>{
     console.log('Result Tally email sent successfully',data);
   }).catch((error)=>{
