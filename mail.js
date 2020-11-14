@@ -148,7 +148,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
 };
 
 const sendBattleReportEmail = function(tally, resolve, reject){
-
+  console.log('info email - ',process.env.INFO_EMAIL);
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
@@ -175,7 +175,7 @@ const sendBattleReportEmail = function(tally, resolve, reject){
   };
 
   // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error, info) => {console.log('ERROR - ', error, info);
       if (error) {
         reject(console.log(error));
       }
