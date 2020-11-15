@@ -61,8 +61,8 @@ function runBattlesOnBatch(shard){
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
 
-      const itemsUsed = req.body.itemsUsed || null;
-      const actionsChosen = req.body.actionsChosen || null;
+      const itemsUsed = null;
+      const actionsChosen = null;
 
       const foeWithStats = allFoes[i];
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
