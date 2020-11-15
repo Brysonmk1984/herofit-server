@@ -71,7 +71,7 @@ function runBattlesOnBatch(shard){
       // avatar and foe to be used for battle
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
-      
+      console.log('BRABRF - ',BRA, BRF);
       // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
       
       if(itemsUsed || actionsChosen){
@@ -128,7 +128,7 @@ function runBattlesOnBatch(shard){
       // Check for lvl up
       const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-      //console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
+      console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
 
       allBattlePromises.push(Battle.update({
         scenario : scenario.id,
@@ -173,6 +173,8 @@ function runBattlesOnBatch(shard){
 
     return Promise.allSettled(allUpdateAvatarPromises);
     
+  }).catch((error) =>{
+    console.log('BATTLE ERROR - ', error);
   });
 }
 
