@@ -40,11 +40,11 @@ function runBattlesOnBatch(shard){
   allAvatarPromises = [];
 
   shard.forEach((battle) =>{
-    //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
+    console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
-    //console.log('BATTLE - ',battle);
+    console.log('BATTLE - ',battle);
     allAvatarPromises.push(Avatar.findOne(
       { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ));
@@ -53,8 +53,8 @@ function runBattlesOnBatch(shard){
   return Promise.all(allAvatarPromises)
 
   .then((avatars) =>{
-    //console.log('AV LENGTH - ', avatars.length);
-    //console.log('AVS - ', avatars);
+    console.log('AV LENGTH - ', avatars.length);
+    console.log('AVS - ', avatars);
     avatars.forEach((avatar, i) =>{
       // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
@@ -198,7 +198,7 @@ Battle.findAll({
   }));
 
 }).then((results) => {
-  //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
