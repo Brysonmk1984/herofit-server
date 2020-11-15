@@ -13,7 +13,6 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
-const sleep = require('util').promisify(setTimeout);
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -618,7 +617,7 @@ router.get('/do-all-battles', function(req, res, next){
     
     return Promise.allSettled(battleShards.map(async (shard, i) => {
       console.log('I - ', i);
-      // Update one batch every 10 seconds
+      // Update one batch every 8 seconds
       const timeoutDuration = i * 8000;
 
       return await new Promise((resolve) =>{
