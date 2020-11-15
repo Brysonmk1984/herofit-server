@@ -18,7 +18,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     operatorsAliases: false,
     host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {
-      max: 500,
+      max: 20,
       min: 0,
       acquire: 30000,
       idle: 8000
