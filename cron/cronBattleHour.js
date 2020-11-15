@@ -40,11 +40,11 @@ function runBattlesOnBatch(shard){
   allAvatarPromises = [];
 
   shard.forEach((battle) =>{
-    console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
+    //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
-    console.log('BATTLE - ',battle);
+    //console.log('BATTLE - ',battle);
     allAvatarPromises.push(Avatar.findOne(
       { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ));
@@ -53,8 +53,8 @@ function runBattlesOnBatch(shard){
   return Promise.all(allAvatarPromises)
 
   .then((avatars) =>{
-    console.log('AV LENGTH - ', avatars.length);
-    console.log('AVS - ', avatars);
+    //console.log('AV LENGTH - ', avatars.length);
+    //console.log('AVS - ', avatars);
     avatars.forEach((avatar, i) =>{
       // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
 
@@ -71,7 +71,7 @@ function runBattlesOnBatch(shard){
       // avatar and foe to be used for battle
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
-      console.log('BRABRF - ',BRA, BRF);
+      //console.log('BRABRF - ',BRA, BRF);
       // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
       
       if(itemsUsed || actionsChosen){
@@ -128,7 +128,7 @@ function runBattlesOnBatch(shard){
       // Check for lvl up
       const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-      console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
+      //console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
 
       allBattlePromises.push(Battle.update({
         scenario : scenario.id,
@@ -164,7 +164,7 @@ function runBattlesOnBatch(shard){
 
     return Promise.all(allBattlePromises);
   }).then(() => {
-    console.log('UPDATED ALL BATTLES');
+    //console.log('UPDATED ALL BATTLES');
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
@@ -188,7 +188,7 @@ Battle.findAll({
   console.log('BattleShard length = ', battleShards.length);
   
   return Promise.allSettled(battleShards.map(async (shard, i) => {
-    console.log('I - ', i);
+    //console.log('I - ', i);
     // Update one batch every 8 seconds
     const timeoutDuration = i * 8000;
 
@@ -200,7 +200,7 @@ Battle.findAll({
   }));
 
 }).then((results) => {
-  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+  //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
