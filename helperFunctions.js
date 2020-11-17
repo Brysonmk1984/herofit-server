@@ -34,8 +34,7 @@ function cloneObj(obj, deep=false){
   return result
 }
 
-function arrayChunker(inputArray){
-   var perChunk = 20 // items per chunk    
+function arrayChunker(inputArray, perChunk){   
 
    var result = inputArray.reduce((resultArray, item, index) => { 
    const chunkIndex = Math.floor(index/perChunk)

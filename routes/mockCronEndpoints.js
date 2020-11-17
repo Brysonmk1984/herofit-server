@@ -611,8 +611,8 @@ router.get('/do-all-battles', function(req, res, next){
     raw : true
   }).then((battles) =>{
     console.log('BATTLECOUNT - ', battles.length);
-    // Need to divide records into groups of 20
-    battleShards = arrayChunker(battles);
+    // Need to divide records into groups of 15
+    battleShards = arrayChunker(battles, 15);
     console.log('BattleShard length = ', battleShards.length);
     
     return Promise.allSettled(battleShards.map(async (shard, i) => {
