@@ -81,7 +81,8 @@ const OUTCOME_XP = {
 const REVIVE_AMOUNT = 1;
 
 // DO BATTLE
-const ARMOR_DRF = 4;
+// lower is more effective
+const ARMOR_DRF = 3.5;
 
 
 module.exports = { 
