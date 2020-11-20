@@ -25,12 +25,12 @@ const utCalc = function(userTotals){
         if(ut[a] === null){
           ut[a] = defaultTotals[a];
         }
-
+        console.log('A! - ', a, ut[a]);
         // All activities track instance count, duration, and average heart rate
         ut[a] = {
           instance : ++ut[a].instance,
           duration : ut[a].duration + activity.moving_time,
-          avgHeartrate : (ut[a].avgHeartrate + activity.average_heartrate) / ut[a].instance
+          avgHeartrate : (ut[a].avgHeartrate + activity.average_heartrate || 0) / ut[a].instance
         }
 
         // The competitive activities also track distance, elevation gain, and speed in HF
@@ -40,7 +40,7 @@ const utCalc = function(userTotals){
           ut[a].avgSpeed = (ut[a].avgSpeed + activity.average_speed) / ut[a].instance;
         }
 
-      });
+      });console.log('UT - ', ut);
       return ut;
     },
     initialUpdate : function(activities, accountDate){

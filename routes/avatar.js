@@ -109,16 +109,20 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
     aXPDiff = aXP - avStatSnapshot.activityXP;
-
+    
+    console.log('AXP - ', aXP, avStatSnapshot.activityXP);
+    
     const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
     lvlUp = leveledUp;
     lvlAfterBuff = endingLevel;
     qpe = qpEarned;
-
+    
+    
+    
     const updatedPower = updatePower();
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
-    
+    console.log(avatar, updatedAvatar);
     // Finally, Update Avatar in DB
     return Avatar.update(
       {...updatedAvatar},
