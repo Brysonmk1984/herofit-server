@@ -7,7 +7,7 @@ const { Op, literal, col, fn, QueryTypes } = require("sequelize");
 const sequelize = require("sequelize");
 const { sendAppErrorEmail, sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { REVIVE_AMOUNT, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
+const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
@@ -96,8 +96,14 @@ router.get('/try-recovery', function(req, res, next){
         const winningNum = Math.floor(Math.random() * 100);
         const found = recoveryWinners.includes(winningNum);
         
+        // Need to restrict how effective KO recovery is
+        let winnerRetarder = false;
+        if(Math.random() < KO_RECOVERY_RETARDER){
+          winnerRetarder = true;
+        }
+
         // Revive avatar to the REVIVE_AMOUNT in constants.js
-        if(found){
+        if(winnerRetarder && found){
           console.log('Found & Recovering!', result.owner);
           return recoveredAvatars.push(result.owner);
         }

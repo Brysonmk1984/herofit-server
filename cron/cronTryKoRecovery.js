@@ -1,7 +1,7 @@
 const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
-const { REVIVE_AMOUNT } = require('../game/constants');
+const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER } = require('../game/constants');
 const { sendCronErrorEmail } = require('../mail');
 const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
@@ -16,7 +16,7 @@ Avatar.findAll(
     // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
     results.forEach((result, i) =>{
       result = parseAvatarProperties(result);
-      const recoveryChance = result.recovery >= 100 ? 100 : result.recovery;
+      const recoveryChance = result.recovery;
 
       // THESE ARE THE NUMBERS THAT IF MATCHED IN THE WHILE LOOP, WILL ALLOW AVATAR TO RECOVER EARLY
       const recoveryWinners = [];
@@ -26,8 +26,14 @@ Avatar.findAll(
       const winningNum = Math.floor(Math.random() * 100);
       const found = recoveryWinners.includes(winningNum);
       
+      // Need to restrict how effective KO recovery is
+      let winnerRetarder = false;
+      if(Math.random() < KO_RECOVERY_RETARDER){
+        winnerRetarder = true;
+      }
+
       // Revive avatar to the REVIVE_AMOUNT in constants.js
-      if(found){
+      if(winnerRetarder && found){
         console.log('Found & Recovering!', result.owner);
         return recoveredAvatars.push(result.owner);
       }
