@@ -11,9 +11,9 @@ const MINUTES_PER_ELM = 30;
 const MINUTES_PER_ALL_ELM = 120;
 
 // ACTIVITIES
-const ACTIVITY_MAP = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout', 'VirtualRide' : 'ride', 'VirtualRun' : 'run' };
+const ACTIVITY_MAP = { 'Run' : 'run', 'Hike' : 'hike', 'Ride' : 'ride', 'Walk' : 'walk', 'StairStepper' : 'stairStepper', 'Elliptical' : 'elliptical', 'Swim' : 'swim', 'WeightTraining' : 'weightTraining', 'Yoga' : 'yoga', 'Rowing' : 'rowing', 'Crossfit' : 'crossfit', 'StandUpPaddling' : 'standUpPaddling', 'Workout' : 'workout', 'VirtualRide' : 'ride', 'VirtualRun' : 'run', 'AlpineSki' : 'ski', 'BackcountrySki' : 'ski', 'NordicSki' : 'ski', 'Snowboard' : 'snowboard', 'Snowshoe' : 'snowshoe' };
 const COMPETITIVE_ACTIVITIES = ['run', 'hike', 'ride', 'walk'];
-const NONCOMPETITIVE_ACTIVITIES = ['stairStepper', 'elliptical', 'swim', 'weightTraining', 'yoga', 'rowing', 'crossfit', 'standUpPaddling', 'workout'];
+const NONCOMPETITIVE_ACTIVITIES = ['stairStepper', 'elliptical', 'swim', 'weightTraining', 'yoga', 'rowing', 'crossfit', 'standUpPaddling', 'ski', 'snowboard', 'snowshoe', 'workout'];
 
 // FOR BATTLES
 const REGENERATION_RATE = 5;

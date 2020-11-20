@@ -74,6 +74,21 @@
     "duration" : 0,
     "avgHeartrate" : 0
   },
+  "snowshoe" : {
+    "instance" : 0,
+    "duration" : 0,
+    "avgHeartrate" : 0
+  },
+  "snowboard" : {
+    "instance" : 0,
+    "duration" : 0,
+    "avgHeartrate" : 0
+  },
+  "ski" : {
+    "instance" : 0,
+    "duration" : 0,
+    "avgHeartrate" : 0
+  },
   "workout" : {
     "instance" : 0,
     "duration" : 0,

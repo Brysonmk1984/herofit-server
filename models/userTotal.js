@@ -69,6 +69,18 @@ const UserTotalModel = function(db, DataTypes){
         type: DataTypes.JSONB,
         allowNull: true
       },
+      ski: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
+      snowboard: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
+      snowshoe: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
       workout: {
         type: DataTypes.JSONB,
         allowNull: true
