@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 // COMMON
 const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
+const accountRoutes = require('./routes/account');
 const userRoutes = require('./routes/user');
 const emailRoutes = require('./routes/email');
 const battleRoutes = require('./routes/battle');
@@ -36,6 +37,7 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
   // Protected routes
   app.use('/authenticate', authenticateRoutes);
   app.use('/avatar', avatarRoutes);
+  app.use('/account', accountRoutes);
   app.use('/user', userRoutes);
   app.use('/email', emailRoutes);
   app.use('/battle', battleRoutes);
