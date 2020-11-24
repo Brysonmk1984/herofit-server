@@ -30,14 +30,6 @@ const AvatarModel = function(db, DataTypes){
               notEmpty :true,
           }
       },
-      
-      ownerUsername : {
-        type : DataTypes.STRING,
-        unique : true,
-        validate : {
-            notEmpty :true,
-        }
-      },
       hasBeenUpgraded : {
         type: DataTypes.BOOLEAN,
           defaultValue: false,

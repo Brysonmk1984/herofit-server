@@ -364,7 +364,6 @@ router.post('/insert-random-avatar', function(req,res,next){
     defaults: { 
       isFake : true,
       owner: req.body.owner,
-      ownerUsername: req.body.username,
       name: randomHero.name,
       character: randomHero.character,
       power: randomHero.power,

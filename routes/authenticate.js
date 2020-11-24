@@ -141,13 +141,11 @@ router.post('/strava-credentials', function(req, res, next){
           stravaAccessTokenExpiration: req.body.stravaAccessTokenExpiration,
           stravaRefreshToken: req.body.stravaRefreshToken,
         },
-        {where: {
-          email: req.body.email
-        }})
+        {where: {email: req.body.email},
+        returning : true, plain : true })
       .then(function (data) {
         res.status(200).json({
-          message: `User updated with strava Credentials`,
-          user : data.dataValues
+          user : data[1]
         });
         next();
       })

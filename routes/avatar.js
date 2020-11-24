@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
+const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
 const { parseAvatarProperties } = require('../helperFunctions');
@@ -21,7 +22,7 @@ router.post('/insert-avatar', function(req, res, next){
       owner: req.body.owner
     },
     // set the default properties if it doesn't exist
-    defaults : Object.assign({},{ ...req.body.avatar }, { ownerUsername: req.body.ownerUsername, owner: req.body.email })
+    defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email })
   }).then((result) =>{
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
@@ -205,18 +206,19 @@ router.post('/get-avatar', function(req, res, next){
 
 router.post('/get-all-avatars', function(req, res, next){
 
-  // next();
-  Avatar.findAll({},{raw : true})
-  .then((avatars) =>{
-    avatars.forEach((avatar) =>{
-      // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-      avatar = parseAvatarProperties(avatar);
 
-      const { currentLevelByInput } = xpCalc();
+  Avatar.findAll({attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], include : [{ model: User, attributes: ['username'] }], raw : false})
+  .then((results) =>{
+    const { currentLevelByInput } = xpCalc();
+    // Sequelize requires us to loop over the returned data when 'raw : false'
+    const avatars = results.map((result) => {
+      avatar = result.get({ plain: true });
+      avatar = parseAvatarProperties(avatar);
       avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-      
-    })
-    
+      avatar.user = avatar.user ? avatar.user  : { username : '' };
+      return avatar;
+    });
+    console.log('avatars', avatars);
     // IN THE FUTURE, TRIM AVATAR FIELDS,  DONT NEED ALL OF THEM FOR RANKING PAGE
     res.status(200).json({
       message: `Retrieved All Avatars`,
