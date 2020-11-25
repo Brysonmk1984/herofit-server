@@ -117,7 +117,7 @@ router.delete('/:username', function(req, res, next){
       res.send(400);
     }
   }catch(error){
-    console.log(error);
+    console.log(error, test);
   }
 
 
