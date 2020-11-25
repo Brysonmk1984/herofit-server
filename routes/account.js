@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const User = require('../db').User;
+const Battle = require('../db').Battle;
 const db = require('../db').db;
 
 // UPDATE HERO NAME
@@ -33,9 +34,9 @@ router.post('/update-avatar-name', function(req, res, next){
 // UPDATE USERNAME
 router.post('/update-owner-username', function(req, res, next){
   console.log('NN - ', req.body.owner, req.body.newUsername);
-  Users.update(
+  User.update(
     { username : req.body.newUsername },
-    { where : { owner : req.body.owner}, returning : true },
+    { where : { email : req.body.owner}, returning : true },
   ).then((result) =>{
     if(result[0]){
       res.status(200).json({
@@ -58,11 +59,39 @@ router.post('/update-owner-username', function(req, res, next){
 
 // DELETE ACCOUNT
 router.delete('/:username', function(req, res, next){
-
+  console.log('EM - ',req.body.id);
+  Battle.destroy({
+    where : {
+      owner : req.body.email
+    }
+  }).then(() =>{
+    return Avatar.destroy({
+      where : {
+        owner : req.body.email
+      }
+    })
+  }).then(() =>{
+    return User.destroy({
+      where : {
+        id : req.body.id
+      }
+    })
+  }).then(() =>{
+    res.status(200).json({
+      message : 'Successfully deleted account!'
+     });
+     next();
+  }).catch((error)=>{console.log(error);
+    res.status(400).json({
+      error,
+      message : 'Unable to delete account!'
+     });
+     next();
+  })
 });
 
 
-router.get('/migration', async function(req, res, next){
+/*router.get('/migration', async function(req, res, next){
   const q = `
   SELECT avatars.name, avatars.owner, users.id FROM avatars
   LEFT JOIN users ON avatars.owner=users.email
@@ -92,6 +121,6 @@ router.get('/migration', async function(req, res, next){
   }
 
 
-});
+});*/
 
 module.exports = router;
