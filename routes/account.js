@@ -11,7 +11,7 @@ router.post('/update-avatar-name', function(req, res, next){
   Avatar.update(
     { name : req.body.newHeroName },
     { where : { owner : req.body.owner}, returning : true },
-  ).then((result) =>{
+  ).then((result) =>{console.log('!!', result[0]);
     if(result[0]){
       res.status(200).json({
         updatedName : result[1][0].name
@@ -91,36 +91,36 @@ router.delete('/:username', function(req, res, next){
 });
 
 
-/*router.get('/migration', async function(req, res, next){
-  const q = `
-  SELECT avatars.name, avatars.owner, users.id FROM avatars
-  LEFT JOIN users ON avatars.owner=users.email
-  WHERE avatars.owner='oliver.h.coop@gmail.com'
-  `;
+// router.get('/migration', async function(req, res, next){
+//   const q = `
+//   SELECT avatars.name, avatars.owner, users.id FROM avatars
+//   LEFT JOIN users ON avatars.owner=users.email
+//   WHERE avatars.owner='oliver.h.coop@gmail.com'
+//   `;
 
-  const r = `
-    UPDATE avatars
-    SET "userId"=users.id
-    FROM users
-    WHERE owner=users.email;
-  `;
+//   const r = `
+//     UPDATE avatars
+//     SET "userId"=users.id
+//     FROM users
+//     WHERE owner=users.email;
+//   `;
 
-  try{
-    const [results, metadata] = await db.query(r, {});
+//   try{
+//     const [results, metadata] = await db.query(r, {});
 
-    console.log('results!', metadata);
-    if(results){
-      res.status(200).json({
-        results
-      });
-    }else{
-      res.send(400);
-    }
-  }catch(error){
-    console.log(error, test);
-  }
+//     console.log('results!', metadata);
+//     if(results){
+//       res.status(200).json({
+//         results
+//       });
+//     }else{
+//       res.send(400);
+//     }
+//   }catch(error){
+//     console.log(error, test);
+//   }
 
 
-});*/
+// });
 
 module.exports = router;
