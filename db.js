@@ -61,7 +61,5 @@ const Battle = BattleModel(db, Sequelize);
 User.hasOne(Avatar, {foreignKey: 'userId'});
 Avatar.belongsTo(User, {foreignKey: 'userId'})
 
-// User.hasOne(Avatar, {foreignKey: 'user_id'})
-// Avatar.belongsTo(User, {foreignKey: 'user_id'})
 
 module.exports = { User, Avatar, UserActivity, UserTotal, Battle, db }
