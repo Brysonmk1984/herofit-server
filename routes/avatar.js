@@ -218,7 +218,7 @@ router.post('/get-all-avatars', function(req, res, next){
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       return avatar;
     });
-    console.log('avatars', avatars);
+    //console.log('avatars', avatars);
     // IN THE FUTURE, TRIM AVATAR FIELDS,  DONT NEED ALL OF THEM FOR RANKING PAGE
     res.status(200).json({
       message: `Retrieved All Avatars`,

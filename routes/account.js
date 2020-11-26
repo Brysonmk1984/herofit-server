@@ -7,7 +7,7 @@ const db = require('../db').db;
 
 // UPDATE HERO NAME
 router.post('/update-avatar-name', function(req, res, next){
-  console.log('NN - ', req.body.owner, req.body.newHeroName);
+  //console.log('NN - ', req.body.owner, req.body.newHeroName);
   Avatar.update(
     { name : req.body.newHeroName },
     { where : { owner : req.body.owner}, returning : true },
