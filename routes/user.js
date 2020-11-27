@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router(); 
 const User = require('../db').User;
+const Avatar = require('../db').Avatar;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
-//const db = require('../db').db;
+const db = require('../db').db;
 const moment = require('moment');
 const utCalc = require('../game/upgrades/utCalc');
+const { Op } = require('sequelize');
 
 router.post('/insert-user-activities', function(req, res, next){
   // Need latest Activity to be added to user's account
@@ -184,7 +186,7 @@ router.post('/update-user-totals', function(req, res, next){
 
 
 router.post('/get-user-totals', function(req, res, next){
-  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout'], raw : true })
+  UserTotal.findOne({ where: { user: req.body.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe'], raw : true })
   .then((userTotals) =>{
     if(userTotals){
       res.status(200).json({
@@ -205,6 +207,81 @@ router.post('/get-user-totals', function(req, res, next){
     });
     next();
   });
+});
+
+router.post('/get-info-by-username', function(req, res, next){
+  const username = req.body.username;
+  console.log('!username', username);
+  // First, exchange the username for the email
+  User.findOne({ where: { username }, attributes : ['email'], raw : true })
+  .then((data) =>{
+    console.log('DATA - ', data);
+    const allPromises = [];
+
+    allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe'], raw : true }));
+    allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true, attributes : ['id', 'activity', 'activityDate']}));
+    allPromises.push(Avatar.findOne({ where: { owner: data.email }, raw : true }));
+
+    
+    return Promise.allSettled(allPromises);
+  }).then((userData) =>{
+    
+    res.status(200).json({
+      message: `User data for ${req.body.username}`,
+      userData
+    });
+    next();
+  }).catch((err)=>{
+    console.log(`Error retrieving data for ${req.body.username}, DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Error retrieving data for ${req.body.username}`,
+      debug : err
+    });
+    next();
+  });
+
+
+});
+
+router.post('/get-matching-users', function(req, res, next){
+  const searchInput = req.body.searchInput;
+  console.log('SI - ', searchInput);
+  const allPromises = [];
+
+  allPromises.push(Avatar.findAll({
+    where: {
+      name: {
+        [Op.iLike]: `%${searchInput}%`
+      }
+    }
+  }));
+
+  allPromises.push(User.findAll({
+    where: {
+      username: {
+        [Op.iLike]: `%${searchInput}%`
+      }
+    }
+  }));
+
+  Promise.allSettled(allPromises)
+  .then((data) =>{
+    const userList = [data[0].value, data[1].value];
+    console.log('data - ', userList);
+    res.status(200).json({
+      message: `List for search query ${searchInput}`,
+      userList 
+    });
+    next();
+  }).catch((err) =>{
+    console.log('err - ', err);
+    res.status(400).json({
+      message: `Error retrieving list for query  ${searchInput}`,
+      debug : err
+    });
+    next();
+  });
+
 });
 
 module.exports = router;
