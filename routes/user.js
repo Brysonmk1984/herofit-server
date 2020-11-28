@@ -224,11 +224,12 @@ router.post('/get-info-by-username', function(req, res, next){
 
     
     return Promise.allSettled(allPromises);
-  }).then((userData) =>{
+  }).then(([userTotals, activities, avatar]) =>{
     
     res.status(200).json({
-      message: `User data for ${req.body.username}`,
-      userData
+      userTotals,
+      activities,
+      avatar
     });
     next();
   }).catch((err)=>{

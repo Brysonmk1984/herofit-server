@@ -27,9 +27,9 @@ const sendContactEmail = function(formData, resolve, reject){
 
   // setup email data with unicode symbols
   let mailOptions = {
-      from: formData.email,
+      from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
-      subject: 'HEROFIT - A user submitted a form message.', 
+      subject: `HEROFIT - ${formData.email} submitted a form message.`, 
       text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
       html: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
   };
