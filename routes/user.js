@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router(); 
 const User = require('../db').User;
 const Avatar = require('../db').Avatar;
+const Battle = require('../db').Battle;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
 const db = require('../db').db;
 const moment = require('moment');
 const utCalc = require('../game/upgrades/utCalc');
+const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
+
 
 router.post('/insert-user-activities', function(req, res, next){
   // Need latest Activity to be added to user's account
@@ -221,15 +224,21 @@ router.post('/get-info-by-username', function(req, res, next){
     allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe'], raw : true }));
     allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true, attributes : ['id', 'activity', 'activityDate']}));
     allPromises.push(Avatar.findOne({ where: { owner: data.email }, raw : true }));
-
+    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true }));
     
     return Promise.allSettled(allPromises);
-  }).then(([userTotals, activities, avatar]) =>{
-    
+  }).then(([userTotals, activities, avatar, battles]) =>{
+    userTotals = userTotals.value;
+    activities = activities.value.map((act) =>act.activity);
+    battles = battles.value;
+    const { currentLevelByInput } = xpCalc();
+    avatar = avatar.value;
+    avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
     res.status(200).json({
       userTotals,
       activities,
-      avatar
+      avatar,
+      battles
     });
     next();
   }).catch((err)=>{
@@ -284,5 +293,21 @@ router.post('/get-matching-users', function(req, res, next){
   });
 
 });
+
+router.post('/get-user-by-email', function(req, res, next){
+  User.findOne({ where: { email: req.body.email }, attributes : ['username'], raw : true })
+  .then((data) =>{
+    res.status(200).json({
+      username : data.username
+    });
+  }).catch((err) =>{
+    res.status(400).json({
+      message: `Error retrieving username for  user ${req.body.email}`,
+      debug : err
+    });
+    next();
+  });
+});
+
 
 module.exports = router;
