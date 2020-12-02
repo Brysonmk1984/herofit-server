@@ -5,6 +5,7 @@ const moment = require('moment');
 var jwt = require('jsonwebtoken');
 var jwkToPem = require('jwk-to-pem');
 var jwkJson =  require('../jwk.json');
+const { config } = require('../appConfig');
 
 var key = jwkJson['keys'].find(key => {
  return key.kid;
@@ -72,10 +73,14 @@ router.post('/signup-or-signin', function(req, res, next){
             });
           // User already exists, return data from db
           }else{
-            res.status(200).json({
-              message: `Existing user, logged in as ${user.username}`,
+            const response = {
+              message: `You are logged in as ${user.username}`,
               user
-            });
+            };console.log('GM1');
+            if(config.globalMessage.length){console.log('GM2', config.globalMessage);
+              response.globalMessage = config.globalMessage;
+            }
+            res.status(200).json(response);
           }
           next();
         }).catch((error)=>{
@@ -94,6 +99,7 @@ router.post('/signup-or-signin', function(req, res, next){
                 //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
                 //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
                 // });
+
                 res.status(200).json({
                   message: `You are logged in as ${user.username}`,
                   user
