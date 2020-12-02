@@ -1,0 +1,10 @@
+{
+  "Titans" : [
+    {
+      "id": 9,
+      "type": "Plaguebringer",
+      "foe": ["The Plaguebringer"],
+      "ability": null
+    }
+  ]
+}

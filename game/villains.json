@@ -134,6 +134,15 @@
         "effect" : "Health Trade"
       },
       "color": "#000000"
+    },{
+      "id": 8,
+      "type": "Shadow-Self",
+      "foe": ["Shadow-Self"],
+      "ability": {
+        "name" : "Self-Awareness",
+        "effect" : "Mirrored Stats"
+      },
+      "color": "#0D0D0D"
     }
   ]
 }

@@ -6,23 +6,37 @@ const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
+const xpCalc = require('../game/upgrades/xpCalc');
+
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
-  const foeTemplate = selectFoeTemplate();
+  const avatar = req.body.avatar
+  const { currentLevelByInput } = xpCalc();
+  const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+  const foeTemplate = selectFoeTemplate(currentLevel);
+
+  let foeName;
+
+  if(foeTemplate.type === 'Shadow-Self'){
+    foeName = `Shadow ${avatar.name}`;
+  }else{
+    foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
+  }
+
   const foe = {
     id : foeTemplate.id,
     type : foeTemplate.type,
-    name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+    name : foeName,
     ability : foeTemplate.ability
   }
-  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar));
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
 
-  console.log('FOE!', foe, req.body.email, req.body.avatar)
+  console.log('FOE!', foe, req.body.email, avatar)
   Battle.create({
     owner: req.body.email,
-    avatarID: req.body.avatar.id,
-    avatarName: req.body.avatar.name,
+    avatarID: avatar.id,
+    avatarName: avatar.name,
     foe : foeWithStats,
     outcome: "TBD"
   }, 
