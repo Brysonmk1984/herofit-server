@@ -72,10 +72,10 @@ const FOE_MOD = {
 };
 
 const OUTCOME_XP = {
-  win : 30,
-  loss : 15,
-  draw : 20,
-  dko : 25
+  win : 20,
+  loss : 5,
+  draw : 10,
+  dko : 15
 };
 
 const REVIVE_AMOUNT = 1;

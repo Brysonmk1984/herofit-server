@@ -50,7 +50,7 @@ function runBattlesOnBatch(shard){
     ));
   });
 
-  return Promise.all(allAvatarPromises)
+  return Promise.allSettled(allAvatarPromises)
 
   .then((avatars) =>{
     //console.log('AV LENGTH - ', avatars.length);
@@ -162,7 +162,7 @@ function runBattlesOnBatch(shard){
       // End Avatar for each
     });
 
-    return Promise.all(allBattlePromises);
+    return Promise.allSettled(allBattlePromises);
   }).then(() => {
     //console.log('UPDATED ALL BATTLES');
     

@@ -19,6 +19,20 @@ function selectFoeTemplate(level){
 
 function generateFoeStats(avatar, foe){
 
+  // If it's the shadow boss, just return a mirror image of the avatar
+  if(foe.type === 'Shadow-Self'){
+    return {
+      health : avatar.health,
+      power : avatar.power,
+      armor : avatar.armor,
+      fire : avatar.fire,
+      earth : avatar.earth,
+      water : avatar.water,
+      air : avatar.air
+    };
+  }
+
+  // Otherwise, build foe as usual
   // GIVES CURRENT LEVEL based on XP input
   function currentLevel(xp){
     const exponent = 1.2;
@@ -55,17 +69,7 @@ function generateFoeStats(avatar, foe){
     air : 0
   }
 
-  if(foe.type === 'Shadow-Self'){
-    return {
-      health : avatar.health,
-      power : avatar.power,
-      armor : avatar.armor,
-      fire : avatar.fire,
-      earth : avatar.earth,
-      water : avatar.water,
-      air : avatar.air
-    };
-  }
+
 
   const properties = ["health","power","armor"];
   //const properties = ["health","power","armor","fire","earth","water","air"];

@@ -532,6 +532,7 @@ router.get('/do-all-battles', function(req, res, next){
         // SAVE DATA
         let xpGain;
 
+        console.log('OUTCOME - ', b.outcomeData.outcome);
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
             xpGain = OUTCOME_XP.win;
