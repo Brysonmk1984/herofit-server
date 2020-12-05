@@ -49,7 +49,7 @@ function runBattlesOnBatch(shard){
       { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ));
   });
-
+  // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
   return Promise.all(allAvatarPromises)
 
   .then((avatars) =>{

@@ -485,7 +485,8 @@ router.get('/do-all-battles', function(req, res, next){
       ));
     });
 
-    return Promise.all(allAvatarPromises);
+    // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
+    return Promise.all(allAvatarPromises)
 
     .then((avatars) =>{
       //console.log('AV LENGTH - ', avatars.length);
