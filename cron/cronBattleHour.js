@@ -50,7 +50,7 @@ function runBattlesOnBatch(shard){
     ));
   });
 
-  return Promise.allSettled(allAvatarPromises)
+  return Promise.all(allAvatarPromises)
 
   .then((avatars) =>{
     //console.log('AV LENGTH - ', avatars.length);

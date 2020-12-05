@@ -485,7 +485,7 @@ router.get('/do-all-battles', function(req, res, next){
       ));
     });
 
-    return Promise.all(allAvatarPromises)
+    return Promise.all(allAvatarPromises);
 
     .then((avatars) =>{
       //console.log('AV LENGTH - ', avatars.length);
@@ -598,7 +598,7 @@ router.get('/do-all-battles', function(req, res, next){
         // End Avatar for each
       });
 
-      return Promise.all(allBattlePromises);
+      return Promise.allSettled(allBattlePromises);
     }).then(() => {
       console.log('UPDATED ALL BATTLES');
       
