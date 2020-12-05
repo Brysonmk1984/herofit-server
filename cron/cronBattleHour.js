@@ -64,10 +64,10 @@ function runBattlesOnBatch(shard){
       const itemsUsed = null;
       const actionsChosen = null;
 
-      const foeWithStats = allFoes[i];
+      const foeWithStats = allFoes[i];console.log('FWS - ', foeWithStats);
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
       const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
-      
+      console.log('sFOE - ', sFoe);
       // avatar and foe to be used for battle
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
@@ -85,7 +85,7 @@ function runBattlesOnBatch(shard){
       // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
       if(foeWithStats.ability){
         if(scenario.id !== FOE_NON_ACTION){
-          const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+          const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);console.log('!!', foeBP);
           BRF = foeBP.foe;
           BRA = foeBP.avatar;
         }

@@ -47,6 +47,8 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
       foe.health = avatarHealth;
       avatar.health = foeHealth;
       break ;
+      default:
+      break;
   }
 
   return { foe, avatar };
