@@ -4,6 +4,8 @@ const Avatar = require('../db').Avatar;
 const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
+const AVATAR_COUNT_PER_PAGE = require('../appConfig').AVATAR_COUNT_PER_PAGE;
+const { literal } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/constants');
 const avCalc = require('../game/upgrades/avCalc');
@@ -233,6 +235,90 @@ router.post('/get-all-avatars', function(req, res, next){
     });
     next();
   });
+});
+
+router.post('/fetch-avatars-by-page-number', function(req, res, next){
+  const page = req.body.page || 0;
+  const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
+  console.log('PA - ', page, pageSize);
+
+  const paginate = (query, { page, pageSize }) => {
+    const offset = page * pageSize;
+    const limit = pageSize;
+  
+    return {
+      ...query,
+      offset,
+      limit,
+    };
+  };
+
+    
+  Avatar.findAll(
+    paginate({ 
+      attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], 
+      include : [{ model: User, attributes: ['username'] }],
+      order : [[ 'activityXP', 'DESC' ]],
+      raw : false,
+      
+      },
+      { page, pageSize },
+    )
+  ).then((results) =>{console.log('!!!', results);
+    const { currentLevelByInput } = xpCalc();
+    // Sequelize requires us to loop over the returned data when 'raw : false'
+    const avatars = results.map((result, i) => {
+
+      avatar = result.get({ plain: true });
+      avatar = parseAvatarProperties(avatar);
+      avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+      avatar.user = avatar.user ? avatar.user  : { username : '' };
+      // Determine rank based on page and position within page
+      avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
+      return avatar;
+    });
+    //console.log('avatars', avatars);
+    // IN THE FUTURE, TRIM AVATAR FIELDS,  DONT NEED ALL OF THEM FOR RANKING PAGE
+    res.status(200).json({
+      message: `Retrieved All Avatars`,
+      avatars
+    });
+    next();
+  }).catch((err)=>{
+    console.log(`Couldn't get all Avatars DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get All Avatars`,
+      debug : err
+    });
+    next();
+  });
+  
+});
+
+router.get('/get-avatar-and-page-count', function(req, res, next){
+
+
+  Avatar.findAndCountAll()
+  .then((data) =>{
+    console.log('Data - ', data.count);
+    const avatarCount = data.count;
+    const pageCount = Math.ceil(avatarCount/20);
+    
+    res.status(200).json({
+      avatarCount,
+      pageCount,
+      currentPage : 1,
+    });
+    next();
+  }).catch((err)=>{
+    console.log(`Couldn't get all Avatars DEBUG: ${err}`);
+    res.status(400).json({
+      message: `Couldn't get All Avatars`,
+      debug : err
+    });
+    next();
+  });
+
 });
 
 module.exports = router;
