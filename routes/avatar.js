@@ -261,6 +261,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
     ]],
     group: ['avatars.id', 'user.id'],
     raw : true,
+    nest: true,
   };
   if(searchInput){
     expression.where = { name: { [Op.iLike]: `%${searchInput}%`}};
@@ -272,10 +273,12 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
     )
   ).then(({rows, count}) =>{
     const { currentLevelByInput } = xpCalc();
+
     // Sequelize requires us to loop over the returned data when 'raw : false'
     const avatars = rows.map((result, i) => {
       avatar = parseAvatarProperties(result);
       avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
