@@ -5,7 +5,7 @@ const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
 const AVATAR_COUNT_PER_PAGE = require('../appConfig').AVATAR_COUNT_PER_PAGE;
-const { literal, fn, where, col } = require("sequelize");
+const { literal, Op } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/constants');
 const avCalc = require('../game/upgrades/avCalc');
@@ -240,7 +240,7 @@ router.post('/get-all-avatars', function(req, res, next){
 router.post('/fetch-avatars-by-page-number', function(req, res, next){
   const page = req.body.page || 0;
   const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
-  console.log('PA - ', page, pageSize);
+  const searchInput = req.body.searchInput;
 
   const paginate = (query, { page, pageSize }) => {
     const offset = page * pageSize;
@@ -253,38 +253,43 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
     };
   };
 
-    
-  Avatar.findAll(
-    paginate({ 
-      attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], 
-      include : [{ model: User, attributes: ['username'] }],
-      order : [[
-        literal('SUM("activityXP" + "battleXP")'), 'DESC'
-      ]],
-      group: ['avatars.id', 'user.id'],
-      raw : false,
-      
-      },
+  const expression = { 
+    attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], 
+    include : [{ model: User, attributes: ['username'] }],
+    order : [[
+      literal('SUM("activityXP" + "battleXP")'), 'DESC'
+    ]],
+    group: ['avatars.id', 'user.id'],
+    raw : true,
+  };
+  if(searchInput){
+    expression.where = { name: { [Op.iLike]: `%${searchInput}%`}};
+  }
+
+  Avatar.findAndCountAll(
+    paginate(expression,
       { page, pageSize },
     )
-  ).then((results) =>{console.log('!!!', results.length);
+  ).then(({rows, count}) =>{
     const { currentLevelByInput } = xpCalc();
     // Sequelize requires us to loop over the returned data when 'raw : false'
-    const avatars = results.map((result, i) => {
-
-      avatar = result.get({ plain: true });
-      avatar = parseAvatarProperties(avatar);
+    const avatars = rows.map((result, i) => {
+      avatar = parseAvatarProperties(result);
       avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
       return avatar;
     });
-    //console.log('avatars', avatars);
-    // IN THE FUTURE, TRIM AVATAR FIELDS,  DONT NEED ALL OF THEM FOR RANKING PAGE
+    const avatarCount = count.length;
+
+    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
+
     res.status(200).json({
-      message: `Retrieved All Avatars`,
-      avatars
+      avatars,
+      avatarCount,
+      pageCount,
+      currentPage : page + 1
     });
     next();
   }).catch((err)=>{
@@ -303,7 +308,6 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
 
   Avatar.findAndCountAll()
   .then((data) =>{
-    console.log('Data - ', data.count);
     const avatarCount = data.count;
     const pageCount = Math.ceil(avatarCount/20);
     
