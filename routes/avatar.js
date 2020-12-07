@@ -5,7 +5,7 @@ const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
 const AVATAR_COUNT_PER_PAGE = require('../appConfig').AVATAR_COUNT_PER_PAGE;
-const { literal } = require("sequelize");
+const { literal, fn, where, col } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/constants');
 const avCalc = require('../game/upgrades/avCalc');
@@ -258,13 +258,16 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
     paginate({ 
       attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], 
       include : [{ model: User, attributes: ['username'] }],
-      order : [[ 'activityXP', 'DESC' ]],
+      order : [[
+        literal('SUM("activityXP" + "battleXP")'), 'DESC'
+      ]],
+      group: ['avatars.id', 'user.id'],
       raw : false,
       
       },
       { page, pageSize },
     )
-  ).then((results) =>{console.log('!!!', results);
+  ).then((results) =>{console.log('!!!', results.length);
     const { currentLevelByInput } = xpCalc();
     // Sequelize requires us to loop over the returned data when 'raw : false'
     const avatars = results.map((result, i) => {
