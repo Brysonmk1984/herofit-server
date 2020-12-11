@@ -77,7 +77,7 @@ router.post('/signup-or-signin', function(req, res, next){
               message: `You are logged in as ${user.username}`,
               user
             };
-            if(config.globalMessage.length){
+            if(config.globalMessage && config.globalMessage.length){
               response.globalMessage = config.globalMessage;
             }
             res.status(200).json(response);
