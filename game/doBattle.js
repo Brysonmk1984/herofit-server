@@ -1,4 +1,5 @@
-const { ARMOR_DRF } = require('./constants');
+const chance = require('chance')();
+const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE } = require('./constants');
 
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage){
@@ -68,6 +69,9 @@ function _determineElmMatchups(elm){
 
 
 function _calcElementDamage(attacker, receiver){
+  //NEED TO FIGURE OUT ELEMENTAL DAMAGE
+  //Math.floor(chance.floating({ min: attacker.air * DAMAGE_VARIANCE_RANGE[0], max: attacker.air * DAMAGE_VARIANCE_RANGE[1], fixed: 2 }))
+
   const attackerElms = {
     fire : Math.floor(attacker.fire),
     earth : Math.floor(attacker.earth),
@@ -80,7 +84,7 @@ function _calcElementDamage(attacker, receiver){
     water : Math.floor(receiver.water),
     air : Math.floor(receiver.air),
   };
-
+  
   const overallElmDamageDone = {
     fire : 0,
     earth : 0,
@@ -186,37 +190,135 @@ function _determineOutcome(aHealth, fHealth){
   }
 }
 
-function doBattle(avatar, foe){
-  // Physical damage  
-  const avatarPhyAttack = _calcDamage(avatar.power, foe.armor);
-  const foePhyAttack = _calcDamage(foe.power, avatar.armor);
-
-  // Elemental Damage and Resist
-  const avatarElmAttack = _calcElementDamage(avatar, foe);
-  const foeElmAttack = _calcElementDamage(foe, avatar);
-
-  /* 
-  Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
-  */
-  const aHealthRemaining = Math.floor(avatar.health - (foePhyAttack.netDamage + foeElmAttack.overallElmDamageDone.total));
-  const fHealthRemaining = Math.floor(foe.health - (avatarPhyAttack.netDamage + avatarElmAttack.overallElmDamageDone.total));
-
-  const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
-
-  const results = {
-    aElmDamage : avatarElmAttack.overallElmDamageDone,
-    fElmReduction : avatarElmAttack.overallElmDamagePrevented,
-    fElmDamage : foeElmAttack.overallElmDamageDone,
-    aElmReduction : foeElmAttack.overallElmDamagePrevented,
-    aPhyDamage : avatarPhyAttack.netDamage,
-    fPhyReduction : avatarPhyAttack.reduction,
-    fPhyDamage : foePhyAttack.netDamage,
-    aPhyReduction : foePhyAttack.reduction,
-    aHealthRemaining,
-    fHealthRemaining,
-    outcomeData
+function _checkIfElemental({fire, water, earth, air}){
+  const contenderElms = {fire, water, earth, air};
+  let hasElementalPower = false;
+  for(let elm in contenderElms){
+    if(contenderElms[elm] !== 0){
+      hasElementalPower = true;
+    }
   }
-  return results;
+  // If hasElementalPower is true, the contender is elemental, so return true
+  return hasElementalPower ? true : false;
 }
+
+function _calcHealthLoss(health, damage){
+  return health - damage;
+}
+
+function doBattle(avatar, foe, goesFirst){
+  const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
+  const battleRoundResults = [];
+
+  const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
+  console.log('GF - ', goesFirst, 'GS - ', goesSecond);
+  const foeIsElemental = _checkIfElemental(foe);
+  console.log('FOE is elementals - ', foeIsElemental);
+  
+  let avHealthRemaining = avatar.health;
+  let foeHealthRemaining = foe.health;
+  let winner = null;
+  let i;
+  
+  for(i = 0; i<battleTurns.length; i++){
+    console.log('ROUND - ', battleTurns[i], winner);
+    if(winner){ break;}
+      // because zero-based, if the turn is odd, goesFirst actually doesn't attack, but the other player
+      const turnIsOdd = battleTurns[i] % 2 === 0 ? false : true;
+      // If the turn is odd, the second player attacks, otherwise it's the first player
+      const aggressorString = turnIsOdd ? goesSecond : goesFirst;
+      const aggressor = aggressorString === 'Avatar' ? avatar : foe;
+
+      // If the turn is odd, the first player attacks, otherwise it's the second player
+      const defenderString = turnIsOdd ? goesFirst : goesSecond;
+      const defender = defenderString === 'Avatar' ? avatar : foe;
+      //console.log('!!! ag', aggressor);
+      const lowEnd = aggressor.power * DAMAGE_VARIANCE_RANGE[0];
+      const highEnd = aggressor.power * DAMAGE_VARIANCE_RANGE[1];
+     
+      let turnAttack = Math.floor(chance.floating({ min: lowEnd, max: highEnd, fixed: 2 }));
+      console.log('TA - ', turnAttack);
+      let turnAttackResult;
+      let physicalDamageDealt = 0;
+      let elementalDamageDealt = 0;
+      
+
+      // If turn is odd, then it's an ELEMENTAL round
+      if(turnIsOdd){console.log('turn is odd');
+        // Check if the player (sometimes will be a foe, never a player)
+        if(aggressor === 'Avatar' || foeIsElemental){
+          
+          const { overallElmDamageDone } = _calcElementDamage(aggressor, defender);
+          elementalDamageDealt = overallElmDamageDone;
+        }else{ console.log('turn is NOT  odd');
+          const { netDamage } = _calcDamage(turnAttack, defender.armor); 
+          physicalDamageDealt = netDamage;
+        }
+        
+      // Otherwise, it's a POWER round
+      }else{console.log('turn is NOT  odd',turnAttack, defender.armor);
+        const { netDamage } = _calcDamage(turnAttack, defender.armor);
+        physicalDamageDealt = netDamage;
+      }
+
+      let damageDealt = physicalDamageDealt + elementalDamageDealt;
+      console.log('PDD - ',physicalDamageDealt, damageDealt);
+      
+      let defenderHealthLeft;
+      if(aggressor === 'Avatar'){console.log('A');
+        defenderHealthLeft = _calcHealthLoss(foeHealthRemaining, damageDealt);
+        foeHealthRemaining = defenderHealthLeft;
+      }else{console.log('B', avHealthRemaining, damageDealt);
+
+        defenderHealthLeft = _calcHealthLoss(avHealthRemaining, damageDealt);
+        avHealthRemaining = defenderHealthLeft;
+      }
+
+      console.log('HR - ',avHealthRemaining, foeHealthRemaining);
+
+    console.log('DEF H left -', defenderHealthLeft);
+    if(defenderHealthLeft <= 0){
+      winner = aggressor;
+    }
+    battleRoundResults.push({ turn : i, aggressor, defender, damageDealt, defenderHealthLeft })
+  }
+  //console.log('Battle round results = ', battleRoundResults);
+}
+
+
+// function doBattle(avatar, foe){
+
+
+//   // Physical damage  
+//   const avatarPhyAttack = _calcDamage(avatar.power, foe.armor);
+//   const foePhyAttack = _calcDamage(foe.power, avatar.armor);
+
+//   // Elemental Damage and Resist
+//   const avatarElmAttack = _calcElementDamage(avatar, foe);
+//   const foeElmAttack = _calcElementDamage(foe, avatar);
+
+//   /* 
+//   Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
+//   */
+//   const aHealthRemaining = Math.floor(avatar.health - (foePhyAttack.netDamage + foeElmAttack.overallElmDamageDone.total));
+//   const fHealthRemaining = Math.floor(foe.health - (avatarPhyAttack.netDamage + avatarElmAttack.overallElmDamageDone.total));
+
+//   const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
+
+//   const results = {
+//     aElmDamage : avatarElmAttack.overallElmDamageDone,
+//     fElmReduction : avatarElmAttack.overallElmDamagePrevented,
+//     fElmDamage : foeElmAttack.overallElmDamageDone,
+//     aElmReduction : foeElmAttack.overallElmDamagePrevented,
+//     aPhyDamage : avatarPhyAttack.netDamage,
+//     fPhyReduction : avatarPhyAttack.reduction,
+//     fPhyDamage : foePhyAttack.netDamage,
+//     aPhyReduction : foePhyAttack.reduction,
+//     aHealthRemaining,
+//     fHealthRemaining,
+//     outcomeData
+//   }
+//   return results;
+// }
 
 module.exports = doBattle;

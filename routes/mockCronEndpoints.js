@@ -527,8 +527,19 @@ router.get('/do-all-battles', function(req, res, next){
           }
         }
 
+        // WHO SWINGS FIRST
+        let goesFirst;
+        if(scenario.id === 0){
+          goesFirst = 'Avatar';
+        }else if(scenario.id === 3){
+          goesFirst = 'Foe';
+        }else{
+          const randDecider = Math.floor(Math.random() * 2);
+          goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
+        }
+
         // BATTLE STEP 5 - EXCHANGE DAMAGE
-        const b = doBattle(BRA, BRF);
+        const b = doBattle(BRA, BRF, goesFirst);
 
         // SAVE DATA
         let xpGain;
@@ -629,9 +640,10 @@ router.get('/do-all-battles', function(req, res, next){
       const timeoutDuration = i * 8000;
 
       return await new Promise((resolve) =>{
-        setTimeout(() => {
-          resolve(runBattlesOnBatch(shard));
-        }, timeoutDuration);
+        resolve(runBattlesOnBatch(shard));
+        // setTimeout(() => {
+        //   resolve(runBattlesOnBatch(shard));
+        // }, timeoutDuration);
       });
     }));
 
