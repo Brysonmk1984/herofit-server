@@ -27,7 +27,7 @@ function _calcCounterElmDR(aDamage, rResistance){
 }
 
 // Calculate the total element damage, reducing damage done to each individual elm by it's mirror's resistance vale (F on F)
-function _calcOverallMirrorReduction(aDamage, rResistance){
+function _calcTurnMirrorReduction(aDamage, rResistance){
   let d = aDamage;
   let r = rResistance;
 
@@ -69,23 +69,22 @@ function _determineElmMatchups(elm){
 
 
 function _calcElementDamage(attacker, receiver){
-  //NEED TO FIGURE OUT ELEMENTAL DAMAGE
-  //Math.floor(chance.floating({ min: attacker.air * DAMAGE_VARIANCE_RANGE[0], max: attacker.air * DAMAGE_VARIANCE_RANGE[1], fixed: 2 }))
 
   const attackerElms = {
-    fire : Math.floor(attacker.fire),
-    earth : Math.floor(attacker.earth),
-    water : Math.floor(attacker.water),
-    air : Math.floor(attacker.air),
+    fire : Math.floor(chance.floating({ min: attacker.fire * DAMAGE_VARIANCE_RANGE[0], max: attacker.fire * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    earth : Math.floor(chance.floating({ min: attacker.earth * DAMAGE_VARIANCE_RANGE[0], max: attacker.earth * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    water : Math.floor(chance.floating({ min: attacker.water * DAMAGE_VARIANCE_RANGE[0], max: attacker.water * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    air : Math.floor(chance.floating({ min: attacker.air * DAMAGE_VARIANCE_RANGE[0], max: attacker.air * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
   };
   const receiverElms = {
-    fire : Math.floor(receiver.fire),
-    earth : Math.floor(receiver.earth),
-    water : Math.floor(receiver.water),
-    air : Math.floor(receiver.air),
+    fire : Math.floor(chance.floating({ min: receiver.fire * DAMAGE_VARIANCE_RANGE[0], max: receiver.fire * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    earth : Math.floor(chance.floating({ min: receiver.earth * DAMAGE_VARIANCE_RANGE[0], max: receiver.earth * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    water : Math.floor(chance.floating({ min: receiver.water * DAMAGE_VARIANCE_RANGE[0], max: receiver.water * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    air : Math.floor(chance.floating({ min: receiver.air * DAMAGE_VARIANCE_RANGE[0], max: receiver.air * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
   };
-  
-  const overallElmDamageDone = {
+  console.log('AE = ', attackerElms);
+  console.log('RE = ', receiverElms);
+  const turnElmDamageDone = {
     fire : 0,
     earth : 0,
     water : 0,
@@ -93,7 +92,7 @@ function _calcElementDamage(attacker, receiver){
     total : 0
   };
 
-  const overallElmDamagePrevented = {
+  const turnElmDamagePrevented = {
     fire : 0,
     earth : 0,
     water : 0,
@@ -131,7 +130,7 @@ function _calcElementDamage(attacker, receiver){
       });
 
 
-      // Overall damage reduction from mirror elm; reduces damage to all elm matchups
+      // turn damage reduction from mirror elm; reduces damage to all elm matchups
       let sumElmDamageToEachElm = 0;
       let elmCount = 0;
       for(let e in elmDamageDone){
@@ -146,15 +145,15 @@ function _calcElementDamage(attacker, receiver){
       // then reduce the total value by the Damage Reduction Formula, considering the foes resistance (mirror elm)
       const average = sumElmDamageToEachElm / elmCount;
       //console.log('AVERAGE - ', average);
-      const { reduction, netDamage } = _calcOverallMirrorReduction(average, receiverElms[mirror[0]]);
-      overallElmDamageDone[elm] = Math.floor(netDamage);
-      overallElmDamageDone.total += Math.floor(netDamage);
-      overallElmDamagePrevented[elm] = Math.floor(reduction);
-      overallElmDamagePrevented.total += Math.floor(reduction);
+      const { reduction, netDamage } = _calcTurnMirrorReduction(average, receiverElms[mirror[0]]);
+      turnElmDamageDone[elm] = Math.floor(netDamage);
+      turnElmDamageDone.total += Math.floor(netDamage);
+      turnElmDamagePrevented[elm] = Math.floor(reduction);
+      turnElmDamagePrevented.total += Math.floor(reduction);
     }
   }
-  //console.log('ENDING ATTACKER ELM DAMAGE :', overallElmDamageDone);
-  return { overallElmDamageDone, overallElmDamagePrevented };
+  console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
+  return { turnElmDamageDone : turnElmDamageDone.total, turnElmDamagePrevented : turnElmDamagePrevented.total };
 }
 
 // Calculates damage done against an element's counter element (F on E)
@@ -170,21 +169,25 @@ function _calcArmorDR(aPower, rArmor){
 }
 
 function _calcDamage(aPower, rArmor){
-  return _calcArmorDR(aPower, rArmor);
+  const lowEnd = aPower * DAMAGE_VARIANCE_RANGE[0];
+  const highEnd = aPower * DAMAGE_VARIANCE_RANGE[1];
+  const power = chance.floating({ min: lowEnd, max: highEnd, fixed: 2 });
+  
+  const lowEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[0];
+  const highEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[1];
+  const armor = chance.floating({ min: lowEndArmor, max: highEndArmor, fixed: 2 });
+
+  const { reduction, netDamage } = _calcArmorDR(power, armor);
+  console.log('DAMAGE - ', netDamage, 'REDUCTION - ', reduction);
+  return { netDamage : Math.floor(netDamage), reduction : Math.floor(reduction) }
 }
 
 
-function _determineOutcome(aHealth, fHealth){
-  const avIsDead = aHealth <= 0;
-  const foeIsDead = fHealth <=0;
-
-  if(avIsDead){
-    if(foeIsDead){
-      return { outcome : 'Double KO', avatarStatus : 'Knocked Out', foeStatus : 'Knocked Out' };
-    }
+function _determineOutcome(winner){
+  if(winner === 'Avatar'){
+    return { outcome : 'Avatar Wins', avatarStatus : 'Recovering', foeStatus : 'Knocked Out' }; 
+  }else if(winner === 'Foe'){
     return { outcome : 'Foe Wins', avatarStatus : 'Knocked Out', foeStatus : 'Recovering' };
-  }else if(foeIsDead){
-    return { outcome : 'Avatar Wins', avatarStatus : 'Recovering', foeStatus : 'Knocked Out' };
   }else{
     return { outcome : 'Draw', avatarStatus : 'Recovering', foeStatus : 'Recovering' };
   }
@@ -203,122 +206,160 @@ function _checkIfElemental({fire, water, earth, air}){
 }
 
 function _calcHealthLoss(health, damage){
-  return health - damage;
+  return Math.floor(health - damage);
+}
+
+function _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, totals){
+
+  switch(aggressorString){
+    case 'Avatar':
+      // elemental round, avatar is attacking
+      if(roundType === 'Elemental'){
+        console.log('ROUND IS ELEMENTAL', aggressor);
+
+        // Calc elm damage, get back damage done and how much was prevented
+        const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
+        elementalDamageDealt = Math.floor(turnElmDamageDone);
+        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone);
+
+        // Add to totals done for damage and reduction
+        totals.aElmDamage += elementalDamageDealt;
+        totals.fElmReduction += turnElmDamagePrevented;
+
+        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : elementalDamageDealt, totals };
+
+      // physical round, avatar is attacking
+      }else{
+
+        // Calc physical damage, get back damage done and how much was prevented
+        const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
+        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, netDamage);
+
+        // Add to totals done for damage and reduction
+        totals.aPhyDamage += netDamage;
+        totals.fPhyReduction += reduction;
+
+
+        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals };
+
+      }
+
+    case 'Foe':
+      // elemental round, foe is attacking, foe is elemental
+      if(roundType === 'Elemental' && foeIsElemental){
+        console.log('ROUND IS ELEMENTAL', aggressor);
+
+        // Calc elm damage, get back damage done and how much was prevented
+        const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
+        elementalDamageDealt = turnElmDamageDone;
+        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone);
+
+        // Add to totals done for damage and reduction
+        totals.fElmDamage += elementalDamageDealt;
+        totals.aElmReduction += turnElmDamagePrevented;
+
+        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : elementalDamageDealt, totals }
+      
+      // physical round, foe is attacking
+      // Used for both regular physical damage turns or for elemental turns when the foe doesn't have any elemental power
+      }else{
+        // Calc physical damage, get back damage done and how much was prevented
+        const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
+        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, netDamage);
+
+        // Add to totals done for damage and reduction
+        totals.fPhyDamage += netDamage;
+        totals.aPhyReduction += reduction;
+
+        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals };
+
+      }
+
+    default:
+    return;
+  }
 }
 
 function doBattle(avatar, foe, goesFirst){
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
+  const elementalTurns = [2,3,6,7,10,11];
   const battleRoundResults = [];
 
   const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
-  console.log('GF - ', goesFirst, 'GS - ', goesSecond);
+
   const foeIsElemental = _checkIfElemental(foe);
-  console.log('FOE is elementals - ', foeIsElemental);
-  
-  let avHealthRemaining = avatar.health;
-  let foeHealthRemaining = foe.health;
-  let winner = null;
+
+
+  var grandTotals = {
+    aElmDamage : 0,
+    fElmReduction : 0,
+    fElmDamage : 0,
+    aElmReduction : 0,
+    aPhyDamage : 0,
+    fPhyReduction : 0,
+    fPhyDamage : 0,
+    aPhyReduction : 0,
+    avHealthRemaining : avatar.health,
+    foeHealthRemaining : foe.health
+  };
+  let winnerString = null;
   let i;
   
   for(i = 0; i<battleTurns.length; i++){
-    console.log('ROUND - ', battleTurns[i], winner);
-    if(winner){ break;}
-      // because zero-based, if the turn is odd, goesFirst actually doesn't attack, but the other player
-      const turnIsOdd = battleTurns[i] % 2 === 0 ? false : true;
-      // If the turn is odd, the second player attacks, otherwise it's the first player
-      const aggressorString = turnIsOdd ? goesSecond : goesFirst;
-      const aggressor = aggressorString === 'Avatar' ? avatar : foe;
+    console.log('ROUND-', battleTurns[i]);
 
-      // If the turn is odd, the first player attacks, otherwise it's the second player
-      const defenderString = turnIsOdd ? goesFirst : goesSecond;
-      const defender = defenderString === 'Avatar' ? avatar : foe;
-      //console.log('!!! ag', aggressor);
-      const lowEnd = aggressor.power * DAMAGE_VARIANCE_RANGE[0];
-      const highEnd = aggressor.power * DAMAGE_VARIANCE_RANGE[1];
-     
-      let turnAttack = Math.floor(chance.floating({ min: lowEnd, max: highEnd, fixed: 2 }));
-      console.log('TA - ', turnAttack);
-      let turnAttackResult;
-      let physicalDamageDealt = 0;
-      let elementalDamageDealt = 0;
-      
+    if(winnerString){ break;}
+    
+    // because zero-based, if the turn is odd, goesFirst actually doesn't attack, but the other player
+    const turnIsOdd = battleTurns[i] % 2 === 0 ? false : true;
+    // If the turn is odd, the second player attacks, otherwise it's the first player
+    const aggressorString = turnIsOdd ? goesSecond : goesFirst;
+    const aggressor = aggressorString === 'Avatar' ? avatar : foe;
 
-      // If turn is odd, then it's an ELEMENTAL round
-      if(turnIsOdd){console.log('turn is odd');
-        // Check if the player (sometimes will be a foe, never a player)
-        if(aggressor === 'Avatar' || foeIsElemental){
-          
-          const { overallElmDamageDone } = _calcElementDamage(aggressor, defender);
-          elementalDamageDealt = overallElmDamageDone;
-        }else{ console.log('turn is NOT  odd');
-          const { netDamage } = _calcDamage(turnAttack, defender.armor); 
-          physicalDamageDealt = netDamage;
-        }
-        
-      // Otherwise, it's a POWER round
-      }else{console.log('turn is NOT  odd',turnAttack, defender.armor);
-        const { netDamage } = _calcDamage(turnAttack, defender.armor);
-        physicalDamageDealt = netDamage;
-      }
+    // If the turn is odd, the first player attacks, otherwise it's the second player
+    const defenderString = turnIsOdd ? goesFirst : goesSecond;
+    const defender = defenderString === 'Avatar' ? avatar : foe;
 
-      let damageDealt = physicalDamageDealt + elementalDamageDealt;
-      console.log('PDD - ',physicalDamageDealt, damageDealt);
-      
-      let defenderHealthLeft;
-      if(aggressor === 'Avatar'){console.log('A');
-        defenderHealthLeft = _calcHealthLoss(foeHealthRemaining, damageDealt);
-        foeHealthRemaining = defenderHealthLeft;
-      }else{console.log('B', avHealthRemaining, damageDealt);
 
-        defenderHealthLeft = _calcHealthLoss(avHealthRemaining, damageDealt);
-        avHealthRemaining = defenderHealthLeft;
-      }
 
-      console.log('HR - ',avHealthRemaining, foeHealthRemaining);
+    const roundType = elementalTurns.includes(battleTurns[i]) ? 'Elemental' : 'Physical';
 
-    console.log('DEF H left -', defenderHealthLeft);
-    if(defenderHealthLeft <= 0){
+    const { aggressorHealthLeft, defenderHealthLeft, damageDealt, totals } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
+    console.log('HERE!@!',defenderHealthLeft, damageDealt );
+    grandTotals = totals;
+
+    battleRoundResults.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft });
+
+    if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
+      winnerString = aggressorString;
       winner = aggressor;
+      loser = defender;
+      console.log('WINNER = ',aggressorString);
+    }else if(battleTurns[i] === 11){
+      winnerString = 'Draw';
     }
-    battleRoundResults.push({ turn : i, aggressor, defender, damageDealt, defenderHealthLeft })
+
   }
-  //console.log('Battle round results = ', battleRoundResults);
+
+  console.log('Battle round results = ', battleRoundResults);
+
+  const outcomeData = _determineOutcome(winnerString); 
+
+  const results = {
+    aElmDamage : grandTotals.aElmDamage,
+    fElmReduction : grandTotals.fElmReduction,
+    fElmDamage : grandTotals.fElmDamage,
+    aElmReduction : grandTotals.aElmReduction,
+    aPhyDamage : grandTotals.aPhyDamage,
+    fPhyReduction : grandTotals.fPhyReduction,
+    fPhyDamage : grandTotals.fPhyDamage,
+    aPhyReduction : grandTotals.aPhyReduction,
+    aHealthRemaining : grandTotals.avHealthRemaining,
+    fHealthRemaining : grandTotals.foeHealthRemaining,
+    outcomeData,
+    battleRoundResults
+  }
+  return results;
 }
-
-
-// function doBattle(avatar, foe){
-
-
-//   // Physical damage  
-//   const avatarPhyAttack = _calcDamage(avatar.power, foe.armor);
-//   const foePhyAttack = _calcDamage(foe.power, avatar.armor);
-
-//   // Elemental Damage and Resist
-//   const avatarElmAttack = _calcElementDamage(avatar, foe);
-//   const foeElmAttack = _calcElementDamage(foe, avatar);
-
-//   /* 
-//   Bug here, for some reason the elemental reduction result is the same for both avatar and foe!!
-//   */
-//   const aHealthRemaining = Math.floor(avatar.health - (foePhyAttack.netDamage + foeElmAttack.overallElmDamageDone.total));
-//   const fHealthRemaining = Math.floor(foe.health - (avatarPhyAttack.netDamage + avatarElmAttack.overallElmDamageDone.total));
-
-//   const outcomeData = _determineOutcome(aHealthRemaining, fHealthRemaining);
-
-//   const results = {
-//     aElmDamage : avatarElmAttack.overallElmDamageDone,
-//     fElmReduction : avatarElmAttack.overallElmDamagePrevented,
-//     fElmDamage : foeElmAttack.overallElmDamageDone,
-//     aElmReduction : foeElmAttack.overallElmDamagePrevented,
-//     aPhyDamage : avatarPhyAttack.netDamage,
-//     fPhyReduction : avatarPhyAttack.reduction,
-//     fPhyDamage : foePhyAttack.netDamage,
-//     aPhyReduction : foePhyAttack.reduction,
-//     aHealthRemaining,
-//     fHealthRemaining,
-//     outcomeData
-//   }
-//   return results;
-// }
 
 module.exports = doBattle;

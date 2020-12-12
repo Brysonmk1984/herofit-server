@@ -17,7 +17,7 @@ router.post('/insert-battle', function(req, res, next){
   const foeTemplate = selectFoeTemplate(currentLevel);
 
   let foeName;
-
+  console.log('FT = ', foeTemplate);
   if(foeTemplate.type === 'Shadow-Self'){
     foeName = `Shadow ${avatar.name}`;
   }else{
