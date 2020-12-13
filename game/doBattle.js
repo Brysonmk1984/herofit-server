@@ -153,7 +153,7 @@ function _calcElementDamage(attacker, receiver){
     }
   }
   console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
-  return { turnElmDamageDone : turnElmDamageDone.total, turnElmDamagePrevented : turnElmDamagePrevented.total };
+  return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented };
 }
 
 // Calculates damage done against an element's counter element (F on E)
@@ -210,7 +210,7 @@ function _calcHealthLoss(health, damage){
 }
 
 function _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, totals){
-
+  console.log('AGGG',aggressorString, roundType );
   switch(aggressorString){
     case 'Avatar':
       // elemental round, avatar is attacking
@@ -219,14 +219,26 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
 
         // Calc elm damage, get back damage done and how much was prevented
         const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
-        elementalDamageDealt = Math.floor(turnElmDamageDone);
-        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone);
-
+        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total);
+        console.log('THE GOODS - ', turnElmDamageDone, turnElmDamagePrevented, totals.foeHealthRemaining);
         // Add to totals done for damage and reduction
-        totals.aElmDamage += elementalDamageDealt;
-        totals.fElmReduction += turnElmDamagePrevented;
-
-        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : elementalDamageDealt, totals };
+        for(let elm in totals.aElmDamage){
+          console.log('INSIDE LOOP', turnElmDamageDone);
+          console.log('-', elm);
+          console.log('-', turnElmDamageDone[elm]);
+          totals.aElmDamage[elm] += turnElmDamageDone[elm];
+          console.log('done', totals.aElmDamage[elm]);
+        }
+        for(let elm in totals.fElmReduction){
+          console.log('INSIDE REDUCTION LOOP', turnElmDamagePrevented);
+          console.log('-', elm);
+          console.log('-', turnElmDamagePrevented[elm]);
+          totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
+          console.log('done', totals.fElmReduction[elm]);
+        }
+        //totals.aElmDamage += elementalDamageDealt;
+        //totals.fElmReduction += turnElmDamagePrevented;
+        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone.totals, totals };
 
       // physical round, avatar is attacking
       }else{
@@ -252,13 +264,19 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         // Calc elm damage, get back damage done and how much was prevented
         const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
         elementalDamageDealt = turnElmDamageDone;
-        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone);
+        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total);
 
         // Add to totals done for damage and reduction
-        totals.fElmDamage += elementalDamageDealt;
-        totals.aElmReduction += turnElmDamagePrevented;
+        for(let elm in totals.fElmDamage){
+          totals.fElmDamage[elm] += elementalDamageDealt[elm];
+        }
+        for(let elm in totals.aElmReduction){
+          totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
+        }
+        //totals.fElmDamage += elementalDamageDealt;
+        //totals.aElmReduction += turnElmDamagePrevented;
 
-        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : elementalDamageDealt, totals }
+        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals }
       
       // physical round, foe is attacking
       // Used for both regular physical damage turns or for elemental turns when the foe doesn't have any elemental power
@@ -291,10 +309,10 @@ function doBattle(avatar, foe, goesFirst){
 
 
   var grandTotals = {
-    aElmDamage : 0,
-    fElmReduction : 0,
-    fElmDamage : 0,
-    aElmReduction : 0,
+    aElmDamage : { fire : 0, earth : 0, air : 0, water : 0, total : 0 },
+    fElmReduction : { fire : 0, earth : 0, air : 0, water : 0, total : 0 },
+    fElmDamage : { fire : 0, earth : 0, air : 0, water : 0, total : 0 },
+    aElmReduction : { fire : 0, earth : 0, air : 0, water : 0, total : 0 },
     aPhyDamage : 0,
     fPhyReduction : 0,
     fPhyDamage : 0,
@@ -325,7 +343,9 @@ function doBattle(avatar, foe, goesFirst){
     const roundType = elementalTurns.includes(battleTurns[i]) ? 'Elemental' : 'Physical';
 
     const { aggressorHealthLeft, defenderHealthLeft, damageDealt, totals } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
-    console.log('HERE!@!',defenderHealthLeft, damageDealt );
+    console.log('TTTEST - ');
+    console.log('HERE!@!',defenderHealthLeft );
+    console.log('DD - ', totals);
     grandTotals = totals;
 
     roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft });
