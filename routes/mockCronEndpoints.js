@@ -598,6 +598,7 @@ router.get('/do-all-battles', function(req, res, next){
           fElmReduction : b.fElmReduction,
           fElmDamage : b.fElmDamage,
           aElmReduction : b.aElmReduction,
+          roundBreakdown : b.roundBreakdown
         },
         { where: { id: allBattleIds[i] }, raw : true }
         ));

@@ -89,6 +89,10 @@ const BattleModel = function(db, DataTypes){
       type : DataTypes.JSONB,
       allowNull: true
     },
+    roundBreakdown : {
+      type : DataTypes.JSONB,
+      allowNull: true
+    },
     createdAt: {
       type: DataTypes.TIME,
       defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),

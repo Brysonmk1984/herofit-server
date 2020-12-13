@@ -283,7 +283,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
 function doBattle(avatar, foe, goesFirst){
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
   const elementalTurns = [2,3,6,7,10,11];
-  const battleRoundResults = [];
+  const roundBreakdown = [];
 
   const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
 
@@ -328,7 +328,7 @@ function doBattle(avatar, foe, goesFirst){
     console.log('HERE!@!',defenderHealthLeft, damageDealt );
     grandTotals = totals;
 
-    battleRoundResults.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft });
+    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft });
 
     if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
       winnerString = aggressorString;
@@ -341,7 +341,7 @@ function doBattle(avatar, foe, goesFirst){
 
   }
 
-  console.log('Battle round results = ', battleRoundResults);
+  console.log('Battle round results = ', roundBreakdown);
 
   const outcomeData = _determineOutcome(winnerString); 
 
@@ -357,7 +357,7 @@ function doBattle(avatar, foe, goesFirst){
     aHealthRemaining : grandTotals.avHealthRemaining,
     fHealthRemaining : grandTotals.foeHealthRemaining,
     outcomeData,
-    battleRoundResults
+    roundBreakdown
   }
   return results;
 }
