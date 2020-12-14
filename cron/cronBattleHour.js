@@ -91,8 +91,19 @@ function runBattlesOnBatch(shard){
         }
       }
 
+      // WHO SWINGS FIRST
+      let goesFirst;
+      if(scenario.id === 0){
+        goesFirst = 'Avatar';
+      }else if(scenario.id === 3){
+        goesFirst = 'Foe';
+      }else{
+        const randDecider = Math.floor(Math.random() * 2);
+        goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
+      }
+      console.log('!!goes first', goesFirst);
       // BATTLE STEP 5 - EXCHANGE DAMAGE
-      const b = doBattle(BRA, BRF);
+      const b = doBattle(BRA, BRF, goesFirst);
 
       // SAVE DATA
       let xpGain;
@@ -150,6 +161,7 @@ function runBattlesOnBatch(shard){
         fElmReduction : b.fElmReduction,
         fElmDamage : b.fElmDamage,
         aElmReduction : b.aElmReduction,
+        roundBreakdown : b.roundBreakdown
       },
       { where: { id: allBattleIds[i] }, raw : true }
       ));
