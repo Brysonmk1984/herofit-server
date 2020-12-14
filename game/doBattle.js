@@ -227,7 +227,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
         }
 
-        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone.totals, totals };
+        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals };
 
       // physical round, avatar is attacking
       }else{
