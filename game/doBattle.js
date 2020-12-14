@@ -227,6 +227,11 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
         }
 
+        console.log('totals - ', totals);
+        console.log('fhr', totals.foeHealthRemaining);
+        console.log('teDD - ', turnElmDamageDone);
+        console.log('return value - ', { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals });
+
         return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals };
 
       // physical round, avatar is attacking
@@ -235,11 +240,14 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         // Calc physical damage, get back damage done and how much was prevented
         const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
         totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, netDamage);
-
+        console.log('reduction - ', reduction);
         // Add to totals done for damage and reduction
         totals.aPhyDamage += netDamage;
         totals.fPhyReduction += reduction;
-
+        console.log('totals - ', totals);
+        console.log('fhr', totals.foeHealthRemaining);
+        console.log('tpdd - ', netDamage);
+        console.log('return value - ', { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals });
 
         return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals };
 
@@ -261,7 +269,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         for(let elm in totals.aElmReduction){
           totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
         }
-
+        
         return { defenderHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals }
       
       // physical round, foe is attacking
