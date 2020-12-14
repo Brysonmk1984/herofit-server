@@ -227,7 +227,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
         }
 
-        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals };
+        return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals };
 
       // physical round, avatar is attacking
       }else{
@@ -241,7 +241,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         totals.fPhyReduction += reduction;
 
 
-        return { aggressorHealthLeft : totals.avHealthRemaining, defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals };
+        return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals };
 
       }
 
@@ -262,7 +262,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
         }
 
-        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals }
+        return { defenderHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals }
       
       // physical round, foe is attacking
       // Used for both regular physical damage turns or for elemental turns when the foe doesn't have any elemental power
@@ -275,7 +275,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         totals.fPhyDamage += netDamage;
         totals.aPhyReduction += reduction;
 
-        return { aggressorHealthLeft : totals.foeHealthRemaining, defenderHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals };
+        return { defenderHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals };
 
       }
 
@@ -328,7 +328,7 @@ function doBattle(avatar, foe, goesFirst){
 
     const roundType = elementalTurns.includes(battleTurns[i]) ? 'Elemental' : 'Physical';
 
-    const { aggressorHealthLeft, defenderHealthLeft, damageDealt, totals } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
+    const { defenderHealthLeft, damageDealt, totals } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
     grandTotals = totals;
 
     roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft });
