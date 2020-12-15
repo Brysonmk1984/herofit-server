@@ -82,8 +82,8 @@ function _calcElementDamage(attacker, receiver){
     water : Math.floor(chance.floating({ min: receiver.water * DAMAGE_VARIANCE_RANGE[0], max: receiver.water * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
     air : Math.floor(chance.floating({ min: receiver.air * DAMAGE_VARIANCE_RANGE[0], max: receiver.air * DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
   };
-  console.log('AE = ', attackerElms);
-  console.log('RE = ', receiverElms);
+  // console.log('AE = ', attackerElms);
+  // console.log('RE = ', receiverElms);
   const turnElmDamageDone = {
     fire : 0,
     earth : 0,
@@ -227,10 +227,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
         }
 
-        console.log('totals - ', totals);
-        console.log('fhr', totals.foeHealthRemaining);
-        console.log('teDD - ', turnElmDamageDone);
-        console.log('return value - ', { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals });
+
 
         return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals };
 
@@ -240,14 +237,11 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         // Calc physical damage, get back damage done and how much was prevented
         const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
         totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, netDamage);
-        console.log('reduction - ', reduction);
+
         // Add to totals done for damage and reduction
         totals.aPhyDamage += netDamage;
         totals.fPhyReduction += reduction;
-        console.log('totals - ', totals);
-        console.log('fhr', totals.foeHealthRemaining);
-        console.log('tpdd - ', netDamage);
-        console.log('return value - ', { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals });
+
 
         return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals };
 
@@ -318,7 +312,7 @@ function doBattle(avatar, foe, goesFirst){
   let i;
   
   for(i = 0; i<battleTurns.length; i++){
-    console.log('ROUND-', battleTurns[i]);
+    //console.log('ROUND-', battleTurns[i]);
 
     if(winnerString){ break;}
     
@@ -345,14 +339,14 @@ function doBattle(avatar, foe, goesFirst){
       winnerString = aggressorString;
       winner = aggressor;
       loser = defender;
-      console.log('WINNER = ',aggressorString);
+      //console.log('WINNER = ',aggressorString);
     }else if(battleTurns[i] === 11){
       winnerString = 'Draw';
     }
 
   }
 
-  console.log('Battle round results = ', roundBreakdown);
+  //console.log('Battle round results = ', roundBreakdown);
 
   const outcomeData = _determineOutcome(winnerString); 
 

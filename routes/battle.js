@@ -17,7 +17,7 @@ router.post('/insert-battle', function(req, res, next){
   const foeTemplate = selectFoeTemplate(currentLevel);
 
   let foeName;
-  console.log('FT = ', foeTemplate);
+  //console.log('FT = ', foeTemplate);
   if(foeTemplate.type === 'Shadow-Self'){
     foeName = `Shadow ${avatar.name}`;
   }else{
@@ -32,7 +32,7 @@ router.post('/insert-battle', function(req, res, next){
   }
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
 
-  console.log('FOE!', foe, req.body.email, avatar)
+  //console.log('FOE!', foe, req.body.email, avatar)
   Battle.create({
     owner: req.body.email,
     avatarID: avatar.id,
@@ -42,7 +42,6 @@ router.post('/insert-battle', function(req, res, next){
   }, 
   {raw : true}
   ).then((result) =>{
-    console.log('BATTLE INSERTED!!', result);
 
     Avatar.update({ 
       goToBattle : true,
