@@ -1,7 +1,7 @@
 const config = {
   mode : 'beta',
   globalMessage : [
-    { type : 'info', message : 'Battles just got more epic with turn-by-turn combat! Check out the new patch details on the herofit subreddit - reddit.com/r/herofit.' }
+    { type : 'info', message : 'Welcome to version 1.0! Beta has concluded and thanks so much for being a tester. There is a lot coming down the pike for HF in 2021, stay tuned!' }
   ],
 };
 

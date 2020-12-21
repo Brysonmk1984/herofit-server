@@ -130,8 +130,8 @@
         "Lamia"
       ],
       "ability": {
-        "name" : "Unholy Health",
-        "effect" : "Health Trade"
+        "name" : "Sadistic Siphon",
+        "effect" : "Health Steal"
       },
       "color": "#000000"
     },{

@@ -9,9 +9,9 @@ function selectFoeTemplate(level){
   //   return villains.Titans[Math.floor(Math.random() * villains.Titans.length)];
   // }
 
-  // Must be at least level 10 to have a shot at getting matched against shadow self
+  // Must be at least level 5 to have a shot at getting matched against shadow self
   if(level >= 5){
-    // 1 in 5 will face Shadow-Self
+    // 1 in 20 will face Shadow-Self
     const randomNum = Math.floor(Math.random() * 20);
     if(randomNum === 0){
       return villains.Spirits[villains.Spirits.length -1];

@@ -1,3 +1,4 @@
+
 function doAvatarBattlePrep(avatar, foe, itemsUsed, actionsChosen){
 
   return { avatar, foe };
@@ -40,12 +41,14 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
       // Health Reduction
       avatar.health = Math.floor(avatar.health - (avatar.health * .2));
       break;
-    case "Unholy Health":
-      // Health Trade
+    case "Sadistic Siphon":
+      // Health Steal
       const foeHealth = foe.health;
       const avatarHealth = avatar.health;
-      foe.health = avatarHealth;
-      avatar.health = foeHealth;
+      const stolenHealth =  avatarHealth * .125;
+
+      foe.health = foe.health + stolenHealth;
+      avatar.health = avatar.health - stolenHealth;
       break ;
       default:
       break;
