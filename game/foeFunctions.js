@@ -52,13 +52,13 @@ function generateFoeStats(avatar, foe){
   const level = currentLevel(avatar.activityXP + avatar.battleXP);
   const qp = (level * 5) - 5;
 
+  // Random modifier within -15% of base stat
   function randomizer(stat){
     let randomModifier = Math.floor(Math.random() * 15) * .01;
-    const positive = Math.floor(Math.random() * 2) === 1 ? true : false;
-    randomModifier = randomModifier;
-    const modifiedStat = positive ? stat + (randomModifier * stat) : stat - (randomModifier * stat) ;
+    //const positive = Math.floor(Math.random() * 2) === 1 ? true : false;
+    //const modifiedStat = positive ? stat + (randomModifier * stat) : stat - (randomModifier * stat) ;
+    const modifiedStat = stat - (randomModifier * stat) ;
     return Math.floor(modifiedStat);
-
   }
 
 
