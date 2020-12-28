@@ -67,8 +67,8 @@ const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
   HEALTH : .9,
-  QP : .6,
-  POWER : .7
+  QP : .7,
+  POWER : .8
 };
 
 
@@ -78,6 +78,7 @@ const OUTCOME_XP = {
   draw : 10,
   dko : 15
 };
+
 
 const REVIVE_AMOUNT = 1;
 const KO_RECOVERY_RETARDER = .5;
