@@ -15,9 +15,9 @@ const xpCalc = require('../game/upgrades/xpCalc');
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
-  if(AppMode === 'beta'){
-    req.body.avatar.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being a Beta Tester'})
-  }
+  // if(AppMode === 'beta'){
+  //   req.body.avatar.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being a Beta Tester'})
+  // }
 
   Avatar.findOrCreate({
     where: {

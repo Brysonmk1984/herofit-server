@@ -109,7 +109,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const adminData = formData.admin;
   const debug = formData.debug || formData.message;
   const status = formData.status || formData.name;
-  const version = formData.version || 'Beta';
+  const version = formData.version || 'Release';
 
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
@@ -126,7 +126,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   }else{
     html += `<br/><br/><p>User not logged in.</p>`;
   }
-  html += `<br/><br/><div>APP VERSION: ${formData.version}</div>`;
+  html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
 
   // setup email data with unicode symbols
