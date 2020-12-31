@@ -18,7 +18,7 @@ let allAvatarIds = [];
 let allAvatarPromises = [];
 let allFoes = [];
 let allBattlePromises = [];
-let avatarUpdates = [];
+let avatarUpdates = {};
 // Breaking battles into groups of 20 so updating doesn't break
 let battleShards = [];
 
@@ -46,13 +46,15 @@ function runBattlesOnBatch(shard){
     allFoes.push(battle.foe);
     //console.log('BATTLE - ',battle);
     allAvatarPromises.push(Avatar.findOne(
-      { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+      { where : { id: battle.avatarID }, raw : true, attributes: ['id', 'name', 'character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
     ));
   });
   // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
-  return Promise.all(allAvatarPromises)
+  return Promise.allSettled(allAvatarPromises)
 
-  .then((avatars) =>{
+  .then((results) =>{
+    const avatars = results.map((result) => result.value);
+    
     //console.log('AV LENGTH - ', avatars.length);
     //console.log('AVS - ', avatars);
     avatars.forEach((avatar, i) =>{
@@ -170,7 +172,7 @@ function runBattlesOnBatch(shard){
       avatar.battleXP = avatar.battleXP + xpGain;
       avatar.qp += qpEarned;
 
-      avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
+      avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos};
       // End Avatar for each
     });
 
@@ -180,7 +182,7 @@ function runBattlesOnBatch(shard){
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
-      allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[i],{ where: { id: avatarId } }));
+      allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[avatarId],{ where: { id: avatarId } }));
     });
 
     return Promise.allSettled(allUpdateAvatarPromises);
@@ -189,6 +191,7 @@ function runBattlesOnBatch(shard){
     console.log('BATTLE ERROR - ', error);
   });
 }
+
 
 Battle.findAll({
   where: { outcome : 'TBD' },

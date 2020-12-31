@@ -453,7 +453,7 @@ router.get('/do-all-battles', function(req, res, next){
   let allAvatarPromises = [];
   let allFoes = [];
   let allBattlePromises = [];
-  let avatarUpdates = [];
+  let avatarUpdates = {};
   // Breaking battles into groups of 20 so updating doesn't break
   let battleShards = [];
 
@@ -468,27 +468,30 @@ router.get('/do-all-battles', function(req, res, next){
     tiePercent : 0
   };
 
-  function runBattlesOnBatch(shard){
+  function runBattlesOnBatch(shard, shardIndex){
+    console.log('ShardIndex - ', shardIndex);
     allBattleIds = [];
     allAvatarIds = [];
     allFoes = [];
     allAvatarPromises = [];
 
     shard.forEach((battle) =>{
+      console.log('BID - ', battle.id);
       //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
       allFoes.push(battle.foe);
       //console.log('BATTLE - ',battle);
       allAvatarPromises.push(Avatar.findOne(
-        { where : { id: battle.avatarID }, raw : true, attributes: ['name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+        { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
       ));
     });
 
-    // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
-    return Promise.all(allAvatarPromises)
+    return Promise.allSettled(allAvatarPromises)
 
-    .then((avatars) =>{
+    .then((results) =>{
+      const avatars = results.map((result) => result.value);
+
       //console.log('AV LENGTH - ', avatars.length);
       //console.log('AVS - ', avatars);
       avatars.forEach((avatar, i) =>{
@@ -577,7 +580,8 @@ router.get('/do-all-battles', function(req, res, next){
         const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
         const { leveledUp, qpEarned } = checkLevelUp(xpGain);
         //console.log('LEVELED UP - ', leveledUp, 'QP EARNED - ', qpEarned);
-
+        console.log('BATTLE[i] - ', allBattleIds[i] );
+        console.log('AV ID - ', avatar.id, avatar.name );
         allBattlePromises.push(Battle.update({
           scenario : scenario.id,
           outcome : b.outcomeData.outcome,
@@ -607,7 +611,7 @@ router.get('/do-all-battles', function(req, res, next){
         avatar.battleXP = avatar.battleXP + xpGain;
         avatar.qp += qpEarned;
 
-        avatarUpdates.push({ goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos});
+        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos};
         // End Avatar for each
       });
 
@@ -617,18 +621,24 @@ router.get('/do-all-battles', function(req, res, next){
       
       const allUpdateAvatarPromises = [];
       allAvatarIds.forEach((avatarId, i) =>{
-        allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[i],{ where: { id: avatarId } }));
+        //console.log('this will update - ');
+        //console.log('alpaca ID and update - ',avatarId, avatarUpdates[avatarId]);
+
+        allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[avatarId],{ where: { id: avatarId } }));
       });
 
       return Promise.allSettled(allUpdateAvatarPromises);
       
     });
   }
+  // END RUN  BATTLES ON BATCH
 
 
+  // GET ALL TBD BATTLES
   Battle.findAll({
     where: { outcome : 'TBD' },
     raw : true
+  // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
   }).then((battles) =>{
     console.log('BATTLECOUNT - ', battles.length);
     // Need to divide records into groups of 15
@@ -638,23 +648,24 @@ router.get('/do-all-battles', function(req, res, next){
     return Promise.allSettled(battleShards.map(async (shard, i) => {
       console.log('I - ', i);
       // Update one batch every 8 seconds
-      const timeoutDuration = i * 8000;
-
+      const timeoutDuration = i * 2000;
+      // RUN BATTLES ON BATCH
       return await new Promise((resolve) =>{
-        resolve(runBattlesOnBatch(shard));
-        // setTimeout(() => {
-        //   resolve(runBattlesOnBatch(shard));
-        // }, timeoutDuration);
+        //resolve(runBattlesOnBatch(shard));
+        setTimeout(() => {
+          resolve(runBattlesOnBatch(shard, i));
+        }, timeoutDuration);
       });
     }));
 
+  // TALLY UP THE RESULTS AND SEND EMAIL
   }).then(() => {
       console.log('ALL AVATARS UPDATED');
       tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
       tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
       tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
       tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
-      console.log('tally', tally);
+      console.log('tally', tally, 'updates', avatarUpdates);
 
       return sendBattleReportEmail(tally);
   }).then((data) =>{

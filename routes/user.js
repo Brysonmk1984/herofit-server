@@ -36,7 +36,8 @@ router.post('/insert-user-activities', function(req, res, next){
     // Front end is determining which activities are new, so everything passed here can be added to db.
     UserActivity.bulkCreate(entries)
     .then((result) =>{
-      console.log('INSERT USER ACTIVITIES',req.body.activities);
+      console.log('INSERTING USER ACTIVITIES');
+      //console.log('INSERT USER ACTIVITIES',req.body.activities);
       res.status(200).json({
         message: `Activities added for user ${req.body.email}`,
         activities : req.body.activities
