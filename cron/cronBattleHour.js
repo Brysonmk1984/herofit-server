@@ -199,7 +199,7 @@ Battle.findAll({
 }).then((battles) =>{
   console.log('BATTLECOUNT - ', battles.length);
   // Need to divide records into groups of 15
-  battleShards = arrayChunker(battles, 3);
+  battleShards = arrayChunker(battles, 15);
   console.log('BattleShard length = ', battleShards.length);
   
   return Promise.allSettled(battleShards.map(async (shard, i) => {
