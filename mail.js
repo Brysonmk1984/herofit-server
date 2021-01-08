@@ -46,6 +46,30 @@ const sendContactEmail = function(formData, resolve, reject){
   });
 };
 
+const sendDataCollectionEmail = function(formData, resolve, reject){
+  const { opinion, openResponse } = formData.feedbackData;
+  // setup email data with unicode symbols
+  let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: 'HEROFIT - A user submitted Feedback from the Marketing Modal!', 
+      text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      html: `<div>${formData.username} submitted the ${formData.title}, the message is as follows: <br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+  };
+
+  // send mail with defined transport object
+  return transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(console.log(error));
+      }
+
+      // console.log('Message sent: %s', info.messageId);
+      // // Preview only available when sending through an Ethereal account
+      // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+};
+
 const sendSurveyEmail = function(formData, resolve, reject){
   // setup email data with unicode symbols
   let mailOptions = {
@@ -187,4 +211,4 @@ const sendBattleReportEmail = function(tally){
 };
 
 
-module.exports = { sendContactEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail };
+module.exports = { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail };
