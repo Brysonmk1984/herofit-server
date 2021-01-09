@@ -90,6 +90,28 @@ router.delete('/:username', function(req, res, next){
   })
 });
 
+router.post('/toggle-feedback-boolean', async function(req, res, next){
+  const hasSubmittedFeedback = req.body.setToTrue;
+  console.log('HSF - ', hasSubmittedFeedback);
+  const query = `UPDATE users SET "featurePreferenceSubmitted"=${hasSubmittedFeedback};`;
+
+  try{
+    const [results, metadata] = await db.query(query, {});
+
+    console.log('results!', metadata);
+    if(results){
+      res.status(200).json({
+        results
+      });
+    }else{
+      res.send(400);
+    }
+  }catch(error){
+    console.log(error, test);
+  }
+
+
+});
 
 // router.get('/migration', async function(req, res, next){
 //   const q = `

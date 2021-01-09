@@ -1,8 +1,8 @@
 const config = {
   mode : 'release',
-  // globalMessage : [
-  //   { type : 'info', message : 'Welcome to version 1.0! Beta has concluded and thanks so much for being a tester. There is a lot coming down the pike for HF in 2021, stay tuned!' }
-  // ],
+  globalMessage : [
+    { type : 'warning', message : 'There were some pretty big changes in the last few patches related to images. To see the new, optimized images, you will need to clear your cache on your device. Send me a message on the contact page if you need help.' }
+  ],
 };
 
 const AVATAR_COUNT_PER_PAGE = 20;
