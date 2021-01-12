@@ -89,6 +89,7 @@ function avCalc(userTotals){
     // ADDS 5 TO WHICHEVER ELEMENT OF THE SIGN OF THE SEASON WHEN ACCOUNT WAS CREATED
     _determineAstrologyBonus : function(defaultelms, dateOfCreation){
       const bonusElement = avReturn.determineAstrologySeason(dateOfCreation).element.toLowerCase();
+
       defaultelms[bonusElement] += 5;
       return defaultelms;
     },
@@ -100,11 +101,11 @@ function avCalc(userTotals){
       const thisYear = date.year();
       const lastYear = date.year()-1;
       const nextYear = date.year()+1;
-    
+
       switch(true){
         // Capricorn
         case (date.isAfter(`${lastYear}-12-31`) && date.isBefore(`${thisYear}-01-20`)) || (date.isAfter(`${thisYear}-12-21`) && date.isBefore(`${nextYear}-01-01`)) :
-          return {sign : 'Capricorn', element : 'Fire'};
+          return {sign : 'Capricorn', element : 'Earth'};
         // Aquarius
         case (date.isAfter(`${thisYear}-01-19`) && date.isBefore(`${thisYear}-02-19`)) :
           return  {sign : 'Aquarius', element : 'Air'};
