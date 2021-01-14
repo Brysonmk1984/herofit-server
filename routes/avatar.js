@@ -30,8 +30,11 @@ router.post('/insert-avatar', function(req, res, next){
     // Avatar from results, parse properties that are strings that need to be numbers
     avatar = parseAvatarProperties(result[0].dataValues);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+   
     // Avatar Created
     if(created){
+      // Change new avatar's status from 'New Recruit' to 'Rested'
+      avatar.status = "Rested";
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
