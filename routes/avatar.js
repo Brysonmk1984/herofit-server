@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router(); 
+const db = require('../db').db;
 const Avatar = require('../db').Avatar;
 const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
@@ -257,7 +258,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   };
 
   const expression = { 
-    attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets', 
+    attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets', 'titles', 
     [literal(
         'COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'
       ),'totalXP']],
@@ -335,5 +336,36 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
   });
 
 });
+
+
+router.post('/add-title-to-avatar', async function(req, res, next){
+
+  const title = JSON.stringify([{
+    id : req.body.id,
+    title : req.body.title,
+    type : req.body.type,
+    description : req.body.description,
+  }]);
+  console.log('HSF - ', title);
+  const query = `UPDATE avatars SET titles = '${title}' WHERE name='${req.body.hero}';`;
+
+  try{
+    const [results, metadata] = await db.query(query, {});
+
+    console.log('results!', metadata);
+    if(results){
+      res.status(200).json({
+        results
+      });
+    }else{
+      res.send(400);
+    }
+  }catch(error){
+    console.log("error", error);
+  }
+
+
+});
+
 
 module.exports = router;
