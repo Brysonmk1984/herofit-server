@@ -103,6 +103,10 @@ const BattleModel = function(db, DataTypes){
       defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
       allowNull: false
     },
+    seenReport : {
+      type : DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   });
 
   return Battle;

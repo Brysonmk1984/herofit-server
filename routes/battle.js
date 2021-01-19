@@ -38,7 +38,8 @@ router.post('/insert-battle', function(req, res, next){
     avatarID: avatar.id,
     avatarName: avatar.name,
     foe : foeWithStats,
-    outcome: "TBD"
+    outcome: "TBD",
+    seenReport : false
   }, 
   {raw : true}
   ).then((result) =>{
@@ -118,17 +119,23 @@ router.post('/fetch-battle-report', function(req, res, next){
     raw : true
   }).then((result) =>{
     if(result.length){
-      const withinLastDay =  moment.utc().subtract(1,"day").isBefore(result[0].updatedAt);
+      console.log('RESBATTLE - ', result[0]);
+
       adjResult = result[0];
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-      if(withinLastDay){
+      if(!result[0].seenReport){
+
         res.status(200).json({
           message : 'Retrieved Latest Battle Results',
           result : result[0]
         });
+
       }else{
-        throw new Error('Data Error','Outdated Results');
+        res.status(200).json({
+          message : 'Latest Report already viewed',
+          result : null
+        });
       }
     }else{
       throw new Error('Data Error','No Battle Results');
@@ -159,6 +166,21 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     res.status(200).json({
       message: `No Results`,
       result : null
+    });
+  });
+});
+
+router.post('/update-battle-report-seen', function(req, res, next){
+  Battle.update({ seenReport : true},{ where: { id : req.body.id } })
+  .then(()=>{
+    console.log('updated seenBy');
+    res.status(200).json({
+      message : 'Successfully updated seenReport',
+    });
+  }).catch((err) =>{
+    console.log("couldn't update seen by", err);
+    res.status(401).json({
+      message : 'Failed to update seenReport',
     });
   });
 });

@@ -215,11 +215,11 @@ router.post('/get-user-totals', function(req, res, next){
 
 router.post('/get-info-by-username', function(req, res, next){
   const username = req.body.username;
-  console.log('!username', username);
+
   // First, exchange the username for the email
   User.findOne({ where: { username }, attributes : ['email'], raw : true })
   .then((data) =>{
-    console.log('DATA - ', data);
+    
     const allPromises = [];
 
     allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe'], raw : true }));
