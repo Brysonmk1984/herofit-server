@@ -142,6 +142,27 @@ router.post('/fetch-battle-report', function(req, res, next){
   });
 });
 
+router.post('/fetch-battle-report-by-id', function(req, res, next){
+  Battle.findOne({
+    where: { 
+      id: req.body.id,
+    },
+    raw : true
+  }).then((result) =>{
+    adjResult = result;
+    adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
+    adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
+   
+    res.status(200).json(adjResult);
+
+  }).catch((error) =>{
+    res.status(200).json({
+      message: `No Results`,
+      result : null
+    });
+  });
+});
+
 // USER Logs in after a battle, or clicks button to retrieve report
 router.get('/villain-list', function(req, res, next){
   if(villains){
