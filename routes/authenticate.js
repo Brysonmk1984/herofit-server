@@ -14,9 +14,9 @@ var pem = jwkToPem(key);
 
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
-  res.status(500).json({
-    message: `SERVER DOWN FOR MAINTENANCE`,
-  });
+  // res.status(500).json({
+  //   message: `SERVER DOWN FOR MAINTENANCE`,
+  // });
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
     if(err){
       res.status(401).json({
