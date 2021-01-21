@@ -25,7 +25,7 @@ router.post('/insert-avatar', function(req, res, next){
       owner: req.body.owner
     },
     // set the default properties if it doesn't exist
-    defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email })
+    defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email, status : 'Rested' })
   }).then((result) =>{
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
@@ -34,8 +34,6 @@ router.post('/insert-avatar', function(req, res, next){
    
     // Avatar Created
     if(created){
-      // Change new avatar's status from 'New Recruit' to 'Rested'
-      avatar.status = "Rested";
       res.status(200).json({
         message: `New Avatar Saved belonging to owner ${avatar.owner}`,
         avatarId : avatar.id,
