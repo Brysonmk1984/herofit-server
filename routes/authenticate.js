@@ -59,7 +59,8 @@ router.post('/signup-or-signin', function(req, res, next){
             email: decoded.email,
             username : username,
             firstName : decoded['custom:first_name'] || null,
-            lastName : decoded['custom:last_name'] || null
+            lastName : decoded['custom:last_name'] || null,
+            featurePreferenceSubmitted : true
           }
         }).then(function(result) {
           const created = result[1];

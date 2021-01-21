@@ -19,49 +19,55 @@ router.post('/insert-avatar', function(req, res, next){
   // if(AppMode === 'beta'){
   //   req.body.avatar.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being a Beta Tester'})
   // }
-
-  Avatar.findOrCreate({
-    where: {
-      owner: req.body.owner
-    },
-    // set the default properties if it doesn't exist
-    defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email, status : 'Rested' })
-  }).then((result) =>{
-    const created = result[1];
-    // Avatar from results, parse properties that are strings that need to be numbers
-    avatar = parseAvatarProperties(result[0].dataValues);
-    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-   
-    // Avatar Created
-    if(created){
-      res.status(200).json({
-        message: `New Avatar Saved belonging to owner ${avatar.owner}`,
-        avatarId : avatar.id,
-        avatar,
-        hasAvatar : true
+  if(req.body.email){
+    Avatar.findOrCreate({
+      where: {
+        owner: req.body.owner
+      },
+      // set the default properties if it doesn't exist
+      defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email, status : 'Rested' })
+    }).then((result) =>{
+      const created = result[1];
+      // Avatar from results, parse properties that are strings that need to be numbers
+      avatar = parseAvatarProperties(result[0].dataValues);
+      avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+    
+      // Avatar Created
+      if(created){
+        res.status(200).json({
+          message: `New Avatar Saved belonging to owner ${avatar.owner}`,
+          avatarId : avatar.id,
+          avatar,
+          hasAvatar : true
+        });
+        next();
+      // Avatar Already exists, using existing instead
+      }else if(!created){
+        console.log('AVATAR ALREADY EXISTS - ', avatar);
+        res.status(200).json({
+          message: `Existing avatar for ${avatar.owner}`,
+          avatarId : avatar.id,
+          avatar,
+          hasAvatar : true
+        });
+        next();
+      }else{
+        throw new Error("Couldn't find or create avatar");
+      }
+    }).catch((err) =>{
+      console.log(`Couldn't insert Avatar for user ${req.body.email}, DEBUG: ${err}`);
+      res.status(400).json({
+        message: `Couldn't insert Avatar for user ${req.body.email}`,
+        debug : err
       });
       next();
-    // Avatar Already exists, using existing instead
-    }else if(!created){
-      console.log('AVATAR ALREADY EXISTS - ', avatar);
-      res.status(200).json({
-        message: `Existing avatar for ${avatar.owner}`,
-        avatarId : avatar.id,
-        avatar,
-        hasAvatar : true
-      });
-      next();
-    }else{
-      throw new Error("Couldn't find or create avatar");
-    }
-  }).catch((err) =>{
-    console.log(`Couldn't insert Avatar for user ${req.body.email}, DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Couldn't insert Avatar for user ${req.body.email}`,
-      debug : err
     });
-    next();
-  });
+  }else{
+    res.status(400).json({
+      message: `No Email supplied passed to insert-avatar`,
+      debug : `No Email supplied passed to insert-avatar`
+    });
+  }
 });
 
 router.post('/update-avatar', function(req, res, next){
@@ -172,39 +178,48 @@ router.post('/buff-and-update-avatar', function(req, res, next){
 });
 
 router.post('/get-avatar', function(req, res, next){
-  Avatar.findOne({ where: { owner: req.body.email }, raw : true })
-  .then((avatar) =>{
-    if(!avatar){
-      console.log('NO AV ASSOCIATED WITH EMAIL');
-      res.status(204).json({
-        message: `No Avatar associated with user ${req.body.email}`
+  if(req.body.email){
+    Avatar.findOne({ where: { owner: req.body.email }, raw : true })
+    .then((avatar) =>{
+      if(!avatar){
+        console.log('NO AV ASSOCIATED WITH EMAIL');
+        res.status(204).json({
+          message: `No Avatar associated with user ${req.body.email}`
+        });
+        return;
+      }else{
+        const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+  
+        avatar.level = getCurrentLevel();
+        avatar.nextLevelStartXp = getNextLevel();
+        avatar.thisLevelStartXp = getNextLevel(-1);
+        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+        avatar = parseAvatarProperties(avatar);
+        avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+  
+        res.status(200).json({
+          message: `Found matching Avatar`,
+          avatar
+        });
+      }
+        
+      next();
+    }).catch((err)=>{
+      console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
+      res.status(400).json({
+        message: `Couldn't get Avatar for user ${req.body.email}`,
+        debug : err
       });
-      return;
-    }else{
-      const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
-
-      avatar.level = getCurrentLevel();
-      avatar.nextLevelStartXp = getNextLevel();
-      avatar.thisLevelStartXp = getNextLevel(-1);
-      // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-      avatar = parseAvatarProperties(avatar);
-      avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-
-      res.status(200).json({
-        message: `Found matching Avatar`,
-        avatar
-      });
-    }
-      
-    next();
-  }).catch((err)=>{
-    console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
+      next();
+    });
+  }else{
     res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}`,
-      debug : err
+      message: `No Email supplied passed to get-avatar`,
+      debug : `No Email supplied passed to get-avatar`
     });
     next();
-  });
+  }
+
 });
 
 

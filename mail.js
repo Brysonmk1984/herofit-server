@@ -93,8 +93,8 @@ const sendSurveyEmail = function(formData, resolve, reject){
   });
 };
 
-const sendCronErrorEmail = function({status, name, message, debug, version}, resolve, reject){
-
+const sendCronErrorEmail = function({status, name, message, debug, version, errorLocation}, resolve, reject){
+  const location = errorLocation;
   let html = `<div>An Error occured in a HeroFit Production CRON JOB- `;
   // error status and message
   html += `${status}:  ${message}`;
@@ -104,7 +104,7 @@ const sendCronErrorEmail = function({status, name, message, debug, version}, res
     html += `<br/><br/><p>` + debug + `</p>`;
   }
 
-
+  html += `<br/><br/> Error Location: ${location}`;
   html += `<br/><br/><p>User not logged in.</p>`;
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
@@ -114,7 +114,7 @@ const sendCronErrorEmail = function({status, name, message, debug, version}, res
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA: \n \n ${JSON.stringify(accountInfo)}`,
+      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n  Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA: \n \n ${JSON.stringify(accountInfo)}`,
       html
   };
 
@@ -134,7 +134,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const debug = formData.debug || formData.message;
   const status = formData.status || formData.name;
   const version = formData.version || 'Release';
-
+  const location = formData.errorLocation;
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
@@ -143,7 +143,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
     html += `<br/><br/>`;
     html += `<br/><br/><p>` + formData.debug + `</p>`;
   }
-
+  html += `<br/><br/> Error Location: ${location}`;
   if(adminData){
     html += `<br/><br/>`;
     html += `<div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`;
@@ -158,7 +158,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${formData.version}`, 
-      text: `An Error occured in HeroFit Production - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
+      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
       html
   };
 

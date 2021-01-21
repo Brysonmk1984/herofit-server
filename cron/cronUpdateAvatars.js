@@ -48,7 +48,7 @@ Avatar.findAll(
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     //db.close();
   return new Promise((resolve, reject) =>{
-    return sendCronErrorEmail({ message : error.message, name : error.name },resolve, reject)
+    return sendCronErrorEmail({ message : error.message, name : error.name, errorLocation : "Cron Script" },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for UPDATE AVATAR CRON - ', error);
     process.exit();

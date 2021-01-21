@@ -61,7 +61,7 @@ router.get('/regenerate-health', async function(req, res, next){
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     return new Promise((resolve, reject) =>{
-      return sendAppErrorEmail({ message : error.message, name : error.name },resolve, reject)
+      return sendAppErrorEmail({ message : error.message, name : error.name , errorLocation : "Back End"},resolve, reject)
     }).catch((error) =>{
       console.log('couldn\'t send error email for error - ', error);
       res.status(400).json({

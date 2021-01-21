@@ -232,7 +232,7 @@ Battle.findAll({
   process.exit();
 }).catch((error)=>{
   new Promise((resolve, reject) =>{
-    return sendCronErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
+    return sendCronErrorEmail({ message : error.message, status : error.status, debug : error.debug, errorLocation : "Cron Script" },resolve, reject)
   }).catch((error) =>{
     console.log('couldn\'t send error email for REVIVE AVATARS - ', error);
     process.exit();

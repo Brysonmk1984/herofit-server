@@ -101,7 +101,7 @@ router.post('/contact-form', function(req, res, next){
 
 router.post('/app-error', function(req, res, next){
   new Promise((resolve, reject) => {
-    sendAppErrorEmail({ status : req.body.status, message : req.body.message, debug : req.body.debug, version : req.body.version, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+    sendAppErrorEmail({ status : req.body.status, message : req.body.message, debug : req.body.debug, version : req.body.version, errorLocation : "Back End", accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
     res.json({
       success : true,
