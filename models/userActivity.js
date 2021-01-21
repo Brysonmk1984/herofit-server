@@ -24,6 +24,10 @@ const UserActivityModel = function(db, DataTypes){
           defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
           allowNull: false
       },
+      activityId: {
+        type: DataTypes.STRING(10),
+        allowNull: false
+    },
   });
 
       
