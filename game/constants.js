@@ -21,45 +21,45 @@ const RESTED_THRESHOLD = 1;
 const BATTLE_SCENARIOS = [{
   id : 0,
   description : "Avatar attacked unprepared foe",
-  avatarPowerMod : .05,
+  avatarPowerMod : .075,
   avatarHealthMod : 0,
   foePowerMod : 0,
-  foeHealthMod : -.05,
+  foeHealthMod : -.075,
 },{
   id : 1,
   description : "Avatar attacked defending foe",
   avatarPowerMod : 0,
   avatarHealthMod : 0,
   foePowerMod : 0,
-  foeHealthMod : .05,
+  foeHealthMod : .1,
 },{
   id : 2,
   description : "Avatar and Foe met on open field",
-  avatarPowerMod : .05,
+  avatarPowerMod : .1,
   avatarHealthMod : 0,
-  foePowerMod : .05,
+  foePowerMod : .1,
   foeHealthMod : 0,
 },{
   id : 3,
   description : "Foe attacked unprepared avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : -.05,
-  foePowerMod : .05,
+  avatarHealthMod : -.075,
+  foePowerMod : .075,
   foeHealthMod : 0,
 },{
   id : 4,
   description : "Foe attacked defending avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : .05,
+  avatarHealthMod : .1,
   foePowerMod : 0,
   foeHealthMod : 0,
 },{
   id : 5,
   description : "Both avatar and foe fought defensively",
   avatarPowerMod : 0,
-  avatarHealthMod : .05,
+  avatarHealthMod : .1,
   foePowerMod : 0,
-  foeHealthMod : .05,
+  foeHealthMod : .1,
 }];
 
 const FOE_NON_ACTION = 0;
@@ -86,7 +86,7 @@ const KO_RECOVERY_RETARDER = .5;
 // DO BATTLE
 
 // lower is more effective
-const ARMOR_DRF = 3.5;
+const ARMOR_DRF = 3.3;
 
 // variation on the power each attack (one per turn)
 const DAMAGE_PERCENT_PER_TURN = .2;
