@@ -198,7 +198,7 @@ router.get('/villain-list', function(req, res, next){
   }
 });
 
-router.post('/fetch-battles-fought', function(req, res, next){
+router.post('/fetch-battles-won', function(req, res, next){
   
   Battle.findAll({ 
       where : { 
