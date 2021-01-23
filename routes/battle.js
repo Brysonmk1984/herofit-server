@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router(); 
 const { Op } = require("sequelize");
-const moment = require("moment");
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
@@ -11,11 +10,26 @@ const xpCalc = require('../game/upgrades/xpCalc');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
+
+  // If an avatar is not sent, which can happen the first attempt, send 400 error.
+  if(!req.body.avatar){
+    return res.status(400).json({
+      message: `Couldn't Go To Battle, please try again!`,
+      debug: `Couldn't send avatar to battle because no avatar was sent to server.`
+    });
+  }else if(!req.body.email){
+    return res.status(400).json({
+      message: `Couldn't Go To Battle, please try again!`,
+      debug: `Couldn't send avatar to battle because no email associated with account was sent to server.`
+    });
+  }
+
   const avatar = req.body.avatar
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+  console.log('CL - ',currentLevel);
   const foeTemplate = selectFoeTemplate(currentLevel);
-
+  console.log('FT - ',foeTemplate);
   let foeName;
   //console.log('FT = ', foeTemplate);
   if(foeTemplate.type === 'Shadow-Self'){
@@ -119,7 +133,7 @@ router.post('/fetch-battle-report', function(req, res, next){
     raw : true
   }).then((result) =>{
     if(result.length){
-      console.log('RESBATTLE - ', result[0]);
+      //console.log('RESBATTLE - ', result[0]);
 
       adjResult = result[0];
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
