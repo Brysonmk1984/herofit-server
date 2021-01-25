@@ -8,20 +8,24 @@ function selectFoeTemplate(level){
   // if(randomNum === 0 && level >= 10){
   //   return villains.Titans[Math.floor(Math.random() * villains.Titans.length)];
   // }
+  let villain;
 
   // Must be at least level 5 to have a shot at getting matched against shadow self
-  if(level >= 5){
+  if(level >= 5){console.log('FT CASE 1');
     // 1 in 15 will face Shadow-Self
     const randomNum = Math.floor(Math.random() * 15);
-    if(randomNum === 0){
-      return villains.Spirits[villains.Spirits.length -1];
+    
+    if(randomNum === 0){console.log('FT CASE 1A');
+      villain = villains.Spirits[villains.Spirits.length -1];
+    }else{console.log('FT CASE 1B');
+      // Otherwise, they'll face another random spirit
+      // Math.floor ensures the last array item will never be picked, it gets rounded down.
+      villain = villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
     }
-    // Otherwise, they'll face another random spirit
-    // Math.floor ensures the last array item will never be picked, it gets rounded down.
-    return villains.Spirits[Math.floor(Math.random() * villains.Spirits.length -1)];
-  }else{
-    return villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
+  }else{console.log('FT CASE 2');
+    villain = villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
   }
+  return villain;
 }
 
 function generateFoeStats(avatar, foe){
