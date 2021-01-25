@@ -1,6 +1,6 @@
 {
   "name": "stravat-cognito",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Handles login for Eco Allies",
   "main": "start.js",
   "scripts": {
