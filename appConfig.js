@@ -1,8 +1,8 @@
 const config = {
   mode : 'release',
-  // globalMessage : [
-  //   { type : 'info', message : 'Server is down for maintenance, please check back later!' }
-  // ],
+  globalMessage : [
+    { type : 'info', message : 'HeroFit is now a Club on Strava! Join up!' }
+  ],
 };
 
 const AVATAR_COUNT_PER_PAGE = 20;
