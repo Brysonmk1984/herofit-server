@@ -181,7 +181,7 @@ const AvatarModel = function(db, DataTypes){
         type: DataTypes.JSONB,
         allowNull: true
       },
-      skills: {
+      skins: {
         type: DataTypes.JSONB,
         allowNull: true
       },

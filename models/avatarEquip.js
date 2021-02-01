@@ -1,0 +1,50 @@
+const AvatarEquipModel = function(db, DataTypes){
+  const AvatarEquip = db.define('avatar_equip', {
+      id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          autoIncrement: true
+      },
+      createdAt: {
+          type: DataTypes.TIME,
+          defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
+          allowNull: false
+      },
+      avatarID : {
+        type : DataTypes.STRING,
+        allowNull: false,
+      },
+      name : {
+        type : DataTypes.STRING(35),
+        allowNull : false,
+      },
+      type : {
+        type : DataTypes.STRING(15),
+        allowNull : false,
+      },
+      description : {
+        type : DataTypes.STRING(100),
+        allowNull : false,
+      },
+      lore : {
+        type : DataTypes.STRING(500),
+        allowNull : true,
+      },
+      effect1 : {
+        type : DataTypes.STRING(75),
+        allowNull : true,
+      },
+      effect2 : {
+        type : DataTypes.STRING(75),
+        allowNull : true,
+      },
+      effect3 : {
+        type : DataTypes.STRING(75),
+        allowNull : true,
+      }
+  });
+
+  return AvatarEquip;
+}
+
+module.exports = AvatarEquipModel;

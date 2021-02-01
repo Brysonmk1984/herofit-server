@@ -4,6 +4,7 @@ const AvatarModel = require('./models/avatar.js');
 const UserActivityModel = require('./models/userActivity.js');
 const UserTotalModel = require('./models/userTotal.js');
 const BattleModel = require('./models/battle.js');
+const AvatarEquipModel = require('./models/avatarEquip.js');
 
 let db;
 let dbUrl;
@@ -57,9 +58,9 @@ const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
 const UserTotal = UserTotalModel(db, Sequelize);
 const Battle = BattleModel(db, Sequelize);
-
+const AvatarEquip = AvatarEquipModel(db, Sequelize);
 User.hasOne(Avatar, {foreignKey: 'userId'});
 Avatar.belongsTo(User, {foreignKey: 'userId'})
 
 
-module.exports = { User, Avatar, UserActivity, UserTotal, Battle, db }
+module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarEquip, db }

@@ -13,7 +13,7 @@ const heroList = require('../heroList');
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const Avatar = require('../db').Avatar;
-
+const AvatarEquip = require('../db').AvatarEquip;
 
 const shuffleArray = function(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
@@ -305,7 +305,7 @@ router.post('/insert-random-avatar', function(req,res,next){
     power : 100,
     health : 100,
     maxHealth : 100,
-    skills : [],
+    skins : [],
     items : [],
     pets : [],
     titles : [],
@@ -364,7 +364,7 @@ router.post('/insert-random-avatar', function(req,res,next){
       character: randomHero.character,
       power: randomHero.power,
       health: randomHero.health,
-      skills: randomHero.skills,
+      skins: randomHero.skins,
       items: randomHero.items,
       titles: randomHero.titles,
       pets: randomHero.pets,
@@ -477,5 +477,26 @@ router.post('/set-avatar-health-and-status', function(req, res, next){
 
 });
 
+
+router.post('/add-fake-item', function(req, res, next){
+
+  console.log('RED - ', req.body);
+  return AvatarEquip.create(
+    { avatarID: req.body.avatarID, type : req.body.type, name : req.body.name, description : req.body.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3  },
+    { returning : true, raw : true }
+  ).then((item) =>{
+    console.log('returned item', item);
+    res.status(200).json({
+      item
+    });
+  }).catch((error) =>{
+    console.log('ERROR UPDATING AVATAR', error);
+    res.status(400).json({
+      message : `ERROR UPDATING AVATAR - ${error}`,
+    });
+    next();
+  });
+
+});
 
 module.exports = router;
