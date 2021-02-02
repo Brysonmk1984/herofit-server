@@ -14,12 +14,16 @@ const AvatarEquipModel = function(db, DataTypes){
         type : DataTypes.STRING,
         allowNull: false,
       },
-      name : {
-        type : DataTypes.STRING(35),
-        allowNull : false,
+      typeID : {
+        type : DataTypes.INTEGER,
+        allowNull: false,
       },
       type : {
         type : DataTypes.STRING(15),
+        allowNull : false,
+      },
+      name : {
+        type : DataTypes.STRING(35),
         allowNull : false,
       },
       description : {
@@ -42,7 +46,7 @@ const AvatarEquipModel = function(db, DataTypes){
         type : DataTypes.STRING(75),
         allowNull : true,
       }
-  });
+  }, { freezeTableName: true });
 
   return AvatarEquip;
 }
