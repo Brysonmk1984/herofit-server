@@ -45,6 +45,18 @@ const AvatarEquipModel = function(db, DataTypes){
       effect3 : {
         type : DataTypes.STRING(75),
         allowNull : true,
+      },
+      equipped : {
+        type : DataTypes.BOOLEAN,
+        allowNull : false,
+      },
+      icon : {
+        type : DataTypes.STRING(50),
+        allowNull : true,
+      },
+      class : {
+        type : DataTypes.STRING(50),
+        allowNull : true,
       }
   }, { freezeTableName: true });
 

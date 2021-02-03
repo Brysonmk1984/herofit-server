@@ -11,7 +11,7 @@ const AvatarEquip = require('../db').AvatarEquip;
 router.post('/add-item' , function(req, res, next){
   console.log('req body - ', req.body);
   return AvatarEquip.create(
-    { avatarID: req.body.avatarID, typeID : req.body.typeId, type : req.body.type, name : req.body.name, description : req.body.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3  },
+    { avatarID: req.body.avatarID, typeID : req.body.typeId, type : req.body.type, name : req.body.name, description : req.body.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3, equipped : false  },
     { returning : true, raw : true }
   ).then((item) =>{
     console.log('returned item', item);
@@ -54,7 +54,7 @@ router.get('/move-titles' , function(req, res, next){
 
 
       allItemPromises.push(AvatarEquip.create(
-        { avatarID: av.id, typeID : typeID, type : 'title', name : title.title, description : title.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3  },
+        { avatarID: av.id, typeID : typeID, type : 'title', name : title.title, description : title.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3, equipped : false  },
         { returning : true, raw : true }
       ));
 
@@ -100,7 +100,7 @@ router.get('/move-pets' , function(req, res, next){
       }
 
       allItemPromises.push(AvatarEquip.create(
-        { avatarID: av.id, typeID : typeID, type : 'pet', name : pet.name, description : pet.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3  },
+        { avatarID: av.id, typeID : typeID, type : 'pet', name : pet.name, description : pet.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3, equipped : false  },
         { returning : true, raw : true }
       ));
 
