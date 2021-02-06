@@ -35,6 +35,24 @@ router.post('/fetch-avatar-inventory', function(req, res, next){
 
 router.post('/equip-item', function(req, res, next){
   const equipId = req.body.equipId;
+  console.log('EQUIP', equipId);
+  AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true })
+  .then((updatedItem) =>{
+    console.log('UI - ',updatedItem);
+    res.status(200).json({
+      updatedItems : updatedItem[1]
+    })
+  }).catch((error) =>{
+    res.status(400).json({
+      message: `Couldn't update item equip status`,
+      debug : error
+    });
+    next();
+  })
+});
+
+router.post('/equip-unequip-item', function(req, res, next){
+  const equipId = req.body.equipId;
   const unequipId = req.body.unequipId;
 
   const equipPromises = [];
@@ -57,19 +75,18 @@ router.post('/equip-item', function(req, res, next){
     });
     next();
   })
-  
-
 });
+
 
 router.post('/unequip-item', function(req, res, next){
   const unequipId = req.body.unequipId;
-  console.log('!!!', unequipId);
+  console.log('UNEQUIP', unequipId);
   AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     console.log('UI - ',updatedItem);
 
     res.status(200).json({
-      updatedItems : updatedItems[1]
+      updatedItems : updatedItem[1]
     })
   }).catch((error) =>{
     
