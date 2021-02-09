@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const db = require('../db').db;
 const Avatar = require('../db').Avatar;
+const AvatarEquip = require('../db').AvatarEquip;
 const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
@@ -197,13 +198,23 @@ router.post('/get-avatar', function(req, res, next){
         avatar = parseAvatarProperties(avatar);
         avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
   
-        res.status(200).json({
-          message: `Found matching Avatar`,
-          avatar
+        AvatarEquip.findAll({ attributes : ['id', 'avatarID', 'type', 'name', 'description', 'equipped', 'icon', 'class' ], where : { avatarID : avatar.id, equipped : true }}, { raw : true, plain : true  })
+        .then((equipped) =>{
+          console.log('equip! - ', equipped);
+          res.status(200).json({
+            message: `Found matching Avatar`,
+            avatar,
+            equipped
+          });
+          next();
+        }).catch((error) =>{
+          res.status(400).json({
+            message: `Unable to Fetch Hero Items`,
+            debug : error
+          });
+          next();
         });
       }
-        
-      next();
     }).catch((err)=>{
       console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
       res.status(400).json({

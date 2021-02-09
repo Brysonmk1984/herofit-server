@@ -4,12 +4,12 @@ const AvatarEquip = require('../db').AvatarEquip;
 
 router.post('/fetch-avatar-inventory', function(req, res, next){
   const avatarID = req.body.avatarID;
-  console.log('HERE-', avatarID);
+  console.log('FETCHING AVATAR INV FOR -', avatarID);
   AvatarEquip.findAll(
     { where : { avatarID } }
 
   ).then((inventory) =>{
-    console.log('INV - ', inventory);
+    //console.log('INV - ', inventory);
     
     // Massage the data for the frontend
     const inventoryObj = {
@@ -35,12 +35,12 @@ router.post('/fetch-avatar-inventory', function(req, res, next){
 
 router.post('/equip-item', function(req, res, next){
   const equipId = req.body.equipId;
-  console.log('EQUIP', equipId);
+  //console.log('EQUIP', equipId);
   AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    console.log('UI - ',updatedItem);
+    //console.log('UI - ',updatedItem);
     res.status(200).json({
-      updatedItems : updatedItem[1]
+      equippedItem : updatedItem[1][0]
     })
   }).catch((error) =>{
     res.status(400).json({
@@ -57,15 +57,18 @@ router.post('/equip-unequip-item', function(req, res, next){
 
   const equipPromises = [];
 
-  equipPromises.push(AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true }));
-  equipPromises.push(AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true }));
+  equipPromises.push(AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true }));
+  equipPromises.push(AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true }));
 
   Promise.allSettled(equipPromises)
   .then((result) =>{
-    const updatedItems = result.map((item) => item.value[1]);
-
+    //console.log('RES - ', result);
+    const unequippedItem = result[0].value[1][0];
+    const equippedItem = result[1].value[1][0];
+    //console.log('UUUU - ', unequippedItem, 'EEEE - ', equippedItem);
     res.status(200).json({
-      updatedItems
+      unequippedItem,
+      equippedItem
     })
   }).catch((error) =>{
     
@@ -80,13 +83,12 @@ router.post('/equip-unequip-item', function(req, res, next){
 
 router.post('/unequip-item', function(req, res, next){
   const unequipId = req.body.unequipId;
-  console.log('UNEQUIP', unequipId);
+  //console.log('UNEQUIP', unequipId);
   AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    console.log('UI - ',updatedItem);
-
+    //console.log('UI - ',updatedItem);
     res.status(200).json({
-      updatedItems : updatedItem[1]
+      unequippedItem : updatedItem[1][0]
     })
   }).catch((error) =>{
     
