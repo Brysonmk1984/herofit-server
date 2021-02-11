@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const db = require('../db').db;
+const { QueryTypes } = require('sequelize');
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
 const User = require('../db').User;
@@ -32,7 +33,7 @@ router.post('/insert-avatar', function(req, res, next){
       // Avatar from results, parse properties that are strings that need to be numbers
       avatar = parseAvatarProperties(result[0].dataValues);
       avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-    
+      avatar.equipped = [];
       // Avatar Created
       if(created){
         res.status(200).json({
@@ -149,7 +150,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     avatar.level = getCurrentLevel();
     avatar.nextLevelStartXp = getNextLevel();
     avatar.thisLevelStartXp = getNextLevel(-1);
-    
+
     // Calc gains here to be displayed on frontend
     const improvements = {
       power : Math.floor(avatar.power - avStatSnapshot.power),
@@ -178,58 +179,100 @@ router.post('/buff-and-update-avatar', function(req, res, next){
 
 });
 
-router.post('/get-avatar', function(req, res, next){
-  if(req.body.email){
-    Avatar.findOne({ where: { owner: req.body.email }, raw : true })
-    .then((avatar) =>{
-      if(!avatar){
-        console.log('NO AV ASSOCIATED WITH EMAIL');
-        res.status(204).json({
-          message: `No Avatar associated with user ${req.body.email}`
-        });
-        return;
-      }else{
-        const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+router.post('/get-avatar', async function(req, res, next){
+  // 'equipped' refers to 2 things here. the property on the avatar (which is described in the SELECT statement), as well as the equipped boolean that each item posseses. 
+  // This query only grabs items that have equipped set to true.
+  const q = `
+    SELECT avatars.*, equipped 
+    FROM avatars
+    LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2, 'effect3', effect3, 'equipped', equipped, 'class', class, 'description', description, 'icon', icon)) AS equipped
+      FROM avatar_equip WHERE avatar_equip.equipped=true group by 1) AS equipped ON(id="avatarID")
+    WHERE avatars.owner = '${req.body.email}'
+  `;
+
+    try{
+    const [ results ] = await db.query(q, {});
+    //console.log('RESULT - ', results[0]);
+    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+    const avatar = parseAvatarProperties(results[0]);
+      
+    const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    avatar.level = getCurrentLevel();
+    avatar.nextLevelStartXp = getNextLevel();
+    avatar.thisLevelStartXp = getNextLevel(-1);
+    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+    avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
+    //console.log('AVATAR - ', avatar);
   
-        avatar.level = getCurrentLevel();
-        avatar.nextLevelStartXp = getNextLevel();
-        avatar.thisLevelStartXp = getNextLevel(-1);
-        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-        avatar = parseAvatarProperties(avatar);
-        avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-  
-        AvatarEquip.findAll({ attributes : ['id', 'avatarID', 'type', 'name', 'description', 'equipped', 'icon', 'class' ], where : { avatarID : avatar.id, equipped : true }}, { raw : true, plain : true  })
-        .then((equipped) =>{
-          console.log('equip! - ', equipped);
-          res.status(200).json({
-            message: `Found matching Avatar`,
-            avatar,
-            equipped
-          });
-          next();
-        }).catch((error) =>{
-          res.status(400).json({
-            message: `Unable to Fetch Hero Items`,
-            debug : error
-          });
-          next();
-        });
-      }
-    }).catch((err)=>{
-      console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
-      res.status(400).json({
-        message: `Couldn't get Avatar for user ${req.body.email}`,
-        debug : err
-      });
-      next();
+    res.status(200).json({
+      avatar
     });
-  }else{
+    
+  }catch(error){
+    console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${error}`);
     res.status(400).json({
-      message: `No Email supplied passed to get-avatar`,
-      debug : `No Email supplied passed to get-avatar`
+      message: `Couldn't get Avatar for user ${req.body.email}`,
+      debug : error
     });
     next();
   }
+
+
+  
+  // if(req.body.email){
+
+  //   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
+  //     .then((avatar) =>{
+  //       if(!avatar){
+  //         console.log('NO AV ASSOCIATED WITH EMAIL');
+  //         res.status(204).json({
+  //           message: `No Avatar associated with user ${req.body.email}`
+  //         });
+  //         return;
+  //       }else{
+  //         const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    
+  //         avatar.level = getCurrentLevel();
+  //         avatar.nextLevelStartXp = getNextLevel();
+  //         avatar.thisLevelStartXp = getNextLevel(-1);
+  //         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+  //         avatar = parseAvatarProperties(avatar);
+  //         avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+
+  //         AvatarEquip.findAll({ attributes : ['id', 'avatarID', 'type', 'name', 'description', 'equipped', 'icon', 'class' ], where : { avatarID : avatar.id, equipped : true }}, { raw : true, plain : true  })
+  //         .then((equipped) =>{
+  //           avatar.equipped = equipped;
+  //           //console.log('equip! - ', equipped);
+  //           console.log('AVA - ', avatar);
+  //           res.status(200).json({
+  //             message: `Found matching Avatar`,
+  //             avatar,
+  //           });
+  //           next();
+  //         }).catch((error) =>{
+  //           res.status(400).json({
+  //             message: `Unable to Fetch Hero Items`,
+  //             debug : error
+  //           });
+  //           next();
+  //         });
+  //       }
+  //     }).catch((err)=>{
+  //       console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
+  //       res.status(400).json({
+  //         message: `Couldn't get Avatar for user ${req.body.email}`,
+  //         debug : err
+  //       });
+  //       next();
+  //     });
+  // }else{
+  //   res.status(400).json({
+  //     message: `No Email supplied passed to get-avatar`,
+  //     debug : `No Email supplied passed to get-avatar`
+  //   });
+  //   next();
+  // }
+  
 
 });
 
