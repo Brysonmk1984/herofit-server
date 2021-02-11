@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const { Op } = require("sequelize");
 const Avatar = require('../db').Avatar;
+const AvatarEquip = require('../db').AvatarEquip;
 const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
@@ -164,6 +165,8 @@ router.post('/fetch-battle-report', function(req, res, next){
 });
 
 router.post('/fetch-battle-report-by-id', function(req, res, next){
+  const avatarID = req.body.avatarID;
+
   Battle.findOne({
     where: { 
       id: req.body.id,
@@ -174,8 +177,19 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
    
-    res.status(200).json(adjResult);
-
+    //console.log('FETCHING AVATAR INV FOR -', avatarID);
+    return AvatarEquip.findOne({ 
+      attributes : ['name'],
+      where : { avatarID, type : 'skin', equipped : true },
+      raw : true
+    });
+  }).then((skin) =>{
+    //console.log('SKIN - ', skin);
+    adjResult.avatarSkin = skin;
+    res.status(200).json({
+      adjResult
+    });
+    
   }).catch((error) =>{
     res.status(200).json({
       message: `No Results`,

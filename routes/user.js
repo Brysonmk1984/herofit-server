@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const User = require('../db').User;
 const Avatar = require('../db').Avatar;
+const AvatarEquip = require('../db').AvatarEquip;
 const Battle = require('../db').Battle;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
@@ -216,7 +217,7 @@ router.post('/get-user-totals', function(req, res, next){
 
 router.post('/get-info-by-username', function(req, res, next){
   const username = req.body.username;
-
+  let userTotals, activities, avatar, battles;
   // First, exchange the username for the email
   User.findOne({ where: { username }, attributes : ['email'], raw : true })
   .then((data) =>{
@@ -229,18 +230,27 @@ router.post('/get-info-by-username', function(req, res, next){
     allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true }));
     
     return Promise.allSettled(allPromises);
-  }).then(([userTotals, activities, avatar, battles]) =>{
+  }).then(([ut, act, av, bat]) =>{
+    userTotals = ut;
+    activities = act;
+    avatar = av;
+    battles = bat;
+    //console.log('AVID - ', avatar);
+    return AvatarEquip.findAll({ where: { avatarID : avatar.value.id }, raw : true })
+  }).then((equipment) =>{
     userTotals = userTotals.value;
     activities = activities.value.map((act) =>act.activity);
     battles = battles.value;
     const { currentLevelByInput } = xpCalc();
     avatar = avatar.value;
     avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+    //console.log('EQ - ', equipment);
     res.status(200).json({
       userTotals,
       activities,
       avatar,
-      battles
+      battles,
+      equipment
     });
     next();
   }).catch((err)=>{
