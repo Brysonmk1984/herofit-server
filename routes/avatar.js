@@ -309,56 +309,55 @@ router.post('/get-all-avatars', function(req, res, next){
 });
 
 router.post('/fetch-avatars-by-page-number', function(req, res, next){
-  const page = req.body.page || 0;
-  const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
+  const page = +req.body.page || 0;
+  const pageSize = +req.body.pageSize || AVATAR_COUNT_PER_PAGE;
   const searchInput = req.body.searchInput;
 
   const paginate = (query, { page, pageSize }) => {
     const offset = page * pageSize;
     const limit = pageSize;
-  
+
     return {
       ...query,
-      offset,
+     
       limit,
+       offset,
     };
   };
 
   const expression = { 
-    attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets', 'titles', 
-    [literal(
-        'COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'
-      ),'totalXP']],
-    order : [[ literal(
-      'COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'
-    ), 'DESC' ]],
-    include : [{ model: User, attributes: ['username'] }],
-    raw : true,
+    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets', 'titles', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+    include : [
+      { model: User, attributes: ['username'] },
+      { model: AvatarEquip, attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+    ],
+    order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
+    raw : false,
     nest : true
   };
   if(searchInput){
     expression.where = { name: { [Op.iLike]: `%${searchInput}%`}};
   }
-
+  console.log('PAGE - ', page, 'PAGESIZE - ', pageSize);
   Avatar.findAndCountAll(
-    paginate(expression,
-      { page, pageSize },
-    )
-  ).then(({rows, count}) =>{
+    paginate(expression, { page, pageSize })
+  ).then(({ rows, count }) =>{
+    const jsonRows = JSON.parse(JSON.stringify(rows));
+    //console.log('ROWS--', jsonRows);
+    //console.log('COUNT-', count);
     const { currentLevelByInput } = xpCalc();
 
     // Sequelize requires us to loop over the returned data when 'raw : false'
-    const avatars = rows.map((result, i) => {
+    const avatars = jsonRows.map((result, i) => {
       avatar = parseAvatarProperties(result);
       avatar.level = currentLevelByInput(avatar.totalXP);
-
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
       return avatar;
     });
     const avatarCount = count;
-
+    
     const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
 
     res.status(200).json({
