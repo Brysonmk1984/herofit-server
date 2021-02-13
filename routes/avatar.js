@@ -18,9 +18,6 @@ const xpCalc = require('../game/upgrades/xpCalc');
 router.post('/insert-avatar', function(req, res, next){
   console.log('INSERTING AV', req.body.avatar);
 
-  // if(AppMode === 'beta'){
-  //   req.body.avatar.pets.push({type : 'passive', name: 'Betta Fish', description: 'Reward for being a Beta Tester'})
-  // }
   if(req.body.email){
     Avatar.findOrCreate({
       where: {
@@ -280,7 +277,7 @@ router.post('/get-avatar', async function(req, res, next){
 router.post('/get-all-avatars', function(req, res, next){
 
 
-  Avatar.findAll({attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets'], include : [{ model: User, attributes: ['username'] }], raw : false})
+  Avatar.findAll({attributes : ['name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos'], include : [{ model: User, attributes: ['username'] }], raw : false})
   .then((results) =>{
     const { currentLevelByInput } = xpCalc();
     // Sequelize requires us to loop over the returned data when 'raw : false'
@@ -326,7 +323,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   };
 
   const expression = { 
-    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'pets', 'titles', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
     include : [
       { model: User, attributes: ['username'] },
       { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
@@ -400,35 +397,33 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
 
 });
 
+// QUERY NO LONGER WORKS, SWITCH TO NEW EQUIPMENT TABLE
+// router.post('/add-title-to-avatar', async function(req, res, next){
 
-router.post('/add-title-to-avatar', async function(req, res, next){
+//   const title = JSON.stringify([{
+//     id : req.body.id,
+//     title : req.body.title,
+//     type : req.body.type,
+//     description : req.body.description,
+//   }]);
+//   console.log('HSF - ', title);
+//   const query = `UPDATE avatars SET titles = '${title}' WHERE name='${req.body.hero}';`;
 
-  const title = JSON.stringify([{
-    id : req.body.id,
-    title : req.body.title,
-    type : req.body.type,
-    description : req.body.description,
-  }]);
-  console.log('HSF - ', title);
-  const query = `UPDATE avatars SET titles = '${title}' WHERE name='${req.body.hero}';`;
+//   try{
+//     const [results, metadata] = await db.query(query, {});
 
-  try{
-    const [results, metadata] = await db.query(query, {});
-
-    console.log('results!', metadata);
-    if(results){
-      res.status(200).json({
-        results
-      });
-    }else{
-      res.send(400);
-    }
-  }catch(error){
-    console.log("error", error);
-  }
-
-
-});
+//     console.log('results!', metadata);
+//     if(results){
+//       res.status(200).json({
+//         results
+//       });
+//     }else{
+//       res.send(400);
+//     }
+//   }catch(error){
+//     console.log("error", error);
+//   }
+// });
 
 
 module.exports = router;

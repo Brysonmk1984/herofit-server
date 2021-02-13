@@ -244,7 +244,6 @@ router.post('/get-info-by-username', function(req, res, next){
     const { currentLevelByInput } = xpCalc();
     avatar = avatar.value;
     avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-    //console.log('EQ - ', equipment);
     res.status(200).json({
       userTotals,
       activities,

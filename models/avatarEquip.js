@@ -11,10 +11,6 @@ const AvatarEquipModel = function(db, DataTypes){
           allowNull: false
       },
       avatarID : {
-        type : DataTypes.STRING,
-        allowNull: false,
-      },
-      typeID : {
         type : DataTypes.INTEGER,
         allowNull: false,
       },
@@ -34,6 +30,10 @@ const AvatarEquipModel = function(db, DataTypes){
         type : DataTypes.STRING(500),
         allowNull : true,
       },
+      equipped : {
+        type : DataTypes.BOOLEAN,
+        allowNull : false,
+      },
       effect1 : {
         type : DataTypes.STRING(75),
         allowNull : true,
@@ -45,10 +45,6 @@ const AvatarEquipModel = function(db, DataTypes){
       effect3 : {
         type : DataTypes.STRING(75),
         allowNull : true,
-      },
-      equipped : {
-        type : DataTypes.BOOLEAN,
-        allowNull : false,
       },
       icon : {
         type : DataTypes.STRING(50),

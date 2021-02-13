@@ -169,22 +169,6 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
-      items: {
-        type: DataTypes.JSONB,
-        allowNull: true
-      },
-      titles: {
-        type: DataTypes.JSONB,
-        allowNull: true
-      },
-      pets: {
-        type: DataTypes.JSONB,
-        allowNull: true
-      },
-      skins: {
-        type: DataTypes.JSONB,
-        allowNull: true
-      },
       battleWins: {
         type: DataTypes.INTEGER,
         allowNull: false,
