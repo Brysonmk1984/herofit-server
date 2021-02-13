@@ -63,7 +63,7 @@ const AvatarEquip = AvatarEquipModel(db, Sequelize);
 User.hasOne(Avatar, {foreignKey: 'userId'});
 Avatar.belongsTo(User, {foreignKey: 'userId'})
 // Avatar - AvatarEquip JOIN
-Avatar.hasMany(AvatarEquip, {foreignKey: 'avatarID'});
+Avatar.hasMany(AvatarEquip, {foreignKey: 'avatarID', as: 'equipped'});
 AvatarEquip.belongsTo(Avatar, {foreignKey: 'avatarID'})
 
 module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarEquip, db }
