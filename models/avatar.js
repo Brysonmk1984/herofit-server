@@ -189,6 +189,11 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
+      photonTokens: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
   });
 
   return Avatar;

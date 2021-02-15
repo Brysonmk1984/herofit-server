@@ -62,29 +62,36 @@ function generateFoeStats(avatar, foe){
     //const positive = Math.floor(Math.random() * 2) === 1 ? true : false;
     //const modifiedStat = positive ? stat + (randomModifier * stat) : stat - (randomModifier * stat) ;
     const modifiedStat = stat - (randomModifier * stat) ;
-    return Math.floor(modifiedStat);
+    //console.log('STAT - ', stat, 'MODSTAT - ', modifiedStat, 'rand', randomModifier);
+    return { stat : Math.floor(modifiedStat), modifier : randomModifier };
   }
 
 
   const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
   const baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
 
+  const healthAfterMod = randomizer(baseFoeHealth);
+  const powerAfterMod = randomizer(baseFoePower);
+  const qpAfterMod = randomizer(Math.floor(qp * FOE_MOD.QP));
+
+  const averageMod = -((healthAfterMod.modifier + powerAfterMod.modifier +  qpAfterMod.modifier) / 3).toFixed(3);
+
+
 
   const foeWithStats = {
-    health : randomizer(baseFoeHealth),
-    power : randomizer(baseFoePower),
+    health : healthAfterMod.stat,
+    power : powerAfterMod.stat,
     armor : 0,
     fire : 0,
     earth : 0,
     water : 0,
-    air : 0
+    air : 0,
+    difficulty : averageMod
   }
-
-
 
   const properties = ["health","power","armor"];
   //const properties = ["health","power","armor","fire","earth","water","air"];
-  const baseFoeQp = randomizer(Math.floor(qp * FOE_MOD.QP));
+  const baseFoeQp = qpAfterMod.stat;
 
   for(let points = baseFoeQp; points > 0; points-- ){
     const attr = properties[Math.floor(Math.random() * properties.length)];

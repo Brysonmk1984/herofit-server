@@ -7,12 +7,13 @@ const { Op, literal, col, fn, QueryTypes } = require("sequelize");
 const sequelize = require("sequelize");
 const { sendAppErrorEmail, sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
+const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
+const { determineXpGain, determinePtGain } = require('../game/postBattleActions');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -183,19 +184,20 @@ router.post('/do-battle-mock', function(req, res, next){
 
   switch(b.outcomeData.outcome){
     case "Avatar Wins":
-      xpGain = OUTCOME_XP.win;
+      xpGain =  determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP);
       break;
     case "Foe Wins":
-      xpGain = OUTCOME_XP.loss;
+      xpGain = determineXpGain(OUTCOME_XP.loss, BRF.difficulty, BRA.level, BRF.bonusXP);
       break;
     case "Draw":
-      xpGain = OUTCOME_XP.draw;
+      xpGain = determineXpGain(OUTCOME_XP.draw, BRF.difficulty, BRA.level, BRF.bonusXP);
       break;
     case "Double KO":
-      xpGain = OUTCOME_XP.dko;
+      xpGain = determineXpGain(OUTCOME_XP.dko, BRF.difficulty, BRA.level, BRF.bonusXP);
       break;
     default:
   }
+  console.log('XP GAIIN', xpGain);
 
   // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
   res.status(200).json({
@@ -510,7 +512,12 @@ router.get('/do-all-battles', function(req, res, next){
         // avatar and foe to be used for battle
         let BRA = Object.assign({}, sAvatar);
         let BRF = Object.assign({}, sFoe);
-        
+
+        // Need level to figure out xp gain from wins after battle
+        const { currentLevelByInput } = xpCalc();
+        BRA.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+
+
         // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
         
         if(itemsUsed || actionsChosen){
@@ -545,36 +552,45 @@ router.get('/do-all-battles', function(req, res, next){
         const b = doBattle(BRA, BRF, goesFirst);
 
         // SAVE DATA
-        let xpGain;
-
+        let xpGain, ptGain;
+        
         console.log('OUTCOME - ', b.outcomeData.outcome);
+        BRF.bonusXP = 50;
+        BRF.bonusPT = 50;
+
+        ptGain = determinePtGain(BRA.level, BRF.bonusPT);
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
-            xpGain = OUTCOME_XP.win;
+            xpGain = determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP);
+            
             avatar.battleWins = avatar.battleWins + 1;
             // for email tally
             tally.avatarWins += 1;
             break;
           case "Foe Wins":
-            xpGain = OUTCOME_XP.loss;
+            xpGain = determineXpGain(OUTCOME_XP.loss, BRF.difficulty, BRA.level);
             avatar.battleLosses = avatar.battleLosses + 1;
             // for email tally
             tally.foeWins += 1;
             break;
           case "Draw":
-            xpGain = OUTCOME_XP.draw;
+            xpGain = determineXpGain(OUTCOME_XP.draw, BRF.difficulty, BRA.level);
             avatar.battleDraws = avatar.battleDraws + 1;
             // for email tally
             tally.draw += 1;
             break;
           case "Double KO":
-            xpGain = OUTCOME_XP.dko;
+            xpGain = determineXpGain(OUTCOME_XP.dko, BRF.difficulty, BRA.level);
             avatar.battleDkos = avatar.battleDkos + 1;
             // for email tally
             tally.doubleKO += 1;
             break;
           default:
         }
+        
+        console.log('XPgain - ', xpGain, 'PTgain', ptGain);
+
+        
         
         // Check for lvl up
         const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);

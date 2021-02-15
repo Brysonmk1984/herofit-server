@@ -28,6 +28,7 @@ router.post('/insert-battle', function(req, res, next){
   const avatar = req.body.avatar
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+
   console.log('CL - ',currentLevel);
   const foeTemplate = selectFoeTemplate(currentLevel);
   console.log('FT - ',foeTemplate);
@@ -46,7 +47,7 @@ router.post('/insert-battle', function(req, res, next){
     ability : foeTemplate.ability
   }
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
-
+  console.log('FWS! - ', foeWithStats);
   //console.log('FOE!', foe, req.body.email, avatar)
   Battle.create({
     owner: req.body.email,

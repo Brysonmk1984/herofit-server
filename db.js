@@ -16,7 +16,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     dialect: 'postgres',
     protocol: 'postgres',
     timezone: 'utc',
-    operatorsAliases: false,
+    operatorsAliases: '0',
     host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {
       max: 20,
