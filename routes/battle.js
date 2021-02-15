@@ -7,7 +7,7 @@ const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
-
+const { determinePostBattleActions } = require('../game/postBattleActions');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
@@ -29,11 +29,11 @@ router.post('/insert-battle', function(req, res, next){
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
-  console.log('CL - ',currentLevel);
+
   const foeTemplate = selectFoeTemplate(currentLevel);
-  console.log('FT - ',foeTemplate);
+  console.log('FoeTemplate - ',foeTemplate);
   let foeName;
-  //console.log('FT = ', foeTemplate);
+
   if(foeTemplate.type === 'Shadow-Self'){
     foeName = `Shadow ${avatar.name}`;
   }else{
@@ -48,47 +48,59 @@ router.post('/insert-battle', function(req, res, next){
   }
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
   console.log('FWS! - ', foeWithStats);
-  //console.log('FOE!', foe, req.body.email, avatar)
-  Battle.create({
-    owner: req.body.email,
-    avatarID: avatar.id,
-    avatarName: avatar.name,
-    foe : foeWithStats,
-    outcome: "TBD",
-    seenReport : false
-  }, 
-  {raw : true}
-  ).then((result) =>{
 
-    Avatar.update({ 
-      goToBattle : true,
-    },{ where: { owner: req.body.email }, raw: true })
-    .then((result) =>{
-      if(!result){
-        res.status(204).json({
-          message: `No Avatar associated with user ${req.body.email}`
-        });
-        return;
-      }
-      res.status(200).json({
-        message : 'Avatar set for battle',
-        goToBattle : true,
-        foe : foeWithStats
-      });
-      next();
-    }).catch((err)=>{
-      console.log(`Couldn't Send Avatar to battle: ${err}`);
-      res.status(400).json({
-        message: `Couldn't send avatar to battle`,
-        debug : err
-      });
-      next();
-    });
+  // PROMISE - need to determine previous battles.
+  new Promise((resolve, reject) =>{
+    return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
+  }).then((postBattleActions) =>{
+
+    console.log('PBA -', postBattleActions);
 
 
-  }).catch((error) =>{
-    console.log('ERROR INSERTING battle', error);
-  });
+
+    // Battle.create({
+    //   owner: req.body.email,
+    //   avatarID: avatar.id,
+    //   avatarName: avatar.name,
+    //   foe : foeWithStats,
+    //   outcome: "TBD",
+    //   seenReport : false,
+    //   postBattleActions
+    // }, 
+    // {raw : true}
+    // ).then((result) =>{
+
+    //   return Avatar.update({ 
+    //     goToBattle : true,
+    //   },{ where: { owner: req.body.email }, raw: true })
+    //   .then((result) =>{
+    //     if(!result){
+    //       res.status(204).json({
+    //         message: `No Avatar associated with user ${req.body.email}`
+    //       });
+    //       return;
+    //     }
+    //     res.status(200).json({
+    //       message : 'Avatar set for battle',
+    //       goToBattle : true,
+    //       foe : foeWithStats
+    //     });
+    //     next();
+    //   }).catch((err)=>{
+    //     console.log(`Couldn't Send Avatar to battle: ${err}`);
+    //     res.status(400).json({
+    //       message: `Couldn't send avatar to battle`,
+    //       debug : err
+    //     });
+    //     next();
+    //   });
+
+
+    // }).catch((error) =>{
+    //   console.log('ERROR INSERTING battle', error);
+    // });
+  })
+
 });
 
 // USER CLICKED 'DONT GO TO BATTLE'

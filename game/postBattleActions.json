@@ -1,0 +1,41 @@
+[{
+  "id" : 0,
+  "action" : "Grant Shadow-Self",
+  "name" : "Shadow-Self",
+  "type" : "Award Skin",
+  "description" : "A new 'Shadow-Self' costume earned as an award for defeating Shadow-Self."
+},{
+  "id" : 100,
+  "action" : "Grant Win Streak 3",
+  "name" : "Adept",
+  "type" : "Award Title",
+  "description" : "Title awarded for a 3 - battle win streak"
+},
+{
+  "id" : 101,
+  "action" : "Grant Win Streak 5",
+  "name" : "Warrior",
+  "type" : "Award Title",
+  "description" : "Title awarded for a 5 - battle win streak"
+},
+{
+  "id" : 102,
+  "action" : "Grant Win Streak 10",
+  "name" : "Untouchable",
+  "type" : "Award Title",
+  "description" : "Title awarded for a 10 - battle win streak"
+},
+{
+  "id" : 103,
+  "action" : "Grant Win Streak 20",
+  "name" : "Dominator",
+  "type" : "Award Title",
+  "description" : "Title awarded for a 20 - battle win streak"
+},
+{
+  "id" : 104,
+  "action" : "Grant Win Streak 35",
+  "name" : "Legendary",
+  "type" : "Award Title",
+  "description" : "Title awarded for a 35 - battle win streak"
+}]

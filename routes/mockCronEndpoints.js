@@ -13,7 +13,7 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { determineXpGain, determinePtGain } = require('../game/postBattleActions');
+const { determineXpGain, determinePtGain, doPostBattleActions, determinePostBattleActions } = require('../game/postBattleActions');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -143,78 +143,6 @@ router.post('/generate-foe', function(req, res, next){
     foe
   });
 });
-
-
-
-// DO A SINGLE INSTANCE OF BATTLE with passed in Avatar
-router.post('/do-battle-mock', function(req, res, next){
-  // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
-  let avatar = req.body.avatar;
-  const itemsUsed = req.body.itemsUsed;
-  const actionsChosen = req.body.actionsChosen;
-  let foeWithStats = generateFoeStats(avatar);
-
-  // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-  const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
-  
-  // avatar and foe to be used for battle
-  let BRA = Object.assign({}, sAvatar);
-  let BRF = Object.assign({}, sFoe);
-
-  // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
-  if(itemsUsed || actionsChosen){
-    if(scenario.id !== AVATAR_NON_ACTION){
-      BRA = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
-    }
-  }
-
-  // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-  if(foeWithStats.ability){
-    if(scenario.id !== FOE_NON_ACTION){
-      const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
-      BRF = foeBP.foe;
-      BRA = foeBP.avatar;
-    }
-  }
-
-
-  // BATTLE STEP 5 - EXCHANGE DAMAGE
-  const b = doBattle(BRA, BRF);
-  let xpGain;
-
-  switch(b.outcomeData.outcome){
-    case "Avatar Wins":
-      xpGain =  determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP);
-      break;
-    case "Foe Wins":
-      xpGain = determineXpGain(OUTCOME_XP.loss, BRF.difficulty, BRA.level, BRF.bonusXP);
-      break;
-    case "Draw":
-      xpGain = determineXpGain(OUTCOME_XP.draw, BRF.difficulty, BRA.level, BRF.bonusXP);
-      break;
-    case "Double KO":
-      xpGain = determineXpGain(OUTCOME_XP.dko, BRF.difficulty, BRA.level, BRF.bonusXP);
-      break;
-    default:
-  }
-  console.log('XP GAIIN', xpGain);
-
-  // BATTLE STEP 6 - END COMBAT, APPLY ANY POST BATTLE MECHANICS HERE
-  res.status(200).json({
-    avatar,
-    //avatarPrep,
-    BRA,
-    BRF,
-    //foePrep,
-    scenario,
-    battleResults : b,
-    xpGain
-  });
-  next();
-});
-
-
-
 
 
 // SIMULATE 100 BATTLES FOR EACH OF THE 6 SCENARIOS
@@ -475,6 +403,7 @@ router.get('/do-all-battles', function(req, res, next){
     allBattleIds = [];
     allAvatarIds = [];
     allFoes = [];
+    allPostBattleActions = [];
     allAvatarPromises = [];
 
     shard.forEach((battle) =>{
@@ -483,6 +412,7 @@ router.get('/do-all-battles', function(req, res, next){
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
       allFoes.push(battle.foe);
+      allPostBattleActions.push(battle.postBattleActions);
       //console.log('BATTLE - ',battle);
       allAvatarPromises.push(Avatar.findOne(
         { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
@@ -555,33 +485,51 @@ router.get('/do-all-battles', function(req, res, next){
         let xpGain, ptGain;
         
         console.log('OUTCOME - ', b.outcomeData.outcome);
-        BRF.bonusXP = 50;
-        BRF.bonusPT = 50;
-
-        ptGain = determinePtGain(BRA.level, BRF.bonusPT);
+        //BRF.bonusXP = 50;
+        //BRF.bonusPT = 50;
+        
+        // POST BATTLE ACTIONS
+        const postBattleActions = allPostBattleActions[i] || [];
+        
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
-            xpGain = determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP);
-            
+            xpGain = determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP); 
+            ptGain = determinePtGain(BRA.level, BRF.bonusPT);
             avatar.battleWins = avatar.battleWins + 1;
+            
+            const actionsForWin = postBattleActions.filter(action => action.battleOutcome === 'win' || action.battleOutcome === 'any');
+            doPostBattleActions(actionsForWin);
+
             // for email tally
             tally.avatarWins += 1;
             break;
           case "Foe Wins":
             xpGain = determineXpGain(OUTCOME_XP.loss, BRF.difficulty, BRA.level);
             avatar.battleLosses = avatar.battleLosses + 1;
+            
+            const actionsForLoss = postBattleActions.filter(action => action.battleOutcome === 'loss' || action.battleOutcome === 'any');
+            doPostBattleActions(actionsForLoss);
+
             // for email tally
             tally.foeWins += 1;
             break;
           case "Draw":
             xpGain = determineXpGain(OUTCOME_XP.draw, BRF.difficulty, BRA.level);
             avatar.battleDraws = avatar.battleDraws + 1;
+            
+            const actionsForDraw = postBattleActions.filter(action => action.battleOutcome === 'draw' || action.battleOutcome === 'any');
+            doPostBattleActions(actionsForDraw);
+
             // for email tally
             tally.draw += 1;
             break;
           case "Double KO":
             xpGain = determineXpGain(OUTCOME_XP.dko, BRF.difficulty, BRA.level);
             avatar.battleDkos = avatar.battleDkos + 1;
+            
+            const actionsForDko = postBattleActions.filter(action => action.battleOutcome === 'dko' || action.battleOutcome === 'any');
+            doPostBattleActions(actionsForDko);
+
             // for email tally
             tally.doubleKO += 1;
             break;
@@ -589,6 +537,9 @@ router.get('/do-all-battles', function(req, res, next){
         }
         
         console.log('XPgain - ', xpGain, 'PTgain', ptGain);
+
+
+
 
         
         
@@ -693,5 +644,56 @@ router.get('/do-all-battles', function(req, res, next){
   
 });
 
+// MOCK ENDPOINT for triggering PBAs
+router.get('/mock-do-pbas', function(req, res, next){
+
+  const avatar = {
+    "id": "254",
+    "qp": 43,
+    "air": 43.5,
+    "fire": 20.86,
+    "name": "Grabbler",
+    "armor": 30,
+    "earth": 112.47,
+    "power": 251,
+    "water": 2,
+    "health": 180,
+    "status": "Recovering",
+    "battleXP": 1242,
+    "character": "Boulder Bro",
+    "activityXP": 4554,
+    "battleDkos": 6,
+    "battleWins": 36,
+    "battleDraws": 2,
+    "battleLosses": 13
+};
+
+  const foe = {
+    "id": 2,
+    "air": 0,
+    "fire": 0,
+    "name": "Qarinah",
+    "type": "Phantasm",
+    "armor": 33,
+    "earth": 0,
+    "power": 232,
+    "water": 0,
+    "health": 196,
+    "ability": {
+        "name": "Armor Barter",
+        "effect": "Armor Trade"
+    },
+    "difficulty": -0.057
+  };
+
+  new Promise((resolve, reject) =>{
+    return determinePostBattleActions(avatar, foe, resolve, reject);
+  }).then((data) =>{
+    console.log('IN THEN OF MOCK ENDPOINT');
+    console.log('DATA - ', data);
+  }).catch((err)=>{
+    console.log('ERR - ', err);
+  });
+});
 
 module.exports = router;
