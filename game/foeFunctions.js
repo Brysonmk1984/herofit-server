@@ -13,7 +13,7 @@ function selectFoeTemplate(level){
   // Must be at least level 5 to have a shot at getting matched against shadow self
   if(level >= 5){console.log('FT CASE 1');
     // 1 in 15 will face Shadow-Self
-    const randomNum = Math.floor(Math.random() * 15);
+    const randomNum = Math.floor(Math.random() * 18);
     
     if(randomNum === 0){console.log('FT CASE 1A');
       villain = villains.Spirits[villains.Spirits.length -1];

@@ -1,6 +1,7 @@
 {
   "Spirits": [{
       "id": 0,
+      "class" : "Spirits",
       "type" : "Shade",
       "foe": [
         "Kerrim",
@@ -14,10 +15,12 @@
         "name" : "From the Shadows",
         "effect" : "Bonus Power"
       },
-      "color": "#000000"
+      "color": "#000000",
+      "pba" : ["Grant Shade"]
     },
     {
       "id": 1,
+      "class" : "Spirits",
       "type": "Apparition",
       "foe": [
         "Githinji",
@@ -31,10 +34,12 @@
         "name" : "Intimidation",
         "effect" : "Power Reduction"
       },
-      "color": "#0D0D0D"
+      "color": "#0D0D0D",
+      "pba" : ["Grant Apparition"]
     },
     {
       "id": 2,
+      "class" : "Spirits",
       "type": "Phantasm",
       "foe": [
         "Fridtjof",
@@ -48,10 +53,12 @@
         "name" : "Armor Barter",
         "effect" : "Armor Trade"
       },
-      "color": "#080808"
+      "color": "#080808",
+      "pba" : ["Grant Phantasm"]
     },
     {
       "id": 3,
+      "class" : "Spirits",
       "type" : "Phantom",
       "foe": [
         "Seth",
@@ -65,10 +72,12 @@
         "name" : "Unseen Swap",
         "effect" : "Power Trade"
       },
-      "color": "#232323"
+      "color": "#232323",
+      "pba" : ["Grant Phantom"]
     },
     {
       "id": 4,
+      "class" : "Spirits",
       "type": "Wraith",
       "foe": [
         "Methuselah",
@@ -82,10 +91,12 @@
         "name" : "Can't Hide from Me",
         "effect" : "Armor Break"
       },
-      "color": "#383838"
+      "color": "#383838",
+      "pba" : ["Grant Wraith"]
     },
     {
       "id": 5,
+      "class" : "Spirits",
       "type": "Poltergeist",
       "foe": [
         "Phobus",
@@ -99,10 +110,12 @@
         "name" : "Shadowy Influx",
         "effect" : "Bonus Health"
       },
-      "color": "#676767"
+      "color": "#676767",
+      "pba" : ["Grant Poltergeist"]
     },
     {
       "id": 6,
+      "class" : "Spirits",
       "type" : "Specter",
       "foe": [
         "Brody",
@@ -116,10 +129,12 @@
         "name" : "Breath Bane",
         "effect" : "Health Reduction"
       },
-      "color": "#4f4f4f"
+      "color": "#4f4f4f",
+      "pba" : ["Grant Specter"]
     },
     {
       "id": 7,
+      "class" : "Spirits",
       "type": "Banshee",
       "foe": [
         "Laverna",
@@ -133,16 +148,21 @@
         "name" : "Sadistic Siphon",
         "effect" : "Health Steal"
       },
-      "color": "#000000"
+      "color": "#000000",
+      "pba" : ["Grant Banshee"]
     },{
       "id": 8,
+      "class" : "Spirits",
       "type": "Shadow-Self",
       "foe": ["Shadow-Self"],
       "ability": {
         "name" : "Self-Awareness",
         "effect" : "Mirrored Stats"
       },
-      "color": "#0D0D0D"
+      "color": "#0D0D0D",
+      "bonusXpBase": 50,
+      "bonusPtBase": 100,
+      "pba" : ["Grant Shadow-Self"]
     }
   ]
 }

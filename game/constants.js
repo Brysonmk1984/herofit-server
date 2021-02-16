@@ -73,10 +73,10 @@ const FOE_MOD = {
 
 
 const OUTCOME_XP = {
-  win : 30,
-  loss : 10,
-  draw : 15,
-  dko : 20
+  base : 30,
+  lossMultiplier : .25,
+  drawMultiplier : .5,
+  dkoMultiplier : .7
 };
 // Used in calculation to increase the deduction of XP for weaker opponents
 const FOE_DIFFICULTY_XP_MOD_FACTOR = 3.5;

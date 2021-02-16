@@ -13,7 +13,7 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { determineXpGain, determinePtGain, doPostBattleActions, determinePostBattleActions } = require('../game/postBattleActions');
+const { doPostBattleActions, determinePostBattleActions } = require('../game/postBattleActions');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -493,8 +493,8 @@ router.get('/do-all-battles', function(req, res, next){
         
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
-            xpGain = determineXpGain(OUTCOME_XP.win, BRF.difficulty, BRA.level, BRF.bonusXP); 
-            ptGain = determinePtGain(BRA.level, BRF.bonusPT);
+            xpGain = BRF.xpBounty; 
+            ptGain = BRF.xpBounty; 
             avatar.battleWins = avatar.battleWins + 1;
             
             const actionsForWin = postBattleActions.filter(action => action.battleOutcome === 'win' || action.battleOutcome === 'any');
@@ -504,7 +504,7 @@ router.get('/do-all-battles', function(req, res, next){
             tally.avatarWins += 1;
             break;
           case "Foe Wins":
-            xpGain = determineXpGain(OUTCOME_XP.loss, BRF.difficulty, BRA.level);
+            xpGain = BRF.xpBounty * OUTCOME.lossMultiplier;
             avatar.battleLosses = avatar.battleLosses + 1;
             
             const actionsForLoss = postBattleActions.filter(action => action.battleOutcome === 'loss' || action.battleOutcome === 'any');
@@ -514,7 +514,7 @@ router.get('/do-all-battles', function(req, res, next){
             tally.foeWins += 1;
             break;
           case "Draw":
-            xpGain = determineXpGain(OUTCOME_XP.draw, BRF.difficulty, BRA.level);
+            xpGain = BRF.xpBounty * OUTCOME.drawMultiplier;
             avatar.battleDraws = avatar.battleDraws + 1;
             
             const actionsForDraw = postBattleActions.filter(action => action.battleOutcome === 'draw' || action.battleOutcome === 'any');
@@ -524,7 +524,7 @@ router.get('/do-all-battles', function(req, res, next){
             tally.draw += 1;
             break;
           case "Double KO":
-            xpGain = determineXpGain(OUTCOME_XP.dko, BRF.difficulty, BRA.level);
+            xpGain = BRF.xpBounty * OUTCOME.dkoMultiplier;
             avatar.battleDkos = avatar.battleDkos + 1;
             
             const actionsForDko = postBattleActions.filter(action => action.battleOutcome === 'dko' || action.battleOutcome === 'any');
@@ -670,10 +670,11 @@ router.get('/mock-do-pbas', function(req, res, next){
 
   const foe = {
     "id": 2,
+    "class":"Spirits",
     "air": 0,
     "fire": 0,
-    "name": "Qarinah",
-    "type": "Phantasm",
+    "name": "Shadow-Grabbler",
+    "type": "Shadow-Self",
     "armor": 33,
     "earth": 0,
     "power": 232,
@@ -688,11 +689,11 @@ router.get('/mock-do-pbas', function(req, res, next){
 
   new Promise((resolve, reject) =>{
     return determinePostBattleActions(avatar, foe, resolve, reject);
-  }).then((data) =>{
+  }).then((PBAs) =>{
     console.log('IN THEN OF MOCK ENDPOINT');
-    console.log('DATA - ', data);
+    console.log('PBA-s - ', PBAs);
   }).catch((err)=>{
-    console.log('ERR - ', err);
+    console.log('ERROR DETERMINING PBAs - ', err);
   });
 });
 

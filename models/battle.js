@@ -106,6 +106,10 @@ const BattleModel = function(db, DataTypes){
     seenReport : {
       type : DataTypes.BOOLEAN,
       allowNull: false,
+    },    
+    postBattleActions : {
+      type : DataTypes.JSONB,
+      allowNull: true
     },
   });
 

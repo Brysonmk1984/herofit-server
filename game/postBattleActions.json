@@ -3,9 +3,58 @@
   "action" : "Grant Shadow-Self",
   "name" : "Shadow-Self",
   "type" : "Award Skin",
-  "description" : "A new 'Shadow-Self' costume earned as an award for defeating Shadow-Self."
+  "description" : "A 'Shadow-Self' costume earned as an award for defeating Shadow-Self."
+},{
+  "id" : 1,
+  "action" : "Grant Shade",
+  "name" : "Shade Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Shade Tint' costume earned as an award for defeating all Shades."
+},{
+  "id" : 2,
+  "action" : "Grant Apparition",
+  "name" : "Apparition Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Apparition Tint' costume earned as an award for defeating all Apparitions."
+},{
+  "id" : 3,
+  "action" : "Grant Phantasm",
+  "name" : "Phantasm Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Phantasm Tint' costume earned as an award for defeating all Phantasm."
+},{
+  "id" : 4,
+  "action" : "Grant Phanton",
+  "name" : "Phanton Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Phanton Tint' costume earned as an award for defeating all Phantoms."
+},{
+  "id" : 5,
+  "action" : "Grant Wraith",
+  "name" : "Wraith Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Wraith Tint' costume earned as an award for defeating all Wraiths."
+},{
+  "id" : 6,
+  "action" : "Grant Poltergeist",
+  "name" : "Poltergeist Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Poltergeist Tint' costume earned as an award for defeating all Poltergeist."
+},{
+  "id" : 7,
+  "action" : "Grant Specter",
+  "name" : "Specter Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Specter Tint' costume earned as an award for defeating all Specters."
+},{
+  "id" : 8,
+  "action" : "Grant Banshee",
+  "name" : "Banshee Tint",
+  "type" : "Award Skin",
+  "description" : "A 'Banshee Tint' costume earned as an award for defeating all Banshees."
 },{
   "id" : 100,
+  "requirement" : 3,
   "action" : "Grant Win Streak 3",
   "name" : "Adept",
   "type" : "Award Title",
@@ -13,6 +62,7 @@
 },
 {
   "id" : 101,
+  "requirement" : 5,
   "action" : "Grant Win Streak 5",
   "name" : "Warrior",
   "type" : "Award Title",
@@ -20,6 +70,7 @@
 },
 {
   "id" : 102,
+  "requirement" : 10,
   "action" : "Grant Win Streak 10",
   "name" : "Untouchable",
   "type" : "Award Title",
@@ -27,6 +78,7 @@
 },
 {
   "id" : 103,
+  "requirement" : 20,
   "action" : "Grant Win Streak 20",
   "name" : "Dominator",
   "type" : "Award Title",
@@ -34,6 +86,7 @@
 },
 {
   "id" : 104,
+  "requirement" : 35,
   "action" : "Grant Win Streak 35",
   "name" : "Legendary",
   "type" : "Award Title",

@@ -7,7 +7,8 @@ const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { determinePostBattleActions } = require('../game/postBattleActions');
+const { determinePostBattleActions, determineXpBounty, determinePtBounty } = require('../game/postBattleActions');
+const { OUTCOME_XP } = require('../game/constants'); 
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
@@ -31,7 +32,7 @@ router.post('/insert-battle', function(req, res, next){
 
 
   const foeTemplate = selectFoeTemplate(currentLevel);
-  console.log('FoeTemplate - ',foeTemplate);
+
   let foeName;
 
   if(foeTemplate.type === 'Shadow-Self'){
@@ -44,9 +45,15 @@ router.post('/insert-battle', function(req, res, next){
     id : foeTemplate.id,
     type : foeTemplate.type,
     name : foeName,
-    ability : foeTemplate.ability
+    ability : foeTemplate.ability,
+    class : foeTemplate.class
   }
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
+
+  
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase);
+  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase);
+  
   console.log('FWS! - ', foeWithStats);
 
   // PROMISE - need to determine previous battles.
@@ -54,51 +61,49 @@ router.post('/insert-battle', function(req, res, next){
     return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
   }).then((postBattleActions) =>{
 
-    console.log('PBA -', postBattleActions);
+    console.log('PBA BEFORE BATTLE INSERTION', postBattleActions);
+
+    Battle.create({
+      owner: req.body.email,
+      avatarID: avatar.id,
+      avatarName: avatar.name,
+      foe : foeWithStats,
+      outcome: "TBD",
+      seenReport : false,
+      postBattleActions
+    }, 
+    {raw : true}
+    ).then((result) =>{
+
+      return Avatar.update({ 
+        goToBattle : true,
+      },{ where: { owner: req.body.email }, raw: true })
+      .then((result) =>{
+        if(!result){
+          res.status(204).json({
+            message: `No Avatar associated with user ${req.body.email}`
+          });
+          return;
+        }
+        res.status(200).json({
+          message : 'Avatar set for battle',
+          goToBattle : true,
+          foe : foeWithStats
+        });
+        next();
+      }).catch((err)=>{
+        console.log(`Couldn't Send Avatar to battle: ${err}`);
+        res.status(400).json({
+          message: `Couldn't send avatar to battle`,
+          debug : err
+        });
+        next();
+      });
 
 
-
-    // Battle.create({
-    //   owner: req.body.email,
-    //   avatarID: avatar.id,
-    //   avatarName: avatar.name,
-    //   foe : foeWithStats,
-    //   outcome: "TBD",
-    //   seenReport : false,
-    //   postBattleActions
-    // }, 
-    // {raw : true}
-    // ).then((result) =>{
-
-    //   return Avatar.update({ 
-    //     goToBattle : true,
-    //   },{ where: { owner: req.body.email }, raw: true })
-    //   .then((result) =>{
-    //     if(!result){
-    //       res.status(204).json({
-    //         message: `No Avatar associated with user ${req.body.email}`
-    //       });
-    //       return;
-    //     }
-    //     res.status(200).json({
-    //       message : 'Avatar set for battle',
-    //       goToBattle : true,
-    //       foe : foeWithStats
-    //     });
-    //     next();
-    //   }).catch((err)=>{
-    //     console.log(`Couldn't Send Avatar to battle: ${err}`);
-    //     res.status(400).json({
-    //       message: `Couldn't send avatar to battle`,
-    //       debug : err
-    //     });
-    //     next();
-    //   });
-
-
-    // }).catch((error) =>{
-    //   console.log('ERROR INSERTING battle', error);
-    // });
+    }).catch((error) =>{
+      console.log('ERROR INSERTING battle', error);
+    });
   })
 
 });
