@@ -66,16 +66,16 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
   return AvatarEquip.findAll({
     attributes : ["id", "avatarID", "type", "name"],
     where : { type : 'title', avatarID : avatar.id }
-  }).then((titles) =>{
+  }).then((titles) =>{console.log('TTTs', titles);
     const titleNamesArray = titles.map(title => title.name);
-    console.log('TNA - ', titleNamesArray);
+    //console.log('TNA - ', titleNamesArray);
     const allPbaCheckPromises = [];
    
     // Win Totals Check
     allPbaCheckPromises.push(_checkWinTotal(avatar.id));
 
     // Win streak Check
-    allPbaCheckPromises.push(_checkWinStreak(avatar.id));
+    allPbaCheckPromises.push(_checkWinStreak(avatar.id, titleNamesArray));
 
 
     // Spirits get a skin if they defeat all of a particular type
@@ -89,13 +89,13 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     .then((resolvedPromises)=>{
       const totalCheck = resolvedPromises[0];
       const streakCheck = resolvedPromises[1];
-      const criticalFoeCheck = resolvedPromises[2];
-      console.log('RP - ', totalCheck, streakCheck, criticalFoeCheck);
+      const defeatFoeCheck = resolvedPromises[2];
+      console.log('RP - ', totalCheck, streakCheck, defeatFoeCheck);
       
       // results from resolved promises
-      const winTotalAction = totalCheck.value;
-      const streakIfWin = streakCheck.value;
-      const isLastOfType = criticalFoeCheck && criticalFoeCheck.value;
+      const winTotalAction = totalCheck ? totalCheck.value : null;
+      const winStreakAction = streakCheck ? streakCheck.value : null;
+      const defeatFoeAction = defeatFoeCheck ? defeatFoeCheck.value : null;
 
       
       // 1 - WIN TOTAL AWARD PBA
@@ -104,29 +104,18 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
       }
 
       // 2 - STREAK TITLE AWARD PBA
-      // Need to find the streak that matches a pba requirement, if one exists
-      const matchingPBA = WINSTREAK.find(pba => pba.requirement === streakIfWin);
-
-
-      // If win matches a possible critical win default
-      if(matchingPBA){
-        // Win is critical if it's unearned
-        const isCriticalWin = !titleNamesArray.includes(matchingPBA.name);
-        //console.log('IS CRIT - ', isCriticalWin);
-        //Add to PBAs if critical
-        if(isCriticalWin){
-          const pbaToPush = matchingPBA.action;
-          PBAs.push(pbaToPush);
-        }
+      if(winStreakAction){
+        PBAs.push(winStreakAction);
       }
 
       // 3 - SKIN AWARD PBA
-      if(isLastOfType){
-        const pbaToPush = VILLAINS['Spirits'].find(f => f.type === foe.type).pba;
-        // Theere's an array of PBAs associated with foes. For now, we're only needing the first, which grants a skin for beating all names of a specific type
-        PBAs.push(pbaToPush[0]);
+      if(defeatFoeAction){
+        PBAs.push(defeatFoeAction);
       }
-      console.log('PBBB', PBAs);
+
+
+      // ALL PBAs as action strings in an array
+      console.log('PBA-ACTION-ARRAY - ', PBAs);
       resolve(PBAs);
 
     }).catch((err)=> {
@@ -174,19 +163,25 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
       console.log('AFMC', allFoesMinusCurrent);
       console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
       // Compare the previous array to the deduped foes defeated array
-      const afmcMatchesFd = allFoesMinusCurrent.every((val, i) => val === fdNoDUpes[i]);
-      // If match return true, otherwisefalse
-      return afmcMatchesFd;
+      const isLastOfType = allFoesMinusCurrent.every((val, i) => val === fdNoDUpes[i]);
+     
+      // If last foe of type, return matching PBA action
+      if(isLastOfType){
+        // Consider moving the PBA action to the normal PBA JSON file
+        const matchingPBAAction = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
+        return matchingPBAAction;
+      }
+      return undefined;
     }
     // THIS SHOULDN'T HAPPEN, BUT I WANT TO PREVENT THE SCRIPT FROM STALLING IF IT DOES
-    return false;
+    return undefined;
   }).catch((error)=>{
     console.log('ERR - ', error);
   });
 }
 
 // CHECKS FOR WIN STREAK
-function _checkWinStreak(avatarId){
+function _checkWinStreak(avatarId, titleNamesArray){
 
   // Get latest 35 battles
   return Battle.findAll({
@@ -205,8 +200,22 @@ function _checkWinStreak(avatarId){
       }
     }
 
-    // Return current streak that Avatar will have if it wins tonight
-    return streak + 1;
+    // Current streak that Avatar will have if it wins tonight
+    const streakIfWin = streak + 2;
+
+    // Need to find the streak that matches a pba requirement, if one exists
+    const matchingPBA = WINSTREAK.find(pba => pba.requirement === streakIfWin);
+
+    // If win matches a possible critical win default
+    if(matchingPBA){
+      // Win is critical if it's unearned
+      const isCriticalWin = !titleNamesArray.includes(matchingPBA.name);
+
+      //Add to PBAs if critical
+      if(isCriticalWin){
+        return matchingPBA.action;
+      }
+    }
 
   }).catch((error)=>{
     console.log('Error getting win streak - ', error);
@@ -221,11 +230,13 @@ function _checkWinTotal(avatarId){
     where : { id : avatarId },
     raw : true
   }).then(({ battleWins }) =>{
-    const battleWinsIfWinTonight = battleWins + 1;
+    const battleWinsIfWinTonight = battleWins + 7;
     // Check if the potential win total will match a new PBA
     const matchingPBA = WINTOTAL.find(pba => pba.requirement === battleWinsIfWinTonight);
 
-    return matchingPBA.action;
+    if(matchingPBA){
+      return matchingPBA.action;
+    }
   }).catch((error)=>{
     console.log('Error getting battle wins - ', error);
   });
