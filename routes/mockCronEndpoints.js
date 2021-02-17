@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
+const AvatarEquip = require('../db').AvatarEquip;
 const Battle = require('../db').Battle;
 const db = require('../db').db;
 const { Op, literal, col, fn, QueryTypes } = require("sequelize");
@@ -13,7 +14,9 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { doPostBattleActions, determinePostBattleActions } = require('../game/postBattleActions');
+const { doAllPbas } = require('../game/runPostBattleActions');
+const { determinePostBattleActions } = require('../game/onGoToBattle');
+const ALLPBAs = require('../game/postBattleActions.json');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -382,6 +385,7 @@ router.get('/do-all-battles', function(req, res, next){
   let allAvatarIds = [];
   let allAvatarPromises = [];
   let allFoes = [];
+  let allPbaPromises = [];
   let allBattlePromises = [];
   let avatarUpdates = {};
   // Breaking battles into groups of 20 so updating doesn't break
@@ -403,7 +407,8 @@ router.get('/do-all-battles', function(req, res, next){
     allBattleIds = [];
     allAvatarIds = [];
     allFoes = [];
-    allPostBattleActions = [];
+    // array of arrays
+    allPbaArrays = [];
     allAvatarPromises = [];
 
     shard.forEach((battle) =>{
@@ -412,7 +417,7 @@ router.get('/do-all-battles', function(req, res, next){
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
       allFoes.push(battle.foe);
-      allPostBattleActions.push(battle.postBattleActions);
+      allPbaArrays.push(battle.postBattleActions);
       //console.log('BATTLE - ',battle);
       allAvatarPromises.push(Avatar.findOne(
         { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
@@ -466,6 +471,8 @@ router.get('/do-all-battles', function(req, res, next){
             BRA = foeBP.avatar;
           }
         }
+        //TEMP CHEAT
+        //BRA.power += 1000;
 
         // WHO SWINGS FIRST
         let goesFirst;
@@ -489,46 +496,41 @@ router.get('/do-all-battles', function(req, res, next){
         //BRF.bonusPT = 50;
         
         // POST BATTLE ACTIONS
-        const postBattleActions = allPostBattleActions[i] || [];
+        const postBattleActions = allPbaArrays[i] || [];
         
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
             xpGain = BRF.xpBounty; 
             ptGain = BRF.xpBounty; 
             avatar.battleWins = avatar.battleWins + 1;
-            
-            const actionsForWin = postBattleActions.filter(action => action.battleOutcome === 'win' || action.battleOutcome === 'any');
-            doPostBattleActions(actionsForWin);
+            console.log('1pbas- ',postBattleActions);
+            //const actionsForWin = postBattleActions.filter(action => action.outcome === 'win' || action.outcome === 'any');
+            //console.log('2actionsforwin- ',actionsForWin);
+            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
 
             // for email tally
             tally.avatarWins += 1;
             break;
           case "Foe Wins":
-            xpGain = BRF.xpBounty * OUTCOME.lossMultiplier;
+            xpGain = BRF.xpBounty * OUTCOME_XP.lossMultiplier;
             avatar.battleLosses = avatar.battleLosses + 1;
-            
-            const actionsForLoss = postBattleActions.filter(action => action.battleOutcome === 'loss' || action.battleOutcome === 'any');
-            doPostBattleActions(actionsForLoss);
+            //const actionsForLoss = postBattleActions.filter(action => action.outcome === 'loss' || action.outcome === 'any');
 
             // for email tally
             tally.foeWins += 1;
             break;
           case "Draw":
-            xpGain = BRF.xpBounty * OUTCOME.drawMultiplier;
-            avatar.battleDraws = avatar.battleDraws + 1;
-            
-            const actionsForDraw = postBattleActions.filter(action => action.battleOutcome === 'draw' || action.battleOutcome === 'any');
-            doPostBattleActions(actionsForDraw);
+            xpGain = BRF.xpBounty * OUTCOME_XP.drawMultiplier;
+            avatar.battleDraws = avatar.battleDraws + 1; 
+            //const actionsForDraw = postBattleActions.filter(action => action.outcome === 'draw' || action.outcome === 'any');
 
             // for email tally
             tally.draw += 1;
             break;
           case "Double KO":
-            xpGain = BRF.xpBounty * OUTCOME.dkoMultiplier;
+            xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
             avatar.battleDkos = avatar.battleDkos + 1;
-            
-            const actionsForDko = postBattleActions.filter(action => action.battleOutcome === 'dko' || action.battleOutcome === 'any');
-            doPostBattleActions(actionsForDko);
+            // const actionsForDko = postBattleActions.filter(action => action.outcome === 'dko' || action.outcome === 'any');
 
             // for email tally
             tally.doubleKO += 1;
@@ -539,9 +541,6 @@ router.get('/do-all-battles', function(req, res, next){
         console.log('XPgain - ', xpGain, 'PTgain', ptGain);
 
 
-
-
-        
         
         // Check for lvl up
         const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
@@ -582,9 +581,9 @@ router.get('/do-all-battles', function(req, res, next){
         // End Avatar for each
       });
 
-      return Promise.allSettled(allBattlePromises);
+      return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
     }).then(() => {
-      console.log('UPDATED ALL BATTLES');
+      console.log('UPDATED ALL BATTLES AND RAN PBAS');
       
       const allUpdateAvatarPromises = [];
       allAvatarIds.forEach((avatarId, i) =>{
@@ -596,6 +595,8 @@ router.get('/do-all-battles', function(req, res, next){
 
       return Promise.allSettled(allUpdateAvatarPromises);
       
+    }).catch((error) =>{
+      console.log('ERROR - ', error);
     });
   }
   // END RUN  BATTLES ON BATCH
@@ -644,8 +645,8 @@ router.get('/do-all-battles', function(req, res, next){
   
 });
 
-// MOCK ENDPOINT for triggering PBAs
-router.get('/mock-do-pbas', function(req, res, next){
+// MOCK ENDPOINT for DETERMINING PBAs
+router.get('/mock-determine-pbas', function(req, res, next){
 
   const avatar = {
     "id": "254",
@@ -690,11 +691,86 @@ router.get('/mock-do-pbas', function(req, res, next){
   new Promise((resolve, reject) =>{
     return determinePostBattleActions(avatar, foe, resolve, reject);
   }).then((PBAs) =>{
-    console.log('IN THEN OF MOCK ENDPOINT');
-    console.log('PBA-s - ', PBAs);
+    res.status(200).json({
+      postBattleActions : PBAs
+    });
   }).catch((err)=>{
     console.log('ERROR DETERMINING PBAs - ', err);
   });
+});
+
+// MOCK ENDPOINT for RUNNING PBAs
+router.post('/mock-run-pbas', function(req, res, next){
+  let battleId = req.body.id;
+
+  if(battleId){
+    // only meant to grab latest TBD battle, look at the PBAs, and create items from them
+    Battle.find({
+      attributes : ['avatarID', 'postBattleActions'],
+      where : { id : battleId }
+    }).then(({ avatarID, postBattleActions }) =>{;
+      const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
+      const PBAACTIONS = postBattleActions;
+      const pbaArray = [];
+      
+      // ALL PBAs FROM BATTLE
+      PBAACTIONS.forEach((ACTION)=>{
+        let matchingPBA;
+        
+        // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
+        for(let actionType in ALLPBAs){
+          let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
+          if(matching){
+            matchingPBA = matching;
+            break;
+          }
+        }
+        pbaArray.push(matchingPBA);
+      })
+
+      
+      console.log('ARR!', pbaArray);
+      const pbaToInserts = pbaArray.map(pba => {
+        return {
+          avatarID,
+          type : itemTypeMap[pba.type],
+          'name' : pba.name,
+          description : pba.description,
+          lore : pba.lore || null,
+          effect1 : pba.effect1 || null,
+          effec2 : pba.effect2 || null,
+          effect3 : pba.effect3 || null,
+          icon : pba.icon || null,
+          class : pba.class || null,
+          equipped : false
+        }
+      });
+
+
+      AvatarEquip.bulkCreate(pbaToInserts)
+      .then((result) =>{
+        console.log('RESSS - ', result);
+
+        res.status(200).json({
+          avatarID,
+          postBattleActions
+        });
+
+
+
+      }).catch((error) =>{
+        console.log('EERR', error);
+      });
+
+
+
+    });
+  }else{
+    res.status(400).json({
+      message : "Need to pass Battle ID"
+    });
+  }
+
 });
 
 module.exports = router;

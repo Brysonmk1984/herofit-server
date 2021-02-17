@@ -5,54 +5,63 @@
       "action" : "Grant Shadow-Self",
       "name" : "Shadow-Self",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Shadow-Self' costume earned as an award for defeating Shadow-Self."
     },{
       "id" : 1,
       "action" : "Grant Shade",
       "name" : "Shade Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Shade Tint' costume earned as an award for defeating all Shades."
     },{
       "id" : 2,
       "action" : "Grant Apparition",
       "name" : "Apparition Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Apparition Tint' costume earned as an award for defeating all Apparitions."
     },{
       "id" : 3,
       "action" : "Grant Phantasm",
       "name" : "Phantasm Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Phantasm Tint' costume earned as an award for defeating all Phantasm."
     },{
       "id" : 4,
       "action" : "Grant Phanton",
       "name" : "Phanton Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Phanton Tint' costume earned as an award for defeating all Phantoms."
     },{
       "id" : 5,
       "action" : "Grant Wraith",
       "name" : "Wraith Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Wraith Tint' costume earned as an award for defeating all Wraiths."
     },{
       "id" : 6,
       "action" : "Grant Poltergeist",
       "name" : "Poltergeist Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Poltergeist Tint' costume earned as an award for defeating all Poltergeist."
     },{
       "id" : 7,
       "action" : "Grant Specter",
       "name" : "Specter Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Specter Tint' costume earned as an award for defeating all Specters."
     },{
       "id" : 8,
       "action" : "Grant Banshee",
       "name" : "Banshee Tint",
       "type" : "Award Skin",
+      "outcome" : "win",
       "description" : "A 'Banshee Tint' costume earned as an award for defeating all Banshees."
     },{
       "id" : 100,
@@ -60,6 +69,7 @@
       "action" : "Grant Win Streak 3",
       "name" : "Adept",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 3 - battle win streak"
     }
   ],
@@ -71,6 +81,7 @@
       "action" : "Grant Win Streak 3",
       "name" : "The Renowned",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 3 - battle win streak"
     },
     {
@@ -79,6 +90,7 @@
       "action" : "Grant Win Streak 5",
       "name" : "The Acclaimed",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 5 - battle win streak"
     },
     {
@@ -87,6 +99,7 @@
       "action" : "Grant Win Streak 10",
       "name" : "The Untouchable",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 10 - battle win streak"
     },
     {
@@ -95,6 +108,7 @@
       "action" : "Grant Win Streak 15",
       "name" : "The Dominator",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 15 - battle win streak"
     },
     {
@@ -103,6 +117,7 @@
       "action" : "Grant Win Streak 25",
       "name" : "The Legendary",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for a 25 - battle win streak"
     }
   ],
@@ -114,6 +129,7 @@
       "action" : "Grant Win Total 5",
       "name" : "White Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 5 battles"
     },{
       "id" : 201,
@@ -121,6 +137,7 @@
       "action" : "Grant Win Total 10",
       "name" : "Yellow Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 10 battles"
     },{
       "id" : 202,
@@ -128,6 +145,7 @@
       "action" : "Grant Win Total 25",
       "name" : "Orange Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 25 battles"
     },{
       "id" : 203,
@@ -135,6 +153,7 @@
       "action" : "Grant Win Total 50",
       "name" : "Blue Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 50 battles"
     },{
       "id" : 204,
@@ -142,6 +161,7 @@
       "action" : "Grant Win Total 75",
       "name" : "Purple Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 75 battles"
     },{
       "id" : 205,
@@ -149,6 +169,7 @@
       "action" : "Grant Win Total 100",
       "name" : "Green Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 100 battles"
     },{
       "id" : 206,
@@ -156,6 +177,7 @@
       "action" : "Grant Win Total 150",
       "name" : "Red Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 100 battles"
     },{
       "id" : 207,
@@ -163,6 +185,7 @@
       "action" : "Grant Win Total 250",
       "name" : "Brown Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 250 battles"
     },{
       "id" : 208,
@@ -170,6 +193,7 @@
       "action" : "Grant Win Total 500",
       "name" : "Black Belt",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 500 battles"
     },{
       "id" : 209,
@@ -177,6 +201,7 @@
       "action" : "Grant Win Total 1000",
       "name" : "Black Belt Sensei",
       "type" : "Award Title",
+      "outcome" : "win",
       "description" : "Title awarded for winning 1000 battles"
     }
   ]

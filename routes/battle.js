@@ -7,7 +7,8 @@ const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { determinePostBattleActions, determineXpBounty, determinePtBounty } = require('../game/postBattleActions');
+const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
+const { determinePostBattleActions } = require('../game/onGoToBattle');
 const { OUTCOME_XP } = require('../game/constants'); 
 
 // USER CLICKED 'GO TO BATTLE'
