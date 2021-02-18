@@ -204,5 +204,17 @@
       "outcome" : "win",
       "description" : "Title awarded for winning 1000 battles"
     }
+  ],
+  "HELPER" : [
+    {
+      "id" : 300,
+      "requirement" : null,
+      "action" : null,
+      "name" : "White Light Warrior",
+      "type" : "Award Title",
+      "outcome" : null,
+      "description" : "Earned for an exceptional level of support during the early stages of development.",
+      "icon" : "GiWingedEmblem"
+    }
   ]
 }

@@ -148,7 +148,7 @@ function _checkWinStreak(avatarId, titleNamesArray){
     }
 
     // Current streak that Avatar will have if it wins tonight
-    const streakIfWin = streak + 2;
+    const streakIfWin = streak + 1;
 
     // Need to find the streak that matches a pba requirement, if one exists
     const matchingPBA = WINSTREAK.find(pba => pba.requirement === streakIfWin);
@@ -177,7 +177,7 @@ function _checkWinTotal(avatarId){
     where : { id : avatarId },
     raw : true
   }).then(({ battleWins }) =>{
-    const battleWinsIfWinTonight = battleWins + 7;
+    const battleWinsIfWinTonight = battleWins + 1;
     // Check if the potential win total will match a new PBA
     const matchingPBA = WINTOTAL.find(pba => pba.requirement === battleWinsIfWinTonight);
 
