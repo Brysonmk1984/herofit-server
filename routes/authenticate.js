@@ -14,6 +14,8 @@ var pem = jwkToPem(key);
 
 // Handles both Register and login. 
 router.post('/signup-or-signin', function(req, res, next){
+  console.log('in SINGUPORSIGNIN');
+  console.log('BODY - ', req.body);
   // res.status(500).json({
   //   message: `SERVER DOWN FOR MAINTENANCE`,
   // });
@@ -24,7 +26,7 @@ router.post('/signup-or-signin', function(req, res, next){
         debug : err
       });
       next();
-    }else{
+    }else{  console.log('in SINGUPORSIGNIN 2');
       // TOKEN has Expired
       if (Date.now() >= decoded.exp * 1000) {
         res.status(401).json({
@@ -39,7 +41,7 @@ router.post('/signup-or-signin', function(req, res, next){
           debug : `AUD : ${decoded.aud}, CLIENT ID: ${process.env.COGNITO_CLIENT_ID}`
         });
       // TOKEN IS LEGIT
-      }else{
+      }else{  console.log('TOKEN IS LEGIT');
         //console.log('DECODED', decoded);
         let username;
         // Must have unique username, low priority bug possible here.
@@ -65,6 +67,7 @@ router.post('/signup-or-signin', function(req, res, next){
             featurePreferenceSubmitted : true
           }
         }).then(function(result) {
+          console.log('in THEN OF SUSI');
           const created = result[1];
           let user = result[0].dataValues ? result[0].dataValues : result[0];
 
@@ -87,6 +90,7 @@ router.post('/signup-or-signin', function(req, res, next){
           }
           next();
         }).catch((error)=>{
+          console.log('in ERROR OF SUSI');
           // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
           if(error && error.original && error.original.code === '23505'){
             User.create({
