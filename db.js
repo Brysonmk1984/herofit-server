@@ -9,7 +9,7 @@ const AvatarEquipModel = require('./models/avatarEquip.js');
 let db;
 let dbUrl;
 let sequelizeSettings;
-console.log(process.env.NODE_ENV);
+
 // PRODUCTION or Locally running backend through PROXY
 if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
   sequelizeSettings = {
@@ -30,7 +30,6 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     query:{raw:true}
   }
   dbUrl = process.env.DATABASE_URL;
-console.log('DBURL - ', dbUrl);
 
   // DEVELOPMENTS
 }else{

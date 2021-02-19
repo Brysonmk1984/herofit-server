@@ -4,7 +4,7 @@ const AvatarEquip = require('../db').AvatarEquip;
 
 router.post('/fetch-avatar-inventory', function(req, res, next){
   const avatarID = req.body.avatarID;
-  console.log('FETCHING AVATAR INV FOR -', avatarID);
+  //console.log('FETCHING AVATAR INV FOR -', avatarID);
   AvatarEquip.findAll(
     { where : { avatarID } }
 
