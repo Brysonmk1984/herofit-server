@@ -56,13 +56,8 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
 
 
 db = new Sequelize(dbUrl, sequelizeSettings);
-db.authenticate().then((data) =>{
-  console.log('IN THEN OF SYNC', data);
-}).catch((error) =>{
-  console.log('IN ERROR OF SYNC', error);
-})
-
-console.log('DBB-');
+db.sync();
+console.log('DBB-', db);
 const User = UserModel(db, Sequelize);
 const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
