@@ -51,5 +51,8 @@
     "ramda": "^0.27.1",
     "sequelize": "4.44.4",
     "verify-cognito-token": "^1.2.2"
+  },
+  "engines": {
+    "node": "13.x"
   }
 }
