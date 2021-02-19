@@ -6,6 +6,8 @@ const UserTotalModel = require('./models/userTotal.js');
 const BattleModel = require('./models/battle.js');
 const AvatarEquipModel = require('./models/avatarEquip.js');
 
+
+
 let db;
 let dbUrl;
 let sequelizeSettings;
