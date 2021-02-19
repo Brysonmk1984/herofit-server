@@ -56,7 +56,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
 
 
 db = new Sequelize(dbUrl, sequelizeSettings);
-db.sync().then((data) =>{
+db.authenticate().then((data) =>{
   console.log('IN THEN OF SYNC', data);
 }).catch((error) =>{
   console.log('IN ERROR OF SYNC', error);
