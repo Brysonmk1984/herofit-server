@@ -15,7 +15,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
   sequelizeSettings = {
     dialect: 'postgres',
     dialectOptions: {
-      ssl : false
+      ssl : true
     },
     protocol: 'postgres',
     timezone: 'utc',
