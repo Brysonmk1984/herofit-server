@@ -51,8 +51,10 @@ console.log('DBURL - ', dbUrl);
 
 
 db = new Sequelize(dbUrl, sequelizeSettings);
-db.sync();
-
+db.sync().then(() =>{
+  console.log('DB1', db);
+});
+console.log('DB2', db);
 const User = UserModel(db, Sequelize);
 const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
