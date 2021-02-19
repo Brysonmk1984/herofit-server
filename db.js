@@ -6,8 +6,6 @@ const UserTotalModel = require('./models/userTotal.js');
 const BattleModel = require('./models/battle.js');
 const AvatarEquipModel = require('./models/avatarEquip.js');
 
-
-
 let db;
 let dbUrl;
 let sequelizeSettings;
@@ -16,9 +14,6 @@ console.log(process.env.NODE_ENV);
 if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
   sequelizeSettings = {
     dialect: 'postgres',
-    dialectOptions: {
-      ssl : false
-    },
     protocol: 'postgres',
     timezone: 'utc',
     operatorsAliases: '0',
@@ -32,7 +27,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     query:{raw:true}
   }
   dbUrl = process.env.DATABASE_URL;
-  console.log('DBURL-', dbUrl);
+
 
   // DEVELOPMENTS
 }else{
@@ -57,7 +52,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
 
 db = new Sequelize(dbUrl, sequelizeSettings);
 db.sync();
-console.log('DBB-', db);
+
 const User = UserModel(db, Sequelize);
 const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
