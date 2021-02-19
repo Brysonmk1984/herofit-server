@@ -53,7 +53,7 @@ router.post('/signup-or-signin', function(req, res, next){
         }else{
           username = decoded['cognito:username'];
         }
-
+        console.log('DEMAIL-', decoded.email);
         User.findOrCreate({
           where: {
             email: decoded.email
