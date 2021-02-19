@@ -32,7 +32,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     query:{raw:true}
   }
   dbUrl = process.env.DATABASE_URL;
-
+  console.log('DBURL-', dbUrl);
 
   // DEVELOPMENTS
 }else{
