@@ -285,9 +285,21 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
         foe : battle.foe
       });
     }else{
-      res.status(422).json({
-        debug : "couldn't retrieve foe for upcoming battle!"
+      Avatar.update(
+        { goToBattle : false },
+        { where : { id : req.body.avatarID } }
+      ).then((data) =>{
+        res.status(422).json({
+          debug : "Couldn't retrieve foe for upcoming battle! No Battle Record listed.",
+          message : "No Upcoming battle on Record."
+        });
+      }).catch((err) =>{
+        res.status(400).json({
+          debug : err,
+          message : "Unable to Reset goToBattle status."
+        });
       });
+
     }
   }).catch((error) =>{console.log('THE ERR', error);
     res.status(400).json({
