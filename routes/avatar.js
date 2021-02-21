@@ -306,10 +306,10 @@ router.post('/get-all-avatars', function(req, res, next){
 });
 
 router.post('/fetch-avatars-by-page-number', function(req, res, next){
-  const page = +req.body.page || 0;
-  const pageSize = +req.body.pageSize || AVATAR_COUNT_PER_PAGE;
+  const page = req.body.page || 0;
+  const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
   const searchInput = req.body.searchInput;
-
+  
   const paginate = (query, { page, pageSize }) => {
     const offset = page * pageSize;
     const limit = pageSize;
@@ -319,6 +319,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
      
       limit,
        offset,
+   
     };
   };
 
@@ -329,7 +330,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
       { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
     ],
     order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
-    raw : false,
+    raw : undefined,
     nest : true
   };
   if(searchInput){
@@ -339,11 +340,15 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   Avatar.findAndCountAll(
     paginate(expression, { page, pageSize })
   ).then(({ rows, count }) =>{
-    const jsonRows = JSON.parse(JSON.stringify(rows));
+    const actualRows = rows.map(r =>{
+      const av = r.dataValues;
+      av.user = r.user.dataValues;
+      return r.dataValues;
+    });
     const { currentLevelByInput } = xpCalc();
 
     // Sequelize requires us to loop over the returned data when 'raw : false'
-    const avatars = jsonRows.map((result, i) => {
+    const avatars = actualRows.map((result, i) => {
       avatar = parseAvatarProperties(result);
       avatar.level = currentLevelByInput(avatar.totalXP);
       avatar.user = avatar.user ? avatar.user  : { username : '' };
