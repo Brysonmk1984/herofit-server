@@ -192,7 +192,7 @@ router.post('/get-avatar', async function(req, res, next){
     //console.log('RESULT - ', results[0]);
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
-      
+      console.log('AVATARR-', avatar);
     const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
     avatar.level = getCurrentLevel();
     avatar.nextLevelStartXp = getNextLevel();

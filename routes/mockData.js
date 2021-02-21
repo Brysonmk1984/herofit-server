@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require("path");
 const moment = require('moment');
 const AppMode = require('../appConfig').config.mode;
-const mockAccounts = require('../mockData/mockCognitoAccounts');
+
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
 const { parseAvatarProperties } = require('../helperFunctions');
@@ -85,21 +85,6 @@ const activities = shuffleArray(mockActivities).slice(0,count);
 
 
 
-});
-
-
-// Get mock accounts from JSON file and return to front end
-router.get('/get-mock-accounts', function(req, res, next){
-  if(mockAccounts){
-    res.status(200).json({
-      mockAccounts
-    });
-    next();
-  }else{
-    res.status(500).json({
-      message: `Server Error getting Mock Data`
-    });
-  }
 });
 
 

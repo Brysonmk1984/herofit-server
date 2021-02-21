@@ -2,75 +2,67 @@
   "DEFEATEDFOE" : [
     {
       "id" : 0,
-      "action" : "Grant Shadow-Self",
-      "name" : "Shadow-Self",
+      "action" : "Grant Shadow Self",
+      "name" : "Shadow Self",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Shadow-Self' costume earned as an award for defeating Shadow-Self."
+      "description" : "Shadow-Self costume earned as an award for defeating the Shadow-Self"
     },{
       "id" : 1,
       "action" : "Grant Shade",
       "name" : "Shade Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Shade Tint' costume earned as an award for defeating all Shades."
+      "description" : "Shade-like tint earned for defeating all foes within the 'Shade' category"
     },{
       "id" : 2,
       "action" : "Grant Apparition",
       "name" : "Apparition Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Apparition Tint' costume earned as an award for defeating all Apparitions."
+      "description" : "Apparition-like tint earned for defeating all foes within the 'Apparition' category"
     },{
       "id" : 3,
       "action" : "Grant Phantasm",
       "name" : "Phantasm Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Phantasm Tint' costume earned as an award for defeating all Phantasm."
+      "description" : "Phantasm-like tint earned for defeating all foes within the 'Phantasm' category"
     },{
       "id" : 4,
       "action" : "Grant Phanton",
       "name" : "Phanton Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Phanton Tint' costume earned as an award for defeating all Phantoms."
+      "description" : "Phantom-like tint earned for defeating all foes within the 'Phantom' category"
     },{
       "id" : 5,
       "action" : "Grant Wraith",
       "name" : "Wraith Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Wraith Tint' costume earned as an award for defeating all Wraiths."
+      "description" : "Wraith-like tint earned for defeating all foes within the 'Wraith' category"
     },{
       "id" : 6,
       "action" : "Grant Poltergeist",
       "name" : "Poltergeist Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Poltergeist Tint' costume earned as an award for defeating all Poltergeist."
+      "description" : "Poltergeist-like tint earned for defeating all foes within the 'Poltergeist' category"
     },{
       "id" : 7,
       "action" : "Grant Specter",
       "name" : "Specter Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Specter Tint' costume earned as an award for defeating all Specters."
+      "description" : "Specter-like tint earned for defeating all foes within the 'Specter' category"
     },{
       "id" : 8,
       "action" : "Grant Banshee",
       "name" : "Banshee Tint",
       "type" : "Award Skin",
       "outcome" : "win",
-      "description" : "A 'Banshee Tint' costume earned as an award for defeating all Banshees."
-    },{
-      "id" : 100,
-      "requirement" : 3,
-      "action" : "Grant Win Streak 3",
-      "name" : "Adept",
-      "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 3 - battle win streak"
+      "description" : "Banshee-like tint earned for defeating all foes within the 'Banshee' category"
     }
   ],
 
@@ -82,7 +74,8 @@
       "name" : "The Renowned",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for a 3 - battle win streak"
+      "description" : "Title awarded for a 3 - battle win streak",
+      "icon" : "GiFlowerStar"
     },
     {
       "id" : 102,
@@ -91,7 +84,8 @@
       "name" : "The Acclaimed",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for a 5 - battle win streak"
+      "description" : "Title awarded for a 5 - battle win streak",
+      "icon" : "GiBarbedStar"
     },
     {
       "id" : 103,
@@ -100,7 +94,8 @@
       "name" : "The Untouchable",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for a 10 - battle win streak"
+      "description" : "Title awarded for a 10 - battle win streak",
+      "icon" : "GiMoebiusStar"
     },
     {
       "id" : 104,
@@ -109,7 +104,8 @@
       "name" : "The Dominator",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for a 15 - battle win streak"
+      "description" : "Title awarded for a 15 - battle win streak",
+      "icon" : "GiStarFormation"
     },
     {
       "id" : 105,
@@ -118,7 +114,8 @@
       "name" : "The Legendary",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for a 25 - battle win streak"
+      "description" : "Title awarded for a 25 - battle win streak",
+      "icon" : "GiJusticeStar"
     }
   ],
 
@@ -178,7 +175,7 @@
       "name" : "Red Belt",
       "type" : "Award Title",
       "outcome" : "win",
-      "description" : "Title awarded for winning 100 battles"
+      "description" : "Title awarded for winning 150 battles"
     },{
       "id" : 207,
       "requirement" : 250,
