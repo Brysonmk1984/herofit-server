@@ -7,6 +7,7 @@ const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
+const { doAllPbas } = require('../game/runPostBattleActions');
 
 console.log('*** RUNNING CRON AVATAR BATTLES ***');
 
@@ -110,6 +111,9 @@ function runBattlesOnBatch(shard){
 
       // SAVE DATA
       let xpGain, ptGain;
+      
+      // POST BATTLE ACTIONS
+      const postBattleActions = allPbaArrays[i] || [];
 
       switch(b.outcomeData.outcome){
         case "Avatar Wins":
