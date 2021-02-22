@@ -1,7 +1,7 @@
 const config = {
   mode : 'release',
   globalMessage : [
-    { type : 'success', message : 'Equippable Items now LIVE! if you are having issues logging in, refer to the help thread on reddit.com/r/herofit or use the contact form' }
+    { type : 'info', message : 'Assigning items based on battle outcomes still needs to be tested and deployed and will happen this week. Any awards earned before then will be manually added. Thanks for your patience!' }
   ],
 };
 
