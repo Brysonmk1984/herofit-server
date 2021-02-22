@@ -1,16 +1,12 @@
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
-const { Op } = require("sequelize");
-//const db = require('../db').db;
 const { sendBattleReportEmail, sendCronErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { determineXPGain } = require('../game/postBattleActions');
 
 console.log('*** RUNNING CRON AVATAR BATTLES ***');
 
@@ -18,6 +14,7 @@ let allBattleIds = [];
 let allAvatarIds = [];
 let allAvatarPromises = [];
 let allFoes = [];
+let allPbaPromises = [];
 let allBattlePromises = [];
 let avatarUpdates = {};
 // Breaking battles into groups of 20 so updating doesn't break
@@ -38,6 +35,8 @@ function runBattlesOnBatch(shard){
   allBattleIds = [];
   allAvatarIds = [];
   allFoes = [];
+  // array of arrays
+  allPbaArrays = [];
   allAvatarPromises = [];
 
   shard.forEach((battle) =>{
@@ -45,9 +44,10 @@ function runBattlesOnBatch(shard){
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
     allFoes.push(battle.foe);
+    allPbaArrays.push(battle.postBattleActions);
     //console.log('BATTLE - ',battle);
     allAvatarPromises.push(Avatar.findOne(
-      { where : { id: battle.avatarID }, raw : true, attributes: ['id', 'name', 'character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos'] }
+      { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
     ));
   });
   // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
@@ -109,29 +109,37 @@ function runBattlesOnBatch(shard){
       const b = doBattle(BRA, BRF, goesFirst);
 
       // SAVE DATA
-      let xpGain;
+      let xpGain, ptGain;
 
       switch(b.outcomeData.outcome){
         case "Avatar Wins":
-          xpGain = OUTCOME_XP.win;
+        case "Foe Wins":
+          xpGain = BRF.xpBounty; 
+          //ptGain = BRF.ptBounty; 
           avatar.battleWins = avatar.battleWins + 1;
+          //console.log('XP-bounty', xpGain);
+          //console.log('PT-bounty', ptGain);
+          console.log('1pbas- ',postBattleActions);
+          //avatar.photonTokens += ptGain;
+          postBattleActions.push( "Grant Win Streak 10");
+          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
           tally.avatarWins += 1;
           break;
         case "Foe Wins":
-          xpGain = OUTCOME_XP.loss;
+          xpGain = BRF.xpBounty * OUTCOME_XP.lossMultiplier;
           avatar.battleLosses = avatar.battleLosses + 1;
           // for email tally
           tally.foeWins += 1;
           break;
         case "Draw":
-          xpGain = OUTCOME_XP.draw;
-          avatar.battleDraws = avatar.battleDraws + 1;
+          xpGain = BRF.xpBounty * OUTCOME_XP.drawMultiplier;
+          avatar.battleDraws = avatar.battleDraws + 1; 
           // for email tally
           tally.draw += 1;
           break;
         case "Double KO":
-          xpGain = OUTCOME_XP.dko;
+          xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
           avatar.battleDkos = avatar.battleDkos + 1;
           // for email tally
           tally.doubleKO += 1;
@@ -168,18 +176,20 @@ function runBattlesOnBatch(shard){
       },
       { where: { id: allBattleIds[i] }, raw : true }
       ));
+
       const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
       avatar.status = b.outcomeData.avatarStatus;
-      avatar.battleXP = avatar.battleXP + xpGain;
-      avatar.qp += qpEarned;
+        avatar.battleXP += xpGain;
+        avatar.qp += qpEarned;
 
-      avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos};
+        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
+      
       // End Avatar for each
     });
 
-    return Promise.allSettled(allBattlePromises);
+    return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
   }).then(() => {
-    //console.log('UPDATED ALL BATTLES');
+    console.log('UPDATED ALL BATTLES');
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
@@ -215,7 +225,7 @@ Battle.findAll({
     });
   }));
 
-}).then((results) => {
+}).then(() => {
   //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
