@@ -285,6 +285,11 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
       res.status(200).json({
         foe : battle.foe
       });
+    }else{
+      res.status(422).json({
+        debug : "Couldn't retrieve foe for upcoming battle! No Battle Record listed.",
+        message : "No Upcoming battle on Record."
+      });
     }
     
     
