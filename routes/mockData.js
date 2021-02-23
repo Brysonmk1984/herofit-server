@@ -454,26 +454,4 @@ router.post('/set-avatar-health-and-status', function(req, res, next){
 
 });
 
-
-router.post('/add-fake-item', function(req, res, next){
-
-  console.log('RED - ', req.body);
-  return AvatarEquip.create(
-    { avatarID: req.body.avatarID, type : req.body.type, name : req.body.name, description : req.body.description, lore : req.body.lore, effect1 : req.body.effect1, effect2 : req.body.effect2, effect3 : req.body.effect3  },
-    { returning : true, raw : true }
-  ).then((item) =>{
-    console.log('returned item', item);
-    res.status(200).json({
-      item
-    });
-  }).catch((error) =>{
-    console.log('ERROR UPDATING AVATAR', error);
-    res.status(400).json({
-      message : `ERROR UPDATING AVATAR - ${error}`,
-    });
-    next();
-  });
-
-});
-
 module.exports = router;

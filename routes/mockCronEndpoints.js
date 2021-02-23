@@ -239,7 +239,6 @@ router.post('/mock-run-pbas', function(req, res, next){
           lore : pba.lore || null,
           effect1 : pba.effect1 || null,
           effec2 : pba.effect2 || null,
-          effect3 : pba.effect3 || null,
           icon : pba.icon || null,
           class : pba.class || null,
           equipped : false
@@ -404,6 +403,7 @@ router.get('/do-all-battles', function(req, res, next){
             console.log('1pbas- ',postBattleActions);
             //avatar.photonTokens += ptGain;
             postBattleActions.push( "Grant Win Streak 10");
+            console.log('Avatar id should be 253', avatar.id);
             allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
             // for email tally
             tally.avatarWins += 1;

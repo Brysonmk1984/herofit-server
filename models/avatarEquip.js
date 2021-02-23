@@ -43,10 +43,6 @@ const AvatarEquipModel = function(db, DataTypes){
         type : DataTypes.STRING(75),
         allowNull : true,
       },
-      effect3 : {
-        type : DataTypes.STRING(75),
-        allowNull : true,
-      },
       icon : {
         type : DataTypes.STRING(50),
         allowNull : true,

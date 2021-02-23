@@ -80,7 +80,6 @@ function doAllPbas(avatarID, postBattleActions){
       lore : pba.lore || null,
       effect1 : pba.effect1 || null,
       effec2 : pba.effect2 || null,
-      effect3 : pba.effect3 || null,
       icon : pba.icon || null,
       class : pba.class || null,
       equipped : false

@@ -182,7 +182,7 @@ router.post('/get-avatar', async function(req, res, next){
   const q = `
     SELECT avatars.*, equipped 
     FROM avatars
-    LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2, 'effect3', effect3, 'equipped', equipped, 'class', class, 'description', description, 'icon', icon)) AS equipped
+    LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2, 'equipped', equipped, 'class', class, 'description', description, 'icon', icon)) AS equipped
       FROM avatar_equip WHERE avatar_equip.equipped=true group by 1) AS equipped ON(id="avatarID")
     WHERE avatars.owner = '${req.body.email}'
   `;
