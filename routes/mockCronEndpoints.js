@@ -366,7 +366,7 @@ router.get('/do-all-battles', function(req, res, next){
           }
         }
         //TEMP CHEAT
-        BRA.power += 1000;
+        //BRA.power += 1000;
 
         // WHO SWINGS FIRST
         let goesFirst;
@@ -401,7 +401,6 @@ router.get('/do-all-battles', function(req, res, next){
             //console.log('PT-bounty', ptGain);
             console.log('1pbas- ',postBattleActions);
             //avatar.photonTokens += ptGain;
-            postBattleActions.push( "Grant Win Streak 10");
             console.log('Avatar id should be 253', avatar.id);
             allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
             // for email tally

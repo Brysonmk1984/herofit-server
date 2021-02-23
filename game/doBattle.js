@@ -152,7 +152,7 @@ function _calcElementDamage(attacker, receiver){
       turnElmDamagePrevented.total += Math.floor(reduction);
     }
   }
-  console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
+  //console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
   return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented };
 }
 
@@ -178,7 +178,7 @@ function _calcDamage(aPower, rArmor){
   const armor = chance.floating({ min: lowEndArmor, max: highEndArmor, fixed: 2 });
 
   const { reduction, netDamage } = _calcArmorDR(power, armor);
-  console.log('DAMAGE - ', netDamage, 'REDUCTION - ', reduction);
+  //console.log('DAMAGE - ', netDamage, 'REDUCTION - ', reduction);
   return { netDamage : Math.floor(netDamage), reduction : Math.floor(reduction) }
 }
 
@@ -214,8 +214,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
     case 'Avatar':
       // elemental round, avatar is attacking
       if(roundType === 'Elemental'){
-        console.log('ROUND IS ELEMENTAL', aggressor);
-
+        //console.log('ROUND IS ELEMENTAL', aggressor);
         // Calc elm damage, get back damage done and how much was prevented
         const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
         totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total);
@@ -233,7 +232,6 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
 
       // physical round, avatar is attacking
       }else{
-
         // Calc physical damage, get back damage done and how much was prevented
         const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
         totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, netDamage);

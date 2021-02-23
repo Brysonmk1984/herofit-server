@@ -280,11 +280,15 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
       raw : true, 
       attributes: ['foe'] 
   }).then((battle) =>{
+    console.log(`upcoming battle for ${req.body.avatarID} - `, battle);
     if(battle){
       res.status(200).json({
         foe : battle.foe
       });
-    }else{
+    }
+    
+    
+    /*else{
       Avatar.update(
         { goToBattle : false },
         { where : { id : req.body.avatarID } }
@@ -300,7 +304,7 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
         });
       });
 
-    }
+    }*/
   }).catch((error) =>{console.log('THE ERR', error);
     res.status(400).json({
       debug : "couldn't retrieve foe for upcoming battle!",

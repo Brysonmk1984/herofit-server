@@ -117,7 +117,6 @@ function runBattlesOnBatch(shard){
 
       switch(b.outcomeData.outcome){
         case "Avatar Wins":
-        case "Foe Wins":
           xpGain = BRF.xpBounty; 
           //ptGain = BRF.ptBounty; 
           avatar.battleWins = avatar.battleWins + 1;

@@ -17,7 +17,7 @@ function selectFoeTemplate(level){
     const randomNum = Math.floor(Math.random() * 18);
     
     // Shadow-Self
-    if(true || randomNum === 0){
+    if(randomNum === 0){
       //console.log('FT CASE 1A');
       villain = villains.Spirits[villains.Spirits.length -1];
 

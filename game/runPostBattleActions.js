@@ -50,7 +50,7 @@ function determinePtBounty(heroLevel,bonusPt = 0){
 
 // DO POST BATTLE ACTIONS
 function doAllPbas(avatarID, postBattleActions){
-  console.log('Running ACTIONSS - ', postBattleActions, 'AVID - ', avatarID);
+  console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID);
 
   const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
   const pbaArray = [];
@@ -58,7 +58,6 @@ function doAllPbas(avatarID, postBattleActions){
   // ALL PBAs FROM BATTLE
   postBattleActions.forEach((ACTION, i)=>{
     let matchingPBA;
-    console.log('action loop - ', ACTION, i);
     // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
     for(let actionType in ALLPBAs){
       let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
@@ -70,8 +69,8 @@ function doAllPbas(avatarID, postBattleActions){
     pbaArray.push(matchingPBA);
   });
 
-  console.log('PBA array after loop, just before insertion - ', pbaArray);
-  console.log('AVID - ', avatarID);
+  //console.log('PBA array after loop, just before insertion - ', pbaArray);
+  //console.log('AVID - ', avatarID);
   const pbaToInserts = pbaArray.map(pba => {
     return {
       avatarID,
@@ -86,7 +85,7 @@ function doAllPbas(avatarID, postBattleActions){
       equipped : false
     }
   });
-  console.log('BULK CREATE - INSERTPBAS-', pbaToInserts);
+  //console.log('BULK CREATE - INSERTPBAS-', pbaToInserts);
   return AvatarEquip.bulkCreate(pbaToInserts);
 
 }
