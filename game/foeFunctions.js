@@ -19,8 +19,8 @@ function selectFoeTemplate(level){
     // Shadow-Self
     if(true || randomNum === 0){
       //console.log('FT CASE 1A');
-      //villain = villains.Spirits[villains.Spirits.length -1];
-      villain = villains.Spirits[villains.Spirits.length -2];
+      villain = villains.Spirits[villains.Spirits.length -1];
+
     }else{
       //console.log('FT CASE 1B');
       // Otherwise, they'll face another random spirit
