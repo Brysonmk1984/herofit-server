@@ -1,7 +1,7 @@
 const config = {
   mode : 'release',
   globalMessage : [
-    { type : 'success', message : 'Items should now be awarded after battles!' }
+    { type : 'success', message : 'Items should now be awarded after battles & all heros have been updated with their previously-earned items!' }
   ],
 };
 
