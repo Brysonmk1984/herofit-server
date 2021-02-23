@@ -286,8 +286,10 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
         foe : battle.foe
       });
     }else{
+      console.log(`COULDNT FIND BATTLE ${req.body.avatarID}`);
+
       res.status(422).json({
-        debug : "Couldn't retrieve foe for upcoming battle! No Battle Record listed.",
+        debug : `Couldn't retrieve foe for upcoming battle! No Battle Record listed. USER - ${req.body.avatarID}`,
         message : "No Upcoming battle on Record."
       });
     }
