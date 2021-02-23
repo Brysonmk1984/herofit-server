@@ -366,7 +366,7 @@ router.get('/do-all-battles', function(req, res, next){
           }
         }
         //TEMP CHEAT
-        //BRA.power += 1000;
+        BRA.power += 1000;
 
         // WHO SWINGS FIRST
         let goesFirst;
@@ -394,7 +394,6 @@ router.get('/do-all-battles', function(req, res, next){
         
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
-          case "Foe Wins":
             xpGain = BRF.xpBounty; 
             //ptGain = BRF.ptBounty; 
             avatar.battleWins = avatar.battleWins + 1;

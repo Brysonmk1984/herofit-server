@@ -76,7 +76,7 @@ function doAllPbas(avatarID, postBattleActions){
     return {
       avatarID,
       type : itemTypeMap[pba.type],
-      'name' : pba.name,
+      name : pba.name,
       description : pba.description,
       lore : pba.lore || null,
       effect1 : pba.effect1 || null,

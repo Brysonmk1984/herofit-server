@@ -10,7 +10,7 @@ router.post('/fetch-avatar-inventory', function(req, res, next){
     { where : { avatarID } }
 
   ).then((inventory) =>{
-    console.log('INV - ', inventory);
+    //console.log('INV - ', inventory);
     
     // Massage the data for the frontend
     const inventoryObj = {

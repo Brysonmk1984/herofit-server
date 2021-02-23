@@ -107,26 +107,37 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
       // GOAL of this code is to determine if this exact foe name is the final name of a type that HAS NOT been defeated
       // IF SO, we want to assign a postBattleAction that will award the user if they win the battle
 
-      // Need to change name for Shadow-Grabbler to Shadow Self
-      const nameAdjustedForShadow = currentFoeName.includes('Shadow') ? 'Shadow-Self' : currentFoeName;
+      // Need to handle Shadow foe differently
+      if(currentFoeName.includes('Shadow')){
+        const currentFoeName = 'Shadow-Self';
+        // If Shadow self was already defeated, just return undefined
+        if(fdNoDUpes.includes('Shadow-Self')){
+          return undefined;
+        // If Shadow-Self wasn't defeated, then add the GRANT Shadow-Self award
+        }else{
+          return VILLAINS['Spirits'].find(f => f.type === 'Shadow-Self').pba[0];
+        }
+      // ANY OTHER FOE
+      }else{
+        // Make an array of all foes of type EXCLUDING the name of the current foe
+        const allFoesMinusCurrent = allFoes.filter(foe => foe !== currentFoeName);
+        console.log('AFMC', allFoesMinusCurrent);
+        console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
+        // Compare the previous array to the deduped foes defeated array
+        const isLastOfType = allFoesMinusCurrent.every((val, i) => {
+          console.log('iS THIS EVEN CALLED ONCE?', val === fdNoDUpes[i]);
+          return val === fdNoDUpes[i]
+        });
+        console.log('isLastOfType', isLastOfType);
+        // If last foe of type, return matching PBA action
+        if(isLastOfType){
+          // Consider moving the PBA action to the normal PBA JSON file
+          const matchingPBAAction = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
+          return matchingPBAAction;
+        }
+        return undefined;
 
-      // Make an array of all foes of type EXCLUDING the name of the current foe
-      const allFoesMinusCurrent = allFoes.filter(foe => foe !== nameAdjustedForShadow);
-      console.log('AFMC', allFoesMinusCurrent);
-      console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
-      // Compare the previous array to the deduped foes defeated array
-      const isLastOfType = allFoesMinusCurrent.every((val, i) => {
-        console.log('iS THIS EVEN CALLED ONCE?', val === fdNoDUpes[i]);
-        return val === fdNoDUpes[i]
-      });
-      console.log('isLastOfType', isLastOfType);
-      // If last foe of type, return matching PBA action
-      if(isLastOfType){
-        // Consider moving the PBA action to the normal PBA JSON file
-        const matchingPBAAction = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
-        return matchingPBAAction;
       }
-      return undefined;
     }
     // THIS SHOULDN'T HAPPEN, BUT I WANT TO PREVENT THE SCRIPT FROM STALLING IF IT DOES
     return undefined;
