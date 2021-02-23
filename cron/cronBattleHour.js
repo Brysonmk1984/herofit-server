@@ -123,7 +123,7 @@ function runBattlesOnBatch(shard){
           avatar.battleWins = avatar.battleWins + 1;
           //console.log('XP-bounty', xpGain);
           //console.log('PT-bounty', ptGain);
-          console.log('1pbas- ',postBattleActions);
+          console.log('pbas after win before insertion - cron - ',postBattleActions);
           //avatar.photonTokens += ptGain;
           allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
@@ -189,10 +189,10 @@ function runBattlesOnBatch(shard){
       
       // End Avatar for each
     });
-
+    console.log('the pba promises = ', allPbaPromises);
     return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
-  }).then(() => {
-    console.log('UPDATED ALL BATTLES');
+  }).then((data) => {
+    console.log('UPDATED ALL BATTLES AND RAN ALL PBAS - cron', data);
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{

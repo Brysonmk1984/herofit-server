@@ -469,9 +469,9 @@ router.get('/do-all-battles', function(req, res, next){
       });
 
       return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
-    }).then(() => {
+    }).then((data) => {
       console.log('UPDATED ALL BATTLES AND RAN PBAS');
-      
+      console.log('data after all battles and pbas settled - ', data);
       const allUpdateAvatarPromises = [];
       allAvatarIds.forEach((avatarId, i) =>{
         //console.log('this will update - ');
