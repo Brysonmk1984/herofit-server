@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const AvatarEquip = require('../db').AvatarEquip;
+const ALLITEMS = require('../game/allItems.json');
 
 router.post('/fetch-avatar-inventory', function(req, res, next){
   const avatarID = req.body.avatarID;
@@ -100,6 +101,29 @@ router.post('/unequip-item', function(req, res, next){
   })
 });
 
+router.get('/get-default-items', function(req, res, next){
+  res.status(200).json({
+    items : ALLITEMS
+  });
+});
 
+router.post('/insert-item-by-avatar-id', function(req, res, next){
+  const item = req.body;
+  console.log('IIIS - ', item);
+  AvatarEquip.create(
+    item, { returning: true }
+  ).then((data) =>{
+    console.log('SUCCESS - ', data);
+    res.status(200).json({
+      createdItem : data
+    });
+    next();
+  }).catch((error) =>{
+    console.log(error);
+    res.status(400).json({
+      error
+    })
+  });
+});
 
 module.exports = router;

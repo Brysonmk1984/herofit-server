@@ -33,6 +33,7 @@ const AvatarEquipModel = function(db, DataTypes){
       equipped : {
         type : DataTypes.BOOLEAN,
         allowNull : false,
+        defaultValue: false,
       },
       effect1 : {
         type : DataTypes.STRING(75),

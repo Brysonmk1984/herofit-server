@@ -125,7 +125,6 @@ function runBattlesOnBatch(shard){
           //console.log('PT-bounty', ptGain);
           console.log('1pbas- ',postBattleActions);
           //avatar.photonTokens += ptGain;
-          postBattleActions.push( "Grant Win Streak 10");
           allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
           tally.avatarWins += 1;

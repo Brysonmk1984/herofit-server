@@ -212,7 +212,7 @@ router.post('/mock-run-pbas', function(req, res, next){
       const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
       const PBAACTIONS = postBattleActions;
       const pbaArray = [];
-      
+      console.log('all pbas from battle', PBAACTIONS);
       // ALL PBAs FROM BATTLE
       PBAACTIONS.forEach((ACTION)=>{
         let matchingPBA;

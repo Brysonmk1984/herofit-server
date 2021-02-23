@@ -16,7 +16,8 @@ function selectFoeTemplate(level){
     // 1 in 15 will face Shadow-Self
     const randomNum = Math.floor(Math.random() * 18);
     
-    if(randomNum === 0){
+    // Shadow-Self
+    if(true || randomNum === 0){
       //console.log('FT CASE 1A');
       villain = villains.Spirits[villains.Spirits.length -1];
     }else{

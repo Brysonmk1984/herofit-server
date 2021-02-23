@@ -50,7 +50,7 @@ function determinePtBounty(heroLevel,bonusPt = 0){
 
 // DO POST BATTLE ACTIONS
 function doAllPbas(avatarID, postBattleActions){
-  console.log('ACTIONS - ', postBattleActions);
+  console.log('ACTIONSS - ', postBattleActions, 'AVID - ', avatarID);
 
   const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
   const pbaArray = [];
@@ -86,7 +86,7 @@ function doAllPbas(avatarID, postBattleActions){
       equipped : false
     }
   });
-
+  console.log('INSERTPBAS-', pbaToInserts);
   return AvatarEquip.bulkCreate(pbaToInserts);
 
 }

@@ -7,7 +7,7 @@ const VILLAINS = require('../game/villains.json');
 
 // ON GOTOBATTLE, DETERMINE POST BATTLE ACTIONS
 function determinePostBattleActions(avatar, foe, resolve, reject){
-  console.log('av', avatar, 'foe', foe);
+  //console.log('av', avatar, 'foe', foe);
   const PBAs = [];
  
   return AvatarEquip.findAll({
@@ -34,6 +34,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
 
     return Promise.allSettled(allPbaCheckPromises)
     .then((resolvedPromises)=>{
+      console.log('ALL3RP - ', resolvedPromises);
       const totalCheck = resolvedPromises[0];
       const streakCheck = resolvedPromises[1];
       const defeatFoeCheck = resolvedPromises[2];
@@ -89,13 +90,15 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
     if(results){
       // From resulting battles, make an array that's only the names of the foes. Then sort it in alphabetical order
       const foesDefeated = results.map(result => {
+        console.log('FOE DEFEATED - ', result);
         // Need to check for Shadow-Self instead of Shadow-Grabbler
         const foeName = result.foe.type === 'Shadow-Self' ? 'Shadow-Self' : result.foe.name;
         return foeName;
       }).slice().sort();
+      console.log('FD BEFORE DEDUP - ', foesDefeated);
       // Remove duplicates from foesDefeated
       const fdNoDUpes = [...new Set(foesDefeated)];
-      //console.log('FD - ', fdNoDUpes);
+      console.log('FD - ', fdNoDUpes);
       // All foes of a certain type
       const allFoes = VILLAINS[foeClass].find(foe => foe.type === foeType).foe.slice().sort();
       //console.log('AF',allFoes);
@@ -104,14 +107,19 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
       // GOAL of this code is to determine if this exact foe name is the final name of a type that HAS NOT been defeated
       // IF SO, we want to assign a postBattleAction that will award the user if they win the battle
 
+      // Need to change name for Shadow-Grabbler to Shadow Self
+      const nameAdjustedForShadow = currentFoeName.includes('Shadow') ? 'Shadow-Self' : currentFoeName;
 
       // Make an array of all foes of type EXCLUDING the name of the current foe
-      const allFoesMinusCurrent = allFoes.filter(foe => foe !== currentFoeName);
+      const allFoesMinusCurrent = allFoes.filter(foe => foe !== nameAdjustedForShadow);
       console.log('AFMC', allFoesMinusCurrent);
       console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
       // Compare the previous array to the deduped foes defeated array
-      const isLastOfType = allFoesMinusCurrent.every((val, i) => val === fdNoDUpes[i]);
-     
+      const isLastOfType = allFoesMinusCurrent.every((val, i) => {
+        console.log('iS THIS EVEN CALLED ONCE?', val === fdNoDUpes[i]);
+        return val === fdNoDUpes[i]
+      });
+      console.log('isLastOfType', isLastOfType);
       // If last foe of type, return matching PBA action
       if(isLastOfType){
         // Consider moving the PBA action to the normal PBA JSON file
