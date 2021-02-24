@@ -10,8 +10,8 @@ function selectFoeTemplate(level){
   // }
   let villain;
 
-  // Must be at least level 5 to have a shot at getting matched against shadow self
-  if(level >= 5){
+  // Must be at least level 10 to have a shot at getting matched against shadow self
+  if(level >= 10){
     //console.log('FT CASE 1');
     // 1 in 15 will face Shadow-Self
     const randomNum = Math.floor(Math.random() * 18);
