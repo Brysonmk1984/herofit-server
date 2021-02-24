@@ -19,7 +19,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-shade"
     },    {
       "id" : 2,
       "type" : "skin",
@@ -29,7 +29,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-apparition"
     },    {
       "id" : 3,
       "type" : "skin",
@@ -39,7 +39,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-phantasm"
     },    {
       "id" : 4,
       "type" : "skin",
@@ -49,7 +49,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-phantom"
     },    {
       "id" : 5,
       "type" : "skin",
@@ -59,7 +59,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-wraith"
     },    {
       "id" : 6,
       "type" : "skin",
@@ -69,7 +69,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-poltergeist"
     },    {
       "id" : 7,
       "type" : "skin",
@@ -79,7 +79,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-specter"
     },    {
       "id" : 8,
       "type" : "skin",
@@ -89,7 +89,7 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "skin-banshee"
     }
   ],
   "pets" : [
