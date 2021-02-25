@@ -17,6 +17,7 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const { doAllPbas } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
+const ALLITEMS = require('../game/allItems.json');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
@@ -209,44 +210,38 @@ router.post('/mock-run-pbas', function(req, res, next){
       attributes : ['avatarID', 'postBattleActions'],
       where : { id : battleId }
     }).then(({ avatarID, postBattleActions }) =>{;
-      const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
-      const PBAACTIONS = postBattleActions;
-      const pbaArray = [];
-      console.log('all pbas from battle', PBAACTIONS);
+
+      const itemsToInsert = [];
+      
       // ALL PBAs FROM BATTLE
-      PBAACTIONS.forEach((ACTION)=>{
+      postBattleActions.forEach(( ACTION )=>{
         let matchingPBA;
-        
         // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
         for(let actionType in ALLPBAs){
+          // Find the PBA that matches the pba.action property
           let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
+          // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
           if(matching){
             matchingPBA = matching;
             break;
           }
         }
-        pbaArray.push(matchingPBA);
-      })
 
-      
-      console.log('ARR!', pbaArray);
-      const pbaToInserts = pbaArray.map(pba => {
-        return {
-          avatarID,
-          type : itemTypeMap[pba.type],
-          'name' : pba.name,
-          description : pba.description,
-          lore : pba.lore || null,
-          effect1 : pba.effect1 || null,
-          effec2 : pba.effect2 || null,
-          icon : pba.icon || null,
-          class : pba.class || null,
-          equipped : false
-        }
+        // Use the matchingPBA type and name to find the exact item referenced in the PBA
+        const matchingItem = ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+        // remove ID, we use autoinc here
+        delete matchingItem.id;
+        //console.log('MATTCHITEM = ', matchingItem);
+        //console.log('AVID = ', avatarID);
+        const itemToInsert = Object.assign({}, matchingItem, { avatarID })
+        // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
+        itemsToInsert.push(itemToInsert);
       });
 
 
-      AvatarEquip.bulkCreate(pbaToInserts)
+      console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
+      // INSERT all the items from the itemsToInsert array, gathered from the PBAs
+      AvatarEquip.bulkCreate(itemsToInsert)
       .then((result) =>{
         console.log('RESSS - ', result);
 

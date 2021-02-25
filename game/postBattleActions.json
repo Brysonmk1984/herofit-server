@@ -5,64 +5,64 @@
       "action" : "Grant Shadow-Self",
       "name" : "Shadow Self",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Shadow-Self costume earned as an award for defeating the Shadow-Self"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 1,
       "action" : "Grant Shade",
       "name" : "Shade Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Shade-like tint earned for defeating all foes within the 'Shade' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 2,
       "action" : "Grant Apparition",
       "name" : "Apparition Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Apparition-like tint earned for defeating all foes within the 'Apparition' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 3,
       "action" : "Grant Phantasm",
       "name" : "Phantasm Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Phantasm-like tint earned for defeating all foes within the 'Phantasm' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 4,
       "action" : "Grant Phanton",
       "name" : "Phanton Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Phantom-like tint earned for defeating all foes within the 'Phantom' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 5,
       "action" : "Grant Wraith",
       "name" : "Wraith Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Wraith-like tint earned for defeating all foes within the 'Wraith' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 6,
       "action" : "Grant Poltergeist",
       "name" : "Poltergeist Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Poltergeist-like tint earned for defeating all foes within the 'Poltergeist' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 7,
       "action" : "Grant Specter",
       "name" : "Specter Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Specter-like tint earned for defeating all foes within the 'Specter' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     },{
       "id" : 8,
       "action" : "Grant Banshee",
       "name" : "Banshee Tint",
       "type" : "Award Skin",
-      "outcome" : "win",
-      "description" : "Banshee-like tint earned for defeating all foes within the 'Banshee' category"
+      "itemCategory": "skins",
+      "outcome" : "win"
     }
   ],
 
@@ -73,9 +73,8 @@
       "action" : "Grant Win Streak 3",
       "name" : "The Renowned",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 3 - battle win streak",
-      "icon" : "GiFlowerStar"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },
     {
       "id" : 102,
@@ -83,9 +82,8 @@
       "action" : "Grant Win Streak 5",
       "name" : "The Acclaimed",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 5 - battle win streak",
-      "icon" : "GiBarbedStar"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },
     {
       "id" : 103,
@@ -93,9 +91,8 @@
       "action" : "Grant Win Streak 10",
       "name" : "The Untouchable",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 10 - battle win streak",
-      "icon" : "GiMoebiusStar"
+      "itemCategory": "titles",
+      "outcome" : "win"
     },
     {
       "id" : 104,
@@ -103,9 +100,8 @@
       "action" : "Grant Win Streak 15",
       "name" : "The Dominator",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 15 - battle win streak",
-      "icon" : "GiStarFormation"
+      "itemCategory": "titles",
+      "outcome" : "win"
     },
     {
       "id" : 105,
@@ -113,9 +109,8 @@
       "action" : "Grant Win Streak 25",
       "name" : "The Legendary",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for a 25 - battle win streak",
-      "icon" : "GiJusticeStar"
+      "itemCategory": "titles",
+      "outcome" : "win"
     }
   ],
 
@@ -126,80 +121,80 @@
       "action" : "Grant Win Total 5",
       "name" : "White Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 5 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 201,
       "requirement" : 10,
       "action" : "Grant Win Total 10",
       "name" : "Yellow Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 10 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 202,
       "requirement" : 25,
       "action" : "Grant Win Total 25",
       "name" : "Orange Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 25 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 203,
       "requirement" : 50,
       "action" : "Grant Win Total 50",
       "name" : "Blue Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 50 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 204,
       "requirement" : 75,
       "action" : "Grant Win Total 75",
       "name" : "Purple Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 75 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 205,
       "requirement" : 100,
       "action" : "Grant Win Total 100",
       "name" : "Green Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 100 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 206,
       "requirement" : 150,
       "action" : "Grant Win Total 150",
       "name" : "Red Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 150 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 207,
       "requirement" : 250,
       "action" : "Grant Win Total 250",
       "name" : "Brown Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 250 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 208,
       "requirement" : 500,
       "action" : "Grant Win Total 500",
       "name" : "Black Belt",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 500 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     },{
       "id" : 209,
       "requirement" : 1000,
       "action" : "Grant Win Total 1000",
       "name" : "Black Belt Sensei",
       "type" : "Award Title",
-      "outcome" : "win",
-      "description" : "Title awarded for winning 1000 battles"
+      "itemCategory" : "titles",
+      "outcome" : "win"
     }
   ],
   "HELPER" : [
@@ -209,9 +204,8 @@
       "action" : null,
       "name" : "White Light Warrior",
       "type" : "Award Title",
-      "outcome" : null,
-      "description" : "Earned for an exceptional level of support during the early stages of development.",
-      "icon" : "GiWingedEmblem"
+      "itemCategory": "titles",
+      "outcome" : null
     }
   ]
 }

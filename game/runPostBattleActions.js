@@ -1,6 +1,7 @@
 const AvatarEquip = require('../db').AvatarEquip;
 const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT } = require('./constants'); 
 const ALLPBAs = require('./postBattleActions.json');
+const ALLITEMS = require('./allItems.json');
 
 // XP GAIN FOR DEFEATING FOES
 function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 1, bonusXp = 0){
@@ -52,41 +53,37 @@ function determinePtBounty(heroLevel,bonusPt = 0){
 function doAllPbas(avatarID, postBattleActions){
   console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID);
 
-  const itemTypeMap = {'Award Skin' : 'skin','Award Title' : 'title','Award Pet' : 'pet'} 
-  const pbaArray = [];
+  const itemsToInsert = [];
   
   // ALL PBAs FROM BATTLE
-  postBattleActions.forEach((ACTION, i)=>{
+  postBattleActions.forEach(( ACTION )=>{
     let matchingPBA;
     // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
     for(let actionType in ALLPBAs){
+      // Find the PBA that matches the pba.action property
       let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
+      // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
       if(matching){
         matchingPBA = matching;
         break;
       }
     }
-    pbaArray.push(matchingPBA);
+
+    // Use the matchingPBA type and name to find the exact item referenced in the PBA
+    const matchingItem = ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+    // remove ID, we use autoinc here
+    delete matchingItem.id;
+    //console.log('MATTCHITEM = ', matchingItem);
+    //console.log('AVID = ', avatarID);
+    const itemToInsert = Object.assign({}, matchingItem, { avatarID })
+    // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
+    itemsToInsert.push(itemToInsert);
   });
 
-  //console.log('PBA array after loop, just before insertion - ', pbaArray);
-  //console.log('AVID - ', avatarID);
-  const pbaToInserts = pbaArray.map(pba => {
-    return {
-      avatarID,
-      type : itemTypeMap[pba.type],
-      name : pba.name,
-      description : pba.description,
-      lore : pba.lore || null,
-      effect1 : pba.effect1 || null,
-      effec2 : pba.effect2 || null,
-      icon : pba.icon || null,
-      class : pba.class || null,
-      equipped : false
-    }
-  });
-  //console.log('BULK CREATE - INSERTPBAS-', pbaToInserts);
-  return AvatarEquip.bulkCreate(pbaToInserts);
+
+  console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
+  // INSERT all the items from the itemsToInsert array, gathered from the PBAs
+  return AvatarEquip.bulkCreate(itemsToInsert);
 
 }
 
