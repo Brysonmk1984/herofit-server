@@ -10,6 +10,8 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const { OUTCOME_XP } = require('../game/constants'); 
+const ALLPBAs = require('../game/postBattleActions.json');
+const ALLITEMS = require('../game/allItems.json');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', function(req, res, next){
@@ -158,6 +160,22 @@ router.post('/fetch-battle-report', function(req, res, next){
       adjResult = result[0];
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
+     
+      // Get the items aquired from the action types in the battle report
+      adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
+        let matchingPBA;
+        for(let actionType in ALLPBAs){
+          const match = ALLPBAs[actionType].find(pba => {
+            console.log(pba.action, action);
+            return pba.action === action;
+          });
+          if(match){
+            return matchingPBA = match;
+          }
+        } 
+        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+      });
+      
       if(!result[0].seenReport){
 
         res.status(200).json({
@@ -176,6 +194,7 @@ router.post('/fetch-battle-report', function(req, res, next){
     }
 
   }).catch((error) =>{
+    console.log('ERR', error);
     res.status(200).json({
       message: `No Results`,
       result : null
@@ -195,7 +214,23 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     adjResult = result;
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-   
+    
+    // Get the items aquired from the action types in the battle report
+    adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
+      let matchingPBA;
+      for(let actionType in ALLPBAs){
+        const match = ALLPBAs[actionType].find(pba => {
+          console.log(pba.action, action);
+          return pba.action === action;
+        });
+        if(match){
+          return matchingPBA = match;
+        }
+      } 
+      return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name];
+    });
+
+
     //console.log('FETCHING AVATAR INV FOR -', avatarID);
     return AvatarEquip.findOne({ 
       attributes : ['name'],
@@ -270,7 +305,7 @@ router.post('/fetch-battles-won', function(req, res, next){
 
 });
 
-router.post('/fetch-upcoming-foe', function(req, res, next){
+router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
   console.log(req.body)
   Battle.findOne({ 
       where : { 
@@ -278,12 +313,31 @@ router.post('/fetch-upcoming-foe', function(req, res, next){
         outcome: "TBD" 
       }, 
       raw : true, 
-      attributes: ['foe'] 
+      attributes: ['foe', 'postBattleActions'] 
   }).then((battle) =>{
     console.log(`upcoming battle for ${req.body.avatarID} - `, battle);
     if(battle){
+      let rewards = null;
+      if(battle.postBattleActions){
+        // Get the items aquired from the action types in the battle report
+        rewards = battle.postBattleActions.map(action => {
+          let matchingPBA;
+          for(let actionType in ALLPBAs){
+            const match = ALLPBAs[actionType].find(pba => {
+              return pba.action === action;
+            });
+            if(match){
+              matchingPBA = match;
+              break;
+            }
+          } 
+          return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+        });
+      }
+
       res.status(200).json({
-        foe : battle.foe
+        foe : battle.foe,
+        rewards
       });
     }else{
       console.log(`COULDNT FIND BATTLE ${req.body.avatarID}`);
