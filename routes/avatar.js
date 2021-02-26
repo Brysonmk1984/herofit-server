@@ -357,7 +357,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
       return avatar;
     });
     const avatarCount = count;
-    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
+    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE)-1;
 
     res.status(200).json({
       avatars,
