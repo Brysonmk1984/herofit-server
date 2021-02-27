@@ -141,7 +141,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   
   if(debug){
     html += `<br/><br/>`;
-    html += `<br/><br/><p>` + formData.debug + `</p>`;
+    html += `<br/><br/><p>` + debug + `</p>`;
   }
   html += `<br/><br/> Error Location: ${location}`;
   if(adminData){
