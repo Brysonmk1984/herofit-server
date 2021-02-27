@@ -184,11 +184,11 @@ router.post('/get-avatar', async function(req, res, next){
     FROM avatars
     LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2, 'equipped', equipped, 'class', class, 'description', description, 'icon', icon)) AS equipped
       FROM avatar_equip WHERE avatar_equip.equipped=true group by 1) AS equipped ON(id="avatarID")
-    WHERE avatars.owner = '${req.body.email}'
+    WHERE avatars.owner = $1
   `;
 
     try{
-    const [ results ] = await db.query(q, {});
+    const [ results ] = await db.query(q, { bind : [req.body.email] });
     //console.log('RESULT - ', results[0]);
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
@@ -412,10 +412,10 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
 //     description : req.body.description,
 //   }]);
 //   console.log('HSF - ', title);
-//   const query = `UPDATE avatars SET titles = '${title}' WHERE name='${req.body.hero}';`;
+//   const query = `UPDATE avatars SET titles = $1 WHERE name=$2;`;
 
 //   try{
-//     const [results, metadata] = await db.query(query, {});
+//     const [results, metadata] = await db.query(query, { bind : [title, req.body.hero] });
 
 //     console.log('results!', metadata);
 //     if(results){

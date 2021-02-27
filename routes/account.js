@@ -93,10 +93,10 @@ router.delete('/:username', function(req, res, next){
 router.post('/toggle-feedback-boolean', async function(req, res, next){
   const hasSubmittedFeedback = req.body.setToTrue;
   console.log('HSF - ', hasSubmittedFeedback);
-  const query = `UPDATE users SET "featurePreferenceSubmitted"=${hasSubmittedFeedback};`;
+  const query = `UPDATE users SET "featurePreferenceSubmitted"=$1`;
 
   try{
-    const [results, metadata] = await db.query(query, {});
+    const [results, metadata] = await db.query(query, { bind : [hasSubmittedFeedback] });
 
     console.log('results!', metadata);
     if(results){
@@ -117,7 +117,7 @@ router.post('/toggle-feedback-boolean', async function(req, res, next){
 //   const q = `
 //   SELECT avatars.name, avatars.owner, users.id FROM avatars
 //   LEFT JOIN users ON avatars.owner=users.email
-//   WHERE avatars.owner='oliver.h.coop@gmail.com'
+//   WHERE avatars.owner=$1
 //   `;
 
 //   const r = `
@@ -128,7 +128,7 @@ router.post('/toggle-feedback-boolean', async function(req, res, next){
 //   `;
 
 //   try{
-//     const [results, metadata] = await db.query(r, {});
+//     const [results, metadata] = await db.query(r, { bind : ['oliver.h.coop@gmail.com'] });
 
 //     console.log('results!', metadata);
 //     if(results){
