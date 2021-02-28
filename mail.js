@@ -152,7 +152,6 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   }
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
-
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
