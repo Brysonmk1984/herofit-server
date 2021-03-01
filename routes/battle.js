@@ -83,7 +83,7 @@ router.post('/insert-battle', function(req, res, next){
       },{ where: { owner: req.body.email }, raw: true })
       .then((result) =>{
         if(!result){
-          res.status(204).json({
+          res.status(400).json({
             message: `No Avatar associated with user ${req.body.email}`
           });
           return;
@@ -161,21 +161,23 @@ router.post('/fetch-battle-report', function(req, res, next){
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
      
-      // Get the items aquired from the action types in the battle report
-      adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
-        let matchingPBA;
-        for(let actionType in ALLPBAs){
-          const match = ALLPBAs[actionType].find(pba => {
-            console.log(pba.action, action);
-            return pba.action === action;
-          });
-          if(match){
-            return matchingPBA = match;
-          }
-        } 
-        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
-      });
-      
+      // IF the avatar won, Get the items aquired from the action types in the battle report
+      if(adjResult.outcome === 'Avatar Wins'){
+        adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
+          let matchingPBA;
+          for(let actionType in ALLPBAs){
+            const match = ALLPBAs[actionType].find(pba => {
+              console.log(pba.action, action);
+              return pba.action === action;
+            });
+            if(match){
+              return matchingPBA = match;
+            }
+          } 
+          return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+        });
+      }
+
       if(!result[0].seenReport){
 
         res.status(200).json({
@@ -214,21 +216,23 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     adjResult = result;
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-    
-    // Get the items aquired from the action types in the battle report
-    adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
-      let matchingPBA;
-      for(let actionType in ALLPBAs){
-        const match = ALLPBAs[actionType].find(pba => {
-          console.log(pba.action, action);
-          return pba.action === action;
-        });
-        if(match){
-          return matchingPBA = match;
-        }
-      } 
-      return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name];
-    });
+
+    // IF WIN, Get the items aquired from the action types in the battle report
+    if(adjResult.outcome === 'Avatar Wins'){
+      adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
+        let matchingPBA;
+        for(let actionType in ALLPBAs){
+          const match = ALLPBAs[actionType].find(pba => {
+            console.log(pba.action, action);
+            return pba.action === action;
+          });
+          if(match){
+            return matchingPBA = match;
+          }
+        } 
+        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name];
+      });
+    }
 
 
     //console.log('FETCHING AVATAR INV FOR -', avatarID);
@@ -340,10 +344,11 @@ router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
         rewards
       });
     }else{
-      console.log(`COULDNT FIND BATTLE ${req.body.avatarID}`);
+      console.log(`COULDNT FIND BATTLE ${req.body.avatarID}`, battle);
 
       res.status(422).json({
         debug : `Couldn't retrieve foe for upcoming battle! No Battle Record listed. USER - ${req.body.avatarID}`,
+        battleObj : battle,
         message : "No Upcoming battle on Record."
       });
     }

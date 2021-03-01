@@ -362,6 +362,7 @@ router.get('/do-all-battles', function(req, res, next){
         }
         //TEMP CHEAT
         //BRA.power += 1000;
+        //BRA.health = 10;
 
         // WHO SWINGS FIRST
         let goesFirst;
