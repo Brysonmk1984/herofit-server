@@ -3,6 +3,7 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const User = require('../db').User;
 const Battle = require('../db').Battle;
+const AvatarEquip = require('../db').AvatarEquip;
 const db = require('../db').db;
 
 // UPDATE HERO NAME
@@ -59,11 +60,17 @@ router.post('/update-owner-username', function(req, res, next){
 
 // DELETE ACCOUNT
 router.delete('/:username', function(req, res, next){
-  console.log('EM - ',req.body.id);
-  Battle.destroy({
+
+  AvatarEquip.destroy({
     where : {
-      owner : req.body.email
+      avatarID : req.body.avatarId
     }
+  }).then(() =>{
+    return Battle.destroy({
+      where : {
+        owner : req.body.email
+      }
+    })
   }).then(() =>{
     return Avatar.destroy({
       where : {
