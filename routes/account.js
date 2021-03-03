@@ -61,19 +61,14 @@ router.post('/update-owner-username', function(req, res, next){
 // DELETE ACCOUNT
 router.delete('/:username', function(req, res, next){
   console.log('attempting delete on ', req.body.avatarId);
-  AvatarEquip.destroy({
-    where : {
-      avatarID : req.body.avatarId
-    }
-  }).then(() =>{
-    console.log('Deleted equip, now deleting battles');
-    return Battle.destroy({
-      where : {
-        owner : req.body.email
-      }
-    })
-  }).then(() =>{
-    console.log('Deleted battles, now deleting avtar');
+
+  const promises = [];
+  promises.push(AvatarEquip.destroy({ where : {avatarID : req.body.avatarId }}));
+  promises.push(Battle.destroy({ where : { owner : req.body.email }}));
+  
+  Promise.allSettled(promises)
+  .then(() =>{
+    console.log('Deleted battles and Items, now deleting avatar');
     return Avatar.destroy({
       where : {
         owner : req.body.email
@@ -94,7 +89,7 @@ router.delete('/:username', function(req, res, next){
   }).catch((error)=>{console.log(error);
     res.status(400).json({
       error,
-      message : 'Unable to delete account!'
+      message : `Unable to delete account for user ${req.body.email}`
      });
      next();
   })
