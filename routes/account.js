@@ -60,24 +60,27 @@ router.post('/update-owner-username', function(req, res, next){
 
 // DELETE ACCOUNT
 router.delete('/:username', function(req, res, next){
-
+  console.log('attempting delete on ', req.body.avatarId);
   AvatarEquip.destroy({
     where : {
       avatarID : req.body.avatarId
     }
   }).then(() =>{
+    console.log('Deleted equip, now deleting battles');
     return Battle.destroy({
       where : {
         owner : req.body.email
       }
     })
   }).then(() =>{
+    console.log('Deleted battles, now deleting avtar');
     return Avatar.destroy({
       where : {
         owner : req.body.email
       }
     })
   }).then(() =>{
+    console.log('Deleted Avatar, now deleting User');
     return User.destroy({
       where : {
         id : req.body.id
