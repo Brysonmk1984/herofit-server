@@ -13,12 +13,12 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
 
 
-router.post('/insert-user-activities', function(req, res, next){console.log('HEERERER');
+router.post('/insert-user-activities', function(req, res, next){
   // Need latest Activity to be added to user's account
   let latestActivityUpdate = null;
   const entries = req.body.activities.map((activity) =>{
     activityId = activity.id;
-    console.log('ACT in question - ', activity, activityId);
+    //console.log('ACT in question - ', activity, activityId);
     const activityDate = moment.utc(activity.start_date);
     // Check for latest activity (doesn't include DB activities)
     if(latestActivityUpdate === null){

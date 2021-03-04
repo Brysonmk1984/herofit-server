@@ -32,7 +32,7 @@ let tally= {
   tiePercent : 0
 };
 
-function runBattlesOnBatch(shard){
+function runBattlesOnBatch(shard, shardIndex){
   allBattleIds = [];
   allAvatarIds = [];
   allFoes = [];
@@ -188,10 +188,10 @@ function runBattlesOnBatch(shard){
       
       // End Avatar for each
     });
-    console.log('the pba promises = ', allPbaPromises);
+
     return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
   }).then((data) => {
-    console.log('UPDATED ALL BATTLES AND RAN ALL PBAS - cron', data);
+    console.log(`SHARD ${shardIndex} - UPDATED ALL BATTLES AND RAN ALL PBAS - cron`, data);
     
     const allUpdateAvatarPromises = [];
     allAvatarIds.forEach((avatarId, i) =>{
@@ -201,7 +201,7 @@ function runBattlesOnBatch(shard){
     return Promise.allSettled(allUpdateAvatarPromises);
     
   }).catch((error) =>{
-    console.log('BATTLE ERROR - ', error);
+    console.log(`SHARD ${shardIndex} - BATTLE ERROR - `, error);
   });
 }
 
@@ -211,18 +211,18 @@ Battle.findAll({
   raw : true
 }).then((battles) =>{
   console.log('BATTLECOUNT - ', battles.length);
-  // Need to divide records into groups of 15
-  battleShards = arrayChunker(battles, 15);
+  // Need to divide records into groups of 7
+  battleShards = arrayChunker(battles, 9);
   console.log('BattleShard length = ', battleShards.length);
   
   return Promise.allSettled(battleShards.map(async (shard, i) => {
     //console.log('I - ', i);
-    // Update one batch every 8 seconds
-    const timeoutDuration = i * 8000;
+    // Update one batch every 9 seconds
+    const timeoutDuration = i * 9000;
 
     return await new Promise((resolve) =>{
       setTimeout(() => {
-        resolve(runBattlesOnBatch(shard));
+        resolve(runBattlesOnBatch(shard, i));
       }, timeoutDuration);
     });
   }));

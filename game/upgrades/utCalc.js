@@ -25,8 +25,8 @@ const utCalc = function(userTotals){
         if(ut[a] === null){
           ut[a] = defaultTotals[a];
         }
-        console.log('UT - ', ut);
-        console.log('A! - ', a, ut[a]);
+        //console.log('UT - ', ut);
+        //console.log('A! - ', a, ut[a]);
         // All activities track instance count, duration, and average heart rate
         ut[a] = {
           instance : ++ut[a].instance,
