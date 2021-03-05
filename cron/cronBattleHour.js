@@ -7,9 +7,13 @@ const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
+const avCalc = require('../game/upgrades/avCalc');
 const { doAllPbas } = require('../game/runPostBattleActions');
 
 console.log('*** RUNNING CRON AVATAR BATTLES ***');
+// Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+const { determineAstrologySeason } = avCalc();
+const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
 
 let allBattleIds = [];
 let allAvatarIds = [];
@@ -75,6 +79,12 @@ function runBattlesOnBatch(shard, shardIndex){
       // avatar and foe to be used for battle
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
+
+      // Element by Seasonal Element Bonus
+      BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
+      BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
+
+
       //console.log('BRABRF - ',BRA, BRF);
       // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
       

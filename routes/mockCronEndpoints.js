@@ -14,6 +14,7 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
+const avCalc = require('../game/upgrades/avCalc');
 const { doAllPbas } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
@@ -269,7 +270,10 @@ router.post('/mock-run-pbas', function(req, res, next){
 
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
 router.get('/do-all-battles', function(req, res, next){
-  
+  // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+  const { determineAstrologySeason } = avCalc();
+  const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
+
   let allBattleIds = [];
   let allAvatarIds = [];
   let allAvatarPromises = [];
@@ -337,10 +341,9 @@ router.get('/do-all-battles', function(req, res, next){
         let BRA = Object.assign({}, sAvatar);
         let BRF = Object.assign({}, sFoe);
 
-        // Need level to figure out xp gain from wins after battle
-        // const { currentLevelByInput } = xpCalc();
-        // BRA.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-
+        // Element by Seasonal Element Bonus
+        BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
+        BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
 
         // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
         
