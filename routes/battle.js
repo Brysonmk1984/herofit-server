@@ -7,6 +7,8 @@ const Battle = require('../db').Battle;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
+const avCalc = require('../game/upgrades/avCalc');
+const moment = require('moment');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const { OUTCOME_XP } = require('../game/constants'); 
@@ -179,10 +181,13 @@ router.post('/fetch-battle-report', function(req, res, next){
       }
 
       if(!result[0].seenReport){
+        // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+        const { determineAstrologySeason } = avCalc();
+        adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
 
         res.status(200).json({
           message : 'Retrieved Latest Battle Results',
-          result : result[0]
+          result : adjResult
         });
 
       }else{
@@ -216,14 +221,13 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     adjResult = result;
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-
     // IF WIN, Get the items aquired from the action types in the battle report
     if(adjResult.outcome === 'Avatar Wins'){
       adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
         let matchingPBA;
         for(let actionType in ALLPBAs){
           const match = ALLPBAs[actionType].find(pba => {
-            console.log(pba.action, action);
+            //console.log(pba.action, action);
             return pba.action === action;
           });
           if(match){
@@ -244,11 +248,19 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
   }).then((skin) =>{
     //console.log('SKIN - ', skin);
     adjResult.avatarSkin = skin;
+
+    // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+    const { determineAstrologySeason } = avCalc();
+    const startedTrackingSeasons = moment('2021-03-04', 'YYYY-MM-DD');
+    const battleDate = moment(adjResult.createdAt);
+    if(battleDate && battleDate.isAfter(startedTrackingSeasons)){
+      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
+    }else{ adjResult.seasonalBonusElement = null; }
     res.status(200).json({
       adjResult
     });
     
-  }).catch((error) =>{
+  }).catch((error) =>{console.log('ERRR', error);
     res.status(200).json({
       message: `No Results`,
       result : null
