@@ -14,8 +14,8 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     attributes : ["id", "avatarID", "type", "name"],
     where : { avatarID : avatar.id }
   }).then((equipment) =>{console.log('equipment', equipment);
-    const skinNamesArray = equipment.map(item => { if(item.type === 'skin'){return item.name;}});
-    const titleNamesArray = equipment.map(item => { if(item.type === 'title'){return item.name;}});
+    const skinNamesArray = equipment.filter(item => item.type === 'skin').map(skin => skin.name);
+    const titleNamesArray = equipment.filter(item => item.type === 'title').map(title => title.name);
 
     console.log('SNA', skinNamesArray, 'TNA - ', titleNamesArray);
     const allPbaCheckPromises = [];

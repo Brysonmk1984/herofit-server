@@ -11,7 +11,7 @@ function selectFoeTemplate(level){
   let villain;
 
   // Get specific foe foe testing purposes
-  //villain = villains.Spirits[4];
+  //return villains.Spirits[4];
 
   // Must be at least level 10 to have a shot at getting matched against shadow self
   if(level >= 10){
