@@ -43,6 +43,9 @@ router.post('/insert-battle', function(req, res, next){
   if(foeTemplate.type === 'Shadow-Self'){
     foeName = `Shadow ${avatar.name}`;
   }else{
+    // specific foe for testing purposes
+    //foeName = foeTemplate.foe[5];
+    
     foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
   }
 

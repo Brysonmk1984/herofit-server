@@ -24,14 +24,14 @@ const nodemailer = require('nodemailer');
 
 
 const sendContactEmail = function(formData, resolve, reject){
-
+  const accountInfo = JSON.stringify(formData.accountInfo);
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${formData.email} submitted a form message.`, 
-      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
-      html: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`
+      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      html: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`
   };
 
   // send mail with defined transport object
@@ -47,14 +47,15 @@ const sendContactEmail = function(formData, resolve, reject){
 };
 
 const sendDataCollectionEmail = function(formData, resolve, reject){
+  const accountInfo = JSON.stringify(formData.accountInfo);
   const { opinion, openResponse } = formData.feedbackData;
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: 'HEROFIT - A user submitted Feedback from the Marketing Modal!', 
-      text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
-      html: `<div>${formData.username} submitted the ${formData.title}, the message is as follows: <br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+      text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      html: `<div>${formData.username} submitted the ${formData.title}, the message is as follows: <br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
   };
 
   // send mail with defined transport object
@@ -71,13 +72,14 @@ const sendDataCollectionEmail = function(formData, resolve, reject){
 };
 
 const sendSurveyEmail = function(formData, resolve, reject){
+  const accountInfo = JSON.stringify(formData.accountInfo);
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: 'HEROFIT - A user submitted a survey!', 
       text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
-      html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`
+      html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
   };
 
   // send mail with defined transport object
@@ -114,7 +116,7 @@ const sendCronErrorEmail = function({status, name, message, debug, version, erro
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n  Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA: \n \n ${JSON.stringify(accountInfo)}`,
+      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n  Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
 
@@ -136,6 +138,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const version = formData.version || 'Release';
   const location = formData.errorLocation;
   let html = `<div>An Error occured in HeroFit Production - `;
+  const accountInfo = JSON.stringify(formData.accountInfo);
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
   
@@ -146,7 +149,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   html += `<br/><br/> Error Location: ${location}`;
   if(adminData){
     html += `<br/><br/>`;
-    html += `<div>ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}</div></div>`;
+    html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`;
   }else{
     html += `<br/><br/><p>User not logged in.</p>`;
   }
@@ -157,7 +160,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${formData.version}`, 
-      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: \n \n ${JSON.stringify(formData.accountInfo)}`,
+      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
 

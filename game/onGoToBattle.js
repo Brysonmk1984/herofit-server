@@ -85,7 +85,11 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
   // FIND ALL BATTLES WHERE THE AVATAR WON AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
   return Battle.findAll({
     attributes : ["foe"],
-    where : {  avatarID : avatarId, outcome : "Avatar Wins",  "foe.type" : { [Op.eq] : foeType  }},
+    where : {  
+      avatarID : avatarId, 
+      [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }],
+      "foe.type" : { [Op.eq] : foeType  }
+    },
     raw : true 
   }).then((results) =>{
     // All foes defeated within a type (eg. Banshee)
@@ -122,8 +126,8 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
       }else{
         // Make an array of all foes of type EXCLUDING the name of the current foe
         const allFoesMinusCurrent = allFoes.filter(foe => foe !== currentFoeName);
-        console.log('AFMC', allFoesMinusCurrent);
-        console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
+        //console.log('AFMC', allFoesMinusCurrent);
+        //console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
         // Compare the previous array to the deduped foes defeated array
         const isLastOfType = allFoesMinusCurrent.every((val, i) => {
           return val === fdNoDUpes[i]
@@ -131,16 +135,17 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
         console.log('isLastOfType', isLastOfType);
         // If last foe of type, return matching PBA action
         if(isLastOfType){
+         
           // Consider moving the PBA action to the normal PBA JSON file
-          const matchingPBAAction = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
-
-
+          const action = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
+          const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
+          console.log('action', action, 'MPBA - ', matchingPBA);
           // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin
           const isCriticalWin = !skinNamesArray.includes(matchingPBA.name);
           
           // Win is critical if it's unearned
           if(isCriticalWin){
-            return matchingPBAAction;
+            return action;
           }
           return undefined
         }
