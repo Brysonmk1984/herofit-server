@@ -219,5 +219,22 @@ router.get('/fetch-latest-patch-details', function(req, res, next){
   res.status(200).json(latestPatchDetails);
 });
 
+router.post('/update-seen-latest-patch', function(req, res, next){
+  const id = req.body.id;
+  User.update(
+    { seenLatestPatch : true },
+    { where : { id }, returning : true },
+  ).then((data) =>{
+    res.status(200).json({ data : "seen latest patch set to true" });
+  }).catch((error) =>{
+    console.log(`Couldnt update seenLatestPatch boolean for userID ${id}`);
+    res.status(400).json({
+      message: `Couldnt update seenLatestPatch boolean for userID ${id}`,
+      debug : error
+    });
+    next();
+  });
+});
+
 module.exports = router;
 
