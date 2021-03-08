@@ -22,7 +22,6 @@ router.post('/signup-or-signin', function(req, res, next){
   jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
     if(err){
       res.status(401).json({
-        version : process.env.VERSION,
         message: `Token failed validation, see debug for error description`,
         debug : err
       });
@@ -31,7 +30,6 @@ router.post('/signup-or-signin', function(req, res, next){
       // TOKEN has Expired
       if (Date.now() >= decoded.exp * 1000) {
         res.status(401).json({
-          version : process.env.VERSION,
           message: `COGNITO TOKEN EXPIRED`,
           debug : `Token Expiration: ${moment.utc(decoded.exp)}, Evaluation Date: ${moment.utc(Date.now())}`
         });
@@ -75,14 +73,12 @@ router.post('/signup-or-signin', function(req, res, next){
           // New user, created a new db
           if (created) {
             res.status(200).json({
-              version : process.env.VERSION,
               message: `New user created, logged in as ${user.username}`,
               user
             });
           // User already exists, return data from db
           }else{
             const response = {
-              version : process.env.VERSION,
               message: `You are logged in as ${user.username}`,
               user
             };
@@ -110,14 +106,12 @@ router.post('/signup-or-signin', function(req, res, next){
                 // });
 
                 res.status(200).json({
-                  version : process.env.VERSION,
                   message: `You are logged in as ${user.username}`,
                   user
                 });
             })
             .catch((error) =>{console.log('error', error);
               res.status(400).json({
-                version : process.env.VERSION,
                 message: `Couldn't find or create user, but second attempt in catch ${decoded.email}`,
                 debug : error
               });
@@ -125,7 +119,6 @@ router.post('/signup-or-signin', function(req, res, next){
           }else{
             console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
             res.status(400).json({
-              version : process.env.VERSION,
               message: `Couldn't find or create user ${decoded.email}`,
               debug : error
             });
