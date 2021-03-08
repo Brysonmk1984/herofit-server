@@ -54,6 +54,10 @@ const UserModel = function(db, DataTypes){
       featurePreferenceSubmitted : {
         type : DataTypes.BOOLEAN,
         allowNull: true
+    },
+    seenLatestPatch : {
+        type : DataTypes.BOOLEAN,
+        allowNull: false
     }
   });
 

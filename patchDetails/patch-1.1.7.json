@@ -1,0 +1,31 @@
+{
+  "version": "1.1.7",
+  "headline": "New Update Available!",
+  "subheadline": "Patch 1.1.3 - 1.1.7",
+  "openingRemarks": "Seasonal elemental bonus, rewards for battles now visible, and a new patch window!",
+  "newFeatures": [
+    {
+      "title": "Seasonal elemental bonus",
+      "description": "Depending on the astrological season, one particular element will receive a bonus in battles. For instance, it's currently Pisces season and pisces is a water sign, so both Hero and Foe will receive a 25% boost to existing water damage and resistance in battle. This is now visible in the battle details of the battle report."
+    },
+    {
+      "title": "New Patch Window!",
+      "description": "A new patch dialog will appear whenever there is a new patch is deployed. The window will have the details of all the minor patches since the last update. The dialog will also prompt you to refresh your page if it detects you're on the previous version."
+    },
+    {
+      "title": "Potential and Earned Rewards Now Visible",
+      "description": "Now when you Go To Battle, if you're on the verge of earning a new costume or title, it will be visible from the Go To Battle Window. Additionally, you\\'ll see the rewards in the Battle Report window the next day."
+    }
+  ],
+  "bugFixes": [
+    "Fixed an error where sometimes a costume wouldn't be rewarded",
+    "Fixed an error where the Battle Report would say you earned a reward when you did not.",
+    "Fixed an error that would occure if a new user picked an already taken hero name.",
+    "Fixed a bug that was preventing accounts from being deleted if they had earned items."
+  ],
+  "balanceChanges": [
+    "Difficulty of foes increased slightly to make up for extra seasonal elemental power, which will most of the time benefit the hero more."
+  ],
+  "miscDetails": null,
+  "closingRemarks": "After the successful deploy of the big 1.1.0 patch, there were some issues that cropped up and have mostly been addressed. If anyone is still experiencing problems with either battles or items, please report it, Thanks!"
+}
