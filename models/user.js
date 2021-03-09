@@ -54,7 +54,7 @@ const UserModel = function(db, DataTypes){
       featurePreferenceSubmitted : {
         type : DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true,
     },
     seenLatestPatch : {
         type : DataTypes.BOOLEAN,
