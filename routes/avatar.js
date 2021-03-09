@@ -309,7 +309,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   const page = req.body.page || 0;
   const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
   const searchInput = req.body.searchInput;
-  
+
   const paginate = (query, { page, pageSize }) => {
     const offset = page * pageSize;
     const limit = pageSize;
@@ -331,7 +331,8 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
     ],
     order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
     raw : undefined,
-    nest : true
+    nest : true,
+    distinct : true
   };
   if(searchInput){
     expression.where = { name: { [Op.iLike]: `%${searchInput}%`}};
@@ -340,6 +341,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   Avatar.findAndCountAll(
     paginate(expression, { page, pageSize })
   ).then(({ rows, count }) =>{
+    // SHould be 29 pages
     const actualRows = rows.map(r =>{
       const av = r.dataValues;
       av.user = r.user.dataValues;
@@ -357,8 +359,7 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
       return avatar;
     });
     const avatarCount = count;
-    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE)-1;
-
+    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
     res.status(200).json({
       avatars,
       avatarCount,
@@ -384,7 +385,7 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
   .then((data) =>{
     const avatarCount = data.count;
     const pageCount = Math.ceil(avatarCount/20);
-    
+
     res.status(200).json({
       avatarCount,
       pageCount,
@@ -401,34 +402,6 @@ router.get('/get-avatar-and-page-count', function(req, res, next){
   });
 
 });
-
-// QUERY NO LONGER WORKS, SWITCH TO NEW EQUIPMENT TABLE
-// router.post('/add-title-to-avatar', async function(req, res, next){
-
-//   const title = JSON.stringify([{
-//     id : req.body.id,
-//     title : req.body.title,
-//     type : req.body.type,
-//     description : req.body.description,
-//   }]);
-//   console.log('HSF - ', title);
-//   const query = `UPDATE avatars SET titles = $1 WHERE name=$2;`;
-
-//   try{
-//     const [results, metadata] = await db.query(query, { bind : [title, req.body.hero] });
-
-//     console.log('results!', metadata);
-//     if(results){
-//       res.status(200).json({
-//         results
-//       });
-//     }else{
-//       res.send(400);
-//     }
-//   }catch(error){
-//     console.log("error", error);
-//   }
-// });
 
 
 module.exports = router;
