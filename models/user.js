@@ -53,11 +53,13 @@ const UserModel = function(db, DataTypes){
       },
       featurePreferenceSubmitted : {
         type : DataTypes.BOOLEAN,
-        allowNull: true
+        allowNull: false,
+        defaultValue: false,
     },
     seenLatestPatch : {
         type : DataTypes.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: true,
     }
   });
 
