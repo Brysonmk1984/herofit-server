@@ -7,6 +7,8 @@ const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require("body-parser");
+const responseEnhancer = require('express-response-formatter').responseEnhancer;
+
 // COMMON
 const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
@@ -29,6 +31,7 @@ const migrationRoutes = require('./routes/migrations');
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, 'public')));
+  app.use(responseEnhancer());
   app.set('trust proxy', 1);
 
 

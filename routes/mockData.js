@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
 const fs = require('fs');
 const path = require("path");
@@ -418,22 +419,16 @@ router.post('/get-fake-activities', function(req,res,next){
   }
 });
 
-
-router.post('/check-admin-password', function(req,res,next){
-
-
-  if(req.body.password === process.env.ADMIN_PANEL_PASSWORD){
-    res.status(200).json({
-      isValid : true
-    });
-    next();
-  }else{
-    res.status(400).json({
-      message: `Invalid Password`,
-      debug : null
-    });
-    next();
+// Verify the Admin Password is Correct in order to open the Admin panel
+router.post('/check-admin-password', body('password').custom((password) =>{
+  return password === process.env.ADMIN_PANEL_PASSWORD ? true : false; 
+}), (req,res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Some meta data");
   }
+  
+  res.formatter.ok({isValid : true});
 });
 
 router.post('/set-avatar-health-and-status', function(req, res, next){
