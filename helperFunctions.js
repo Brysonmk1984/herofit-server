@@ -52,4 +52,12 @@ function arrayChunker(inputArray, perChunk){
    
 }
 
-module.exports = { cloneObj, parseAvatarProperties, arrayChunker };
+function adjustActivityMinutes(minutes, activityType, timeAndHalfActivities){
+   const isTimeAndHalf =  timeAndHalfActivities.includes(activityType);
+   if(isTimeAndHalf){
+      return minutes * 1.5;
+   }
+   return minutes;
+}
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, adjustActivityMinutes };

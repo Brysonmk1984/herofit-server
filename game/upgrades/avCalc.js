@@ -1,6 +1,6 @@
-const { BASE_POWER, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM } = require('../constants');
+const { BASE_POWER, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../constants');
 const moment = require('moment');
-const { cloneObj } = require('../../helperFunctions');
+const { cloneObj, adjustActivityMinutes } = require('../../helperFunctions');
 const avatarList = require('../../heroList.json');
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
@@ -38,22 +38,24 @@ function avCalc(userTotals){
       // Then they get added to the defaultElement congifuration above
       for(const activityType in userTotals){
         let activityMinutes = userTotals[activityType] ? (userTotals[activityType].duration / 60) : 0;
+        // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
+        let adjustedActivityMinutes = adjustActivityMinutes(activityMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
         //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes);
         switch (activityType){
           case 'run':
           case 'crossfit':
           case 'stairStepper':
-            e.fire += (activityMinutes / MINUTES_PER_ELM);
+            e.fire += (adjustedActivityMinutes / MINUTES_PER_ELM);
             break;
           case 'hike':
           case 'ride':
           case 'weightTraining':
-            e.earth += (activityMinutes / MINUTES_PER_ELM);
+            e.earth += (adjustedActivityMinutes / MINUTES_PER_ELM);
             break;
           case 'walk':
           case 'elliptical':
           case 'yoga':
-            e.air += (activityMinutes / MINUTES_PER_ELM);
+            e.air += (adjustedActivityMinutes / MINUTES_PER_ELM);
             break;
           case 'swim':
           case 'rowing':
@@ -61,7 +63,7 @@ function avCalc(userTotals){
           case 'ski':
           case 'snowboard':
           case 'snowshoe':
-            e.water += (activityMinutes / MINUTES_PER_ELM);
+            e.water += (adjustedActivityMinutes / MINUTES_PER_ELM);
             break;
           case 'workout':
             e.fire += (activityMinutes / MINUTES_PER_ALL_ELM);

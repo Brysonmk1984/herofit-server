@@ -1,4 +1,4 @@
-const { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL } = require('../constants.js');
+const { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES } = require('../constants.js');
 //let LEVEL_CURVE = 1.2;
 //let XP_BASE_LEVEL = 99;
 //let QP_PER_LEVEL = 5;
@@ -56,18 +56,36 @@ function xpCalc(activityXP, battleXP){
       return { aXP : newAXP, bXP : newBXP, tXP : newTXP }
     },
 
+    // Calculate aXP from existing User Totals - The only function used to update activity XP
     calcNewActivityXPFromUt : function(userTotals){
-
-      let totalDuration = 0;
+      // Standard = all activities except the activities that earn 50% bonus (running, crossFit, stairStepper, swimming, elliptical)
+      let standardDuration = 0;
+      let timeAndHalfDuration = 0;
       for(const activity in userTotals){
         if(userTotals[activity]){
-          totalDuration += userTotals[activity].duration;
+          
+          // Check if the activity is an intense activity, if so give user 50% more xp
+          if(TIME_AND_HALF_ACTIVITIES.includes(activity)){
+            timeAndHalfDuration += userTotals[activity].duration;
+          // Otherwise, just give thestandard 1xp for 1 minute
+          }else{
+            standardDuration += userTotals[activity].duration;
+          }
         }
       }
-      const effortSeconds = totalDuration;
-      const effortMinutes = effortSeconds / 60;
-  
-      const newActivityXP = effortMinutes;
+      // Seconds
+      const standardSeconds = standardDuration;
+      const timeAndHalfEffortSeconds = timeAndHalfDuration;
+
+      // Convert to minutes
+      const standardEffortMinutes = standardSeconds / 60;
+      const timeAndHalfEffortMinutes = timeAndHalfEffortSeconds / 60;
+
+      const timeAndHalfAdjusted = timeAndHalfEffortMinutes * 1.5;
+      
+      // Add both the standard effort minutes and the adjusted minutes for intense exercises to get the total new activityXP
+      const newActivityXP = standardEffortMinutes + timeAndHalfAdjusted;
+      
       return Math.floor(newActivityXP);
  
     },
