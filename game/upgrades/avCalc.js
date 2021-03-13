@@ -40,7 +40,7 @@ function avCalc(userTotals){
         let activityMinutes = userTotals[activityType] ? (userTotals[activityType].duration / 60) : 0;
         // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
         let adjustedActivityMinutes = adjustActivityMinutes(activityMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
-        //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes);
+        //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes, 'adjusted - ', adjustedActivityMinutes);
         switch (activityType){
           case 'run':
           case 'crossfit':
