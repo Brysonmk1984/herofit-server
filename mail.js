@@ -13,12 +13,12 @@ const nodemailer = require('nodemailer');
     })
   :
     nodemailer.createTransport({
-      host: `${process.env.MAIL_PROVIDER}`,
+      host: process.env.MAIL_PROVIDER,
       port: 465,
-      secure: false,
+      secure: true,
       auth: {
-          user: `${process.env.INFO_EMAIL}`,
-          pass: `${process.env.EMAIL_PASSWORD}`
+          user: process.env.INFO_EMAIL,
+          pass: process.env.EMAIL_PASSWORD
       }
     });
 
