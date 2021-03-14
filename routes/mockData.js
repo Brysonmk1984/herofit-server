@@ -431,22 +431,33 @@ router.post('/check-admin-password', body('password').custom((password) =>{
   res.formatter.ok({isValid : true});
 });
 
-router.post('/set-avatar-health-and-status', function(req, res, next){
-  return Avatar.update(
-    { health : req.body.health, status : req.body.status },
-    { where: { id: req.body.id }, returning : true, raw : true }
-  ).then((avatar) =>{console.log('REW',avatar[1]);
-    res.status(200).json({
-      avatar : parseAvatarProperties(avatar[1][0])
-    });
-  }).catch((error) =>{
-    console.log('ERROR UPDATING AVATAR', error);
-    res.status(400).json({
-      message : `ERROR UPDATING AVATAR - ${error}`,
-    });
-    next();
-  });
+router.post('/set-avatar-health-and-status', 
+  body('id').isNumeric(), 
+  body('health').isNumeric(), 
+  body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.formatter.badRequest(errors.array(), "Validation Error - for set-avatar-health-and-status endpoint");
+    }
 
-});
+    return Avatar.update(
+      { health : req.body.health, status : req.body.status },
+      { where: { id: req.body.id }, returning : true, raw : true }
+    ).then((avatar) =>{
+      // Shouldn't ever happen
+      if(!avatar){
+        throw new Error(`No Avatar to set health and status for Avatar ID: ${req.body.id}`);
+      }else if(!avatar[1] || !avatar[1][0]){
+        throw new Error('Error with Sequelize return formatting.');
+      }
+
+      res.formatter.ok({ avatar : parseAvatarProperties(avatar[1][0]) });
+    }).catch((error) =>{
+      error = error.toString();
+      res.formatter.notFound(error.toString(), 'Retrieved Data Error for set-avatar-health-and-status endpoint');
+    });
+  }
+);
 
 module.exports = router;
