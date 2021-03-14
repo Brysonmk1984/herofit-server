@@ -137,6 +137,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const status = formData.status || formData.name;
   const version = formData.version || 'Release';
   const location = formData.errorLocation;
+  const message = formData.message;
   let html = `<div>An Error occured in HeroFit Production - `;
   const accountInfo = JSON.stringify(formData.accountInfo);
   // error status and message
@@ -157,19 +158,19 @@ const sendAppErrorEmail = function(formData, resolve, reject){
     html += `<br/><br/><p>User not logged in.</p>`;
   }
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
-  console.log('HERE');
+
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
-      subject: `HEROFIT - ${status} APPLICATION ERROR - version ${formData.version}`, 
-      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${formData.message} \n \n ${formData.debug} \n \n APP VERSION: ${formData.version} ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
+      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
-  console.log(mailOptions);
+  console.log('mail options - ',mailOptions);
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {console.log('err', error)
+      if (error) {console.log('mail error - ', error)
         reject(console.log(error));
       }
       resolve(nodemailer.getTestMessageUrl(info));
