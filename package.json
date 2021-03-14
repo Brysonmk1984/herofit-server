@@ -37,11 +37,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-response-formatter": "^2.0.2",
-<<<<<<< Updated upstream
     "express-validator": "^6.10.0",
-=======
-    "express-validator": "^5.3.1",
->>>>>>> Stashed changes
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.4",
     "moment": "^2.29.1",
