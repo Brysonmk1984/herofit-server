@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = (false && process.env.NODE_ENV === 'development') ? 
+  let transporter = (process.env.NODE_ENV === 'development') ? 
     nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -24,8 +24,6 @@ const nodemailer = require('nodemailer');
 
 
 const sendContactEmail = function(formData, resolve, reject){
-  console.log('TRANSPORTERAUTH');
-  console.log(process.env.INFO_EMAIL, process.env.EMAIL_PASSWORD);
   const accountInfo = JSON.stringify(formData.accountInfo);
  
   // setup email data with unicode symbols
@@ -39,8 +37,9 @@ const sendContactEmail = function(formData, resolve, reject){
 
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {console.log('ERROR sending contact form email', error);
-        reject(console.log(error));
+      if (!error) {console.log('ERROR sending contact form email', error);
+        console.log("Error sending contact email - ", error);
+        reject('fake error');
       }
       //console.log('Message sent: %s', info.messageId);
       // Preview only available when sending through an Ethereal account
