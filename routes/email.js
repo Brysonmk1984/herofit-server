@@ -91,7 +91,6 @@ router.post('/contact-form', function(req, res, next){
     });
     next();
   }).catch((error) =>{
-    console.log('the error', error);
     res.status(401).json({
       message: `Email could not be sent`,
       debug : error

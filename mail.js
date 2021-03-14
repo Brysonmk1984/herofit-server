@@ -37,9 +37,8 @@ const sendContactEmail = function(formData, resolve, reject){
 
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
-      if (!error) {console.log('ERROR sending contact form email', error);
-        console.log("Error sending contact email - ", error);
-        reject('fake error');
+      if (error) {console.log('ERROR sending contact form email', error);
+        reject(error);
       }
       //console.log('Message sent: %s', info.messageId);
       // Preview only available when sending through an Ethereal account
@@ -125,7 +124,7 @@ const sendCronErrorEmail = function({status, name, message, debug, version, erro
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        reject(console.log(error));
+        reject(error);
       }
       resolve(nodemailer.getTestMessageUrl(info));
   });
@@ -144,10 +143,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const accountInfo = JSON.stringify(formData.accountInfo);
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
-  console.log('debug', debug);
-  console.log('status',status);
-  console.log('version',version);
-  console.log('location',location);
+
   if(debug){
     html += `<br/><br/>`;
     html += `<br/><br/><p>` + debug + `</p>`;
@@ -169,11 +165,11 @@ const sendAppErrorEmail = function(formData, resolve, reject){
       text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
-  console.log('mail options - ',mailOptions);
+
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {console.log('mail error - ', error)
-        reject(console.log(error));
+        reject(error);
       }
       resolve(nodemailer.getTestMessageUrl(info));
   });
@@ -210,7 +206,7 @@ const sendBattleReportEmail = function(tally){
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        reject(console.log(error));
+        reject(error);
       }
       resolve(nodemailer.getTestMessageUrl(info));
   });
