@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = process.env.NODE_ENV === 'development' ? 
+  let transporter = process.env.NODE_ENV !== 'development' ? 
     nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
