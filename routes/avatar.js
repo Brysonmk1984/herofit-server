@@ -309,6 +309,8 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
   const page = req.body.page || 0;
   const pageSize = req.body.pageSize || AVATAR_COUNT_PER_PAGE;
   const searchInput = req.body.searchInput;
+  const rankingType = req.body.rankingType;
+  console.log('RANKING TYPE = ', rankingType);
 
   const paginate = (query, { page, pageSize }) => {
     const offset = page * pageSize;
@@ -322,18 +324,37 @@ router.post('/fetch-avatars-by-page-number', function(req, res, next){
    
     };
   };
+  let expression;
+  if(!rankingType){
+    expression = { 
+      attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+      include : [
+        { model: User, attributes: ['username'] },
+        { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+      ],
+      order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
+      raw : undefined,
+      nest : true,
+      distinct : true
+    };
+  }else{
+    console.log('need new query!');
 
-  const expression = { 
-    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
-    include : [
-      { model: User, attributes: ['username'] },
-      { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
-    ],
-    order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
-    raw : undefined,
-    nest : true,
-    distinct : true
-  };
+    expression = { 
+      attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+      include : [
+        { model: User, attributes: ['username'] },
+        { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+      ],
+      order : [[ literal(`(SELECT "avatarId" FROM user_totals)`), 'DESC' ]],
+      raw : undefined,
+      nest : true,
+      distinct : true
+    };
+
+
+  }
+
   if(searchInput){
     expression.where = { name: { [Op.iLike]: `%${searchInput}%`}};
   }
