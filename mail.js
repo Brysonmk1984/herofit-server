@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = process.env.NODE_ENV !== 'development' ? 
+  let transporter = (false && process.env.NODE_ENV === 'development') ? 
     nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
@@ -24,9 +24,10 @@ const nodemailer = require('nodemailer');
 
 
 const sendContactEmail = function(formData, resolve, reject){
-  console.log('contact form detail', formData);
+  console.log('TRANSPORTERAUTH');
+  console.log(process.env.INFO_EMAIL, process.env.EMAIL_PASSWORD);
   const accountInfo = JSON.stringify(formData.accountInfo);
-  console.log('acc info - ', accountInfo);
+ 
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
@@ -35,7 +36,7 @@ const sendContactEmail = function(formData, resolve, reject){
       text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`
   };
-  console.log('MO - ', mailOptions);
+
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {console.log('ERROR sending contact form email', error);
