@@ -48,7 +48,7 @@ const sendContactEmail = function(formData, resolve, reject){
 };
 
 const sendDataCollectionEmail = function(formData, resolve, reject){
-  const accountInfo = JSON.stringify(formData.accountInfo);
+  const accountInfo = formData.accountInfo;
   const { opinion, openResponse } = formData.feedbackData;
   // setup email data with unicode symbols
   let mailOptions = {
