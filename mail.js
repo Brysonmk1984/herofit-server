@@ -56,7 +56,7 @@ const sendDataCollectionEmail = function(formData, resolve, reject){
       to: `${process.env.INFO_EMAIL}`,
       subject: 'HEROFIT - A user submitted Feedback from the Marketing Modal!', 
       text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
-      html: `<div>${formData.username} submitted the ${formData.title}, the message is as follows: <br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
+      html: `<div>${formData.username} submitted the ${formData.title}<br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA:<br /> ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
   };
 
   // send mail with defined transport object
