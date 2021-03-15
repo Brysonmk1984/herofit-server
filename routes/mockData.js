@@ -4,16 +4,14 @@ const router = express.Router();
 const fs = require('fs');
 const path = require("path");
 const moment = require('moment');
-const AppMode = require('../appConfig').config.mode;
-
+const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../helperFunctions');
+// MOCK DATA
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
-const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../helperFunctions');
-
+// MODELS
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const Avatar = require('../db').Avatar;
-const AvatarEquip = require('../db').AvatarEquip;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end
@@ -156,7 +154,6 @@ router.post('/insert-mock-activities', body('count').isNumeric(), body('email').
   });
 
 });
-
 
 // Verify the Admin Password is Correct in order to open the Admin panel
 router.post('/check-admin-password', body('password').custom((password) =>{
