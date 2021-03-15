@@ -8,7 +8,7 @@ const AppMode = require('../appConfig').config.mode;
 
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
-const { parseAvatarProperties } = require('../helperFunctions');
+const { parseAvatarProperties, getRandomNumber } = require('../helperFunctions');
 
 const heroList = require('../heroList');
 const User = require('../db').User;
@@ -39,14 +39,17 @@ const shuffleArray = function(array) {
 
 
 router.post('/insert-mock-activities', function(req,res,next){
-const count = req.body.count;
-const activities = shuffleArray(mockActivities).slice(0,count);
+  const count = req.body.count;
+  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
+    act.id = getRandomNumber(10);
+    return act;
+  });
   console.log('INSERTING THIS MANY ACTS - ',activities.length, 'mock acts - ', mockActivities.length, 'couunt', count);
   const entries = activities.map((activity) =>{
     activity.start_date = moment.utc().format('YYYY-MM-DDTHH:mm:ss');
     activity.start_date_local = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
-    return { user : req.body.email,  activity, activityDate : activity.start_date };
+    return { id: activity.id, user : req.body.email,  activity, activityDate : activity.start_date };
   });
 
   // Add latestActivityUpdate to DB for user
@@ -401,22 +404,18 @@ router.post('/insert-random-avatar', function(req,res,next){
   });
 });
 
-router.post('/get-fake-activities', function(req,res,next){
+router.post('/get-fake-activities',  body('count').isNumeric(), (req,res) => {
   const count = req.body.count;
-  const activities = shuffleArray(mockActivities).slice(0,count);
-
-  if(activities){
-    res.status(200).json({
-      activities
-    });
-    next();
-  }else{
-    res.status(400).json({
-      message: `Error updating latest activity to user table for user  ${req.body.email}`,
-      debug : null
-    });
-    next();
+  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
+    act.id = getRandomNumber(10);
+    return act;
+  });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for get-fake-activities endpoint");
   }
+
+  res.formatter.ok(activities);
 });
 
 // Verify the Admin Password is Correct in order to open the Admin panel
