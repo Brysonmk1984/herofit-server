@@ -24,7 +24,7 @@ const nodemailer = require('nodemailer');
 
 
 const sendContactEmail = function(formData, resolve, reject){
-  const accountInfo = JSON.stringify(formData.accountInfo);
+  const accountInfo = formData.accountInfo;
  
   // setup email data with unicode symbols
   let mailOptions = {
@@ -73,13 +73,13 @@ const sendDataCollectionEmail = function(formData, resolve, reject){
 };
 
 const sendSurveyEmail = function(formData, resolve, reject){
-  const accountInfo = JSON.stringify(formData.accountInfo);
+  const accountInfo = formData.accountInfo;
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: 'HEROFIT - A user submitted a survey!', 
-      text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${JSON.stringify(formData.accountInfo)}`,
+      text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: ${accountInfo}`,
       html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map((item) => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
   };
 
@@ -140,7 +140,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const location = formData.errorLocation;
   const message = formData.message;
   let html = `<div>An Error occured in HeroFit Production - `;
-  const accountInfo = JSON.stringify(formData.accountInfo);
+  const accountInfo = formData.accountInfo;
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
 
