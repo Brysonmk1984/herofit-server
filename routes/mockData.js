@@ -15,91 +15,70 @@ const Avatar = require('../db').Avatar;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end
-router.post('/create-cognito-linked-account', function(req, res, next){
+router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for create-cognito-linked-account endpoint");
+  }
 
-  if(req.body.email){
+  // Create username form firstname and lastname, or assign one
+  let username;
+  if(req.body.firstName || req.body.lastName ){
+    username = `${req.body.firstName} ${req.body.lastName}`.trim();
+  }else{
+    username = shuffleArray(mockAvatarNames)[0];
+  }
 
-    let username;
-    
-    if(req.body.firstName || req.body.lastName ){
-      username = `${req.body.firstName} ${req.body.lastName}`;
+  User.findOrCreate({
+    where: { email: req.body.email },
+    // set the default properties if it doesn't exist
+    defaults: { 
+      email: req.body.email,
+      username : username,
+      firstName : req.body.firstName || null,
+      lastName : req.body.lastName || null,
+      isFake : true
+    }
+  }).then(function(result) {
+    const created = result[1];
+    let user = result[0].dataValues;
+
+    // New user, created a new db
+    if (created) {
+      res.formatter.ok(user), 'New User Created';
+    // User already exists, return data from db
     }else{
-      username = shuffleArray(mockAvatarNames)[0];
+      console.log('User already exists', user.createdAt);
+      res.formatter.ok(user, 'User already Exists');
     }
 
-    User.findOrCreate({
-      where: {
-        email: req.body.email
-      },
-      // set the default properties if it doesn't exist
-      defaults: { 
-        email: req.body.email,
-        username : username,
-        firstName : req.body.firstName || null,
-        lastName : req.body.lastName || null,
-        isFake : true
-      }
-    }).then(function(result) {
-      const created = result[1];
-      let user = result[0].dataValues;
+  }).catch((error)=>{
+    // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
+    if(error && error.original.code === '23505'){
+      User.create({
+          email: req.body.email,
+          username : shuffleArray(mockAvatarNames)[0],
+          firstName : req.body.firstName || null,
+          lastName : req.body.lastName || null
+      })
+      .then((result) =>{
 
-      // New user, created a new db
-      if (created) {
-        res.status(200).json({
-          message: `New user created -  ${user.username}`,
-          user
-        });
-      // User already exists, return data from db
-      }else{
-        console.log('User already exists', user.createdAt);
-        
-        res.status(200).json({
-          message: `User -   ${user.username}`,
-          user
-        });
-      }
-      next();
-    }).catch((error)=>{
-      // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
-      if(error && error.original.code === '23505'){
-        User.create({
-            email: req.body.email,
-            username : shuffleArray(mockAvatarNames)[0],
-            firstName : req.body.firstName || null,
-            lastName : req.body.lastName || null
-        })
-        .then((result) =>{
+        // Need to remove mock username
+        const namesMinusUsed = JSON.stringify(mockAvatarNames.filter((avName) => avName !== user.username));
+        fs.writeFileSync(path.resolve(__dirname,'../mockData/mockAvatarNames.json'), namesMinusUsed);
 
-          // Need to remove mock username
-          const namesMinusUsed = JSON.stringify(mockAvatarNames.filter((avName) => avName !== user.username));
-          fs.writeFileSync(path.resolve(__dirname,'../mockData/mockAvatarNames.json'), namesMinusUsed);
-
-          let user = result.dataValues;
-            res.status(200).json({
-              message: `You are logged in as ${user.username}`,
-              user
-            });
-        })
-        .catch((error) =>{console.log('error', error);
-          res.status(400).json({
-            message: `Couldn't find or create user, but second attempt in catch ${req.body.email}`,
-            debug : error
-          });
-        })
-      }else{
-        console.log(`Couldn't find or create user ${req.body.email}, DEBUG: ${error}`);
-        res.status(400).json({
-          message: `Couldn't find or create user ${req.body.email}`,
-          debug : error
-        });
-        next();
-      }
-    });
-  }else{
-    res.status(400).json({
-      message: `No Passed email`
-    });
-  }
+        let user = result.dataValues;
+        res.formatter.ok(user, 'Username was already taken, just use a mock name instead');
+      })
+      .catch((error) =>{
+        console.log('error', error);
+        res.formatter.serverError(error, 'Couldnt use or make a username for user.');
+      })
+    }else{
+      console.log(`Couldn't find or create user ${req.body.email}, DEBUG: ${error}`);
+      res.formatter.serverError(error, 'Unable to find or create a user.');
+    }
+  });
 });
 
 //  Returns the dummy list of fake activities
