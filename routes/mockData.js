@@ -8,6 +8,7 @@ const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../hel
 // MOCK DATA
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
+const heroList = require('../heroList');
 // MODELS
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
@@ -175,5 +176,118 @@ router.post('/set-avatar-health-and-status',
     });
   }
 );
+
+// Insert random avatar after cognito account was created
+router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-random-avatar endpoint");
+  }
+
+  const selection = shuffleArray(heroList)[0];
+  const elmRandom = shuffleArray(['fire', 'earth', 'water', 'air'])[0];
+
+  const randomHero = {
+    name : shuffleArray(mockAvatarNames)[0],
+    character : selection.character,
+    power : 100,
+    health : 100,
+    maxHealth : 100,
+    fire : selection.elms.fire,
+    earth : selection.elms.earth,
+    air : selection.elms.air,
+    water : selection.elms.water,
+    recovery : 0,
+    armor : 0,
+    activityXP : 0,
+    battleXP : 0,
+    qp : 0,
+    qpRecovery : 0,qpArmor : 0,qpPower : 0,qpItems : 0,qpFire : 0,qpEarth : 0,qpWater : 0,qpAir : 0, qpHealth : 0,
+  };
+  // Elemental bonus
+  randomHero[elmRandom] += 5;
+
+
+  const attrArray = ['Power','Recovery','Armor','Fire', 'Earth', 'Water', 'Air'];
+  const spendQPArray = [1,2,3,4,5,6,7,8,9,10,0,0,0,0,0,0,0,0,0,0];
+
+  // Set random starting xp
+  randomHero.activityXP = Math.floor(Math.random() * (850 - 0));
+  const isLevel = (99 < randomHero.activityXP < 228) ? 2 : randomHero.activityXP < 370 ? 3 : randomHero.activityXP < 523 ? 4 : randomHero.activityXP < 683 ? 5 :randomHero.activityXP < 850 ? 6 : 1;
+  if(isLevel === 2){
+    spendQPArray.push(11,12,13,14,15);
+  }else if(isLevel === 3){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20);
+  }else if(isLevel === 4){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25);
+  }else if(isLevel === 5){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
+  }else if(isLevel === 6){
+    spendQPArray.push(11,12,13,14,15,16,17,18,19,20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
+  }
+  
+  // Randomly spend QP
+  const randomSpentQpNum = shuffleArray(spendQPArray)[0];
+  for(let i = 0; i < randomSpentQpNum; i++){
+    const attr = shuffleArray(attrArray)[0];
+    randomHero[attr.toLowerCase()] += 1;
+    randomHero[`qp${attr}`] += 1;
+  }
+
+  console.log('INSERTING AV', randomHero);
+
+  Avatar.findOrCreate({
+    where: {
+      owner: randomHero.owner
+    },
+    // set the default properties if it doesn't exist
+    defaults: { 
+      isFake : true,
+      owner: req.body.owner,
+      name: randomHero.name,
+      character: randomHero.character,
+      power: randomHero.power,
+      health: randomHero.health,
+      fire : randomHero.fire,
+      earth : randomHero.earth,
+      air : randomHero.air,
+      water : randomHero.water,
+      recovery : randomHero.recovery,
+      armor : randomHero.armor,
+      activityXP : randomHero.activityXP,
+      battleXP : randomHero.battleXP,
+      qp : randomHero.qp,
+      qpFire : randomHero.qpFire,
+      qpEarth : randomHero.qpEarth,
+      qpWater : randomHero.qpWater,
+      qpAir : randomHero.qpAir,
+      qpRecovery : randomHero.qpRecovery,
+      qpPower : randomHero.qpPower,
+      qpArmor : randomHero.qpArmor,
+      qpItems : randomHero.qpItems,
+    }
+  }).then((result) =>{
+    const created = result[1];
+    let avatar = result[0].dataValues;
+    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
+    avatar = parseAvatarProperties(avatar);
+    // New Avatar Created
+    if(created){
+      // Need to remove name used for avatar
+      const namesMinusUsed = JSON.stringify(mockAvatarNames.filter((avName) => avName !== avatar.name));
+      fs.writeFileSync(path.resolve(__dirname,'../mockData/mockAvatarNames.json'), namesMinusUsed);
+      
+      res.formatter.ok({ avatar, avatarId : avatar.id });
+    // Updated Existing Avatar
+    }else{
+      res.formatter.ok({ avatarId : avatar.id });
+    }
+  }).catch((error) =>{
+    console.log(`Couldn't insert Avatar for user ${req.body.owner}, DEBUG: ${error}`);
+    error = error.toString();
+    res.formatter.serverError(error, 'Unable to Create Avatar for Cognito Linked User');
+  });
+  
+});
 
 module.exports = router;
