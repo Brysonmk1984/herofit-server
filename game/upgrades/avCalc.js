@@ -8,18 +8,18 @@ function avCalc(userTotals){
   
   return avReturn = {
     updatePower : function(){
-      //console.log('UT - ', userTotals);
-      let totalDuration = 0;
-      for(const activity in userTotals){
-        if(userTotals[activity]){
-          totalDuration += userTotals[activity].duration;
+
+      let activityMinutes = 0;
+      for(const activityType in userTotals){
+        if(userTotals[activityType]){
+          const durationInMinutes = userTotals[activityType].duration / 60;
+          // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
+          activityMinutes += adjustActivityMinutes(durationInMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
         }
       }
-      const effortSeconds = totalDuration;
-      const effortMinutes = effortSeconds / 60;
-      
-      const effortHalfHours = Math.floor(effortMinutes / MINUTES_PER_POWER);
-  
+      // Currently, not tracking timeAndHalf exercises with a constant. Instead, using the adjustedActivity minutes above. Consider changing this in the future
+      const effortHalfHours = Math.floor(activityMinutes / MINUTES_PER_POWER);
+
       // One extra power earned for every 30 minutes of workout
       const totalPower = BASE_POWER + effortHalfHours;
       return totalPower;
@@ -39,6 +39,7 @@ function avCalc(userTotals){
       for(const activityType in userTotals){
         let activityMinutes = userTotals[activityType] ? (userTotals[activityType].duration / 60) : 0;
         // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
+        // Currently, not tracking timeAndHalf exercises with a constant. Instead, using the adjustedActivity minutes above. Consider changing this in the future
         let adjustedActivityMinutes = adjustActivityMinutes(activityMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
         //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes, 'adjusted - ', adjustedActivityMinutes);
         switch (activityType){
