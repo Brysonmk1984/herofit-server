@@ -82,101 +82,6 @@ router.post('/create-cognito-linked-account', body('email').isEmail(), body('fir
   });
 });
 
-//  Returns the dummy list of fake activities
-router.post('/get-fake-activities',  body('count').isNumeric(), (req,res) => {
-  const count = req.body.count;
-  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
-    act.id = getRandomNumber(10);
-    return act;
-  });
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Validation Error - for get-fake-activities endpoint");
-  }
-
-  res.formatter.ok(activities);
-});
-
-// BROKEN - integer out of range - Inserts fake activities into account by email
-router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), (req,res) =>{
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Validation Error - for insert-mock-activities");
-  }
-  const count = req.body.count;
-  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
-    act.id = getRandomNumber(10);
-    return act;
-  });
-  console.log('INSERTING THIS MANY ACTS - ',activities.length, 'mock acts - ', mockActivities.length, 'couunt', count);
-  const entries = activities.map((activity) =>{
-    activity.start_date = moment.utc().format('YYYY-MM-DDTHH:mm:ss');
-    activity.start_date_local = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-    console.log('ASD - ', activity.id);
-    return { id: 8001, user : req.body.email,  activity, activityDate : activity.start_date };
-  });
-  console.log('ENTRIES - ', entries);
-  // Add latestActivityUpdate to DB for user
-  User.update(
-    {latestActivityUpdate : moment.utc(entries[entries.length.start_date]).format('YYYY-MM-DD HH:mm:ss')},
-    { where: { email: req.body.email } }
-  ).then((result) => {
-    console.log('INSERT USER ACTIVITIES',entries);
-    // Front end is determining which activities are new, so everything passed here can be added to db.
-    return UserActivity.bulkCreate(entries);
-  }).then((result) =>{
-    console.log('HERE!', result);
-    return res.formatter.ok({ activities : req.body.activities });
-  }).catch((error)=>{
-    console.log('ERR', error);
-    error = error.toString();
-    res.formatter.badRequest(error, 'Database Update Error - Unable to bulk insert activities')
-  });
-
-});
-
-// Verify the Admin Password is Correct in order to open the Admin panel
-router.post('/check-admin-password', body('password').custom((password) =>{
-  return password === process.env.ADMIN_PANEL_PASSWORD ? true : false; 
-}), (req,res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Some meta data");
-  }
-  
-  res.formatter.ok({isValid : true});
-});
-
-// Manually set Avatar's health and status
-router.post('/set-avatar-health-and-status', 
-  body('id').isNumeric(), 
-  body('health').isNumeric(), 
-  body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']),
-  (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.formatter.badRequest(errors.array(), "Validation Error - for set-avatar-health-and-status endpoint");
-    }
-
-    return Avatar.update(
-      { health : req.body.health, status : req.body.status },
-      { where: { id: req.body.id }, returning : true, raw : true }
-    ).then((avatar) =>{
-      // Shouldn't ever happen
-      if(!avatar){
-        throw new Error(`No Avatar to set health and status for Avatar ID: ${req.body.id}`);
-      }else if(!avatar[1] || !avatar[1][0]){
-        throw new Error('Error with Sequelize return formatting.');
-      }
-
-      res.formatter.ok({ avatar : parseAvatarProperties(avatar[1][0]) });
-    }).catch((error) =>{
-      error = error.toString();
-      res.formatter.notFound(error.toString(), 'Retrieved Data Error for set-avatar-health-and-status endpoint');
-    });
-  }
-);
-
 // Insert random avatar after cognito account was created
 router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
   const errors = validationResult(req);
@@ -277,7 +182,7 @@ router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
       const namesMinusUsed = JSON.stringify(mockAvatarNames.filter((avName) => avName !== avatar.name));
       fs.writeFileSync(path.resolve(__dirname,'../mockData/mockAvatarNames.json'), namesMinusUsed);
       
-      res.formatter.ok({ avatar, avatarId : avatar.id });
+      res.formatter.ok({ avatar });
     // Updated Existing Avatar
     }else{
       res.formatter.ok({ avatarId : avatar.id });
@@ -289,5 +194,100 @@ router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
   });
   
 });
+
+//  Returns the dummy list of fake activities
+router.post('/get-fake-activities',  body('count').isNumeric(), (req,res) => {
+  const count = req.body.count;
+  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
+    act.id = getRandomNumber(10);
+    return act;
+  });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for get-fake-activities endpoint");
+  }
+
+  res.formatter.ok(activities);
+});
+
+// BROKEN - integer out of range - Inserts fake activities into account by email
+router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), (req,res) =>{
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for insert-mock-activities");
+  }
+  const count = req.body.count;
+  const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
+    act.id = getRandomNumber(10);
+    return act;
+  });
+  console.log('INSERTING THIS MANY ACTS - ',activities.length, 'mock acts - ', mockActivities.length, 'couunt', count);
+  const entries = activities.map((activity) =>{
+    activity.start_date = moment.utc().format('YYYY-MM-DDTHH:mm:ss');
+    activity.start_date_local = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+    console.log('ASD - ', activity.id);
+    return { id: 8001, user : req.body.email,  activity, activityDate : activity.start_date };
+  });
+  console.log('ENTRIES - ', entries);
+  // Add latestActivityUpdate to DB for user
+  User.update(
+    {latestActivityUpdate : moment.utc(entries[entries.length.start_date]).format('YYYY-MM-DD HH:mm:ss')},
+    { where: { email: req.body.email } }
+  ).then((result) => {
+    console.log('INSERT USER ACTIVITIES',entries);
+    // Front end is determining which activities are new, so everything passed here can be added to db.
+    return UserActivity.bulkCreate(entries);
+  }).then((result) =>{
+    console.log('HERE!', result);
+    return res.formatter.ok({ activities : req.body.activities });
+  }).catch((error)=>{
+    console.log('ERR', error);
+    error = error.toString();
+    res.formatter.badRequest(error, 'Database Update Error - Unable to bulk insert activities')
+  });
+
+});
+
+// Verify the Admin Password is Correct in order to open the Admin panel
+router.post('/check-admin-password', body('password').custom((password) =>{
+  return password === process.env.ADMIN_PANEL_PASSWORD ? true : false; 
+}), (req,res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Some meta data");
+  }
+  
+  res.formatter.ok({isValid : true});
+});
+
+// Manually set Avatar's health and status
+router.post('/set-avatar-health-and-status', 
+  body('id').isNumeric(), 
+  body('health').isNumeric(), 
+  body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.formatter.badRequest(errors.array(), "Validation Error - for set-avatar-health-and-status endpoint");
+    }
+
+    return Avatar.update(
+      { health : req.body.health, status : req.body.status },
+      { where: { id: req.body.id }, returning : true, raw : true }
+    ).then((avatar) =>{
+      // Shouldn't ever happen
+      if(!avatar){
+        throw new Error(`No Avatar to set health and status for Avatar ID: ${req.body.id}`);
+      }else if(!avatar[1] || !avatar[1][0]){
+        throw new Error('Error with Sequelize return formatting.');
+      }
+
+      res.formatter.ok({ avatar : parseAvatarProperties(avatar[1][0]) });
+    }).catch((error) =>{
+      error = error.toString();
+      res.formatter.notFound(error.toString(), 'Retrieved Data Error for set-avatar-health-and-status endpoint');
+    });
+  }
+);
 
 module.exports = router;
