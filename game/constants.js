@@ -67,7 +67,7 @@ const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
   HEALTH : .8,
-  QP : 1.2,
+  QP : 1.1,
   POWER : 1.1
 };
 
