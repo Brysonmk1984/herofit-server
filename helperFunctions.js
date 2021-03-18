@@ -35,21 +35,20 @@ function cloneObj(obj, deep=false){
 }
 
 function arrayChunker(inputArray, perChunk){   
-
-   var result = inputArray.reduce((resultArray, item, index) => { 
-   const chunkIndex = Math.floor(index/perChunk)
-
-   if(!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [] // start a new chunk
-   }
-
-   resultArray[chunkIndex].push(item)
-
-   return resultArray
+   return inputArray.reduce((resultArray, item, index) => { 
+      const chunkIndex = Math.floor(index/perChunk)
+      if(!resultArray[chunkIndex]) {
+         resultArray[chunkIndex] = [] // start a new chunk
+      }
+      resultArray[chunkIndex].push(item)
+      return resultArray
    }, [])
-
-   return result;
-   
 }
 
-module.exports = { cloneObj, parseAvatarProperties, arrayChunker };
+const paginate = (query, { page, pageSize }) => {
+   const offset = page * pageSize;
+   const limit = pageSize;
+   return { ...query,limit,offset };
+ };
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, paginate };
