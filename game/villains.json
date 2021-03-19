@@ -164,5 +164,21 @@
       "bonusPtBase": 100,
       "pba" : ["Grant Shadow-Self"]
     }
+  ],
+  "Titans": [
+    {
+      "id": 9,
+      "class" : "Titans",
+      "type": "Plaguebringer",
+      "foe": ["The Plaguebringer"],
+      "ability": {
+        "name" : "Infect",
+        "effect" : "Damage Over Time"
+      },
+      "color": null,
+      "bonusXpBase": 100,
+      "bonusPtBase": 200,
+      "pba" : ["Grant Plaguebringer"]
+    }
   ]
 }
