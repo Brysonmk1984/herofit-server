@@ -194,6 +194,11 @@ const AvatarModel = function(db, DataTypes){
         allowNull: true,
         defaultValue: 0,
       },
+      statusFade: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
   });
 
   return Avatar;

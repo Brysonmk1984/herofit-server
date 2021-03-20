@@ -15,7 +15,7 @@ const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
-const { doAllPbas } = require('../game/runPostBattleActions');
+const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
 const ALLITEMS = require('../game/allItems.json');
@@ -27,34 +27,54 @@ router.get('/regenerate-health', async function(req, res, next){
     
   //Get all avatars who aren't at full health
   return Avatar.findAll(
-    { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
+    { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
   ).then((results) => {
     
     const allPromises = []
     
-    // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
-    results.forEach((result) =>{
-    result = parseAvatarProperties(result);
+    // Loop over each avatar and either regen health if recovering or other status effects
+    results.forEach((avatar) =>{
+      avatar = parseAvatarProperties(avatar);
 
-      let h = result.health;
-      const mH = result.maxHealth;
-      const adjRegenRate = REGENERATION_RATE + result.recovery;
-    
-      if((h + adjRegenRate) > mH){
-        result.health = mH;
-      }else{
-        result.health += adjRegenRate;
-      }
-      // Update status if over 'Rested' threshold
-      let updatedStatus = 'Recovering';
-      if((result.health / mH) >= RESTED_THRESHOLD){
-        updatedStatus = 'Rested';
-      }
+      let avatarHealth = avatar.health;
+      const maxHealth = avatar.maxHealth;
+      const adjRegenRate = REGENERATION_RATE + avatar.recovery;
+      let avatarStatus = avatar.status;
+      let avatarStatusFade = avatar.statusFade;
 
+      // Check avatar status and run appropriate action
+      switch(avatarStatus){
+        case 'Infected':
+          const infectAmount = Math.floor(adjRegenRate / 2);
+          // If no more counters, set to recovering and no break statement - the hero will recover health this round
+          if(avatarStatusFade === 0){
+            avatarStatus = 'Recovering';
+          // If Fade counter is greater than zero, reduce health of avatar by infect amount and decrement counter. BREAK statement
+          }else{
+            avatarHealth = avatarHealth - infectAmount;
+            --avatarStatusFade;
+            break;
+          }
+        case 'Recovering':
+          // If one tick of health recovery is over maxHealth, just assign maxHealth
+          if((avatarHealth + adjRegenRate) > maxHealth){
+            avatarHealth = maxHealth;
+          // Otherwise add one tick of health back to avatar's health
+          }else{
+            avatarHealth += adjRegenRate;
+          }
+          // Update status to 'Rested' if over 'Rested' threshold
+          if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+            avatarStatus = 'Rested';
+          }
+          break;
+        default: 
+          break;
+      }
 
       allPromises.push(Avatar.update(
-        {health : result.health, status : updatedStatus},
-        { where: { owner: result.owner },
+        {health : avatarHealth, status : avatarStatus, statusFade : avatarStatusFade},
+        { where: { owner: avatar.owner },
         returning: true,
         raw: true, 
         plain: true
@@ -345,8 +365,7 @@ router.get('/do-all-battles', function(req, res, next){
         BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
         BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
 
-        // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
-        
+        // BATTLE STEP 3 - NOT IMPLEMENTED YET - PLAYER USES ITEMS AND CHOOSED ACTIONS
         if(itemsUsed || actionsChosen){
           if(scenario.id !== AVATAR_NON_ACTION){
             const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
@@ -355,8 +374,8 @@ router.get('/do-all-battles', function(req, res, next){
           }
         }
 
-        // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-        if(foeWithStats.ability){
+        // BATTLE STEP 4 - FOE USES PRE-BATTLE ABILITY
+        if(foeWithStats.ability && foeWithStats.ability.type === 'pre-battle'){
           if(scenario.id !== FOE_NON_ACTION){
             const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
             BRF = foeBP.foe;
@@ -364,7 +383,7 @@ router.get('/do-all-battles', function(req, res, next){
           }
         }
         //TEMP CHEAT
-        //BRA.power += 1000;
+        BRA.power += 1000;
         //BRA.health = 10;
 
         // WHO SWINGS FIRST
@@ -460,7 +479,9 @@ router.get('/do-all-battles', function(req, res, next){
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
 
-        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
+        // If Any Post-Battle abilities exist, use them
+        avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
+        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
 
         // End Avatar for each
       });

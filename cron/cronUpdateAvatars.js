@@ -1,4 +1,5 @@
 const Avatar = require('../db').Avatar;
+const { Op } = require("sequelize");
 const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
 //const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
@@ -7,32 +8,53 @@ console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health
 Avatar.findAll(
-  { where: { status: 'Recovering' }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner'] },
+  { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
 ).then((results) => {
   
   const allPromises = []
-  
-  // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
-  results.forEach((result) =>{
-    result = parseAvatarProperties(result);
-    
-    let h = result.health;
-    const mH = result.maxHealth;
-    const adjRegenRate = REGENERATION_RATE + result.recovery;
+  // Loop over each avatar and either regen health if recovering or other status effects
+  results.forEach((avatar) =>{
+    avatar = parseAvatarProperties(avatar);
 
-    if((h + adjRegenRate) > mH){
-      result.health = mH;
-    }else{
-      result.health += adjRegenRate;
+    let avatarHealth = avatar.health;
+    const maxHealth = avatar.maxHealth;
+    const adjRegenRate = REGENERATION_RATE + avatar.recovery;
+    let avatarStatus = avatar.status;
+    let avatarStatusFade = avatar.statusFade;
+
+    // Check avatar status and run appropriate action
+    switch(avatarStatus){
+      case 'Infected':
+        const infectAmount = Math.floor(adjRegenRate / 2);
+        // If no more counters, set to recovering and no break statement - the hero will recover health this round
+        if(avatarStatusFade === 0){
+          avatarStatus = 'Recovering';
+        // If Fade counter is greater than zero, reduce health of avatar by infect amount and decrement counter. BREAK statement
+        }else{
+          avatarHealth = avatarHealth - infectAmount;
+          --avatarStatusFade;
+          break;
+        }
+      case 'Recovering':
+        // If one tick of health recovery is over maxHealth, just assign maxHealth
+        if((avatarHealth + adjRegenRate) > maxHealth){
+          avatarHealth = maxHealth;
+        // Otherwise add one tick of health back to avatar's health
+        }else{
+          avatarHealth += adjRegenRate;
+        }
+        // Update status to 'Rested' if over 'Rested' threshold
+        if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+          avatarStatus = 'Rested';
+        }
+        break;
+      default: 
+        break;
     }
-    // Update status if over 'Rested' threshold
-    let updatedStatus = 'Recovering';
-    if((result.health / mH) >= RESTED_THRESHOLD){
-      updatedStatus = 'Rested';
-    }
+
     allPromises.push(Avatar.update(
-      {health : result.health, status : updatedStatus},
-      { where: { owner: result.owner },
+      {health : avatarHealth, status : avatarStatus, statusFade : avatarStatusFade},
+      { where: { owner: avatar.owner },
       returning: true,
       raw: true, 
       plain: true
@@ -41,9 +63,8 @@ Avatar.findAll(
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
-  return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
-}).then(() =>{
-  process.exit();
+  results.forEach((result) => console.log('All Regenerate Results - ', result.status));
+  return process.exit();
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
     //db.close();
