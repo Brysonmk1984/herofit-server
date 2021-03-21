@@ -53,25 +53,24 @@ function parseAvatarProperties(avatar){
 }
 
 function arrayChunker(inputArray, perChunk){   
-
-   var result = inputArray.reduce((resultArray, item, index) => { 
-   const chunkIndex = Math.floor(index/perChunk)
-
-   if(!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [] // start a new chunk
-   }
-
-   resultArray[chunkIndex].push(item)
-
-   return resultArray
+   return inputArray.reduce((resultArray, item, index) => { 
+      const chunkIndex = Math.floor(index/perChunk)
+      if(!resultArray[chunkIndex]) {
+         resultArray[chunkIndex] = [] // start a new chunk
+      }
+      resultArray[chunkIndex].push(item)
+      return resultArray
    }, [])
-
-   return result;
-   
 }
 
 function getRandomNumber(length) {
    return Math.floor(Math.pow(10, length-1) + Math.random() * 9 * Math.pow(10, length-1));
 }
 
-module.exports = { cloneObj, shuffleArray, parseAvatarProperties, arrayChunker, getRandomNumber };
+const paginate = (query, { page, pageSize }) => {
+   const offset = page * pageSize;
+   const limit = pageSize;
+   return { ...query,limit,offset };
+ };
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate };
