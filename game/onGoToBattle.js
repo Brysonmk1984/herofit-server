@@ -16,6 +16,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
   }).then((equipment) =>{console.log('equipment', equipment);
     const skinNamesArray = equipment.filter(item => item.type === 'skin').map(skin => skin.name);
     const titleNamesArray = equipment.filter(item => item.type === 'title').map(title => title.name);
+    const petNamesArray = equipment.filter(item => item.type === 'pet').map(pet => pet.name);
 
     console.log('SNA', skinNamesArray, 'TNA - ', titleNamesArray);
     const allPbaCheckPromises = [];
@@ -31,6 +32,14 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     if(foe.class === 'Spirits'){
       // Check if current foe is last of type of foe
       allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, 'Spirits', foe.name, skinNamesArray));
+    }
+
+    if(foe.class === 'Titans'){
+      if(foe.type === 'Plaguebringer'){
+        const allPastRewards = [...skinNamesArray, ...titleNamesArray, ...petNamesArray];
+        // Check if foe has been defeated
+        allPbaCheckPromises.push(_checkDefeatedParticularFoe(avatar.id, foe.type, 'Titans', foe.name, allPastRewards));
+      }
     }
 
 
@@ -78,6 +87,55 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
   }).catch((error) => console.log('Error Getting all titles', error));
   
 
+}
+
+// CHECKS IF THE CURRENT FOE WILL GRANT A REWARD
+function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName, arrayOfPastRewards){
+  // FIND ALL BATTLES WHERE THE AVATAR WON AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
+  return Battle.findAll({
+    attributes : ["foe"],
+    where : {  
+      avatarID : avatarId, 
+      [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }],
+      "foe.type" : { [Op.eq] : foeType  }
+    },
+    raw : true 
+  }).then((results) =>{
+    // All foes defeated within a type (eg. Banshee)
+    if(results){
+      // From resulting battles, make an array that's only the names of the foes. Then sort it in alphabetical order
+      const foesDefeated = results.map(result => result.foe.name).slice().sort();
+
+      // Remove duplicates from foesDefeated
+      const fdNoDUpes = [...new Set(foesDefeated)];
+
+      const hasBeenDefeated = fdNoDUpes.includes(currentFoeName) ? true : false;
+      console.log('hasBeenDefeated', hasBeenDefeated);
+      // If last foe of type, return matching PBA action
+      if(hasBeenDefeated){
+        
+        // Consider moving the PBA action to the normal PBA JSON file
+        const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];
+        const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
+        console.log('action', action, 'MPBA - ', matchingPBA);
+        // Check to make sure the user doesn't already have the item
+        const isCriticalWin = !arrayOfPastRewards.includes(matchingPBA.name);
+        
+        // Win is critical if it's unearned
+        if(isCriticalWin){
+          console.log('IS A CRITICAL WIN', isCriticalWin);
+          return action;
+        }
+        return undefined
+      }
+      return undefined;
+
+    }
+    // THIS SHOULDN'T HAPPEN, BUT I WANT TO PREVENT THE SCRIPT FROM STALLING IF IT DOES
+    return undefined;
+  }).catch((error)=>{
+    console.log('ERR - ', error);
+  });
 }
 
 // CHECKS IF THE CURRENT FOE WILL GRANT A NEW SKIN FOR BEING LAST OF TYPE
