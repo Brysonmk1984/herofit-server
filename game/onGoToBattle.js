@@ -112,7 +112,7 @@ function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName
       const hasBeenDefeated = fdNoDUpes.includes(currentFoeName) ? true : false;
       console.log('hasBeenDefeated', hasBeenDefeated);
       // If last foe of type, return matching PBA action
-      if(hasBeenDefeated){
+      if(!hasBeenDefeated){
         
         // Consider moving the PBA action to the normal PBA JSON file
         const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];

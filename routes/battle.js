@@ -338,6 +338,7 @@ router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
     if(battle){
       let rewards = null;
       if(battle.postBattleActions){
+        //console.log(battle.postBattleActions);
         // Get the items aquired from the action types in the battle report
         rewards = battle.postBattleActions.map(action => {
           let matchingPBA;
@@ -350,6 +351,7 @@ router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
               break;
             }
           } 
+          //console.log('MBPA - ',matchingPBA);
           return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
         });
       }
