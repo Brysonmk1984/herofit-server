@@ -93,10 +93,27 @@ router.post('/insert-battle', function(req, res, next){
           });
           return;
         }
+
+        const rewards = postBattleActions.map(action => {
+          let matchingPBA;
+          for(let actionType in ALLPBAs){
+            const match = ALLPBAs[actionType].find(pba => {
+              console.log(pba.action, action);
+              return pba.action === action;
+            });
+            if(match){
+              return matchingPBA = match;
+            }
+          } 
+          return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+        });
+
+
         res.status(200).json({
           message : 'Avatar set for battle',
           goToBattle : true,
-          foe : foeWithStats
+          foe : foeWithStats,
+          rewards
         });
         next();
       }).catch((err)=>{
