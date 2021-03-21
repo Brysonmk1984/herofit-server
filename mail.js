@@ -156,7 +156,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
     html += `<br/><br/><p>User not logged in.</p>`;
   }
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
-
+  console.log('HERE');
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
@@ -165,7 +165,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
       text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
-
+  console.log(mailOptions);
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {console.log('mail error - ', error)

@@ -254,11 +254,12 @@ router.post('/check-admin-password', body('password').custom((password) =>{
 }), (req,res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Some meta data");
+    return res.formatter.badRequest(errors.array(), "Validation Error for check-admin-password endpoint");
   }
   
   res.formatter.ok({isValid : true});
 });
+
 
 // Manually set Avatar's health and status
 router.post('/set-avatar-health-and-status', 

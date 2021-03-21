@@ -73,4 +73,13 @@ const paginate = (query, { page, pageSize }) => {
    return { ...query,limit,offset };
  };
 
-module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate };
+function adjustActivityMinutes(minutes, activityType, timeAndHalfActivities){
+   const isTimeAndHalf =  timeAndHalfActivities.includes(activityType);
+   if(isTimeAndHalf){
+      return minutes * 1.5;
+   }
+   return minutes;
+}
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes };
+
