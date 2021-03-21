@@ -87,4 +87,24 @@ function doAllPbas(avatarID, postBattleActions){
 
 }
 
-module.exports = { determineXpBounty, determinePtBounty, doAllPbas };
+function doPostBattleEffects(avatar, foe, outcome){
+  const fAbility = foe.ability;
+  if(fAbility.type === 'post-battle'){
+    switch(fAbility.name){
+      //PLAGUEBRINGER
+      case 'Infect':
+        // Only apply Infect if the hero won, otherwise he should just be knocked out
+        if(outcome === 'Avatar Wins'){
+          const status = 'Infected';
+          const statusFade = 24;
+
+          return Object.assign({}, avatar, { status, statusFade });
+        }
+        return avatar;
+      default:
+        return;
+    }
+  }
+}
+
+module.exports = { determineXpBounty, determinePtBounty, doAllPbas, doPostBattleEffects };

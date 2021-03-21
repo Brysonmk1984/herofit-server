@@ -1,12 +1,12 @@
 
-function doAvatarBattlePrep(avatar, foe, itemsUsed, actionsChosen){
+function doAvatarBattlePrep(avatar, foe, itemsUsed, ability){
 
   return { avatar, foe };
 }
 
-function doFoeBattlePrep(foe, avatar, itemsUsed, actionsChosen){
+function doFoeBattlePrep(foe, avatar, itemsUsed, ability){
 
-  switch(actionsChosen.name){
+  switch(ability.name){
     case "From the Shadows":
       // Increased Power
       foe.power = Math.floor(foe.power + (foe.power * .2));
