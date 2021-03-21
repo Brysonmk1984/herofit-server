@@ -8,7 +8,7 @@ const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/const
 const doBattle = require('../game/doBattle');
 const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
-const { doAllPbas } = require('../game/runPostBattleActions');
+const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 
 console.log('*** RUNNING CRON AVATAR BATTLES ***');
 // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
@@ -86,8 +86,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
 
       //console.log('BRABRF - ',BRA, BRF);
-      // BATTLE STEP 3 - PLAYER USES ITEMS AND CHOOSED ACTIONS
-      
+      // BATTLE STEP 3 - NOT IMPLEMENTED YET - PLAYER USES ITEMS AND CHOOSED ACTIONS
       if(itemsUsed || actionsChosen){
         if(scenario.id !== AVATAR_NON_ACTION){
           const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
@@ -96,8 +95,8 @@ function runBattlesOnBatch(shard, shardIndex){
         }
       }
 
-      // BATTLE STEP 4 - FOE USES ITEMS AND CHOOSED ACTIONS
-      if(foeWithStats.ability){
+      // BATTLE STEP 4 - FOE USES PRE-BATTLE ABILITY
+      if(foeWithStats.ability && foeWithStats.ability.type === 'pre-battle'){
         if(scenario.id !== FOE_NON_ACTION){
           const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
           BRF = foeBP.foe;
@@ -132,7 +131,7 @@ function runBattlesOnBatch(shard, shardIndex){
           avatar.battleWins = avatar.battleWins + 1;
           //console.log('XP-bounty', xpGain);
           //console.log('PT-bounty', ptGain);
-          console.log('pbas after win before insertion - cron - ',postBattleActions);
+          //console.log('pbas after win before insertion - cron - ',postBattleActions);
           //avatar.photonTokens += ptGain;
           allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
@@ -191,10 +190,12 @@ function runBattlesOnBatch(shard, shardIndex){
 
       const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
       avatar.status = b.outcomeData.avatarStatus;
-        avatar.battleXP += xpGain;
-        avatar.qp += qpEarned;
+      avatar.battleXP += xpGain;
+      avatar.qp += qpEarned;
 
-        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
+      // If Any Post-Battle abilities exist, use them
+      avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
+      avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
       
       // End Avatar for each
     });

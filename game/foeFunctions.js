@@ -120,10 +120,11 @@ function generateFoeStats(avatar, foe){
     }
     qpAdjustedStats = ["health","power","armor"];
   // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
+  // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
   }else if(foe.class === 'Titans'){
-    const powerQuarter = Math.floor(powerAfterMod.stat / 4);
+    const powerQuarter = Math.floor(powerAfterMod.stat / 8);
     foeWithStats = {
-      health : healthAfterMod.stat,
+      health : healthAfterMod.stat < 200 ? 200 : healthAfterMod.stat,
       power : powerAfterMod.stat,
       armor : 0,
       fire : powerQuarter,
