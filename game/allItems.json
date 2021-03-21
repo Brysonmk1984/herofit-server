@@ -114,6 +114,17 @@
       "effect2" : "",
       "icon" : "",
       "class" : ""
+    },
+    {
+      "id" : 2,
+      "type" : "pet",
+      "name" : "PlaguePuff",
+      "description" : "Award for defeating The Plaguebringer (Titan)",
+      "lore" : "While it would appear that Plaguebringer only cares to inflict infectious devastation on the world, this is not true. He actually cares deeply for his pet noxious gas cloud.",
+      "effect1" : "",
+      "effect2" : "",
+      "icon" : "",
+      "class" : ""
     }
   ],
   "titles" : [

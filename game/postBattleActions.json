@@ -63,6 +63,13 @@
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
+    },{
+      "id" : 8,
+      "action" : "Grant Plaguebringer",
+      "name" : "PlaguePuff Pet",
+      "type" : "Award Pet",
+      "itemCategory": "pets",
+      "outcome" : "win"
     }
   ],
 
