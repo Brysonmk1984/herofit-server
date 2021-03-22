@@ -18,10 +18,17 @@
   ],
   "bugFixes": [
     "Fixed a bug where new players couldn't get past new patch window",
+    "Fixed a bug where the battle time was off by one hour because of daylight savings time",
+    "Fixed issue where the last page of the rankings was not showing",
+    "Fixed an issue where my contact form messages and error-reporting emails were not being sent",
+    "Fixed an issue where sometimes the reward for an upcoming battle win would not show in the Awaiting Battle window"
   ],
   "balanceChanges": [
     "On going foe difficuty tweaks, working on finding the right balance"
   ],
-  "miscDetails": null,
-  "closingRemarks": null
+  "miscDetails": [
+    "Ongoing improvements to the backend API are underway. Nothing fancy for the user, but for the devleopers out there, We're improving request body validation and formatting responses.",
+    "Likewise on the frontend, we're working on refactoring how the http requests are handled and presenting error messages."
+  ],
+  "closingRemarks": "It's clear from the previous patch feedback that there hasn't been enough documentation about how to use new features. Also, more items are needed, especially at the lower levels. This will be addressed in upcoming patches. Thanks again for playing!"
 } 
