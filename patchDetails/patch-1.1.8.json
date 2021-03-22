@@ -13,7 +13,7 @@
     },
     {
       "title": "XP,Elemental, Power changes to Fire activities, swimming, and elliptical",
-      "description": "Fire activities, swimming, and elliptical will now grant XP, Elemental points, and Power 50% faster. This is because of the strenuousness of the activities per minutes spent. This may change in the future."
+      "description": "Fire activities, swimming, and elliptical will now grant XP, Elemental points, and Power 50% faster. This is because of the strenuousness of the activities per minutes spent. This may change in the future. IMPORTANT - this change will be retroactive, meaning on your next level up, your total xp, power, and elements will be calculated fresh with the new changes. You'll likely have a big upgrade to make up the difference."
     }
   ],
   "bugFixes": [
