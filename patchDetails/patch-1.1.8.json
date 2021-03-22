@@ -1,0 +1,27 @@
+{
+  "version": "1.1.8",
+  "headline": "New Update!  -  1.1.8",
+  "openingRemarks": "New Foe! - Plaguebringer, Rankings by activities, changes to running and other activities!",
+  "newFeatures": [
+    {
+      "title": "A New Foe arrived from the NetherRealm: The Plaguebringer",
+      "description": "Available after level 20, earn a Plagueling pet for defeating The Plaguebringer. If you survive, he'll infect your hero, causing health loss equal to half the heroe's regeneration rate for 24 hours."
+    },
+    {
+      "title": "Ranking By Activities",
+      "description": "There is now a dropdown box to select different activities and view how you rank among the HeroFit community. Who's going to be the top runner? the top yogi?"
+    },
+    {
+      "title": "XP,Elemental, Power changes to Fire activities, swimming, and elliptical",
+      "description": "Fire activities, swimming, and elliptical will now grant XP, Elemental points, and Power 50% faster. This is because of the strenuousness of the activities per minutes spent. This may change in the future."
+    }
+  ],
+  "bugFixes": [
+    "Fixed a bug where new players couldn't get past new patch window",
+  ],
+  "balanceChanges": [
+    "On going foe difficuty tweaks, working on finding the right balance"
+  ],
+  "miscDetails": null,
+  "closingRemarks": null
+} 

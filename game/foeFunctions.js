@@ -92,9 +92,9 @@ function generateFoeStats(avatar, foe){
   let qpAfterMod;
   // If boss, randomize higher stats
   if(foe.class === 'Titans'){
-    healthAfterMod = randomizer(baseFoeHealth, -10);
+    healthAfterMod = randomizer(baseFoeHealth, -12);
     powerAfterMod = randomizer(baseFoePower, -20);
-    qpAfterMod = randomizer(Math.floor(qp * FOE_MOD.QP), -3);
+    qpAfterMod = randomizer(Math.floor(qp * FOE_MOD.QP), -5);
   }else{
     healthAfterMod = randomizer(baseFoeHealth);
     powerAfterMod = randomizer(baseFoePower);

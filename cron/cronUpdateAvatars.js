@@ -26,10 +26,17 @@ Avatar.findAll(
     switch(avatarStatus){
       case 'Infected':
         const infectAmount = Math.floor(adjRegenRate / 2);
-        // If no more counters, set to recovering and no break statement - the hero will recover health this round
-        if(avatarStatusFade === 0){
+        // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
+        if((avatarHealth - infectAmount) <= 0){
+          avatarStatus = 'Knocked Out';
+          avatarHealth = 0;
+          avatarStatusFade = 0;
+          break;
+        // Otherwise, if no more counters, set to recovering and no break statement - the hero will recover health this round
+        }else if(avatarStatusFade === 0){
           avatarStatus = 'Recovering';
-        // If Fade counter is greater than zero, reduce health of avatar by infect amount and decrement counter. BREAK statement
+        
+        // If Fade counter is greater than zero AND hero wont be KO from 1 more proc, reduce health of avatar by infect amount and decrement counter. BREAK statement
         }else{
           avatarHealth = avatarHealth - infectAmount;
           --avatarStatusFade;
