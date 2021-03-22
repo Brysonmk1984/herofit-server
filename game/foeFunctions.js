@@ -17,10 +17,10 @@ function selectFoeTemplate(level){
   if(level >= 20){
     const randomNum = Math.floor(Math.random() * 18);
     // Probability of facing one of many bosses = 1/18
-    if(true || randomNum === 0){
+    if(randomNum === 0){
       const randomNum2 = Math.floor(Math.random() * 3);
       // Probability of facing Plaguebringer = 2/3
-      if(true ||randomNum === 0 || randomNum === 1){
+      if(randomNum === 0 || randomNum === 1){
         villain = villains.Titans[0];
       }else{
         villain = villains.Spirits[villains.Spirits.length -1];
