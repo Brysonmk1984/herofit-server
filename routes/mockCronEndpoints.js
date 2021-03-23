@@ -480,9 +480,10 @@ router.get('/do-all-battles', function(req, res, next){
         },
         { where: { id: allBattleIds[i] }, raw : true }
         ));
-
+        console.log('AVATAR CHECK - ', avatar);
         const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
         avatar.status = b.outcomeData.avatarStatus;
+        avatar.statusFade = avatar.statusFade || 0;
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
         console.log('AVATAR CHECK - ', avatar);
