@@ -485,9 +485,10 @@ router.get('/do-all-battles', function(req, res, next){
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
-
+        console.log('AVATAR CHECK - ', avatar);
         // If Any Post-Battle abilities exist, use them
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
+        console.log('AVATAR CHECK - ', avatar);
         avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
 
         // End Avatar for each
