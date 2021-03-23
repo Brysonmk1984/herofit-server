@@ -105,6 +105,7 @@ function doPostBattleEffects(avatar, foe, outcome){
         return;
     }
   }
+  return avatar;
 }
 
 module.exports = { determineXpBounty, determinePtBounty, doAllPbas, doPostBattleEffects };
