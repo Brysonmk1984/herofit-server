@@ -340,7 +340,7 @@ router.get('/do-all-battles', function(req, res, next){
       allPbaArrays.push(battle.postBattleActions);
       //console.log('BATTLE - ',battle);
       allAvatarPromises.push(Avatar.findOne(
-        { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
+        { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
       ));
     });
 

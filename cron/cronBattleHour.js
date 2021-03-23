@@ -52,7 +52,7 @@ function runBattlesOnBatch(shard, shardIndex){
     allPbaArrays.push(battle.postBattleActions);
     //console.log('BATTLE - ',battle);
     allAvatarPromises.push(Avatar.findOne(
-      { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
+      { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
     ));
   });
   // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
@@ -195,6 +195,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
       // If Any Post-Battle abilities exist, use them
       avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
+      console.log('AVATAR CHECK - ', avatar);
       avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
       
       // End Avatar for each
