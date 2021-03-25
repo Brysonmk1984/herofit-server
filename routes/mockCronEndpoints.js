@@ -167,9 +167,10 @@ router.post('/generate-foe', body('avatar').isObject(), (req, res) => {
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
   }
-  const foe = generateFoeStats(req.body.avatar);
-  if(foe){
-    res.formatter.ok(foe);
+  const foe = selectFoeTemplate(req.body.avatar.level);
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
+  if(foeWithStats){console.log(foeWithStats);
+    res.formatter.ok(foeWithStats);
   }else{
     const error =  new Error("Couldn't generate foe");
     res.formatter.serverError(error);
