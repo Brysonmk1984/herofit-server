@@ -27,7 +27,7 @@ const ALLITEMS = require('../game/allItems.json');
 router.get('/regenerate-health', (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Validation Error - for create-cognito-linked-account endpoint");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /regenerate-health endpoint");
   }
   
   //Get all avatars who aren't at full health
@@ -104,11 +104,17 @@ router.get('/regenerate-health', (req, res) =>{
 
 
 // FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS
-router.get('/try-recovery', function(req, res, next){
+router.get('/try-recovery', (req, res) =>{
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /try-recovery endpoint");
+  }
+  
   // Get all avatars who are KOed
   return Avatar.findAll(
     { where: { status: "Knocked Out" }, raw: true, attributes: ['health', 'recovery','status', 'owner'] },
-  ).then((results) => {console.log('all KO results', results);
+  ).then((results) => {
+    console.log('all KO results', results);
     const recoveredAvatars = []
     
     if(results.length){
@@ -137,7 +143,6 @@ router.get('/try-recovery', function(req, res, next){
           return recoveredAvatars.push(result.owner);
         }
         return null;
-
       });
       console.log('recovered avs', recoveredAvatars);
       return Avatar.update(
@@ -145,29 +150,30 @@ router.get('/try-recovery', function(req, res, next){
         { where: { owner: { [Op.in]: recoveredAvatars } }}
       );
     }else{
-      console.log('No Avs to Recover');
-      res.status(200);
-      next();
+      res.formatter.ok(null, 'Successfully ran /try-recovery, no Avatars to Recover')
     }
   }).then(()=>{
-    console.log('SHOULD HAVE ATTEMPTED KO RECOVERY');
-    res.status(200);
-    next();
+    return res.formatter.ok(null, 'Successfully ran /try-recovery');
   }).catch((error) =>{
-      console.log('ERROR TRYING TO DO KO REVIVES', error);
-    return new Promise((resolve, reject) =>{
-      return sendAppErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
-    });
+    console.log('ERROR DOING BULK HEALTH UPDATE', error);
+    res.formatter.serverError(error, `Error running /try-recovery`);
   });
 });
 
 
 // RANDOMLY GENERATE A FOE
-router.post('/generate-foe', function(req, res, next){
+router.post('/generate-foe', body('avatar').isObject(), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
+  }
   const foe = generateFoeStats(req.body.avatar);
-  res.status(200).json({
-    foe
-  });
+  if(foe){
+    res.formatter.ok(foe);
+  }else{
+    const error =  new Error("Couldn't generate foe");
+    res.formatter.serverError(error);
+  }
 });
 
 // MOCK ENDPOINT for DETERMINING PBAs
