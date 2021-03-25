@@ -96,16 +96,31 @@ const sendSurveyEmail = function(formData, resolve, reject){
   });
 };
 
-const sendCronErrorEmail = function({status, name, message, debug, version, errorLocation}, resolve, reject){
+const sendCronErrorEmail = function({status, message, debug, meta, version, errorLocation}, resolve, reject){
   const location = errorLocation;
   let html = `<div>An Error occured in a HeroFit Production CRON JOB- `;
   // error status and message
   html += `${status}:  ${message}`;
-  
+  let textDebug;
   if(debug){
+    console.log('DEBUG - ', debug);
     html += `<br/><br/>`;
-    html += `<br/><br/><p>` + debug + `</p>`;
+    debug.forEach((err, i ) =>{
+      html += `<p>ERROR #${i + 1}`;
+      html += `<p>msg: ` + err.msg + `</p>`;
+      html += `<p>location: ` + err.location + `</p>`;
+      html += `<p>value: ` + err.value + `</p>`;
+      html += `<p>param: ` + err.param + `</p>`;
+      textDebug = `msg : ${err.msg}, location: ${err.location}, value: ${err.value}, param: ${err.param}`;
+    });
   }
+
+  if(meta){
+    html += `<br/><br/>`;
+    html += `<br/><br/><p>` + meta + `</p>`;
+  }
+
+  
 
   html += `<br/><br/> Error Location: ${location}`;
   html += `<br/><br/><p>User not logged in.</p>`;
@@ -117,7 +132,7 @@ const sendCronErrorEmail = function({status, name, message, debug, version, erro
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${debug} \n \n  Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ''} \n \n ${meta ? meta : ''} Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
 
@@ -133,39 +148,52 @@ const sendCronErrorEmail = function({status, name, message, debug, version, erro
 
 
 const sendAppErrorEmail = function(formData, resolve, reject){
-  const adminData = formData.admin;
+
   const debug = formData.debug || formData.message;
+  const meta = formData.meta || null;
   const status = formData.status || formData.name;
   const version = formData.version || 'Release';
-  const location = formData.errorLocation;
+  const location = status === 500 ? 'Backend' : (status === 400  || status === 422 || status === 404 || status === 401) ? 'Frontend' : 'Unknown';
   const message = formData.message;
-  let html = `<div>An Error occured in HeroFit Production - `;
   const accountInfo = formData.accountInfo;
+  let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
-
+  let textDebug;
   if(debug){
     html += `<br/><br/>`;
-    html += `<br/><br/><p>` + debug + `</p>`;
+    debug.forEach((err, i ) =>{
+      html += `<p>ERROR #${i + 1}`;
+      html += `<p>msg: ` + err.msg + `</p>`;
+      html += `<p>location: ` + err.location + `</p>`;
+      html += `<p>value: ` + err.value + `</p>`;
+      html += `<p>param: ` + err.param + `</p>`;
+
+      textDebug = `msg : ${err.msg}, location: ${err.location}, value: ${err.value}, param: ${err.param}`;
+    });
+  }
+  if(meta){
+    html += `<br/><br/>`;
+    html += `<br/><br/><p>` + meta + `</p>`;
   }
   html += `<br/><br/> Error Location: ${location}`;
-  if(adminData){
+  if(accountInfo){
     html += `<br/><br/>`;
     html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`;
   }else{
     html += `<br/><br/><p>User not logged in.</p>`;
   }
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
-  console.log('HERE');
+
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${debug} \n \n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${textDebug ? textDebug : ''} \n \n ${meta ? meta : ''} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
-  console.log(mailOptions);
+
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {console.log('mail error - ', error)

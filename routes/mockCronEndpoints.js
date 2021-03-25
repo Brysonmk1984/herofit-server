@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
@@ -23,13 +24,16 @@ const ALLITEMS = require('../game/allItems.json');
 
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
-router.get('/regenerate-health', async function(req, res, next){
-    
+router.get('/regenerate-health', (req, res) =>{
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for create-cognito-linked-account endpoint");
+  }
+  
   //Get all avatars who aren't at full health
   return Avatar.findAll(
     { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
   ).then((results) => {
-    
     const allPromises = []
     
     // Loop over each avatar and either regen health if recovering or other status effects
@@ -90,19 +94,11 @@ router.get('/regenerate-health', async function(req, res, next){
     return Promise.allSettled(allPromises);
 
   }).then((results) => {
-    return results.forEach((result) => console.log('All Regenerate Results - ', result.status));
+    results.forEach((result) => console.log('All Regenerate Results - ', result.status));
+    res.formatter.ok(null, 'Successfully ran /regenerate-health');
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    return new Promise((resolve, reject) =>{
-      return sendAppErrorEmail({ message : error.message, name : error.name , errorLocation : "Back End"},resolve, reject)
-    }).catch((error) =>{
-      console.log('couldn\'t send error email for error - ', error);
-      res.status(400).json({
-        status:400,
-        eInside : error
-      });
-      next();
-    });
+    res.formatter.serverError(error, `Error running /regenerate-health`);
   });
 });
 
