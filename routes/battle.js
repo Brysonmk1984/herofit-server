@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
 const { Op } = require("sequelize");
 const Avatar = require('../db').Avatar;
@@ -16,19 +17,10 @@ const ALLPBAs = require('../game/postBattleActions.json');
 const ALLITEMS = require('../game/allItems.json');
 
 // USER CLICKED 'GO TO BATTLE'
-router.post('/insert-battle', function(req, res, next){
-
-  // If an avatar is not sent, which can happen the first attempt, send 400 error.
-  if(!req.body.avatar){
-    return res.status(400).json({
-      message: `Couldn't Go To Battle, please try again!`,
-      debug: `Couldn't send avatar to battle because no avatar was sent to server.`
-    });
-  }else if(!req.body.email){
-    return res.status(400).json({
-      message: `Couldn't Go To Battle, please try again!`,
-      debug: `Couldn't send avatar to battle because no email associated with account was sent to server.`
-    });
+router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /insert-battle endpoint");
   }
 
   const avatar = req.body.avatar
@@ -62,16 +54,17 @@ router.post('/insert-battle', function(req, res, next){
   foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase);
   foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase);
   
-  console.log('FWS! - ', foeWithStats);
-
+  //console.log('FWS! - ', foeWithStats);
+  let postBattleActions;
   // PROMISE - need to determine previous battles.
   new Promise((resolve, reject) =>{
     return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
-  }).then((postBattleActions) =>{
+  }).then((pbas) =>{
+    // Need parent context;
+    postBattleActions = pbas;
+    console.log('PBA BEFORE BATTLE INSERTION', pbas);
 
-    console.log('PBA BEFORE BATTLE INSERTION', postBattleActions);
-
-    Battle.create({
+    return Battle.create({
       owner: req.body.email,
       avatarID: avatar.id,
       avatarName: avatar.name,
@@ -81,55 +74,44 @@ router.post('/insert-battle', function(req, res, next){
       postBattleActions
     }, 
     {raw : true}
-    ).then((result) =>{
+    );
+  }).then(() =>{
+    return Avatar.update({ 
+      goToBattle : true,
+    },{ where: { owner: req.body.email }, raw: true })
+    .then((result) =>{
+      // SHOULD NEVER HAPPEN
+      if(!result){ console.log('THIS ERROR SHOULD NEVER HAPPEN');
+        const error =  new Error(`No Avatar associated with user ${req.body.email}`);
+        res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
+      }
 
-      return Avatar.update({ 
-        goToBattle : true,
-      },{ where: { owner: req.body.email }, raw: true })
-      .then((result) =>{
-        if(!result){
-          res.status(400).json({
-            message: `No Avatar associated with user ${req.body.email}`
+      const rewards = postBattleActions.map(action => {
+        let matchingPBA;
+        for(let actionType in ALLPBAs){
+          const match = ALLPBAs[actionType].find(pba => {
+            console.log(pba.action, action);
+            return pba.action === action;
           });
-          return;
-        }
-
-        const rewards = postBattleActions.map(action => {
-          let matchingPBA;
-          for(let actionType in ALLPBAs){
-            const match = ALLPBAs[actionType].find(pba => {
-              console.log(pba.action, action);
-              return pba.action === action;
-            });
-            if(match){
-              return matchingPBA = match;
-            }
-          } 
-          return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
-        });
-
-
-        res.status(200).json({
-          message : 'Avatar set for battle',
-          goToBattle : true,
-          foe : foeWithStats,
-          rewards
-        });
-        next();
-      }).catch((err)=>{
-        console.log(`Couldn't Send Avatar to battle: ${err}`);
-        res.status(400).json({
-          message: `Couldn't send avatar to battle`,
-          debug : err
-        });
-        next();
+          if(match){
+            return matchingPBA = match;
+          }
+        } 
+        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
       });
 
+      res.formatter.ok({
+        goToBattle : true,
+        foe : foeWithStats,
+        rewards
+      });
 
-    }).catch((error) =>{
-      console.log('ERROR INSERTING battle', error);
     });
-  })
+  }).catch((error)=>{
+    error = error.toString();
+    console.log(`Couldn't Send Avatar to battle: ${error}`);
+    res.formatter.serverError(error, 'Database update or server code error - POST /insert-battle');
+  });
 
 });
 
