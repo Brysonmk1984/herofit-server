@@ -1,132 +1,106 @@
 const express = require('express');
+const { body, header, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const User = require('../db').User;
 const moment = require('moment');
-var jwt = require('jsonwebtoken');
-var jwkToPem = require('jwk-to-pem');
-var jwkJson =  require('../jwk.json');
 const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 
-var key = jwkJson['keys'].find(key => {
- return key.kid;
-})
-var pem = jwkToPem(key);
-
 // Handles both Register and login. 
-router.post('/signup-or-signin', function(req, res, next){
-
+router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
+  console.log('HT - ',req.user);
   // res.status(500).json({
   //   message: `SERVER DOWN FOR MAINTENANCE`,
   // });
-  jwt.verify(req.body.token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-    if(err){
-      res.status(401).json({
-        message: `Token failed validation, see debug for error description`,
-        debug : err
-      });
-      next();
-    }else{  
-      // TOKEN has Expired
-      if (Date.now() >= decoded.exp * 1000) {
-        res.status(401).json({
-          message: `COGNITO TOKEN EXPIRED`,
-          debug : `Token Expiration: ${moment.utc(decoded.exp)}, Evaluation Date: ${moment.utc(Date.now())}`
-        });
-        next();
-      // AUDIENCE in token different from Client ID
-      }else if(decoded.aud !== process.env.COGNITO_CLIENT_ID){
-        res.status(401).json({
-          message: `AUD / CLIENT ID MISMATCH`,
-          debug : `AUD : ${decoded.aud}, CLIENT ID: ${process.env.COGNITO_CLIENT_ID}`
-        });
-      // TOKEN IS LEGIT
-      }else{  //console.log('TOKEN IS LEGIT');
-        //console.log('DECODED', decoded);
-        let username;
-        // Must have unique username, low priority bug possible here.
-        if(decoded['custom:first_name']){
-          username = decoded['custom:first_name'];
-          if(decoded['custom:last_name']){
-            username += ` ${decoded['custom:last_name']}`;
-          }
-        }else{
-          username = decoded['cognito:username'];
-        }
-        //console.log('USER MODEL', User);
-        User.findOrCreate({
-          where: {
-            email: decoded.email
-          },
-          // set the default properties if it doesn't exist
-          defaults: { 
-            email: decoded.email,
-            username : username,
-            firstName : decoded['custom:first_name'] || null,
-            lastName : decoded['custom:last_name'] || null
-          }
-        }).then(function(result) {
-          const created = result[1];
-          let user = result[0].dataValues ? result[0].dataValues : result[0];
-
-          // New user, created a new db
-          if (created) {
-            res.status(200).json({
-              message: `New user created, logged in as ${user.username}`,
-              user
-            });
-          // User already exists, return data from db
-          }else{
-            const response = {
-              message: `You are logged in as ${user.username}`,
-              user
-            };
-            if(config.globalMessage && config.globalMessage.length){
-              response.globalMessage = config.globalMessage;
-            }
-            res.status(200).json(response);
-          }
-          next();
-        }).catch((error)=>{
-          // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
-          if(error && error.original && error.original.code === '23505'){
-            User.create({
-                email: decoded.email,
-                username : `${decoded['custom:first_name']} ${decoded['custom:last_name']} - ${moment().format("MM DD, YYYY")}`,
-                firstName : decoded['custom:first_name'] || null,
-                lastName : decoded['custom:last_name'] || null
-            })
-            .then((result) =>{
-              let user = result.dataValues;
-                // user = Object.assign({}, user, {
-                //   clientId : process.env.STRAVA_CLIENT_ID, 
-                //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-                //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
-                // });
-
-                res.status(200).json({
-                  message: `You are logged in as ${user.username}`,
-                  user
-                });
-            })
-            .catch((error) =>{console.log('error', error);
-              res.status(400).json({
-                message: `Couldn't find or create user, but second attempt in catch ${decoded.email}`,
-                debug : error
-              });
-            })
-          }else{
-            console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
-            res.status(400).json({
-              message: `Couldn't find or create user ${decoded.email}`,
-              debug : error
-            });
-            next();
-          }
-        })
-      }
+    
+  // TOKEN IS LEGIT
+  const jwtUser = req.user;
+  //console.log('DECODED', decoded);
+  let username;
+  // Must have unique username, low priority bug possible here.
+  if(jwtUser['custom:first_name']){
+    username = jwtUser['custom:first_name'];
+    if(jwtUser['custom:last_name']){
+      username += ` ${jwtUser['custom:last_name']}`;
     }
-  });
+  }else{
+    username = jwtUser['cognito:username'];
+  }
+  //console.log('USER MODEL', User);
+  User.findOrCreate({
+    where: {
+      email: jwtUser.email
+    },
+    // set the default properties if it doesn't exist
+    defaults: { 
+      email: jwtUser.email,
+      username : username,
+      firstName : jwtUser['custom:first_name'] || null,
+      lastName : jwtUser['custom:last_name'] || null
+    }
+  }).then(function(result) {
+    const created = result[1];
+    let user = result[0].dataValues ? result[0].dataValues : result[0];
+
+    // New user, created a new db
+    if (created) {
+      res.status(200).json({
+        message: `New user created, logged in as ${user.username}`,
+        user
+      });
+    // User already exists, return data from db
+    }else{
+      const response = {
+        message: `You are logged in as ${user.username}`,
+        user
+      };
+      if(config.globalMessage && config.globalMessage.length){
+        response.globalMessage = config.globalMessage;
+      }
+      res.status(200).json(response);
+    }
+
+  }).catch((error)=>{
+    // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
+    if(error && error.original && error.original.code === '23505'){
+      User.create({
+          email: decoded.email,
+          username : `${decoded['custom:first_name']} ${decoded['custom:last_name']} - ${moment().format("MM DD, YYYY")}`,
+          firstName : decoded['custom:first_name'] || null,
+          lastName : decoded['custom:last_name'] || null
+      })
+      .then((result) =>{
+        let user = result.dataValues;
+          // user = Object.assign({}, user, {
+          //   clientId : process.env.STRAVA_CLIENT_ID, 
+          //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
+          //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
+          // });
+
+          res.status(200).json({
+            message: `You are logged in as ${user.username}`,
+            user
+          });
+      })
+      .catch((error) =>{console.log('error', error);
+        res.status(400).json({
+          message: `Couldn't find or create user, but second attempt in catch ${decoded.email}`,
+          debug : error
+        });
+      })
+    }else{
+      console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
+      res.status(400).json({
+        message: `Couldn't find or create user ${decoded.email}`,
+        debug : error
+      });
+
+    }
+  })
+  
+    
+ 
 });
 
 router.get('/strava-client-credentials', function(req, res, next){
@@ -227,6 +201,7 @@ router.post('/update-seen-latest-patch', function(req, res, next){
     next();
   });
 });
+
 
 module.exports = router;
 
