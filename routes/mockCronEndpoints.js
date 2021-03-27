@@ -178,56 +178,21 @@ router.post('/generate-foe', body('avatar').isObject(), (req, res) => {
 });
 
 // MOCK ENDPOINT for DETERMINING PBAs
-router.get('/mock-determine-pbas', function(req, res, next){
-
-  const avatar = {
-    "id": "254",
-    "qp": 43,
-    "air": 43.5,
-    "fire": 20.86,
-    "name": "Grabbler",
-    "armor": 30,
-    "earth": 112.47,
-    "power": 251,
-    "water": 2,
-    "health": 180,
-    "status": "Recovering",
-    "battleXP": 1242,
-    "character": "Boulder Bro",
-    "activityXP": 4554,
-    "battleDkos": 6,
-    "battleWins": 36,
-    "battleDraws": 2,
-    "battleLosses": 13
-};
-
-  const foe = {
-    "id": 2,
-    "class":"Spirits",
-    "air": 0,
-    "fire": 0,
-    "name": "Shadow-Grabbler",
-    "type": "Shadow-Self",
-    "armor": 33,
-    "earth": 0,
-    "power": 232,
-    "water": 0,
-    "health": 196,
-    "ability": {
-        "name": "Armor Barter",
-        "effect": "Armor Trade"
-    },
-    "difficulty": -0.057
-  };
+router.post('/mock-determine-pbas', body('avatar').isObject(), (req, res) =>{
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /mock-determine-pbas");
+  }
+  const foe = selectFoeTemplate(req.body.avatar.level);
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
 
   new Promise((resolve, reject) =>{
-    return determinePostBattleActions(avatar, foe, resolve, reject);
-  }).then((PBAs) =>{
-    res.status(200).json({
-      postBattleActions : PBAs
-    });
-  }).catch((err)=>{
-    console.log('ERROR DETERMINING PBAs - ', err);
+    return determinePostBattleActions(req.body.avatar, foeWithStats, resolve, reject);
+  }).then((postBattleActions) =>{
+    res.formatter.ok({ postBattleActions });
+  }).catch((error)=>{
+    error = error.toString();
+    res.formatter.serverError(error);
   });
 });
 
