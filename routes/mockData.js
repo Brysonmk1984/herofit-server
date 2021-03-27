@@ -73,11 +73,11 @@ router.post('/create-cognito-linked-account', body('email').isEmail(), body('fir
       })
       .catch((error) =>{
         console.log('error', error);
-        res.formatter.serverError(error, 'Couldnt use or make a username for user.');
+        res.formatter.serverError(error.toString(), 'Couldnt use or make a username for user.');
       })
     }else{
       console.log(`Couldn't find or create user ${req.body.email}, DEBUG: ${error}`);
-      res.formatter.serverError(error, 'Unable to find or create a user.');
+      res.formatter.serverError(error.toString(), 'Unable to find or create a user.');
     }
   });
 });
@@ -189,8 +189,7 @@ router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
     }
   }).catch((error) =>{
     console.log(`Couldn't insert Avatar for user ${req.body.owner}, DEBUG: ${error}`);
-    error = error.toString();
-    res.formatter.serverError(error, 'Unable to Create Avatar for Cognito Linked User');
+    res.formatter.serverError(error.toString(), 'Unable to Create Avatar for Cognito Linked User');
   });
   
 });
@@ -242,8 +241,7 @@ router.post('/insert-mock-activities', body('count').isNumeric(), body('email').
     return res.formatter.ok({ activities : req.body.activities });
   }).catch((error)=>{
     console.log('ERR', error);
-    error = error.toString();
-    res.formatter.badRequest(error, 'Database Update Error - Unable to bulk insert activities')
+    res.formatter.badRequest(error.toString(), 'Database Update Error - Unable to bulk insert activities')
   });
 
 });
@@ -285,7 +283,6 @@ router.post('/set-avatar-health-and-status',
 
       res.formatter.ok({ avatar : parseAvatarProperties(avatar[1][0]) });
     }).catch((error) =>{
-      error = error.toString();
       res.formatter.notFound(error.toString(), 'Retrieved Data Error for set-avatar-health-and-status endpoint');
     });
   }

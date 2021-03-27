@@ -98,7 +98,7 @@ router.get('/regenerate-health', (req, res) =>{
     res.formatter.ok(null, 'Successfully ran /regenerate-health');
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    res.formatter.serverError(error, `Error running /regenerate-health`);
+    res.formatter.serverError(error.toString(), `Error running /regenerate-health`);
   });
 });
 
@@ -156,7 +156,7 @@ router.get('/try-recovery', (req, res) =>{
     return res.formatter.ok(null, 'Successfully ran /try-recovery');
   }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
-    res.formatter.serverError(error, `Error running /try-recovery`);
+    res.formatter.serverError(error.toString(), `Error running /try-recovery`);
   });
 });
 
@@ -191,80 +191,67 @@ router.post('/mock-determine-pbas', body('avatar').isObject(), (req, res) =>{
   }).then((postBattleActions) =>{
     res.formatter.ok({ postBattleActions });
   }).catch((error)=>{
-    error = error.toString();
-    res.formatter.serverError(error);
+    res.formatter.serverError(error.toString());
   });
 });
 
 // MOCK ENDPOINT for RUNNING PBAs
-router.post('/mock-run-pbas', function(req, res, next){
-  let battleId = req.body.id;
-
-  if(battleId){
-    // only meant to grab latest TBD battle, look at the PBAs, and create items from them
-    Battle.find({
-      attributes : ['avatarID', 'postBattleActions'],
-      where : { id : battleId }
-    }).then(({ avatarID, postBattleActions }) =>{;
-
-      const itemsToInsert = [];
-      
-      // ALL PBAs FROM BATTLE
-      postBattleActions.forEach(( ACTION )=>{
-        let matchingPBA;
-        // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
-        for(let actionType in ALLPBAs){
-          // Find the PBA that matches the pba.action property
-          let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
-          // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
-          if(matching){
-            matchingPBA = matching;
-            break;
-          }
-        }
-
-        // Use the matchingPBA type and name to find the exact item referenced in the PBA
-        const matchingItem = ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
-        // remove ID, we use autoinc here
-        delete matchingItem.id;
-        //console.log('MATTCHITEM = ', matchingItem);
-        //console.log('AVID = ', avatarID);
-        const itemToInsert = Object.assign({}, matchingItem, { avatarID })
-        // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
-        itemsToInsert.push(itemToInsert);
-      });
-
-
-      console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
-      // INSERT all the items from the itemsToInsert array, gathered from the PBAs
-      AvatarEquip.bulkCreate(itemsToInsert)
-      .then((result) =>{
-        console.log('RESSS - ', result);
-
-        res.status(200).json({
-          avatarID,
-          postBattleActions
-        });
-
-
-
-      }).catch((error) =>{
-        console.log('EERR', error);
-      });
-
-
-
-    });
-  }else{
-    res.status(400).json({
-      message : "Need to pass Battle ID"
-    });
+router.get('/mock-run-pbas', (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty){
+    return res.formatter.badRequest(errors.array(), 'Validation Error - /mock-run-pbas endpoint');
   }
+  let _avatarID, _postBattleActions;
+  // only meant to grab latest TBD battle, look at the PBAs, and create items from them
+  Battle.findOne({
+    attributes : ['avatarID', 'postBattleActions'],
+    where : { outcome : 'TBD' }
+  }).then(({ avatarID, postBattleActions }) =>{
+    _avatarID = avatarID;
+    _postBattleActions = postBattleActions;
+    const itemsToInsert = [];
+    
+    // ALL PBAs FROM BATTLE
+    postBattleActions.forEach(( ACTION )=>{
+      let matchingPBA;
+      // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
+      for(let actionType in ALLPBAs){
+        // Find the PBA that matches the pba.action property
+        let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
+        // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
+        if(matching){
+          matchingPBA = matching;
+          break;
+        }
+      }
 
+      // Use the matchingPBA type and name to find the exact item referenced in the PBA
+      const matchingItem = ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+      // remove ID, we use autoinc here
+      delete matchingItem.id;
+      //console.log('MATTCHITEM = ', matchingItem);
+      //console.log('AVID = ', avatarID);
+      const itemToInsert = Object.assign({}, matchingItem, { avatarID })
+      // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
+      itemsToInsert.push(itemToInsert);
+    });
+
+    console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
+    // INSERT all the items from the itemsToInsert array, gathered from the PBAs
+    return AvatarEquip.bulkCreate(itemsToInsert);
+
+  }).then(() =>{
+    res.formatter.ok({
+      avatarID : _avatarID,
+      postBattleActions : _postBattleActions
+    });
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), "Database or Server code error for POST /mock-run-pbas endpoint");
+  });
 });
 
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
-router.get('/do-all-battles', function(req, res, next){
+router.get('/run-all-battles', (req, res) => {
   // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
   const { determineAstrologySeason } = avCalc();
   const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
@@ -518,6 +505,7 @@ router.get('/do-all-battles', function(req, res, next){
       return sendBattleReportEmail(tally);
   }).then((data) =>{
     console.log('Result Tally email sent successfully',data);
+    res.formatter.ok(data, 'Successfully ran all battles through endpoint - GET /run-all-battles');
   }).catch((error)=>{
     console.log('error in cronBattleHour', error);
   });
