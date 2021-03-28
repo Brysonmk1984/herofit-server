@@ -8,15 +8,19 @@ const key = jwkJson['keys'].find(key => {
 const pem = jwkToPem(key);
 
 const authenticateJWT = (req, res, next) => {
+  if(!req.headers.authorization){
+    const error = new Error("Authentication error, please try again.");
+    return res.formatter.forbidden(error.toString(), "Token didn't get passed to authenticate function");
+  }
    const authHeader = req.headers.authorization;
    const token = authHeader.split(' ')[1];
-
+    
    jwt.verify(token,  pem, { algorithms: ['RS256'] }, (error, user) => {
       // TOKEN is invalid
       if(error) {
          return res.formatter.forbidden(error, 'JWT Invalid');
       // TOKEN has Expired
-      } else if (true ||Date.now() >= user.exp * 1000) {
+      } else if (Date.now() >= user.exp * 1000) {
          const error = {
             status : 403,
             message : 'COGNITO TOKEN EXPIRED',

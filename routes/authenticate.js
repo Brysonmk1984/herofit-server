@@ -9,14 +9,13 @@ const latestPatchDetails = require('../patchDetails/latest.json');
 
 // Handles both Register and login. 
 router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
-  console.log('HT - ',req.user);
   // res.status(500).json({
   //   message: `SERVER DOWN FOR MAINTENANCE`,
   // });
     
   // TOKEN IS LEGIT
   const jwtUser = req.user;
-  //console.log('DECODED', decoded);
+  console.log('DECODED', jwtUser);
   let username;
   // Must have unique username, low priority bug possible here.
   if(jwtUser['custom:first_name']){
@@ -97,7 +96,7 @@ router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
       });
 
     }
-  })
+  });
   
     
  
@@ -176,13 +175,13 @@ router.post('/check-strava-refresh-token', function(req, res, next){
   });
 });
 
-router.get('/fetch-latest-patch-details', function(req, res, next){
+router.get('/fetch-latest-patch-details', authenticateJWT,  (req, res) =>{
   if(!latestPatchDetails){
-    res.status(400).json({
-      message: `No latest patch details!`
-    });
+    const error =  new Error("There was a server error, please try again later");
+    res.formatter.serverError(error.toString(), "Can't find latest Patch Details");
   }
-  res.status(200).json(latestPatchDetails);
+  res.formatter.ok(latestPatchDetails);
+
 });
 
 router.post('/update-seen-latest-patch', function(req, res, next){
