@@ -14,11 +14,16 @@ const authenticateJWT = (req, res, next) => {
   }
    const authHeader = req.headers.authorization;
    const token = authHeader.split(' ')[1];
-    
+    console.log('THE TOKEN in jwtValidation befor everify - ', token);
    jwt.verify(token,  pem, { algorithms: ['RS256'] }, (error, user) => {
       // TOKEN is invalid
       if(error) {
-         return res.formatter.forbidden(error, 'JWT Invalid');
+          const _error = {
+            status : 403,
+            message : "Invalid credentials, try signing in again.",
+            debug : `Token Invalid - ${error.toString()}`
+        }
+         return res.formatter.forbidden(_error, 'JWT Invalid');
       // TOKEN has Expired
       } else if (Date.now() >= user.exp * 1000) {
          const error = {

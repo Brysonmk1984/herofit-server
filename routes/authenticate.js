@@ -26,7 +26,7 @@ router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
   }else{
     username = jwtUser['cognito:username'];
   }
-  //console.log('USER MODEL', User);
+
   User.findOrCreate({
     where: {
       email: jwtUser.email
@@ -38,28 +38,14 @@ router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
       firstName : jwtUser['custom:first_name'] || null,
       lastName : jwtUser['custom:last_name'] || null
     }
-  }).then(function(result) {
-    const created = result[1];
-    let user = result[0].dataValues ? result[0].dataValues : result[0];
-
-    // New user, created a new db
-    if (created) {
-      res.status(200).json({
-        message: `New user created, logged in as ${user.username}`,
-        user
-      });
-    // User already exists, return data from db
-    }else{
-      const response = {
-        message: `You are logged in as ${user.username}`,
-        user
-      };
-      if(config.globalMessage && config.globalMessage.length){
-        response.globalMessage = config.globalMessage;
-      }
-      res.status(200).json(response);
+  }).then((result) => {
+    let response = {
+      user : result[0].dataValues ? result[0].dataValues : result[0]
     }
-
+    if(config.globalMessage && config.globalMessage.length){
+      response.globalMessage = config.globalMessage;
+    }
+    return res.formatter.ok(response);
   }).catch((error)=>{
     // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
     if(error && error.original && error.original.code === '23505'){
@@ -71,30 +57,14 @@ router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
       })
       .then((result) =>{
         let user = result.dataValues;
-          // user = Object.assign({}, user, {
-          //   clientId : process.env.STRAVA_CLIENT_ID, 
-          //   redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV, 
-          //   clientSecret : process.env.STRAVA_CLIENT_SECRET,
-          // });
-
-          res.status(200).json({
-            message: `You are logged in as ${user.username}`,
-            user
-          });
+        return res.formatter.ok(user);
       })
       .catch((error) =>{console.log('error', error);
-        res.status(400).json({
-          message: `Couldn't find or create user, but second attempt in catch ${decoded.email}`,
-          debug : error
-        });
+        res.serverError(error.toString(), `Couldn't find or create user, second attempt in catch ${decoded.email}`);
       })
     }else{
       console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
-      res.status(400).json({
-        message: `Couldn't find or create user ${decoded.email}`,
-        debug : error
-      });
-
+      res.serverError(error.toString(), `Couldn't find or create user ${decoded.email}`);
     }
   });
   
@@ -181,23 +151,23 @@ router.get('/fetch-latest-patch-details', authenticateJWT,  (req, res) =>{
     res.formatter.serverError(error.toString(), "Can't find latest Patch Details");
   }
   res.formatter.ok(latestPatchDetails);
-
 });
 
-router.post('/update-seen-latest-patch', function(req, res, next){
+router.post('/update-seen-latest-patch', authenticateJWT, body('id').isNumeric(), (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    res.formatter.badRequest(errors.array(), "Validation Error - for /update-seen-latest-patch");
+  }
+  
   const id = req.body.id;
   User.update(
     { seenLatestPatch : true },
     { where : { id }, returning : true },
   ).then((data) =>{
-    res.status(200).json({ data : "seen latest patch set to true" });
+    res.formatter.ok({ data : "seen latest patch set to true" });
   }).catch((error) =>{
     console.log(`Couldnt update seenLatestPatch boolean for userID ${id}`);
-    res.status(400).json({
-      message: `Couldnt update seenLatestPatch boolean for userID ${id}`,
-      debug : error
-    });
-    next();
+    res.formatter.serverError(error.toString(), "Database or server code error for /update-seen-latest-patch");
   });
 });
 
