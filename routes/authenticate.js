@@ -8,7 +8,7 @@ const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 
 // Handles both Register and login. 
-router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
+router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
   // res.status(500).json({
   //   message: `SERVER DOWN FOR MAINTENANCE`,
   // });
@@ -67,81 +67,43 @@ router.post('/signup-or-signin', authenticateJWT,  (req, res) => {
       res.serverError(error.toString(), `Couldn't find or create user ${decoded.email}`);
     }
   });
-  
-    
- 
 });
 
-router.get('/strava-client-credentials', function(req, res, next){
-
-  res.status(200).json({
-    message: `Here are the Strava Client Credentials.`,
+router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
+  res.formatter.ok({
     clientId: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
     redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV
   });
-  next();
 });
 
-router.post('/strava-credentials', function(req, res, next){
-  User.findOne({ where: { email: req.body.email } })
+router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessToken').isString(), body('stravaAccessTokenExpiration').isNumeric(), body('stravaRefreshToken').isString(), authenticateJWT, (req, res) =>{
+  const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
+  User.findOne({ where: { email } })
   .then((user) =>{
     // Check if record exists in db
     if (user) {
       User.update(
-        {
-          stravaAccessToken: req.body.stravaAccessToken,
-          stravaAccessTokenExpiration: req.body.stravaAccessTokenExpiration,
-          stravaRefreshToken: req.body.stravaRefreshToken,
-        },
-        {where: {email: req.body.email},
+        { stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken },
+        { where: { email },
         returning : true, plain : true })
-      .then(function (data) {
-        res.status(200).json({
+      .then((data) => {
+        res.formatter.ok({
           user : data[1]
         });
-        next();
       })
-      .catch((err)=>{
-        console.log(`Couldn't update Strava tokens for user ${req.body.email}, DEBUG: ${err}`);
-        res.status(400).json({
-          message: `Couldn't update Strava tokens for user ${req.body.email}`,
-          debug : err
-        });
-        next();
+      .catch((error)=>{
+        console.log(`Couldn't update Strava tokens for user ${email}, DEBUG: ${error}`);
+        res.serverError(error.toString(), `Couldn't update Strava tokens for user ${email}`);
       });
     } else {
       console.log('User not found!');
-      res.status(401).json({
-        message: `User not found!`,
-      });
+      const error = new Error('User not found!');
+      res.formatter.serverError(error.toString());
     }
-  }).catch((err)=>{
-    console.log(`Couldn't find user ${req.body.email} to update their Strava, DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Couldn't find user ${req.body.email}`,
-      debug : err
-    });
-    next();
-  });
-});
-
-router.post('/check-strava-refresh-token', function(req, res, next){
-  User.findOne({ where: { email: req.body.email },
-    attributes : ['stravaRefreshToken']
-  }).then((results) =>{
-    if(results.dataValues && results.dataValues.stravaRefreshToken){
-      res.status(200).json({
-        message: `Refresh Token Exists for ${req.body.email}`,
-        stravaRefreshToken : results.dataValues.stravaRefreshToken,
-      });
-      next();
-    }else{
-      res.status(400).json({
-        message: `No Strava refresh token in account ${req.body.email}`
-      });
-      next()
-    }
+  }).catch((error)=>{
+    console.log(`Couldn't find user ${email} to update their Strava, DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't find user ${email}`);
   });
 });
 
