@@ -199,7 +199,7 @@ router.post('/fetch-battle-report', function(req, res, next){
         });
       }
     }else{
-      throw new Error('Data Error','No Battle Results');
+      throw new Error('Data Error - No Battle Results');
     }
 
   }).catch((error) =>{

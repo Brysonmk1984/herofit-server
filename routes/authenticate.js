@@ -107,7 +107,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
   });
 });
 
-router.get('/fetch-latest-patch-details', authenticateJWT,  (req, res) =>{
+router.get('/fetch-latest-patch-details', authenticateJWT, (req, res) =>{
   if(!latestPatchDetails){
     const error =  new Error("There was a server error, please try again later");
     res.formatter.serverError(error.toString(), "Can't find latest Patch Details");
