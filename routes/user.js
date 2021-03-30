@@ -81,7 +81,7 @@ router.post('/get-user-activities', function(req, res, next){
         return result.activityDate;
       });
 
-      let moments = datesArray.map(d => moment(d)),
+      let moments = datesArray.map(d => moment(d, 'YYYY-MM-DD HH:mm:ss')),
       maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
       //console.log(maxDate);
       const activities = results.map((result, i) =>{

@@ -13,10 +13,11 @@ const heroList = require('../heroList');
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const Avatar = require('../db').Avatar;
+const { authenticateJWT } = require('../jwtValidation');
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end
-router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), (req, res) => {
+router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }),  authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for create-cognito-linked-account endpoint");
@@ -83,7 +84,7 @@ router.post('/create-cognito-linked-account', body('email').isEmail(), body('fir
 });
 
 // Insert random avatar after cognito account was created
-router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
+router.post('/insert-random-avatar', body('owner').isEmail(), authenticateJWT, (req,res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-random-avatar endpoint");
@@ -195,7 +196,7 @@ router.post('/insert-random-avatar', body('owner').isEmail(), (req,res) => {
 });
 
 //  Returns the dummy list of fake activities
-router.post('/get-fake-activities',  body('count').isNumeric(), (req,res) => {
+router.post('/get-fake-activities',  body('count').isNumeric(), authenticateJWT, (req,res) => {
   const count = req.body.count;
   const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
     act.id = getRandomNumber(10);
@@ -210,7 +211,7 @@ router.post('/get-fake-activities',  body('count').isNumeric(), (req,res) => {
 });
 
 // BROKEN - integer out of range - Inserts fake activities into account by email
-router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), (req,res) =>{
+router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), authenticateJWT, (req,res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for insert-mock-activities");
@@ -249,10 +250,15 @@ router.post('/insert-mock-activities', body('count').isNumeric(), body('email').
 // Verify the Admin Password is Correct in order to open the Admin panel
 router.post('/check-admin-password', body('password').custom((password) =>{
   return password === process.env.ADMIN_PANEL_PASSWORD ? true : false; 
-}), (req,res) => {
+}), authenticateJWT, (req,res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error for check-admin-password endpoint");
+  }
+  if(req.user.email !== process.env.ADMIN_PANEL_EMAIL){
+    const error = new Error("Unauthorized user attempted access to admin panel");
+    return res.formatter.badRequest(error.toString());
+
   }
   
   res.formatter.ok({isValid : true});
@@ -260,10 +266,7 @@ router.post('/check-admin-password', body('password').custom((password) =>{
 
 
 // Manually set Avatar's health and status
-router.post('/set-avatar-health-and-status', 
-  body('id').isNumeric(), 
-  body('health').isNumeric(), 
-  body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']),
+router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('health').isNumeric(), body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']), authenticateJWT,
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
