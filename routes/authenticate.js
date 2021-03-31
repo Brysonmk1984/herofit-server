@@ -73,7 +73,7 @@ router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
   res.formatter.ok({
     clientId: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
-    redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.STRAVA_REDIRECT_DEV
+    redirectUri : process.env.NODE_ENV === 'production' ? process.env.STRAVA_REDIRECT_PROD : process.env.NODE_ENV === 'staging' ?  process.env.STRAVA_REDIRECT_STAGING : process.env.STRAVA_REDIRECT_DEV
   });
 });
 
