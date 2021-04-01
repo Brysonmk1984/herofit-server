@@ -15,7 +15,7 @@ const authenticateJWT = (req, res, next) => {
   }
    const authHeader = req.headers.authorization;
    const token = authHeader.split(' ')[1];
-    console.log('THE TOKEN in jwtValidation befor everify - ', token);
+    //console.log('THE TOKEN in jwtValidation befor everify - ', token);
    jwt.verify(token,  pem, { algorithms: ['RS256'] }, (error, user) => {
       // TOKEN is invalid
       if(error) {
