@@ -8,7 +8,7 @@ const key = jwkJson['keys'].find(key => {
 const pem = jwkToPem(key);
 
 const authenticateJWT = (req, res, next) => {
-
+  console.log('look', req.headers.authorization);
   if(!req.headers.authorization){
     const error = new Error("Authentication error, please try again.");
     return res.formatter.forbidden(error.toString(), "Token didn't get passed to authenticate function");

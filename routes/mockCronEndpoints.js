@@ -20,11 +20,12 @@ const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
 const ALLITEMS = require('../game/allItems.json');
+const { authenticateJWT } = require('../jwtValidation');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
-router.get('/regenerate-health', (req, res) =>{
+router.get('/regenerate-health', authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /regenerate-health endpoint");
@@ -104,7 +105,7 @@ router.get('/regenerate-health', (req, res) =>{
 
 
 // FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS
-router.get('/try-recovery', (req, res) =>{
+router.get('/try-recovery', authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /try-recovery endpoint");
@@ -162,7 +163,7 @@ router.get('/try-recovery', (req, res) =>{
 
 
 // RANDOMLY GENERATE A FOE
-router.post('/generate-foe', body('avatar').isObject(), (req, res) => {
+router.post('/generate-foe', body('avatar').isObject(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
@@ -178,7 +179,7 @@ router.post('/generate-foe', body('avatar').isObject(), (req, res) => {
 });
 
 // MOCK ENDPOINT for DETERMINING PBAs
-router.post('/mock-determine-pbas', body('avatar').isObject(), (req, res) =>{
+router.post('/mock-determine-pbas', body('avatar').isObject(), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /mock-determine-pbas");
@@ -196,7 +197,8 @@ router.post('/mock-determine-pbas', body('avatar').isObject(), (req, res) =>{
 });
 
 // MOCK ENDPOINT for RUNNING PBAs
-router.get('/mock-run-pbas', (req, res) => {
+router.get('/mock-run-pbas', authenticateJWT, (req, res) => {
+  console.log('didnt get here');
   const errors = validationResult(req);
   if(!errors.isEmpty){
     return res.formatter.badRequest(errors.array(), 'Validation Error - /mock-run-pbas endpoint');
@@ -251,7 +253,7 @@ router.get('/mock-run-pbas', (req, res) => {
 });
 
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
-router.get('/run-all-battles', (req, res) => {
+router.get('/run-all-battles', authenticateJWT, (req, res) => {
   // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
   const { determineAstrologySeason } = avCalc();
   const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
