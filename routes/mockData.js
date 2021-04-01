@@ -255,11 +255,13 @@ router.post('/check-admin-password', body('password').custom((password) =>{
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error for check-admin-password endpoint");
   }
-  if(req.user.email !== process.env.ADMIN_PANEL_EMAIL){
-    const error = new Error("Unauthorized user attempted access to admin panel");
-    return res.formatter.badRequest(error.toString());
-
+  if(process.env.production || process.env.staging){
+    if(req.user.email !== process.env.ADMIN_PANEL_EMAIL){
+      const error = new Error("Unauthorized user attempted access to admin panel");
+      return res.formatter.badRequest(error.toString());
+    }
   }
+
   
   res.formatter.ok({isValid : true});
 });
