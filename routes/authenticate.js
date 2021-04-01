@@ -78,6 +78,7 @@ router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
 });
 
 router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessToken').isString(), body('stravaAccessTokenExpiration').isNumeric(), body('stravaRefreshToken').isString(), authenticateJWT, (req, res) =>{
+  console.log('!!! headers sent to strava-credentials', req.body.headers);
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
   User.findOne({ where: { email } })
   .then((user) =>{
