@@ -20,7 +20,6 @@ const battleRoutes = require('./routes/battle');
 const calculateRoutes = require('./routes/calculate');
 const mockDataRoutes = require('./routes/mockData');
 const mockCronRoutes = require('./routes/mockCronEndpoints');
-const migrationRoutes = require('./routes/migrations');
 
   // http server
   console.log('Listening on port ' + (process.env.PORT || 3001));
@@ -50,7 +49,6 @@ const migrationRoutes = require('./routes/migrations');
   app.use('/calculate', calculateRoutes);
   app.use('/mock-data', mockDataRoutes);
   app.use('/mock-cron', mockCronRoutes);
-  app.use('/migrations', migrationRoutes);
 
 module.exports = app;
 

@@ -1,17 +1,20 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
+const { authenticateJWT } = require('../jwtValidation');
 
-router.post('/fetch-avatar-inventory', function(req, res, next){
+router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatar-inventory");
+  }
   const avatarID = req.body.avatarID;
   //console.log('FETCHING AVATAR INV FOR -', avatarID);
   AvatarEquip.findAll(
     { where : { avatarID } }
-
-  ).then((inventory) =>{
-    //console.log('INV - ', inventory);
-    
+  ).then((inventory) =>{ 
     // Massage the data for the frontend
     const inventoryObj = {
       pets : [],
@@ -22,37 +25,34 @@ router.post('/fetch-avatar-inventory', function(req, res, next){
     inventory.forEach((thing) =>{
       inventoryObj[thing.type +'s'].push(thing);
     });
-
-    res.status(200).json(inventoryObj);
-  }).catch((err) =>{
-    res.status(400).json({
-      message: `Error retrieving  ${req.body.email}`,
-      debug : err
-    });
-    next();
+    res.formatter.ok(inventoryObj, 'Successfully ran /fetch-avatar-inventory');
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), `Error running /fetch-avatar-inventory`);
   });
 
 });
 
-router.post('/equip-item', function(req, res, next){
+router.post('/equip-item', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
+  }
   const equipId = req.body.equipId;
   //console.log('EQUIP', equipId);
   AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     //console.log('UI - ',updatedItem);
-    res.status(200).json({
-      equippedItem : updatedItem[1][0]
-    })
+    res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
   }).catch((error) =>{
-    res.status(400).json({
-      message: `Couldn't update item equip status`,
-      debug : error
-    });
-    next();
-  })
+    res.formatter.serverError(error.toString(), `Error running /equip-item`);
+  });
 });
 
-router.post('/equip-unequip-item', function(req, res, next){
+router.post('/equip-unequip-item', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-unequip-item");
+  }
   const equipId = req.body.equipId;
   const unequipId = req.body.unequipId;
 
@@ -63,66 +63,53 @@ router.post('/equip-unequip-item', function(req, res, next){
 
   Promise.allSettled(equipPromises)
   .then((result) =>{
-    //console.log('RES - ', result);
     const unequippedItem = result[0].value[1][0];
     const equippedItem = result[1].value[1][0];
-    //console.log('UUUU - ', unequippedItem, 'EEEE - ', equippedItem);
-    res.status(200).json({
-      unequippedItem,
-      equippedItem
-    })
+
+    res.formatter.ok({ unequippedItem, equippedItem }, 'Successfully ran /equip-unequip-item');
   }).catch((error) =>{
-    
-    res.status(400).json({
-      message: `Couldn't update item equip status`,
-      debug : error
-    });
-    next();
-  })
+    res.formatter.serverError(error.toString(), `Error running /equip-unequip-item`);
+  });
 });
 
-
-router.post('/unequip-item', function(req, res, next){
+router.post('/unequip-item', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /unequip-item");
+  }
   const unequipId = req.body.unequipId;
   //console.log('UNEQUIP', unequipId);
   AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     //console.log('UI - ',updatedItem);
-    res.status(200).json({
-      unequippedItem : updatedItem[1][0]
-    })
+    res.formatter.ok({ unequippedItem : updatedItem[1][0] }, 'Successfully ran /unequip-item');
   }).catch((error) =>{
-    
-    res.status(400).json({
-      message: `Couldn't update item equip status`,
-      debug : error
-    });
-    next();
-  })
-});
-
-router.get('/get-default-items', function(req, res, next){
-  res.status(200).json({
-    items : ALLITEMS
+    res.formatter.serverError(error.toString(), `Error running /unequip-item`);
   });
 });
 
-router.post('/insert-item-by-avatar-id', function(req, res, next){
+router.get('/get-default-items', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /get-default-items");
+  }
+  res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
+});
+
+router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-item-by-avatar-id");
+  }
+
   const item = req.body;
-  console.log('IIIS - ', item);
+
   AvatarEquip.create(
     item, { returning: true }
   ).then((data) =>{
-    console.log('SUCCESS - ', data);
-    res.status(200).json({
-      createdItem : data
-    });
-    next();
+    res.formatter.ok({ createdItem : data }, 'Successfully ran /insert-item-by-avatar-id');
   }).catch((error) =>{
-    console.log(error);
-    res.status(400).json({
-      error
-    })
+    res.formatter.serverError(error.toString(), `Error running /insert-item-by-avatar-id`);
   });
 });
 
