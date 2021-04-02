@@ -1,153 +1,84 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const User = require('../db').User;
 const Battle = require('../db').Battle;
 const AvatarEquip = require('../db').AvatarEquip;
-const db = require('../db').db;
+
 
 // UPDATE HERO NAME
-router.post('/update-avatar-name', function(req, res, next){
-  //console.log('NN - ', req.body.owner, req.body.newHeroName);
+router.post('/update-avatar-name', body('owner').isEmail(), body('newHeroName').isString({ min: 3, max: 25 }), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /update-avatar-name endpoint");
+  }
+
   Avatar.update(
     { name : req.body.newHeroName },
     { where : { owner : req.body.owner}, returning : true },
-  ).then((result) =>{console.log('!!', result[0]);
+  ).then((result) =>{
     if(result[0]){
-      res.status(200).json({
-        updatedName : result[1][0].name
-      });
-      next();
+      return res.formatter.ok({ updatedName : result[1][0].name });
     }else{
-      throw new Error('Unable to update Record');
+      throw new Error('No Avatar Result');
     }
   }).catch((error) =>{
     console.log('Error updating name - ', error);
-    res.status(400).json({
-     error,
-     message : 'Unable to update record'
-    });
-    next();
+    res.formatter.serverError(error.toString(), 'Unable to update avatar name - for /update-avatar-name endpoint');
   });
 
 });
 
 // UPDATE USERNAME
-router.post('/update-owner-username', function(req, res, next){
-  console.log('NN - ', req.body.owner, req.body.newUsername);
+router.post('/update-owner-username', body('owner').isEmail(), body('newUsername').isString({ min: 3, max: 25 }), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /update-owner-username endpoint");
+  }
+
   User.update(
     { username : req.body.newUsername },
     { where : { email : req.body.owner}, returning : true },
   ).then((result) =>{
     if(result[0]){
-      res.status(200).json({
-        updatedUsername: result[1][0].username
-      });
-      next();
+      return res.formatter.ok({ updatedUsername: result[1][0].username });
     }else{
       throw new Error('Unable to update Record');
     }
   }).catch((error) =>{
     console.log('Error updating name - ', error);
-    res.status(400).json({
-     error,
-     message : 'Unable to update record'
-    });
-    next();
+    res.formatter.serverError(error.toString(), 'Unable to update username - for /update-owner-username endpoint');
   });
-
 });
 
 // DELETE ACCOUNT
-router.delete('/:username', function(req, res, next){
-  console.log('attempting delete on ', req.body.avatarId);
+router.delete('/:username', body('email').isEmail(), body('id').isNumeric(), body('avatarId').isNumeric(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
+  }
+  const { avatarId, email, id } = req.body;
 
   const promises = [];
-  promises.push(AvatarEquip.destroy({ where : {avatarID : req.body.avatarId }}));
-  promises.push(Battle.destroy({ where : { owner : req.body.email }}));
+  promises.push(AvatarEquip.destroy({ where : {avatarID : avatarId }}));
+  promises.push(Battle.destroy({ where : { owner : email }}));
   
   Promise.allSettled(promises)
   .then(() =>{
     console.log('Deleted battles and Items, now deleting avatar');
-    return Avatar.destroy({
-      where : {
-        owner : req.body.email
-      }
-    })
+    return Avatar.destroy({ where : { owner : req.body.email } });
   }).then(() =>{
     console.log('Deleted Avatar, now deleting User');
-    return User.destroy({
-      where : {
-        id : req.body.id
-      }
-    })
+    return User.destroy({ where : { id }});
   }).then(() =>{
-    res.status(200).json({
-      message : 'Successfully deleted account!'
-     });
-     next();
-  }).catch((error)=>{console.log(error);
-    res.status(400).json({
-      error,
-      message : `Unable to delete account for user ${req.body.email}`
-     });
-     next();
-  })
-});
-
-router.post('/toggle-feedback-boolean', async function(req, res, next){
-  const hasSubmittedFeedback = req.body.setToTrue;
-  console.log('HSF - ', hasSubmittedFeedback);
-  const query = `UPDATE users SET "featurePreferenceSubmitted"=$1`;
-
-  try{
-    const [results, metadata] = await db.query(query, { bind : [hasSubmittedFeedback] });
-
-    console.log('results!', metadata);
-    if(results){
-      res.status(200).json({
-        results
-      });
-    }else{
-      res.send(400);
-    }
-  }catch(error){
-    console.log(error, test);
-  }
-
+    return res.formatter.ok({ message : 'Successfully deleted account!' });
+  }).catch((error)=>{
+    console.log(error);
+    return res.formatter.serverError(error.toString(), `Unable to delete account for user ${email}, - DELETE /:username endpoint`);
+  });
 
 });
-
-// router.get('/migration', async function(req, res, next){
-//   const q = `
-//   SELECT avatars.name, avatars.owner, users.id FROM avatars
-//   LEFT JOIN users ON avatars.owner=users.email
-//   WHERE avatars.owner=$1
-//   `;
-
-//   const r = `
-//     UPDATE avatars
-//     SET "userId"=users.id
-//     FROM users
-//     WHERE owner=users.email;
-//   `;
-
-//   try{
-//     const [results, metadata] = await db.query(r, { bind : ['oliver.h.coop@gmail.com'] });
-
-//     console.log('results!', metadata);
-//     if(results){
-//       res.status(200).json({
-//         results
-//       });
-//     }else{
-//       res.send(400);
-//     }
-//   }catch(error){
-//     console.log(error, test);
-//   }
-
-
-// });
 
 module.exports = router;

@@ -1,68 +1,70 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 
 
-router.post('/fetch-astrology-season' , function(req, res, next){
+router.post('/fetch-astrology-season', body('date').isDate().optional({nullable: true}), (req, res) =>{
 
   const { determineAstrologySeason } = avCalc();
   const { sign, element } = determineAstrologySeason(req.body.date);
 
   if(sign && element){
-    res.status(200).json({
-      sign,
-      element
-    });
+    res.formatter.ok({ sign, element });
   }else{
-    res.status(400);
+    res.serverError("Couldn't Determine Astrology Season");
   }
-  next();
 });
 
-router.post('/fetch-current-level-by-input' , function(req, res, next){
-  
+router.post('/fetch-current-level-by-input', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-current-level-by-input");
+  }
+
   const xp = req.body.xp;
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(xp);
 
   if(currentLevel){
-    res.status(200).json({
-      currentLevel
-    });
+    res.formatter.ok(currentLevel);
   }else{
-    res.status(400);
+    res.formatter.serverError('Current level is falsy');
   }
-  next();
+
 });
 
-router.post('/fetch-next-level-xp-by-input' , function(req, res, next){
+router.post('/fetch-next-level-xp-by-input', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-next-level-xp-by-input");
+  }
 
   const level = req.body.level;
   const { nextLevelByInput } = xpCalc();
   const nextLevelXp = nextLevelByInput(level);
   
   if(nextLevelXp){
-    res.status(200).json({
-      nextLevelXp
-    });
+    res.formatter.ok({ nextLevelXp });
   }else{
-    res.status(400);
+    res.formatter.serverError('Next Level up is falsy');
   }
-  next();
+
 });
 
-router.post('/check-level-up-by-input' , function(req, res, next){
-  const startingXP = req.body.startingXP;
-  const endingXP = req.body.endingXP;
+router.post('/check-level-up-by-input', body('startingXP').isNumeric(), body('endingXP').isNumeric(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /check-level-up-by-input");
+  }
+  const { startingXP, endingXP} = req.body;
+
   const { checkLevelUpByInput } = xpCalc();
   const { leveledUp, levels } = checkLevelUpByInput(startingXP, endingXP);
-  res.status(200).json({
-    leveledUp,
-    levels
-  });
-
-  next();
+  
+  res.formatter.ok({ leveledUp, levels });
 });
 
 

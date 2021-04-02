@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const fs = require('fs');
 const path = require("path");
@@ -13,7 +14,7 @@ const heroList = require('../heroList');
 const User = require('../db').User;
 const UserActivity = require('../db').UserActivity;
 const Avatar = require('../db').Avatar;
-const { authenticateJWT } = require('../jwtValidation');
+const db = require('../db').db;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end
@@ -292,5 +293,35 @@ router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('healt
     });
   }
 );
+
+// Sets all feedback booleans to sent value
+router.post('/toggle-feedback-boolean', body('setToTrue').isBoolean(), authenticateJWT, async (req, res) => {
+  const errors = validationResult(req);console.log('ERRS', errors);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /toggle-feedback-boolean");
+  }
+
+
+  const hasSubmittedFeedback = req.body.setToTrue;
+  console.log('HSF - ', hasSubmittedFeedback);
+  const query = `UPDATE users SET "featurePreferenceSubmitted"=$1`;
+
+    try{
+      const [results, metadata] = await db.query(query, { bind : [hasSubmittedFeedback] });
+
+      console.log('results!', metadata);
+      if(results){
+        return res.formatter.ok(results);
+      }else{
+        const error = new Error("No Results for feedback boolean");
+        return  res.formatter.serverError(error.toString(), 'Unable to update avatar name - for /update-avatar-name endpoint');
+      }
+    }catch(error){
+      return res.formatter.serverError(error.toString(), 'Unable to update avatar name - for /update-avatar-name endpoint');
+    }
+
+
+});
+
 
 module.exports = router;
