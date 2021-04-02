@@ -1,8 +1,8 @@
 const config = {
   mode : 'release',
-  // globalMessage : [
-  //   { type : 'info', message : 'Heads up, patch 1.1.8 includes retroactive changes to some activities. You may experience a rather large level up next time to adjust your Hero to the new configuration.' }
-  // ],
+  globalMessage : [
+    { type : 'info', message : 'Some are experiencing login issues, please try a page refresh to resolve the issue.' }
+  ],
 };
 
 // RANKING PAGE
