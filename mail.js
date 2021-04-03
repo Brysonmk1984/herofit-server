@@ -48,8 +48,9 @@ const sendContactEmail = function(formData, resolve, reject){
 };
 
 const sendDataCollectionEmail = function(formData, resolve, reject){
-  const accountInfo = formData.accountInfo;
-  const { opinion, openResponse } = formData.feedbackData;
+  console.log('HERERE');
+  const { opinion, openResponse, accountInfo } = formData;
+  console.log(opinion, openResponse, accountInfo);
   // setup email data with unicode symbols
   let mailOptions = {
       from: `${process.env.INFO_EMAIL}`,
@@ -58,7 +59,7 @@ const sendDataCollectionEmail = function(formData, resolve, reject){
       text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html: `<div>${formData.username} submitted the ${formData.title}<br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA:<br /> ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`
   };
-
+  console.log('MO - ', mailOptions);
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -146,37 +147,51 @@ const sendCronErrorEmail = function({status, message, debug, meta, version, erro
 };
 
 
-
+// ERRORS are always sent from frontend
+// Backend errors are using the sendCronErrorEmail for now
 const sendAppErrorEmail = function(formData, resolve, reject){
 
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
   const status = formData.status || formData.name;
   const version = formData.version || 'Release';
-  const location = status === 500 ? 'Backend' : (status === 400  || status === 422 || status === 404 || status === 401) ? 'Frontend' : 'Unknown';
+  const location = formData.errorLocation;
   const message = formData.message;
   const accountInfo = formData.accountInfo;
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
   html += `${formData.status}:  ${formData.message}`;
   let textDebug;
-  if(debug){
-    html += `<br/><br/>`;
-    debug.forEach((err, i ) =>{
-      html += `<p>ERROR #${i + 1}`;
-      html += `<p>msg: ` + err.msg + `</p>`;
-      html += `<p>location: ` + err.location + `</p>`;
-      html += `<p>value: ` + err.value + `</p>`;
-      html += `<p>param: ` + err.param + `</p>`;
 
-      textDebug = `msg : ${err.msg}, location: ${err.location}, value: ${err.value}, param: ${err.param}`;
+  if(debug && debug.length && typeof debug !== 'string'){
+    html += `<br/><br/>`;
+ 
+    debug.forEach((err, i ) =>{
+      const error = err.error || err;
+      const msg = error.msg;
+      const location = error.location;
+      const value = error.value;
+      const param = error.param;
+
+      html += `<p>ERROR #${i + 1}`;
+      html += `<p>msg: <strong>${ msg }</strong> </p>`;
+      html += `<p>location: <strong>${ location }</strong></p>`;
+      html += `<p>value: <strong>${ value }</strong></p>`;
+      html += `<p>param: <strong>${ param }</strong></p>`;
+
+      textDebug = `msg : ${ msg }, location: ${ location }, value: ${ value }, param: ${ param }`;
+
     });
+  }else if(debug){
+    html += debug;
+    textDebug = debug;
   }
   if(meta){
     html += `<br/><br/>`;
     html += `<br/><br/><p>` + meta + `</p>`;
   }
   html += `<br/><br/> Error Location: ${location}`;
+
   if(accountInfo){
     html += `<br/><br/>`;
     html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`;

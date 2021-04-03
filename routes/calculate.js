@@ -7,6 +7,10 @@ const xpCalc = require('../game/upgrades/xpCalc');
 
 
 router.post('/fetch-astrology-season', body('date').isDate().optional({nullable: true}), (req, res) =>{
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-astrology-season");
+  }
 
   const { determineAstrologySeason } = avCalc();
   const { sign, element } = determineAstrologySeason(req.body.date);
@@ -18,7 +22,7 @@ router.post('/fetch-astrology-season', body('date').isDate().optional({nullable:
   }
 });
 
-router.post('/fetch-current-level-by-input', authenticateJWT, (req, res) => {
+router.post('/fetch-current-level-by-input', body('xp').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-current-level-by-input");
@@ -36,7 +40,7 @@ router.post('/fetch-current-level-by-input', authenticateJWT, (req, res) => {
 
 });
 
-router.post('/fetch-next-level-xp-by-input', authenticateJWT, (req, res) => {
+router.post('/fetch-next-level-xp-by-input', body('level').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-next-level-xp-by-input");

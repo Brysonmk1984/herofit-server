@@ -9,6 +9,11 @@ const latestPatchDetails = require('../patchDetails/latest.json');
 
 // Handles both Register and login. 
 router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /signup-or-signin");
+  }
+
   // res.status(500).json({
   //   message: `SERVER DOWN FOR MAINTENANCE`,
   // });
@@ -49,22 +54,23 @@ router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
   }).catch((error)=>{
     // USERNAME IS THE SAME AS SOMEONE ELSES, NEED TO MODIFY IT AND TRY AGAIN
     if(error && error.original && error.original.code === '23505'){
+
       User.create({
-          email: decoded.email,
-          username : `${decoded['custom:first_name']} ${decoded['custom:last_name']} - ${moment().format("MM DD, YYYY")}`,
-          firstName : decoded['custom:first_name'] || null,
-          lastName : decoded['custom:last_name'] || null
+          email: jwtUser.email,
+          username : `${jwtUser['custom:first_name'] || 'New Hero'} ${jwtUser['custom:last_name'] || ''} - ${moment().format("MM DD, YYYY")}`,
+          firstName : jwtUser['custom:first_name'] || null,
+          lastName : jwtUser['custom:last_name'] || null
       })
       .then((result) =>{
         let user = result.dataValues;
         return res.formatter.ok(user);
       })
       .catch((error) =>{console.log('error', error);
-        res.serverError(error.toString(), `Couldn't find or create user, second attempt in catch ${decoded.email}`);
+        res.serverError(error.toString(), `Couldn't find or create user, second attempt in catch ${jwtUser.email}`);
       })
     }else{
-      console.log(`Couldn't find or create user ${decoded.email}, DEBUG: ${error}`);
-      res.serverError(error.toString(), `Couldn't find or create user ${decoded.email}`);
+      console.log(`Couldn't find or create user ${jwtUser.email}, DEBUG: ${error}`);
+      res.serverError(error.toString(), `Couldn't find or create user ${jwtUser.email}`);
     }
   });
 });
@@ -78,6 +84,11 @@ router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
 });
 
 router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessToken').isString(), body('stravaAccessTokenExpiration').isNumeric(), body('stravaRefreshToken').isString(), authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /strava-credentials");
+  }
+
   console.log('!!! headers sent to strava-credentials', req.body.headers);
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
   User.findOne({ where: { email } })
@@ -109,6 +120,11 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
 });
 
 router.get('/fetch-latest-patch-details', authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-latest-patch-details");
+  }
+
   if(!latestPatchDetails){
     const error =  new Error("There was a server error, please try again later");
     res.formatter.serverError(error.toString(), "Can't find latest Patch Details");
@@ -116,11 +132,11 @@ router.get('/fetch-latest-patch-details', authenticateJWT, (req, res) =>{
   res.formatter.ok(latestPatchDetails);
 });
 
-router.post('/update-seen-latest-patch', authenticateJWT, body('id').isNumeric(), (req, res) =>{
+router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   console.log('UPDATESEENLATESTPATCH Errors - ', errors, 'REQ - ', req);
   if(!errors.isEmpty()){
-    res.formatter.badRequest(errors.array(), "Validation Error - for /update-seen-latest-patch");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /update-seen-latest-patch");
   }
   
   const id = req.body.id;

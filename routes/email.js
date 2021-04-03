@@ -1,4 +1,6 @@
 const express = require('express');
+const { body, header, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const User = require('../db').User;
 const sendDataCollectionEmail = require('../mail.js').sendDataCollectionEmail;
@@ -6,118 +8,94 @@ const sendSurveyEmail = require('../mail.js').sendSurveyEmail;
 const sendContactEmail = require('../mail.js').sendContactEmail;
 const sendAppErrorEmail = require('../mail.js').sendAppErrorEmail;
 
-router.post('/feedback-data', function(req, res, next){
-  let feedbackData = JSON.parse(req.body.feedbackData);
+router.post('/feedback-data', body('email').isEmail(), body('username').isString(), body('title').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), body('opinion').isString(), body('openResponse').isString(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /feedback-data endpoint");
+  }
 
+  const { email, username, title, accountInfo, opinion, openResponse } = req.body;
   new Promise((resolve, reject) => {
-    sendDataCollectionEmail({ email : req.body.email, username : req.body.username, title : req.body.title, feedbackData, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+    sendDataCollectionEmail({ email, username, title, opinion, openResponse, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
   // Add latestActivityUpdate to DB for user
     User.update(
       {featurePreferenceSubmitted : true},
-      { where: { email: req.body.email } }
-    ).then((updatePref) => {
-      next();
-    }).catch((err)=>{
-      console.log(`Error updating latest activity to user table for user ${req.body.email} DEBUG: ${err}`);
-      res.status(400).json({
-        message: `Error updating latest activity to user table for user  ${req.body.email}`,
-        debug : err
-      });
-      next();
+      { where: { email } }
+    ).then(() => {
+      res.formatter.ok({ data : 'Feedback form submitted' });
+    }).catch((error)=>{
+      console.log(`Error updating latest activity to user table for user ${email} DEBUG: ${error}`);
+      res.formatter.serverError(error.toString(), `Email could not be sent ${email} - /feedback-data endpoint`);
     });
-    res.json({
-      success : true,
-      requestType : 'POST',
-      info : data
-    });
-    next();
+
   }).catch((error) =>{
-    res.status(401).json({
-      message: `Email could not be sent`,
-      debug : error
-    });
-    next();
+    res.formatter.serverError(error.toString(), `Email could not be sent ${email} - /feedback-data endpoint`);
   });
 });
 
-router.post('/survey-data', function(req, res, next){
-  let surveyData = JSON.parse(req.body.surveyData);
+router.post('/survey-data', body('email').isEmail(), body('username').isString(), body('surveyTitle').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), body('surveyData').isArray(), authenticateJWT, (req, res) => {
+
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /survey-data");
+  }
+
+  let surveyData = req.body.surveyData;
   surveyData = surveyData.map((item) =>{
     return `#${item.id} - ${item.description} \n`;
   });
-  
+  const { email, username, surveyTitle, accountInfo } = req.body;
   new Promise((resolve, reject) => {
-    sendSurveyEmail({ email : req.body.email, username : req.body.username, surveyTitle : req.body.surveyTitle, surveyData, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+    sendSurveyEmail({ email, username, surveyTitle, surveyData, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
-
-  // Add latestActivityUpdate to DB for user
+    // Add latestActivityUpdate to DB for user
     User.update(
       {featurePreferenceSubmitted : true},
-      { where: { email: req.body.email } }
+      { where: { email } }
     ).then((updatePref) => {
-      next();
-    }).catch((err)=>{
-      console.log(`Error updating latest activity to user table for user ${req.body.email} DEBUG: ${err}`);
-      res.status(400).json({
-        message: `Error updating latest activity to user table for user  ${req.body.email}`,
-        debug : err
-      });
-      next();
+      res.formatter.ok({ data : 'Survey email submitted' });
+    }).catch((error)=>{
+      console.log(`Error updating latest activity to user table for user ${email} DEBUG: ${error}`);
+      res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user ${email} - /survey-data endpoint`);
     });
-    res.json({
-      success : true,
-      requestType : 'POST',
-      info : data
-    });
-    next();
   }).catch((error) =>{
-    res.status(401).json({
-      message: `Email could not be sent`,
-      debug : error
-    });
-    next();
+    res.formatter.serverError(error.toString(), `Email could not be sent for ${email} - /survey-data endpoint`);
   });
 });
 
-router.post('/contact-form', function(req, res, next){
+router.post('/contact-form', body('email').isEmail(), body('message').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
+ 
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /contact-form'");
+  }
+  const { email, message, accountInfo } = req.body;
   new Promise((resolve, reject) => {
-    sendContactEmail({ email : req.body.email, message : req.body.message, accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+    sendContactEmail({ email, message, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
-    res.json({
-      success : true,
-      requestType : 'POST',
-      info : data
-    });
-    next();
+    res.formatter.ok(data);
   }).catch((error) =>{
-    res.status(401).json({
-      message: `Email could not be sent`,
-      debug : error
-    });
-    next();
+    res.formatter.serverError(error.toString(), `Email could not be sent - /contact-form endpoint`);
   });
 });
 
-router.post('/app-error', function(req, res, next){
+// Works for 50x, 40x, and 999 errors... should be everything
+router.post('/app-error', body('status').isNumeric(), body('message').isString(), body('debug').isArray().optional({ checkFalsy: true }), body('version').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
+  console.log('BODY', req.body);
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){ console.log(errors);
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /app-error");
+  }
+  const { status, message, debug, version, accountInfo } = req.body;
+
   new Promise((resolve, reject) => {
-    sendAppErrorEmail({ status : req.body.status, message : req.body.message, debug : req.body.debug, version : req.body.version, errorLocation : "Front End", accountInfo : req.body.accountInfo ? req.body.accountInfo : 'User not logged in.' }, resolve, reject);
+    sendAppErrorEmail({ status, message, debug, version, errorLocation : "Front End", accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
-    res.json({
-      success : true,
-      requestType : 'POST',
-      info : data
-    });
-    next();
+    res.formatter.ok(data);
   }).catch((error) =>{
-    res.status(401).json({
-      message: `Email could not be sent`,
-      debug : error
-    });
-    next();
+    res.formatter.serverError(error.toString(), `Email could not be sent - /app-error endpoint`);
   });
 });
-
-
 
 module.exports = router;
