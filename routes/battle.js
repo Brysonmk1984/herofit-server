@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const { Op } = require("sequelize");
 const Avatar = require('../db').Avatar;
@@ -17,7 +18,7 @@ const ALLPBAs = require('../game/postBattleActions.json');
 const ALLITEMS = require('../game/allItems.json');
 
 // USER CLICKED 'GO TO BATTLE'
-router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), (req, res) => {
+router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /insert-battle endpoint");
@@ -115,40 +116,13 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
 
 });
 
-// USER CLICKED 'DONT GO TO BATTLE'
-router.post('/remove-battle', function(req, res, next){
-  Battle.destroy({
-    where: { avatarID: req.body.avatarID },
-  }, 
-  {raw : true}
-  ).then((result) =>{
-    console.log('BATTLE REMOVED', result);
-    
-    return Avatar.update({ 
-      goToBattle : false,
-    },{ where: { owner: req.body.email }, raw: true });
-    
-  }).then((result) =>{
-    if(!result){
-      throw new CustomError('Unable to Remove Battle',`No Avatar associated with user ${req.body.email}`);
-    }
-    res.status(200).json({
-      message : 'Avatar removed from battle',
-      goToBattle : false,
-    });
-    next();
-  }).catch((err)=>{
-    console.log(`Couldn't Remove AVATAR from Battle: ${err}`);
-    res.status(400).json({
-      message: `Couldn't remove AVATAR from Battle`,
-      debug : err
-    });
-    next();
-  })
-});
-
 // USER Logs in after a battle, or clicks button to retrieve report
-router.post('/fetch-battle-report', function(req, res, next){
+router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battle-report");
+  }
+
   Battle.findAll({
     limit: 1,
     where: { 
@@ -187,40 +161,30 @@ router.post('/fetch-battle-report', function(req, res, next){
         const { determineAstrologySeason } = avCalc();
         adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
 
-        res.status(200).json({
-          message : 'Retrieved Latest Battle Results',
-          result : adjResult
-        });
-
+        res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
       }else{
-        res.status(200).json({
-          message : 'Latest Report already viewed',
-          result : null
-        });
+        res.formatter.ok({ result : null }, 'Latest Report already viewed');
       }
     }else{
-      res.status(200).json({
-        message : 'No Battle Results',
-        result : null
-      });
+      const error = new Error('No Battle Results');
+      res.formatter.serverError(error.toString(), 'No Battle Results for /fetch-battle-report Endpoint');
     }
-
   }).catch((error) =>{
     console.log('ERR', error);
-    res.status(200).json({
-      message: `No Results`,
-      result : null
-    });
+    res.formatter.serverError(error.toString(), 'No Battle Results for /fetch-battle-report Endpoint');
   });
 });
 
-router.post('/fetch-battle-report-by-id', function(req, res, next){
-  const avatarID = req.body.avatarID;
+// Anyone clicks on a battle from anyone's profile page
+router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id').isNumeric(), (req, res) =>{
+  const { avatarID, id } = req.body;
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battle-report-by-id");
+  }
 
   Battle.findOne({
-    where: { 
-      id: req.body.id,
-    },
+    where: { id },
     raw : true
   }).then((result) =>{
     adjResult = result;
@@ -261,82 +225,45 @@ router.post('/fetch-battle-report-by-id', function(req, res, next){
     if(battleDate && battleDate.isAfter(startedTrackingSeasons)){
       adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
     }else{ adjResult.seasonalBonusElement = null; }
-    res.status(200).json({
-      adjResult
-    });
-    
-  }).catch((error) =>{console.log('ERRR', error);
-    res.status(200).json({
-      message: `No Results`,
-      result : null
-    });
+
+    res.formatter.ok({ adjResult });
+  }).catch((error) =>{
+    console.log('ERRR', error);
+    res.formatter.serverError(error.toString(), 'No Results for /fetch-battle-report-by-id Endpoint');
   });
 });
 
-router.post('/update-battle-report-seen', function(req, res, next){
+// USER sees a battle report, mark it so in the database
+router.post('/update-battle-report-seen', body('id').isNumeric(), authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /update-battle-report-seen");
+  }
+
   Battle.update({ seenReport : true},{ where: { id : req.body.id } })
   .then(()=>{
     console.log('updated seenBy');
-    res.status(200).json({
-      message : 'Successfully updated seenReport',
-    });
-  }).catch((err) =>{
-    console.log("couldn't update seen by", err);
-    res.status(401).json({
-      message : 'Failed to update seenReport',
-    });
+    res.formatter.ok({ message : 'Successfully updated seenReport' });
+  }).catch((error) =>{
+    console.log("couldn't update seen by", error);
+    res.formatter.serverError(error.toString(), "Failed to update seenReport");
   });
 });
 
-// USER Logs in after a battle, or clicks button to retrieve report
-router.get('/villain-list', function(req, res, next){
-  if(villains){
-    res.status(200).json({
-      villains
-    });
-  }else{
-    res.status(400).json({
-      debug : "couldn't retrieve villain list"
-    });
+// USER goes to battle
+router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
+  console.log(req.body);
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-upcoming-foe-and-rewards");
   }
-});
-
-router.post('/fetch-battles-won', function(req, res, next){
-  
-  Battle.findAll({ 
-      where : { 
-        avatarID: req.body.avatarID, 
-        [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }] 
-      }, 
-      raw : true, 
-      attributes: ['outcome', 'foe'] 
-  }).then((battles) =>{
-    if(battles){
-      res.status(200).json({
-        battles
-      });
-    }else{
-      res.status(400).json({
-        debug : "couldn't retrieve villain list"
-      });
-    }
-  }).catch(() =>{
-
-  })
-
-});
-
-router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
-  console.log(req.body)
+  const { avatarID } = req.body;
   Battle.findOne({ 
-      where : { 
-        avatarID: req.body.avatarID, 
-        outcome: "TBD" 
-      }, 
+      where : { avatarID, outcome: "TBD" }, 
       raw : true, 
       attributes: ['foe', 'postBattleActions'] 
   }).then((battle) =>{
-    console.log(`upcoming battle for ${req.body.avatarID} - `, battle);
+    console.log(`upcoming battle for ${avatarID} - `, battle);
     if(battle){
       let rewards = null;
       if(battle.postBattleActions){
@@ -358,43 +285,58 @@ router.post('/fetch-upcoming-foe-and-rewards', function(req, res, next){
         });
       }
 
-      res.status(200).json({
-        foe : battle.foe,
-        rewards
-      });
+      res.formatter.ok({ foe : battle.foe, rewards });
     }else{
-      console.log(`COULDNT FIND BATTLE ${req.body.avatarID}`, battle);
+      console.log(`COULDNT FIND BATTLE ${avatarID}`, battle);
 
-      res.status(422).json({
-        debug : `Couldn't retrieve foe for upcoming battle! No Battle Record listed. USER - ${req.body.avatarID}`,
-        battleObj : battle,
-        message : "No Upcoming battle on Record."
-      });
+      const error = new Error("No battles on record");
+      res.formatter.serverError(error.toString(), `Couldn't retrieve foe for upcoming battle! No Battle Record listed. USER - ${avatarID}`);
     }
-    
-    
-    /*else{
-      Avatar.update(
-        { goToBattle : false },
-        { where : { id : req.body.avatarID } }
-      ).then((data) =>{
-        res.status(422).json({
-          debug : "Couldn't retrieve foe for upcoming battle! No Battle Record listed.",
-          message : "No Upcoming battle on Record."
-        });
-      }).catch((err) =>{
-        res.status(400).json({
-          debug : err,
-          message : "Unable to Reset goToBattle status."
-        });
-      });
-
-    }*/
-  }).catch((error) =>{console.log('THE ERR', error);
-    res.status(400).json({
-      debug : "couldn't retrieve foe for upcoming battle!",
-      error
-    });
-  })
+  }).catch((error) =>{
+    console.log('THE ERR', error);
+    res.formatter.serverError(error.toString(), "Couldn't retrieve foe for upcoming battle!");
+  });
 });
+
+// Retrieve list of Villains for Campaign page
+router.get('/villain-list', (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - GET /villain-list");
+  }
+
+  if(villains){
+    res.formatter.ok({ villains });
+  }else{
+    const error = new Error("No battles on record");
+    res.formatter.serverError(error.toString(), "Couldn't retrieve villain list");
+  }
+});
+
+// Fetch battles won by a particular hero for Campaign page
+router.post('/fetch-battles-won', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battles-won");
+  }
+  Battle.findAll({ 
+      where : { 
+        avatarID: req.body.avatarID, 
+        [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }] 
+      }, 
+      raw : true, 
+      attributes: ['outcome', 'foe'] 
+  }).then((battles) =>{
+    if(battles){
+      res.formatter.ok({ battles });
+    }else{
+      const error = new Error("No battles on record");
+      res.formatter.serverError(error.toString(), 'Retrieved Data Error for /fetch-battles-won' );
+    }
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), 'Retrieved Data Error for /fetch-battles-won');
+  });
+});
+
+
 module.exports = router;
