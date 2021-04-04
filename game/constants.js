@@ -75,7 +75,7 @@ const FOE_MOD = {
 
 
 const OUTCOME_XP = {
-  base : 30,
+  base : 20,
   lossMultiplier : .25,
   drawMultiplier : .5,
   dkoMultiplier : .7

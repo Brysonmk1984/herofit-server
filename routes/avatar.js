@@ -121,7 +121,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     const aXP = calcNewActivityXPFromUt(ut);
     aXPDiff = aXP - avStatSnapshot.activityXP;
     
-    console.log('AXP - ', aXP, avStatSnapshot.activityXP);
+    //console.log('AXP - ', aXP, avStatSnapshot.activityXP);
     
     const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
     lvlUp = leveledUp;
@@ -133,7 +133,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     const updatedPower = updatePower();
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
-    console.log(avatar, updatedAvatar);
+    //console.log(avatar, updatedAvatar);
     // Finally, Update Avatar in DB
     return Avatar.update(
       {...updatedAvatar},
@@ -157,7 +157,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
       fire : Math.floor(avatar.fire - avStatSnapshot.fire),
       earth : Math.floor(avatar.earth - avStatSnapshot.earth),
     };
-    console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
+    //console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
 
     res.status(200).json({
       avatar,
