@@ -24,7 +24,8 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /insert-battle endpoint");
   }
 
-  const avatar = req.body.avatar
+  const avatar = req.body.avatar;
+  console.log('GTB Avatar - ', avatar);
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
@@ -166,8 +167,7 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
         res.formatter.ok({ result : null }, 'Latest Report already viewed');
       }
     }else{
-      const error = new Error('No Battle Results');
-      res.formatter.serverError(error.toString(), 'No Battle Results for /fetch-battle-report Endpoint');
+      res.formatter.ok({ result : null }, 'No Results, must be new user');
     }
   }).catch((error) =>{
     console.log('ERR', error);
