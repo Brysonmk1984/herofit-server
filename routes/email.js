@@ -82,15 +82,15 @@ router.post('/contact-form', body('email').isEmail(), body('message').isString()
 
 // Works for 50x, 40x, and 999 errors... should be everything
 router.post('/app-error', body('status').isNumeric(), body('message').isString(), body('debug').isArray().optional({ checkFalsy: true }), body('version').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
-  console.log('BODY', req.body);
+
   const errors = validationResult(req);
-  if(!errors.isEmpty()){ console.log(errors);
+  if(!errors.isEmpty()){ 
     return res.formatter.badRequest(errors.array(), "Validation Error - for /app-error");
   }
-  const { status, message, debug, version, accountInfo } = req.body;
+  const { status, message, debug, version, accountInfo, errorLocation, meta } = req.body;
 
   new Promise((resolve, reject) => {
-    sendAppErrorEmail({ status, message, debug, version, errorLocation : "Front End", accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
+    sendAppErrorEmail({ status, message, debug, version, errorLocation, meta, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
     res.formatter.ok(data);
   }).catch((error) =>{

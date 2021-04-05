@@ -150,7 +150,6 @@ const sendCronErrorEmail = function({status, message, debug, meta, version, erro
 // ERRORS are always sent from frontend
 // Backend errors are using the sendCronErrorEmail for now
 const sendAppErrorEmail = function(formData, resolve, reject){
-
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
   const status = formData.status || formData.name;
@@ -160,7 +159,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
   const accountInfo = formData.accountInfo;
   let html = `<div>An Error occured in HeroFit Production - `;
   // error status and message
-  html += `${formData.status}:  ${formData.message}`;
+  html += `${status}:  ${meta || message}`;
   let textDebug;
 
   if(debug && debug.length && typeof debug !== 'string'){
@@ -186,12 +185,9 @@ const sendAppErrorEmail = function(formData, resolve, reject){
     html += debug;
     textDebug = debug;
   }
-  if(meta){
-    html += `<br/><br/>`;
-    html += `<br/><br/><p>` + meta + `</p>`;
-  }
   html += `<br/><br/> Error Location: ${location}`;
-
+  html += `<br/><br/> Message to User: ${message}`;
+  
   if(accountInfo){
     html += `<br/><br/>`;
     html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`;
@@ -205,7 +201,7 @@ const sendAppErrorEmail = function(formData, resolve, reject){
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${message} \n \n ${textDebug ? textDebug : ''} \n \n ${meta ? meta : ''} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ''} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
       html
   };
 
