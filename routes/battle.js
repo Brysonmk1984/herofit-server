@@ -92,7 +92,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
         let matchingPBA;
         for(let actionType in ALLPBAs){
           const match = ALLPBAs[actionType].find(pba => {
-            console.log(pba.action, action);
+            //console.log(pba.action, action);
             return pba.action === action;
           });
           if(match){
@@ -146,17 +146,17 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
           let matchingPBA;
           for(let actionType in ALLPBAs){
             const match = ALLPBAs[actionType].find(pba => {
-              console.log(pba.action, action);
               return pba.action === action;
             });
+
             if(match){
-              return matchingPBA = match;
+              matchingPBA = match;
             }
           } 
-          return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+          return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
         });
       }
-
+ 
       if(!result[0].seenReport){
         // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
         const { determineAstrologySeason } = avCalc();
@@ -196,7 +196,6 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
         let matchingPBA;
         for(let actionType in ALLPBAs){
           const match = ALLPBAs[actionType].find(pba => {
-            //console.log(pba.action, action);
             return pba.action === action;
           });
           if(match){
