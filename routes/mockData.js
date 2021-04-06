@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT, authenticateAdminJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const fs = require('fs');
 const path = require("path");
@@ -18,7 +18,7 @@ const db = require('../db').db;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end
-router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }),  authenticateJWT, (req, res) => {
+router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }),  authenticateAdminJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for create-cognito-linked-account endpoint");
@@ -85,7 +85,7 @@ router.post('/create-cognito-linked-account', body('email').isEmail(), body('fir
 });
 
 // Insert random avatar after cognito account was created
-router.post('/insert-random-avatar', body('owner').isEmail(), authenticateJWT, (req,res) => {
+router.post('/insert-random-avatar', body('owner').isEmail(), authenticateAdminJWT, (req,res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-random-avatar endpoint");
@@ -197,7 +197,7 @@ router.post('/insert-random-avatar', body('owner').isEmail(), authenticateJWT, (
 });
 
 // Returns the dummy list of fake activities
-router.post('/get-fake-activities',  body('count').isNumeric(), authenticateJWT, (req,res) => {
+router.post('/get-fake-activities',  body('count').isNumeric(), authenticateAdminJWT, (req,res) => {
   const count = req.body.count;
   const activities = shuffleArray(mockActivities).slice(0,count).map((act) =>{
     act.id = getRandomNumber(10);
@@ -212,7 +212,7 @@ router.post('/get-fake-activities',  body('count').isNumeric(), authenticateJWT,
 });
 
 // BROKEN - integer out of range - Inserts fake activities into account by email
-router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), authenticateJWT, (req,res) =>{
+router.post('/insert-mock-activities', body('count').isNumeric(), body('email').isEmail(), authenticateAdminJWT, (req,res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for insert-mock-activities");
@@ -251,7 +251,7 @@ router.post('/insert-mock-activities', body('count').isNumeric(), body('email').
 // Verify the Admin Password is Correct in order to open the Admin panel
 router.post('/check-admin-password', body('password').custom((password) =>{
   return password === process.env.ADMIN_PANEL_PASSWORD ? true : false; 
-}), authenticateJWT, (req,res) => {
+}), authenticateAdminJWT, (req,res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error for check-admin-password endpoint");
@@ -269,7 +269,7 @@ router.post('/check-admin-password', body('password').custom((password) =>{
 
 
 // Manually set Avatar's health and status
-router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('health').isNumeric(), body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']), authenticateJWT,
+router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('health').isNumeric(), body('status').isIn(['Recovering', 'Rested', 'Knocked Out', 'New Recruit']), authenticateAdminJWT,
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -295,7 +295,7 @@ router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('healt
 );
 
 // Sets all feedback booleans to sent value
-router.post('/toggle-feedback-boolean', body('setToTrue').isBoolean(), authenticateJWT, async (req, res) => {
+router.post('/toggle-feedback-boolean', body('setToTrue').isBoolean(), authenticateAdminJWT, async (req, res) => {
   const errors = validationResult(req);console.log('ERRS', errors);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /toggle-feedback-boolean");

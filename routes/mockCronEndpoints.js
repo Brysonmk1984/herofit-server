@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
+const { authenticateJWT, authenticateAdminJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
@@ -20,12 +21,11 @@ const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
 const ALLITEMS = require('../game/allItems.json');
-const { authenticateJWT } = require('../jwtValidation');
 // { where: { health: { [Op.lt]: db.col('maxHealth') } }
 
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
-router.get('/regenerate-health', authenticateJWT, (req, res) =>{
+router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /regenerate-health endpoint");
@@ -105,7 +105,7 @@ router.get('/regenerate-health', authenticateJWT, (req, res) =>{
 
 
 // FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS
-router.get('/try-recovery', authenticateJWT, (req, res) =>{
+router.get('/try-recovery', authenticateAdminJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /try-recovery endpoint");
@@ -163,7 +163,7 @@ router.get('/try-recovery', authenticateJWT, (req, res) =>{
 
 
 // RANDOMLY GENERATE A FOE
-router.post('/generate-foe', body('avatar').isObject(), authenticateJWT, (req, res) => {
+router.post('/generate-foe', body('avatar').isObject(), authenticateAdminJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
@@ -179,7 +179,7 @@ router.post('/generate-foe', body('avatar').isObject(), authenticateJWT, (req, r
 });
 
 // MOCK ENDPOINT for DETERMINING PBAs
-router.post('/mock-determine-pbas', body('avatar').isObject(), authenticateJWT, (req, res) =>{
+router.post('/mock-determine-pbas', body('avatar').isObject(), authenticateAdminJWT, (req, res) =>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /mock-determine-pbas");
@@ -197,7 +197,7 @@ router.post('/mock-determine-pbas', body('avatar').isObject(), authenticateJWT, 
 });
 
 // MOCK ENDPOINT for RUNNING PBAs
-router.get('/mock-run-pbas', authenticateJWT, (req, res) => {
+router.get('/mock-run-pbas', authenticateAdminJWT, (req, res) => {
   console.log('didnt get here');
   const errors = validationResult(req);
   if(!errors.isEmpty){
@@ -253,7 +253,7 @@ router.get('/mock-run-pbas', authenticateJWT, (req, res) => {
 });
 
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
-router.get('/run-all-battles', authenticateJWT, (req, res) => {
+router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
   // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
   const { determineAstrologySeason } = avCalc();
   const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
