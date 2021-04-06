@@ -17,12 +17,13 @@ const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run'];
 
+// Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
   }
-  const { avatar, userId, email } = req.body;
+  let { avatar, userId, email } = req.body;
 
   Avatar.findOrCreate({
     where: { owner : email },
@@ -46,6 +47,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
   });
 });
 
+// Update Avatar without full buff sequence. Used when spending QP points and initial avatar update after Strava connection
 router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -55,19 +57,18 @@ router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail()
 
   const { avatar, email } = req.body;
 
-
   Avatar.update(
     {...avatar},
     { where: { owner: email }, raw : true }
-  ).then((avatar) => {
-    console.log(avatar);
-    res.formatter.ok(avatar);
+  ).then((result) => {
+    res.formatter.ok();
   }).catch((error) =>{
     console.log(`Error updating avatar for user ${email}, DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for POST /update-avatar Endpoint`);
   });
 });
 
+// When a user applies their latest Strava activities, adjust avatar
 router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -147,6 +148,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
 });
 
+// Retrieve Avatar on login
 router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -166,7 +168,11 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
 
   try{
     const [ results ] = await db.query(q, { bind : [email] });
-    //console.log('RESULT - ', results[0]);
+    if(results.length === 0){
+      const error = new Error("Error retrieving Hero, Please try again later.");
+      res.formatter.serverError(error.toString(), `No Avatar Saved... Likely from initial account setup failure." ${email} for /get-avatar Endpoint`);
+    }
+  
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
     const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
