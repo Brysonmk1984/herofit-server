@@ -1,4 +1,6 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const User = require('../db').User;
 const Avatar = require('../db').Avatar;

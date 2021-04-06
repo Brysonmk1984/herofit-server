@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwtValidation');
 const db = require('../db').db;
 const { QueryTypes } = require('sequelize');
 const Avatar = require('../db').Avatar;
@@ -16,106 +17,82 @@ const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run'];
 
-router.post('/insert-avatar', function(req, res, next){
-  console.log('INSERTING AV', req.body.avatar);
-
-  if(req.body.email){
-    Avatar.findOrCreate({
-      where: {
-        owner: req.body.owner
-      },
-      // set the default properties if it doesn't exist
-      defaults : Object.assign({},{ ...req.body.avatar }, { userId: req.body.userId, owner: req.body.email, status : 'Rested' })
-    }).then((result) =>{
-      const created = result[1];
-      // Avatar from results, parse properties that are strings that need to be numbers
-      avatar = parseAvatarProperties(result[0].dataValues);
-      avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-      avatar.equipped = [];
-      // Avatar Created
-      if(created){
-        res.status(200).json({
-          message: `New Avatar Saved belonging to owner ${avatar.owner}`,
-          avatarId : avatar.id,
-          avatar,
-          hasAvatar : true
-        });
-        next();
-      // Avatar Already exists, using existing instead
-      }else if(!created){
-        console.log('AVATAR ALREADY EXISTS - ', avatar);
-        res.status(200).json({
-          message: `Existing avatar for ${avatar.owner}`,
-          avatarId : avatar.id,
-          avatar,
-          hasAvatar : true
-        });
-        next();
-      }else{
-        throw new Error("Couldn't find or create avatar");
-      }
-    }).catch((err) =>{
-      console.log(`Couldn't insert Avatar for user ${req.body.email}, DEBUG: ${err}`);
-      res.status(400).json({
-        message: `Couldn't insert Avatar for user ${req.body.email}`,
-        debug : err
-      });
-      next();
-    });
-  }else{
-    res.status(400).json({
-      message: `No Email supplied passed to insert-avatar`,
-      debug : `No Email supplied passed to insert-avatar`
-    });
+router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
   }
-});
+  const { avatar, userId, email } = req.body;
 
-router.post('/update-avatar', function(req, res, next){
-  delete req.body.restedEnough;
-  Avatar.update(
-    {...req.body.avatar},
-    { where: { owner: req.body.email }, raw : true }
-  )
-  .then(function(result) {
-    res.status(200).json({
-      message: `${result} record updated --- avatar ${req.body.id}`,
+  Avatar.findOrCreate({
+    where: { owner : email },
+    // set the default properties if it doesn't exist
+    defaults : Object.assign({},{ ...avatar }, { userId, owner: email})
+  }).then((result) =>{
+    const created = result[1];
+    // Avatar from results, parse properties that are strings that need to be numbers
+    avatar = parseAvatarProperties(result[0].dataValues);
+    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+    avatar.equipped = [];
+    
+    res.formatter.ok({
+      avatarId : avatar.id,
+      avatar,
+      hasAvatar : true
     });
-  })
-  .catch((err) =>{
-    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}`,
-      debug : err
-    });
-    next();
+  }).catch((error) =>{
+    console.log(`Couldn't insert Avatar for user ${email}, DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't insert Avatar for user ${email} for POST /insert-avatar Endpoint`);
   });
 });
 
-router.post('/buff-and-update-avatar', function(req, res, next){
-  let ut;
-  let avStatSnapshot;
-  let aXPDiff;
-  let lvlUp;
-  let lvlAfterBuff;
-  let qpe;
+router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /update-avatar endpoint");
+  }
   delete req.body.restedEnough;
+
+  const { avatar, email } = req.body;
+
+
+  Avatar.update(
+    {...avatar},
+    { where: { owner: email }, raw : true }
+  ).then((avatar) => {
+    console.log(avatar);
+    res.formatter.ok(avatar);
+  }).catch((error) =>{
+    console.log(`Error updating avatar for user ${email}, DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for POST /update-avatar Endpoint`);
+  });
+});
+
+router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /buff-and-update-avatar Endpoint");
+  }
+  const { email } = req.body;
+  delete req.body.restedEnough;
+  let ut, avStatSnapshot, aXPDiff, lvlUp, lvlAfterBuff, qpe;
+
   
   // First, retrieve userTotals AND avatar from DB
   UserTotal.findOne(
-    { where: { user: req.body.email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true }
+    { where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true }
   ).then((userTotals) =>{
     ut = userTotals;
     
     return Avatar.findOne(
-      { where: { owner: req.body.email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qp'], raw : true }
+      { where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qp'], raw : true }
     );
   }).then((avatar) =>{
     avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
     
     // Then, Update Avatar Totals
     const { checkLevelUp, calcNewActivityXPFromUt, currentLevelByInput } = xpCalc(avatar.activityXP, avatar.battleXP);
-    const { updatePower, updateElements } = avCalc(ut);
-    
+    const { updatePower, updateElements } = avCalc(ut);  
     
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
@@ -128,8 +105,6 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     lvlAfterBuff = endingLevel;
     qpe = qpEarned;
     
-    
-    
     const updatedPower = updatePower();
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
@@ -137,7 +112,7 @@ router.post('/buff-and-update-avatar', function(req, res, next){
     // Finally, Update Avatar in DB
     return Avatar.update(
       {...updatedAvatar},
-      { where: { owner: req.body.email }, returning: true, plain: true }
+      { where: { owner: email }, returning: true, plain: true }
     );
 
   }).then((result) =>{
@@ -158,26 +133,27 @@ router.post('/buff-and-update-avatar', function(req, res, next){
       earth : Math.floor(avatar.earth - avStatSnapshot.earth),
     };
     //console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
-
-    res.status(200).json({
+    res.formatter.ok({
       avatar,
       improvements,
       reachedLevel : lvlUp ? lvlAfterBuff : null,
       qpEarned : qpe,
       xpGain : aXPDiff,
     });
-  }).catch((err) =>{
-    console.log(`Error updating avatar for user ${req.body.email}, DEBUG: ${err}`);
-    res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}`,
-      debug : err
-    });
-    next();
+  }).catch((error) =>{
+    console.log(`Error updating avatar for user ${email}, DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for POST /buff-and-update-avatar Endpoint`);
   });
 
 });
 
-router.post('/get-avatar', async function(req, res, next){
+router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-avatar Endpoint");
+  }
+  const { email } = req.body;
+
   // 'equipped' refers to 2 things here. the property on the avatar (which is described in the SELECT statement), as well as the equipped boolean that each item posseses. 
   // This query only grabs items that have equipped set to true.
   const q = `
@@ -189,7 +165,7 @@ router.post('/get-avatar', async function(req, res, next){
   `;
 
   try{
-    const [ results ] = await db.query(q, { bind : [req.body.email] });
+    const [ results ] = await db.query(q, { bind : [email] });
     //console.log('RESULT - ', results[0]);
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
@@ -201,75 +177,11 @@ router.post('/get-avatar', async function(req, res, next){
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
     //console.log('AVATAR - ', avatar);
   
-    res.status(200).json({
-      avatar
-    });
-    
+    res.formatter.ok(avatar);
   }catch(error){
-    console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${error}`);
-    res.status(400).json({
-      message: `Couldn't get Avatar for user ${req.body.email}`,
-      debug : error
-    });
-    next();
+    console.log(`Couldn't get Avatar for user ${email} DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
   }
-
-
-  
-  // if(req.body.email){
-
-  //   Avatar.findOne({ where: { owner: req.body.email }, raw : true })
-  //     .then((avatar) =>{
-  //       if(!avatar){
-  //         console.log('NO AV ASSOCIATED WITH EMAIL');
-  //         res.status(204).json({
-  //           message: `No Avatar associated with user ${req.body.email}`
-  //         });
-  //         return;
-  //       }else{
-  //         const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
-    
-  //         avatar.level = getCurrentLevel();
-  //         avatar.nextLevelStartXp = getNextLevel();
-  //         avatar.thisLevelStartXp = getNextLevel(-1);
-  //         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-  //         avatar = parseAvatarProperties(avatar);
-  //         avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-
-  //         AvatarEquip.findAll({ attributes : ['id', 'avatarID', 'type', 'name', 'description', 'equipped', 'icon', 'class' ], where : { avatarID : avatar.id, equipped : true }}, { raw : true, plain : true  })
-  //         .then((equipped) =>{
-  //           avatar.equipped = equipped;
-  //           //console.log('equip! - ', equipped);
-  //           console.log('AVA - ', avatar);
-  //           res.status(200).json({
-  //             message: `Found matching Avatar`,
-  //             avatar,
-  //           });
-  //           next();
-  //         }).catch((error) =>{
-  //           res.status(400).json({
-  //             message: `Unable to Fetch Hero Items`,
-  //             debug : error
-  //           });
-  //           next();
-  //         });
-  //       }
-  //     }).catch((err)=>{
-  //       console.log(`Couldn't get Avatar for user ${req.body.email} DEBUG: ${err}`);
-  //       res.status(400).json({
-  //         message: `Couldn't get Avatar for user ${req.body.email}`,
-  //         debug : err
-  //       });
-  //       next();
-  //     });
-  // }else{
-  //   res.status(400).json({
-  //     message: `No Email supplied passed to get-avatar`,
-  //     debug : `No Email supplied passed to get-avatar`
-  //   });
-  //   next();
-  // }
-  
 
 });
 
@@ -278,11 +190,10 @@ RANKING PAGE
 */
 
 // Fetch avatars by page number, with or without search query,  no filter selected
-router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}),
-(req, res) =>{
+router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}), (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - fetch-avatars-by-page");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /fetch-avatars-by-page Endpoint");
   }
 
   const page = req.body.page || 0;
@@ -335,22 +246,19 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
     });
   }).catch((error)=>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-    res.formatter.serverError(error, "Retrieved Data Error for fetch-avatars-by-page-and-ranking-type endpoint");
+    res.formatter.serverError(error.toString(), "Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint");
   });
   
 });
 
 // Fetch avatars by page number, with or without search query,  FILTER SELECTED
-router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(RANKING_FILTER_ACTIVITIES), body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}),
-(req, res) => {
+router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(RANKING_FILTER_ACTIVITIES), body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - fetch-avatars-by-page-and-ranking-type");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatars-by-page-and-ranking-type Endpoint");
   }
   
   const rankingType = req.body.rankingType;
-  //console.log('RANKING TYPE = ', rankingType);
-
   const page = req.body.page || 0;
   const pageSize = AVATAR_COUNT_PER_PAGE;
   const searchInput = req.body.searchInput;
@@ -412,28 +320,19 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
        });
       }).catch((error) =>{
         console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-        error = error.toString();
-        res.formatter.serverError(error, 'Retrieved Data Error for fetch-avatars-by-page-and-ranking-type endpoint' );
+        res.formatter.serverError(error, 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint' );
       });
   }).catch((error) =>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-    error = error.toString();
-    res.formatter.serverError(error, 'Retrieved Data Error for fetch-avatars-by-page-and-ranking-type endpoint' );
+    res.formatter.serverError(error.toString(), 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint' );
   });
 });
 
-
-
-
-
-
-
 // Fetch avatars by page number, with or without search query,  FILTER SELECTED - Battle
-router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType').equals('battle'), body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}),
-(req, res) => {
+router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType').equals('battle'), body('page').isNumeric(), body('searchInput').isString().optional({nullable: true, checkFalsy: true}), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - fetch-avatars-by-page-and-ranking-type-battle");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatars-by-page-and-ranking-type-battle Endpoint");
   }
   
   const page = req.body.page || 0;
@@ -490,8 +389,8 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
       currentPage : page + 1
     });
   }).catch((error)=>{
-    console.log(`Couldn't get all Avatars DEBUG: ${err}`);
-    res.formatter.serverError(error, 'Retrieved Data Error for fetch-avatars-by-page-and-ranking-type-battle' );
+    console.log(`Couldn't get all Avatars DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type-battle Endpoint' );
   });
 });
 

@@ -65,7 +65,6 @@ router.post('/survey-data', body('email').isEmail(), body('username').isString()
 });
 
 router.post('/contact-form', body('email').isEmail(), body('message').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
- 
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for /contact-form'");
