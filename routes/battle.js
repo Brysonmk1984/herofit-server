@@ -190,7 +190,8 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     adjResult = result;
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-    // IF WIN, Get the items aquired from the action types in the battle report
+     
+    // IF the avatar won, Get the items aquired from the action types in the battle report
     if(adjResult.outcome === 'Avatar Wins'){
       adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
         let matchingPBA;
@@ -198,11 +199,12 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
           const match = ALLPBAs[actionType].find(pba => {
             return pba.action === action;
           });
+
           if(match){
-            return matchingPBA = match;
+            matchingPBA = match;
           }
         } 
-        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name];
+        return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
       });
     }
 
