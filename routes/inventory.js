@@ -96,25 +96,6 @@ router.get('/get-default-items', (req, res) => {
   res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
 });
 
-// For Item Modal, Battle reports only display PBA reward, need to use that to fetch actual item here
-router.post('/fetch-owned-item-by-name', body('name').isString(), body('avatarID').isNumeric, (req, res) => {
-  console.log('REQ BODY', req.body);
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Validation Error - for /get-default-items");
-  }
-  const { name, avatarID } = req.body;
-  console.log('here',name, avatarID);
-  AvatarEquip.findOne({ 
-    where : { avatarID, name }, raw : true
-  }).then((item) =>{ 
-    console.log('ITTTEM', item);
-    res.formatter.ok({ item : item }, 'Successfully ran /fetch-owned-item-by-name');
-  }).catch((error) =>{console.log('ERR', error);
-    res.formatter.serverError(error.toString(), 'Error Running  /get-default-items Endpoint');
-  });
-});
-
 router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
