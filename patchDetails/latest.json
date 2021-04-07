@@ -1,34 +1,30 @@
 {
-  "version": "1.1.9",
-  "headline": "New Update!  -  1.1.9",
-  "openingRemarks": "New Foe! - Plaguebringer, Rankings by activities, changes to running and other activities!",
+  "version": "1.1.10",
+  "headline": "New Update!  - version 1.1.10",
+  "openingRemarks": "New Item Window and Improved Security",
   "newFeatures": [
     {
-      "title": "A New Foe arrived from the NetherRealm: The Plaguebringer",
-      "description": "Available after level 20, earn a Plagueling pet for defeating The Plaguebringer. If you survive, he'll infect your hero, causing health loss equal to half the heroe's regeneration rate for 24 hours."
+      "title": "Item Window",
+      "description": "Now when you click on items or item links, a window will pop up with more details about the item. You can see this in the Campaign, Profile, & Iventory pages, as well as the Awaiting Battle & Battle Report windows."
     },
     {
-      "title": "Ranking By Activities",
-      "description": "There is now a dropdown box to select different activities and view how you rank among the HeroFit community. Who's going to be the top runner? the top yogi?"
-    },
-    {
-      "title": "XP,Elemental, Power changes to Fire activities, swimming, and elliptical",
-      "description": "Fire activities, swimming, and elliptical will now grant XP, Elemental points, and Power 50% faster. This is because of the strenuousness of the activities per minutes spent. This may change in the future. IMPORTANT - this change will be retroactive, meaning on your next level up, your total xp, power, and elements will be calculated fresh with the new changes. You'll likely have a big upgrade to make up the difference."
+      "title": "Improved UI for User Profiles",
+      "description": "Various UI improvements and all earned costumes are now showing up in profile"
     }
   ],
   "bugFixes": [
-    "Fixed a bug where new players couldn't get past new patch window",
-    "Fixed a bug where the battle time was off by one hour because of daylight savings time",
-    "Fixed issue where the last page of the rankings was not showing",
-    "Fixed an issue where my contact form messages and error-reporting emails were not being sent",
-    "Fixed an issue where sometimes the reward for an upcoming battle win would not show in the Awaiting Battle window"
+    "The server errors people experienced over the last week were related to implementation of improved security measures, and should be resolved",
+    "After Spending all your QP, the 'Quantum Points Activated' message will go away",
+    "Resolved error where sometimes users couldn't Go To Battle when they should have been able to"
   ],
   "balanceChanges": [
-    "On going foe difficulty tweaks, working on finding the right balance"
+    "Reduced difficulty of foes slightly across the board",
+    "Reduced XP gained for battles in general"
   ],
   "miscDetails": [
-    "Ongoing improvements to the backend API are underway. Nothing fancy for the user, but for the developers out there, We're improving request body validation and formatting responses.",
-    "Likewise on the frontend, we're working on refactoring how the http requests are handled and presenting error messages."
+    "The Hero Name input on the Select Hero page will now check to see if the name is available as they type. This was added to prevent naming collisions and improve new user's experience",
+    "Security has been improved across the application",
+    "Major code refactoring related to http requests both on the client side and server side has been completed"
   ],
-  "closingRemarks": "It's clear from the previous patch feedback that there hasn't been enough documentation about how to use new features. Also, more items are needed, especially at the lower levels. This will be addressed in upcoming patches. Thanks again for playing!"
+  "closingRemarks": "More code refactoring ahead, but there's more new content in the works too ;)"
 } 

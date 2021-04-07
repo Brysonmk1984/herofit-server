@@ -191,6 +191,31 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
 
 });
 
+// Check if Avatar name is available
+router.post('/check-avatar-name', body('name').isString(), (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /check-avatar-name Endpoint");
+  }
+  const { name } = req.body;
+  console.log(name);
+  Avatar.findOne({ where : { name : { [Op.iLike]: `%${name}%`} }, raw : true })
+  .then((result) => {
+    if(result){
+      const resultName = result.name.toLowerCase();
+      if(resultName === name){
+        return res.formatter.ok({ availability : false });
+      }
+      return res.formatter.ok({ availability : true });
+    }
+    return res.formatter.ok({ availability : true });
+  }).catch((error) =>{
+    console.log(`Couldn't search for avatar name ${name}, DEBUG: ${error}`);
+    return res.formatter.serverError(error.toString(), `Couldn't search for avatar name ${name} POST /check-avatar-name Endpoint`);
+  });
+
+});
+
 /*
 RANKING PAGE
 */
