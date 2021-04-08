@@ -24,6 +24,10 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
   }
   let { avatar, userId, email } = req.body;
+  // This is to allow the user to Go To Battle after signup.
+  if(avatar.status === 'New Recruit'){
+    avatar.status = 'Rested';
+  }
 
   Avatar.findOrCreate({
     where: { owner : email },
@@ -35,7 +39,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     avatar = parseAvatarProperties(result[0].dataValues);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = [];
-    
+
     res.formatter.ok({
       avatarId : avatar.id,
       avatar,

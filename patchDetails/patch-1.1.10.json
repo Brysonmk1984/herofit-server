@@ -1,11 +1,11 @@
 {
   "version": "1.1.10",
-  "headline": "New Update!  - version 1.1.10",
+  "headline": "New Update!  - version 1.1.9 - 1.1.10",
   "openingRemarks": "New Item Window and Improved Security",
   "newFeatures": [
     {
       "title": "Item Window",
-      "description": "Now when you click on items or item links, a window will pop up with more details about the item. You can see this in the Campaign, Profile, & Iventory pages, as well as the Awaiting Battle & Battle Report windows."
+      "description": "Now when you click on items or item links, a window will pop up with more details about the item. You can see this in the Campaign, Profile, & Inventory pages, as well as the Awaiting Battle & Battle Report windows"
     },
     {
       "title": "Improved UI for User Profiles",
