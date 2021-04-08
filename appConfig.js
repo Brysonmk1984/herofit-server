@@ -1,8 +1,8 @@
 const config = {
   mode : 'release',
-  // globalMessage : [
-  //   { type : 'info', message : 'Some are experiencing login issues, please try a page refresh to resolve the issue.' }
-  // ],
+  globalMessage : [
+    { type : 'info', message : "If you're receiving errors, try refreshing your page. If problems persist, try clearing your cache." }
+  ],
 };
 
 // RANKING PAGE
