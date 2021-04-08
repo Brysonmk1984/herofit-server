@@ -174,7 +174,7 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     const [ results ] = await db.query(q, { bind : [email] });
     if(results.length === 0){
       const error = new Error("Error retrieving Hero, Please try again later.");
-      res.formatter.serverError(error.toString(), `No Avatar Saved... Likely from initial account setup failure." ${email} for /get-avatar Endpoint`);
+      return res.formatter.serverError(error.toString(), `No Avatar Saved... Likely from initial account setup failure." ${email} for /get-avatar Endpoint`);
     }
   
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
