@@ -174,17 +174,16 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
   let userTotals, activities, avatar, battles;
   // First, exchange the username for the email
   User.findOne({ where: { username }, attributes : ['email'], raw : true })
-  .then((data) =>{console.log('the data', data);
+  .then((data) =>{
     if(!data){
-      const error = new Error('No User Found by that username!');
-      return res.formatter.badRequest(error.toString(), "Request Error - for POST /get-info-by-username Endpoint");
+      return res.formatter.ok({ noUser : true });
     }
     const allPromises = [];
 
     allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe'], raw : true }));
     allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true, attributes : ['id', 'activity', 'activityDate']}));
     allPromises.push(Avatar.findOne({ where: { owner: data.email }, raw : true }));
-    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true }));
+    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true, order: [['createdAt', 'ASC']] }));
     
     return Promise.allSettled(allPromises);
   }).then(([ut, act, av, bat]) =>{
@@ -192,7 +191,6 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     activities = act;
     avatar = av;
     battles = bat;
-    //console.log('AVID - ', avatar);
     return AvatarEquip.findAll({ where: { avatarID : avatar.value.id }, raw : true })
   }).then((equipment) =>{
     userTotals = userTotals.value;
