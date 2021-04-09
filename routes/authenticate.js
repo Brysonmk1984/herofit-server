@@ -134,7 +134,6 @@ router.get('/fetch-latest-patch-details', authenticateJWT, (req, res) =>{
 
 router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
-  console.log('UPDATESEENLATESTPATCH Errors - ', errors, 'REQ - ', req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for /update-seen-latest-patch");
   }
