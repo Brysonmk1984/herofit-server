@@ -1,7 +1,7 @@
 const config = {
   mode : 'release',
   globalMessage : [
-    { type : 'info', message : "If you're receiving errors, try refreshing your page. If problems persist, try clearing your cache." }
+    { type : 'info', link : null, message : "If you're receiving errors, refresh your page. If problems persist, try clearing your cache." }
   ],
 };
 
