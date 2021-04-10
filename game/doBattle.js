@@ -228,7 +228,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
 
 
 
-        return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented };
+        return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented };
 
       // physical round, avatar is attacking
       }else{
@@ -241,7 +241,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         totals.fPhyReduction += reduction;
 
 
-        return { defenderHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals, reduction };
+        return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals, reduction };
 
       }
 
@@ -262,7 +262,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
           totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
         }
         
-        return { defenderHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented }
+        return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented }
       
       // physical round, foe is attacking
       // Used for both regular physical damage turns or for elemental turns when the foe doesn't have any elemental power
@@ -275,7 +275,7 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
         totals.fPhyDamage += netDamage;
         totals.aPhyReduction += reduction;
 
-        return { defenderHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals, reduction };
+        return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals, reduction };
 
       }
 
@@ -328,10 +328,10 @@ function doBattle(avatar, foe, goesFirst){
 
     const roundType = elementalTurns.includes(battleTurns[i]) ? 'Elemental' : 'Physical';
 
-    const { defenderHealthLeft, damageDealt, totals, reduction } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
+    const { defenderHealthLeft, aggressorHealthLeft, damageDealt, totals, reduction } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
     grandTotals = totals;
 
-    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft, reduction });
+    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft, aggressorHealthLeft, reduction });
 
     if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
       winnerString = aggressorString;
