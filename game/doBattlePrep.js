@@ -16,16 +16,22 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, ability){
       avatar.power = Math.floor(avatar.power - (avatar.power * .2));
       break;
     case "Unseen Swap":
-      // Power Trade
       const foePower = foe.power;
       const avatarPower = avatar.power;
+      if(foePower > avatarPower){
+        break;
+      }
+      // Power Trade
       foe.power = avatarPower;
       avatar.power = foePower;
       break;
     case "Armor Barter":
-      // Armor Trade
       const foeArmor = foe.armor;
       const avatarArmor = avatar.armor;
+      if(foeArmor > avatarArmor){
+        break;
+      }
+      // Armor Trade
       foe.armor = avatarArmor;
       avatar.armor = foeArmor;
       break;

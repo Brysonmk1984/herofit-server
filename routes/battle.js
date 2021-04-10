@@ -88,18 +88,34 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
         res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
       }
 
+      // const rewards = postBattleActions.map(action => {
+      //   let matchingPBA;
+      //   for(let actionType in ALLPBAs){
+      //     const match = ALLPBAs[actionType].find(pba => {
+      //       //console.log(pba.action, action);
+      //       return pba.action === action;
+      //     });
+      //     if(match){
+      //       return matchingPBA = match;
+      //     }
+      //   } 
+      //   return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+      // });
+
+      // Get the items aquired from the action types in the battle report
       const rewards = postBattleActions.map(action => {
         let matchingPBA;
         for(let actionType in ALLPBAs){
           const match = ALLPBAs[actionType].find(pba => {
-            //console.log(pba.action, action);
             return pba.action === action;
           });
           if(match){
-            return matchingPBA = match;
+            matchingPBA = match;
+            break;
           }
         } 
-        return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
+        console.log('MBPA - ',matchingPBA);
+        return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
       });
 
       res.formatter.ok({
