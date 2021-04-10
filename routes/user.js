@@ -147,8 +147,9 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
       });
 
       let moments = datesArray.map(d => moment(d, 'YYYY-MM-DD HH:mm:ss')),
-      maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
-      //console.log(maxDate);
+      //maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
+      maxDate = moment.utc(moment.max(moments), 'YYYY-MM-DD HH:mm:ss');
+
       const activities = results.map((result, i) =>{
         return result.activity;
       });

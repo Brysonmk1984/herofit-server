@@ -11,7 +11,7 @@ function selectFoeTemplate(level){
   let villain;
 
   // Get specific foe foe testing purposes
-  //return villains.Spirits[4];
+  //return villains.Spirits[3];
 
   // Must be at least level 20 to have a shot at getting matched against Plaguebringer
   if(level >= 20){

@@ -25,7 +25,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   }
 
   const avatar = req.body.avatar;
-  console.log('GTB Avatar - ', avatar);
+  //console.log('GTB Avatar - ', avatar);
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
@@ -64,7 +64,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   }).then((pbas) =>{
     // Need parent context;
     postBattleActions = pbas;
-    console.log('PBA BEFORE BATTLE INSERTION', pbas);
+    //console.log('PBA BEFORE BATTLE INSERTION', pbas);
 
     return Battle.create({
       owner: req.body.email,
@@ -114,7 +114,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
             break;
           }
         } 
-        console.log('MBPA - ',matchingPBA);
+        //console.log('MBPA - ',matchingPBA);
         return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
       });
 
