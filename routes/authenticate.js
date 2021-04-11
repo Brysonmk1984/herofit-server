@@ -89,7 +89,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
     return res.formatter.badRequest(errors.array(), "Validation Error - for /strava-credentials");
   }
 
-  console.log('!!! headers sent to strava-credentials', req.body.headers);
+  console.log('!!! headers sent to strava-credentials', req.headers, req.headers.authorization);
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
   User.findOne({ where: { email } })
   .then((user) =>{

@@ -53,7 +53,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
 
 // Update Avatar without full buff sequence. Used when spending QP points and initial avatar update after Strava connection
 router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail(), authenticateJWT, (req, res) => {
-  console.log('UPDATEAVATAR - ', req.body);
+
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /update-avatar endpoint");

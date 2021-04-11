@@ -1,8 +1,8 @@
 const config = {
   mode : 'release',
-  globalMessage : [
-    { type : 'info', link : null, message : "If you're receiving errors, refresh your page. If problems persist, try clearing your cache." }
-  ],
+  // globalMessage : [
+  //   { type : 'info', link : null, message : "If you're receiving errors, refresh your page. If problems persist, try clearing your cache." }
+  // ],
 };
 
 // RANKING PAGE
