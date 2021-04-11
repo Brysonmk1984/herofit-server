@@ -98,8 +98,7 @@ function avCalc(userTotals){
     },
 
     determineAstrologySeason : function(dateOfCreation = null){
-
-      const date = dateOfCreation ? moment.utc(dateOfCreation) : moment.utc(new Date());
+      const date = dateOfCreation ? moment(dateOfCreation) : moment();
     
       const thisYear = date.year();
       const lastYear = date.year()-1;
@@ -113,7 +112,7 @@ function avCalc(userTotals){
         case (date.isAfter(`${thisYear}-01-19`) && date.isBefore(`${thisYear}-02-19`)) :
           return  {sign : 'Aquarius', element : 'Air'};
         // Pisces
-        case (date.isAfter(`${thisYear}-02-18,`) && date.isBefore(`${thisYear}-03-21`)) :
+        case (date.isAfter(`${thisYear}-02-18`) && date.isBefore(`${thisYear}-03-21`)) :
           return  {sign : 'Pisces', element : 'Water'};
         // Aries
         case (date.isAfter(`${thisYear}-03-20`) && date.isBefore(`${thisYear}-04-20`)) :
