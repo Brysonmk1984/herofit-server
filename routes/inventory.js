@@ -20,6 +20,7 @@ router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
       pets : [],
       skins : [],
       titles : [],
+      consumables : [],
       items : []
     };
     inventory.forEach((thing) =>{

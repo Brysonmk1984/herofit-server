@@ -50,7 +50,17 @@ const AvatarEquipModel = function(db, DataTypes){
       class : {
         type : DataTypes.STRING(50),
         allowNull : true,
-      }
+      },
+      exhaustible : {
+        type : DataTypes.BOOLEAN,
+        allowNull : false,
+        defaultValue: false,
+      },
+      stackable : {
+        type : DataTypes.BOOLEAN,
+        allowNull : false,
+        defaultValue: false,
+      },
   }, { freezeTableName: true });
 
   return AvatarEquip;

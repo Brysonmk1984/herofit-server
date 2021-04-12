@@ -33,7 +33,7 @@ router.post('/fetch-current-level-by-input', body('xp').isNumeric(), authenticat
   const currentLevel = currentLevelByInput(xp);
 
   if(currentLevel){
-    res.formatter.ok(currentLevel);
+    res.formatter.ok({ currentLevel });
   }else{
     res.formatter.serverError('Current level is falsy');
   }
@@ -63,8 +63,7 @@ router.post('/check-level-up-by-input', body('startingXP').isNumeric(), body('en
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /check-level-up-by-input");
   }
-  const { startingXP, endingXP} = req.body;
-
+  const { startingXP, endingXP } = req.body;
   const { checkLevelUpByInput } = xpCalc();
   const { leveledUp, levels } = checkLevelUpByInput(startingXP, endingXP);
   

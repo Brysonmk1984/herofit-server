@@ -9,7 +9,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 1,
       "type" : "skin",
@@ -19,7 +21,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-shade"
+      "class" : "skin-shade",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 2,
       "type" : "skin",
@@ -29,7 +33,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-apparition"
+      "class" : "skin-apparition",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 3,
       "type" : "skin",
@@ -39,7 +45,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-phantasm"
+      "class" : "skin-phantasm",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 4,
       "type" : "skin",
@@ -49,7 +57,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-phantom"
+      "class" : "skin-phantom",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 5,
       "type" : "skin",
@@ -59,7 +69,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-wraith"
+      "class" : "skin-wraith",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 6,
       "type" : "skin",
@@ -69,7 +81,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-poltergeist"
+      "class" : "skin-poltergeist",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 7,
       "type" : "skin",
@@ -79,7 +93,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-specter"
+      "class" : "skin-specter",
+      "exhaustible" : false,
+      "stackable" : false
     },    {
       "id" : 8,
       "type" : "skin",
@@ -89,7 +105,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : "skin-banshee"
+      "class" : "skin-banshee",
+      "exhaustible" : false,
+      "stackable" : false
     }
   ],
   "pets" : [
@@ -102,7 +120,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 1,
@@ -113,7 +133,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 2,
@@ -124,7 +146,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     }
   ],
   "titles" : [
@@ -137,7 +161,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiWingedEmblem",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 1,
@@ -148,7 +174,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiFlowerStar",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 2,
@@ -159,7 +187,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBarbedStar",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 3,
@@ -170,7 +200,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiMoebiusStar",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 4,
@@ -181,7 +213,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiStarFormation",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 5,
@@ -192,7 +226,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiJusticeStar",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 6,
@@ -203,7 +239,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 7,
@@ -214,7 +252,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 8,
@@ -225,7 +265,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 9,
@@ -236,7 +278,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 10,
@@ -247,7 +291,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 11,
@@ -258,7 +304,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 12,
@@ -269,7 +317,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 13,
@@ -280,7 +330,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 14,
@@ -291,7 +343,9 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
     },
     {
       "id" : 15,
@@ -302,7 +356,24 @@
       "effect1" : "",
       "effect2" : "",
       "icon" : "GiBlackBelt",
-      "class" : ""
+      "class" : "",
+      "exhaustible" : false,
+      "stackable" : false
+    }
+  ],
+  "consumables" : [
+    {
+      "id" : 0,
+      "type" : "consumable",
+      "name" : "Retrocausal Capsul",
+      "description" : "Reset spent Quantum Points, hero retains all points earned thus far and can resdistribute as desired",
+      "lore" : "These mysterious pills are believed to be future technology brought back in time by Chrono Guy. He's too secretive to make the tech available to other heroes though. Rumor has it, a certain Scavenger Robot 'accidentally' cleaned out the stash thinking it was trash.",
+      "effect1" : "Reset QP",
+      "effect2" : "",
+      "icon" : "GiTimeTrap",
+      "class" : "",
+      "exhaustible" : true,
+      "stackable" : true
     }
   ]
 }
