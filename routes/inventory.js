@@ -11,7 +11,7 @@ router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatar-inventory");
   }
   const avatarID = req.body.avatarID;
-  //console.log('FETCHING AVATAR INV FOR -', avatarID);
+
   AvatarEquip.findAll(
     { where : { avatarID } }
   ).then((inventory) =>{ 
@@ -23,7 +23,9 @@ router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
       items : []
     };
     inventory.forEach((thing) =>{
-      inventoryObj[thing.type +'s'].push(thing);
+      if(inventoryObj[thing.type +'s']){
+        inventoryObj[thing.type +'s'].push(thing);
+      }
     });
     res.formatter.ok(inventoryObj, 'Successfully ran /fetch-avatar-inventory');
   }).catch((error) =>{
