@@ -91,14 +91,14 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     ut = userTotals;
     
     return Avatar.findOne(
-      { where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qp'], raw : true }
+      { where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp'], raw : true }
     );
   }).then((avatar) =>{
-    avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
+    avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
     
     // Then, Update Avatar Totals
     const { checkLevelUp, calcNewActivityXPFromUt, currentLevelByInput } = xpCalc(avatar.activityXP, avatar.battleXP);
-    const { updatePower, updateElements } = avCalc(ut);  
+    const { updatePower, updateHealth, updateElements } = avCalc(ut);  
     
     // Updated aXP
     const aXP = calcNewActivityXPFromUt(ut);
@@ -111,9 +111,10 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     lvlAfterBuff = endingLevel;
     qpe = qpEarned;
     
-    const updatedPower = updatePower();
+    const updatedPower = updatePower(endingLevel, avatar.qpPower);
+    const updatedHealth = updateHealth(endingLevel, avatar.qpHealth);
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
-    const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, fire, earth, water, air, hasBeenUpgraded : true });
+    const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : lvlUp ? updatedHealth : avatar.health, maxHealth : updatedHealth, fire, earth, water, air, hasBeenUpgraded : true });
     //console.log(avatar, updatedAvatar);
     // Finally, Update Avatar in DB
     return Avatar.update(
@@ -133,6 +134,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     // Calc gains here to be displayed on frontend
     const improvements = {
       power : Math.floor(avatar.power - avStatSnapshot.power),
+      Health : Math.floor(avatar.maxHealth - avStatSnapshot.maxHealth),
       air : Math.floor(avatar.air - avStatSnapshot.air),
       water : Math.floor(avatar.water - avStatSnapshot.water),
       fire : Math.floor(avatar.fire - avStatSnapshot.fire),

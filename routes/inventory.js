@@ -118,18 +118,27 @@ router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
 });
 
 // CONSUME ITEM - first applies effects of the item, then deletes it from the Hero's inventory
-router.delete('/use-consumable-item', body('id').isNumeric(), body('avatarID').isNumeric(), body('effects').isArray(), authenticateJWT, (req, res) => {
+router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEmail(), body('avatarID').isNumeric(), body('effects').isArray(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /use-consumable-item");
   }
 
-  const { id, avatarID, effects } = req.body;
+  const { id, email, avatarID, effects } = req.body;
 
-  itemEffects(effects, avatarID)
-  .then(([avatar]) =>{
-
-    avatar = parseAvatarProperties(avatar);
+  itemEffects(effects, avatarID, email)
+  .then((data) =>{
+    console.log('DDATA', data);
+    // If any effect errors out, throw new error
+    data.forEach((result, i) =>{
+      console.log(`result! ${i}`, result instanceof Error);
+      if(result instanceof Error){
+        throw newError(data.error);
+      }
+    });
+    console.log('DONE - ', data[0]);
+    let avatar = parseAvatarProperties(data[0], true);
+    console.log('DONE2 - ', avatar);
     AvatarEquip.destroy({
       where : { id }
     }).then((data) =>{

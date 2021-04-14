@@ -40,13 +40,15 @@ const shuffleArray = function(array) {
    return array;
  }
 
-function parseAvatarProperties(avatar){
+function parseAvatarProperties(avatar, wholeNumbers = false){
    const attrsToBeParsed = ['fire', 'earth', 'air', 'water', 'armor', 'recovery'];
-   let toBeParsed;
+   
    for(let attr in avatar){
-      toBeParsed = attrsToBeParsed.includes(attr);
+      let toBeParsed = attrsToBeParsed.includes(attr);
+      console.log(toBeParsed, attr);
       if(toBeParsed){
-         avatar[attr] = JSON.parse(avatar[attr]);
+
+         avatar[attr] = wholeNumbers ? Math.floor(JSON.parse(avatar[attr]).toFixed(0)) : JSON.parse(avatar[attr]);
       }
    }
    return avatar;

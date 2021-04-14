@@ -1,4 +1,4 @@
-const { BASE_POWER, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../constants');
+const { BASE_POWER, BASE_HEALTH, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../constants');
 const moment = require('moment');
 const { cloneObj, adjustActivityMinutes } = require('../../helperFunctions');
 const avatarList = require('../../heroList.json');
@@ -7,22 +7,15 @@ const avatarList = require('../../heroList.json');
 function avCalc(userTotals){
   
   return avReturn = {
-    updatePower : function(){
-
-      let activityMinutes = 0;
-      for(const activityType in userTotals){
-        if(userTotals[activityType]){
-          const durationInMinutes = userTotals[activityType].duration / 60;
-          // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
-          activityMinutes += adjustActivityMinutes(durationInMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
-        }
-      }
-      // Currently, not tracking timeAndHalf exercises with a constant. Instead, using the adjustedActivity minutes above. Consider changing this in the future
-      const effortHalfHours = Math.floor(activityMinutes / MINUTES_PER_POWER);
-
-      // One extra power earned for every 30 minutes of workout
-      const totalPower = BASE_POWER + effortHalfHours;
+    updatePower : function(level, qpPower){
+      // 5 Power per level, plus base, plus how much QP has been spent
+      const totalPower = ((level-1) * 5) + qpPower + BASE_POWER;
       return totalPower;
+    },
+    updateHealth : function(level, qpHealth){
+      // 5 Power per level, plus base, plus how much QP has been spent
+      const totalHealth = ((level-1) * 5) + qpHealth + BASE_HEALTH;
+      return totalHealth;
     },
     updateElements : function(character, qpSpent, dateOfCreation){
 

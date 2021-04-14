@@ -337,12 +337,48 @@
     {
       "id" : 0,
       "type" : "consumable",
-      "name" : "Retrocausal Capsul",
+      "name" : "Reset Capsul",
+      "description" : "Reset spent Quantum Points, hero retains all points earned thus far and can resdistribute as desired",
+      "lore" : "These mysterious pills are believed to be future technology brought back in time by Chrono Guy. He's too secretive to make the tech available to other heroes though. Rumor has it, a certain Scavenger Robot 'accidentally' cleaned out the stash thinking it was trash.",
+      "effect1" : "Reset QP by XP",
+      "effect2" : "",
+      "icon" : "GiPill",
+      "class" : "",
+      "exhaustible" : true
+    },
+    {
+      "id" : 1,
+      "type" : "consumable",
+      "name" : "Retrocausality Capsul",
       "description" : "Reset spent Quantum Points, hero retains all points earned thus far and can resdistribute as desired",
       "lore" : "These mysterious pills are believed to be future technology brought back in time by Chrono Guy. He's too secretive to make the tech available to other heroes though. Rumor has it, a certain Scavenger Robot 'accidentally' cleaned out the stash thinking it was trash.",
       "effect1" : "Reset QP",
       "effect2" : "",
-      "icon" : "GiTimeTrap",
+      "icon" : "GiPillDrop",
+      "class" : "",
+      "exhaustible" : true
+    },
+    {
+      "id" : 2,
+      "type" : "consumable",
+      "name" : "Health Potion",
+      "description" : "Heals Hero to full health",
+      "lore" : "The miraculous effects of this health potion are the result of the Empath supercharging various well-springs with her unshakable divine love. The skeptics of course believe the healing power is simply the placebo effect.",
+      "effect1" : "Heal Hero Completely",
+      "effect2" : "",
+      "icon" : "GiHealthPotion",
+      "class" : "",
+      "exhaustible" : true
+    },
+    {
+      "id" : 3,
+      "type" : "consumable",
+      "name" : "Antidote Potion",
+      "description" : "Cures a hero from the 'Infected' status",
+      "lore" : "Filtron Five's brilliant work in the lab led to the breakthrough of this amazing elixir, capable of curing the worst diseases and infections. The ingredients are 100% natural and a result of the robots' cutting-edge, onboard filtration unit.",
+      "effect1" : "Remove Infected Status",
+      "effect2" : "",
+      "icon" : "GiStandingPotion",
       "class" : "",
       "exhaustible" : true
     }
