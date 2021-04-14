@@ -81,5 +81,20 @@ function adjustActivityMinutes(minutes, activityType, timeAndHalfActivities){
    return minutes;
 }
 
-module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes };
+function stackItems(allItems){
+   const stackedItems = [];
+   allItems.forEach((item) =>{
+     const alreadyIncluded = stackedItems.find(stackedItem => item.name === stackedItem.name);
+     if(alreadyIncluded){
+       alreadyIncluded.count ++;
+     }else{
+       item.count = 1;
+       stackedItems.push(item);
+     }
+   });
+
+   return stackedItems;
+ }
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems };
 

@@ -55,12 +55,7 @@ const AvatarEquipModel = function(db, DataTypes){
         type : DataTypes.BOOLEAN,
         allowNull : false,
         defaultValue: false,
-      },
-      stackable : {
-        type : DataTypes.BOOLEAN,
-        allowNull : false,
-        defaultValue: false,
-      },
+      }
   }, { freezeTableName: true });
 
   return AvatarEquip;

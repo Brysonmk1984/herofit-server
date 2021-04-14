@@ -1,7 +1,10 @@
-const { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES } = require('../constants.js');
+let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES } = require('../constants.js');
 //let LEVEL_CURVE = 1.2;
 //let XP_BASE_LEVEL = 99;
 //let QP_PER_LEVEL = 5;
+
+LEVEL_CURVE = 1.6
+
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP){

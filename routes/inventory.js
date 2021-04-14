@@ -3,9 +3,11 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
+const { stackItems, parseAvatarProperties } = require('../helperFunctions');
+const { itemEffects } = require('../game/applyEffects');
 const { authenticateJWT } = require('../jwtValidation');
 
-router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
+router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatar-inventory");
@@ -20,12 +22,13 @@ router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
       pets : [],
       skins : [],
       titles : [],
-      consumables : [],
-      items : []
+      consumables : []
     };
     inventory.forEach((thing) =>{
       inventoryObj[thing.type +'s'].push(thing);
     });
+    inventoryObj.consumables = stackItems(inventoryObj.consumables);
+ 
     res.formatter.ok(inventoryObj, 'Successfully ran /fetch-avatar-inventory');
   }).catch((error) =>{
     res.formatter.serverError(error.toString(), `Error running /fetch-avatar-inventory`);
@@ -33,7 +36,7 @@ router.post('/fetch-avatar-inventory', authenticateJWT, (req, res) => {
 
 });
 
-router.post('/equip-item', authenticateJWT, (req, res) => {
+router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
@@ -49,7 +52,7 @@ router.post('/equip-item', authenticateJWT, (req, res) => {
   });
 });
 
-router.post('/equip-unequip-item', authenticateJWT, (req, res) => {
+router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-unequip-item");
@@ -73,7 +76,7 @@ router.post('/equip-unequip-item', authenticateJWT, (req, res) => {
   });
 });
 
-router.post('/unequip-item', authenticateJWT, (req, res) => {
+router.post('/unequip-item', body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /unequip-item");
@@ -111,6 +114,36 @@ router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
     res.formatter.ok({ createdItem : data }, 'Successfully ran /insert-item-by-avatar-id');
   }).catch((error) =>{
     res.formatter.serverError(error.toString(), `Error running /insert-item-by-avatar-id`);
+  });
+});
+
+// CONSUME ITEM - first applies effects of the item, then deletes it from the Hero's inventory
+router.delete('/use-consumable-item', body('id').isNumeric(), body('avatarID').isNumeric(), body('effects').isArray(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /use-consumable-item");
+  }
+
+  const { id, avatarID, effects } = req.body;
+
+  itemEffects(effects, avatarID)
+  .then(([avatar]) =>{
+
+    avatar = parseAvatarProperties(avatar);
+    AvatarEquip.destroy({
+      where : { id }
+    }).then((data) =>{
+      return AvatarEquip.findAll({
+        where : { avatarID, type : 'consumable' }
+      });
+    }).then((consumables) =>{
+      const stackedItems = stackItems(consumables);
+      res.formatter.ok({ consumables : stackedItems, avatar });
+    }).catch((error) =>{
+      res.formatter.serverError(error.toString(), `Error destroying item -  DELETE /use-consumable-item`);
+    });
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
   });
 });
 

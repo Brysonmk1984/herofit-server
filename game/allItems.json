@@ -10,8 +10,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 1,
       "type" : "skin",
@@ -22,8 +21,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-shade",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 2,
       "type" : "skin",
@@ -34,8 +32,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-apparition",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 3,
       "type" : "skin",
@@ -46,8 +43,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-phantasm",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 4,
       "type" : "skin",
@@ -58,8 +54,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-phantom",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 5,
       "type" : "skin",
@@ -70,8 +65,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-wraith",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 6,
       "type" : "skin",
@@ -82,8 +76,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-poltergeist",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 7,
       "type" : "skin",
@@ -94,8 +87,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-specter",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },    {
       "id" : 8,
       "type" : "skin",
@@ -106,8 +98,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "skin-banshee",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     }
   ],
   "pets" : [
@@ -121,8 +112,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 1,
@@ -134,8 +124,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 2,
@@ -147,8 +136,7 @@
       "effect2" : "",
       "icon" : "",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     }
   ],
   "titles" : [
@@ -162,8 +150,7 @@
       "effect2" : "",
       "icon" : "GiWingedEmblem",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 1,
@@ -175,8 +162,7 @@
       "effect2" : "",
       "icon" : "GiFlowerStar",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 2,
@@ -188,8 +174,7 @@
       "effect2" : "",
       "icon" : "GiBarbedStar",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 3,
@@ -201,8 +186,7 @@
       "effect2" : "",
       "icon" : "GiMoebiusStar",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 4,
@@ -214,8 +198,7 @@
       "effect2" : "",
       "icon" : "GiStarFormation",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 5,
@@ -227,8 +210,7 @@
       "effect2" : "",
       "icon" : "GiJusticeStar",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 6,
@@ -240,8 +222,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 7,
@@ -253,8 +234,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 8,
@@ -266,8 +246,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 9,
@@ -279,8 +258,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 10,
@@ -292,8 +270,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 11,
@@ -305,8 +282,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 12,
@@ -318,8 +294,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 13,
@@ -331,8 +306,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 14,
@@ -344,8 +318,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     },
     {
       "id" : 15,
@@ -357,8 +330,7 @@
       "effect2" : "",
       "icon" : "GiBlackBelt",
       "class" : "",
-      "exhaustible" : false,
-      "stackable" : false
+      "exhaustible" : false
     }
   ],
   "consumables" : [
@@ -372,8 +344,7 @@
       "effect2" : "",
       "icon" : "GiTimeTrap",
       "class" : "",
-      "exhaustible" : true,
-      "stackable" : true
+      "exhaustible" : true
     }
   ]
 }
