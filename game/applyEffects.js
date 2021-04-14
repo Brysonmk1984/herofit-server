@@ -3,7 +3,7 @@ const Avatar = require('../db').Avatar;
 const UserTotal = require('../db').UserTotal;
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('./constants');
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./constants');
 
 // Reset Capsul (just meant for one time balance change)
 // Requires User Totals being passed into the function
@@ -42,7 +42,7 @@ function resetQPByXp(avatarID, email){
       power,
       maxHealth,
       armor : 0,
-      recovery : 0,
+      recovery : BASE_RECOVERY,
       fire,
       earth,
       air,
@@ -86,7 +86,7 @@ function resetQP(id){
       maxHealth : (maxHealth - qpHealth),
       // Values shouldn't ever go below zero, but just in case
       armor : (armor - qpArmor) > 0 ? (armor - qpArmor) : 0,
-      recovery : (recovery - qpRecovery) > 0 ? (recovery - qpRecovery) : 0,
+      recovery : (recovery - qpRecovery) > 0 ? (recovery - qpRecovery) : BASE_RECOVERY,
       fire : (fire - qpFire) > 0 ? (fire - qpFire) : 0,
       earth : (earth - qpEarth) > 0 ? (earth - qpEarth) : 0,
       air : (air - qpAir) > 0 ? (air - qpAir) : 0,
