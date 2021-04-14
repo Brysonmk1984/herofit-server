@@ -109,7 +109,7 @@ router.post('/insert-random-avatar', body('owner').isEmail(), authenticateAdminJ
     activityXP : 0,
     battleXP : 0,
     qp : 0,
-    qpRecovery : 0,qpArmor : 0,qpPower : 0,qpItems : 0,qpFire : 0,qpEarth : 0,qpWater : 0,qpAir : 0, qpHealth : 0,
+    qpRecovery : 0,qpArmor : 0,qpPower : 0,qpFire : 0,qpEarth : 0,qpWater : 0,qpAir : 0, qpHealth : 0,
   };
   // Elemental bonus
   randomHero[elmRandom] += 5;
@@ -171,7 +171,6 @@ router.post('/insert-random-avatar', body('owner').isEmail(), authenticateAdminJ
       qpRecovery : randomHero.qpRecovery,
       qpPower : randomHero.qpPower,
       qpArmor : randomHero.qpArmor,
-      qpItems : randomHero.qpItems,
     }
   }).then((result) =>{
     const created = result[1];
