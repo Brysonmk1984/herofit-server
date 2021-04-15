@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
+const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
 const { stackItems, parseAvatarProperties } = require('../helperFunctions');
@@ -100,6 +101,7 @@ router.get('/get-default-items', (req, res) => {
   res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
 });
 
+// INSERT ITEM BY AVATAR ID - USER IN ADMIN PANEL
 router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -117,6 +119,36 @@ router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
   });
 });
 
+// INSERT ITEM FOR ALL AVATARS - USER IN ADMIN PANEL
+router.post('/insert-item-for-all-avatars', authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for  POST /insert-item-for-all-avatars");
+  }
+  const item = req.body;
+
+  Avatar.findAll({
+    attributes : ['id']
+  }).then((results) =>{
+    return allItemsWithAvIds = results.map((obj) =>{
+      const itemWithAvId = Object.assign({}, item, { avatarID : obj.id })
+      return itemWithAvId;
+    });
+  }).then((itemWithAvId) =>{
+    return AvatarEquip.bulkCreate(
+      itemWithAvId, { returning: true }
+    ).then((data) =>{
+      res.formatter.ok({ createdItem : data }, 'Successfully ran POST /insert-item-for-all-avatars');
+    }).catch((error) =>{
+      res.formatter.serverError(error.toString(), `Error running POST /insert-item-for-all-avatars`);
+    });
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), `Error running POST /insert-item-for-all-avatars`);
+  });
+
+});
+
+
 // CONSUME ITEM - first applies effects of the item, then deletes it from the Hero's inventory
 router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEmail(), body('avatarID').isNumeric(), body('effects').isArray(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
@@ -133,7 +165,7 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
     data.forEach((result, i) =>{
       console.log(`result! ${i}`, result instanceof Error);
       if(result instanceof Error){
-        throw newError(data.error);
+        throw new Error(data.error);
       }
     });
     console.log('DONE - ', data[0]);
