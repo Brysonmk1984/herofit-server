@@ -102,7 +102,7 @@ router.get('/get-default-items', (req, res) => {
 });
 
 // INSERT ITEM BY AVATAR ID - USER IN ADMIN PANEL
-router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
+router.post('/insert-item-by-avatar-id', body('item').isObject, authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-item-by-avatar-id");
@@ -120,7 +120,7 @@ router.post('/insert-item-by-avatar-id', authenticateJWT, (req, res) => {
 });
 
 // INSERT ITEM FOR ALL AVATARS - USER IN ADMIN PANEL
-router.post('/insert-item-for-all-avatars', authenticateJWT, (req, res) => {
+router.post('/insert-item-for-all-avatars', body('item').isObject, authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for  POST /insert-item-for-all-avatars");
@@ -146,6 +146,34 @@ router.post('/insert-item-for-all-avatars', authenticateJWT, (req, res) => {
     res.formatter.serverError(error.toString(), `Error running POST /insert-item-for-all-avatars`);
   });
 
+});
+
+
+// BUY ITEM BY AVATAR ID
+router.post('/buy-item-by-avatar-id', body('itemName').isString(), body('itemType').isString(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /buy-item-by-avatar-id");
+  }
+  let { itemName, itemType, avatarID } = req.body;
+  console.log(itemName,itemType);
+  const item = Object.assign({}, ALLITEMS[`${itemType}s`].find(item => item.name === itemName), { avatarID });
+  delete item.id;
+
+
+  console.log('ITEM!', item);
+  AvatarEquip.create(
+    item, { returning: true }
+  ).then((data) =>{console.log('DATA', data);
+    return AvatarEquip.findAll({
+      where : { avatarID, type : 'consumable' }
+    })
+  }).then((consumables) =>{
+    const stackedItems = stackItems(consumables);
+    res.formatter.ok({ consumables : stackedItems }, 'Successfully ran POST /buy-item-by-avatar-id');
+  }).catch((error) =>{console.log('error', error);
+    res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
+  });
 });
 
 

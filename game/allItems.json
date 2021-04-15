@@ -344,7 +344,8 @@
       "effect2" : "",
       "icon" : "GiPill",
       "class" : "",
-      "exhaustible" : true
+      "exhaustible" : true,
+      "ptCost" : null
     },
     {
       "id" : 1,
@@ -356,7 +357,8 @@
       "effect2" : "",
       "icon" : "GiPillDrop",
       "class" : "",
-      "exhaustible" : true
+      "exhaustible" : true,
+      "ptCost" : 1000
     },
     {
       "id" : 2,
@@ -368,7 +370,8 @@
       "effect2" : "",
       "icon" : "GiHealthPotion",
       "class" : "",
-      "exhaustible" : true
+      "exhaustible" : true,
+      "ptCost" : 90
     },
     {
       "id" : 3,
@@ -380,7 +383,8 @@
       "effect2" : "",
       "icon" : "GiStandingPotion",
       "class" : "",
-      "exhaustible" : true
+      "exhaustible" : true,
+      "ptCost" : 100
     }
   ]
 }

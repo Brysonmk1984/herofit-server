@@ -45,7 +45,6 @@ function parseAvatarProperties(avatar, wholeNumbers = false){
    
    for(let attr in avatar){
       let toBeParsed = attrsToBeParsed.includes(attr);
-      console.log(toBeParsed, attr);
       if(toBeParsed){
 
          avatar[attr] = wholeNumbers ? Math.floor(JSON.parse(avatar[attr]).toFixed(0)) : JSON.parse(avatar[attr]);
