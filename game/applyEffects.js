@@ -56,7 +56,9 @@ function resetQPByXp(avatarID, email){
       qpAir : 0,
       qpWater : 0,
       // Need to change health of avatar if it's over the amount of the new maxHealth
-      health : health > maxHealth ? maxHealth : health
+      health : health > maxHealth ? maxHealth : health,
+      // tracks whether or not they've updatedtheir stats to account for new level curve
+      hasResetStats : true
     };
 
     // UPDATE AVATAR

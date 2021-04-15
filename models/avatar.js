@@ -199,6 +199,11 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
+      hasResetStats: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
   });
 
   return Avatar;
