@@ -94,10 +94,10 @@ function doPostBattleEffects(avatar, foe, outcome){
     switch(fAbility.name){
       //PLAGUEBRINGER
       case 'Infect':
-        // Only apply Infect if the hero won, otherwise he should just be knocked out
-        if(outcome === 'Avatar Wins'){
+        // Only apply Infect if the hero won or DRAW, otherwise he should just be knocked out
+        if(outcome === 'Avatar Wins' || outcome === 'Draw'){
           const status = 'Infected';
-          const statusFade = 24;
+          const statusFade = 12;
 
           return Object.assign({}, avatar, { status, statusFade });
         }

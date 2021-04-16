@@ -8,10 +8,10 @@ const key = jwkJson['keys'].find(key => {
 const pem = jwkToPem(key);
 
 const authenticateJWT = (req, res, next) => {
-  //console.log('look', req.headers.authorization);
+
   if(!req.headers.authorization){
     const error = new Error("Authentication error, please try again.");
-    return res.formatter.forbidden(error.toString(), "Token didn't get passed to authenticate function");
+    return res.formatter.forbidden(error.toString(), `Token didn't get passed to authenticate function - ${req.method} ${req.url}`);
   }
    const authHeader = req.headers.authorization;
    const token = authHeader.split(' ')[1];
@@ -52,7 +52,7 @@ const authenticateAdminJWT = (req, res, next) => {
    //console.log('look', req.headers.authorization);
    if(!req.headers.authorization){
      const error = new Error("Authentication error, please try again.");
-     return res.formatter.forbidden(error.toString(), "Token didn't get passed to authenticate function");
+     return res.formatter.forbidden(error.toString(), `Token didn't get passed to authenticate function - ${req.method} ${req.url}`);
    }
     const authHeader = req.headers.authorization;
     const token = authHeader.split(' ')[1];

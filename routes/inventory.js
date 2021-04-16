@@ -15,7 +15,7 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
     return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-avatar-inventory");
   }
   const avatarID = req.body.avatarID;
-  //console.log('FETCHING AVATAR INV FOR -', avatarID);
+
   AvatarEquip.findAll(
     { where : { avatarID } }
   ).then((inventory) =>{ 
@@ -27,7 +27,9 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
       consumables : []
     };
     inventory.forEach((thing) =>{
-      inventoryObj[thing.type +'s'].push(thing);
+      if(inventoryObj[thing.type +'s']){
+        inventoryObj[thing.type +'s'].push(thing);
+      }
     });
     inventoryObj.consumables = stackItems(inventoryObj.consumables);
  
