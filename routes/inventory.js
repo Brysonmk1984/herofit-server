@@ -4,6 +4,7 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
+const { col, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties } = require('../helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
 const { authenticateJWT } = require('../jwtValidation');
@@ -156,21 +157,32 @@ router.post('/buy-item-by-avatar-id', body('itemName').isString(), body('itemTyp
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /buy-item-by-avatar-id");
   }
   let { itemName, itemType, avatarID } = req.body;
-  console.log(itemName,itemType);
   const item = Object.assign({}, ALLITEMS[`${itemType}s`].find(item => item.name === itemName), { avatarID });
   delete item.id;
 
-
-  console.log('ITEM!', item);
-  AvatarEquip.create(
-    item, { returning: true }
-  ).then((data) =>{console.log('DATA', data);
+  let remainingPT;
+  Avatar.findOne({
+    attributes : ['photonTokens'],
+    where : { id : avatarID } 
+  }).then(({ photonTokens })=>{
+    if(photonTokens < item.ptCost){
+      const error = new Error("Not Enough Photon Tokens");
+      return res.formatter.badRequest(error.toString(), `Not Enough Photon Tokens POST /buy-item-by-avatar-id`);
+    }
+    return Avatar.update(
+      { photonTokens : literal(`"photonTokens" - ${item.ptCost}`) },
+      { where : { id : avatarID }, returning : true })
+  }).then((result) =>{
+    remainingPT = result[1][0].photonTokens
+    //console.log('PTTT - ', result[1], remainingPT);
+    return AvatarEquip.create( item, { returning: true });
+  }).then((result) =>{
     return AvatarEquip.findAll({
       where : { avatarID, type : 'consumable' }
     })
   }).then((consumables) =>{
     const stackedItems = stackItems(consumables);
-    res.formatter.ok({ consumables : stackedItems }, 'Successfully ran POST /buy-item-by-avatar-id');
+    res.formatter.ok({ consumables : stackedItems, remainingPT }, 'Successfully ran POST /buy-item-by-avatar-id');
   }).catch((error) =>{console.log('error', error);
     res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
   });
