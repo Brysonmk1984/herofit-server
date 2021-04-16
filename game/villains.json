@@ -201,8 +201,8 @@
         "type" : "pre-battle"
       },
       "color": "#0D0D0D",
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
       "pba" : ["Grant Shadow-Self"],
       "reward" : {
         "type" : "skin",
@@ -222,8 +222,8 @@
         "type" : "post-battle"
       },
       "color": null,
-      "bonusXpBase": 100,
-      "bonusPtBase": 200,
+      "bonusXpBase": 50,
+      "bonusPtBase": 75,
       "pba" : ["Grant Plaguebringer"],
       "reward" : {
         "type" : "pet",
