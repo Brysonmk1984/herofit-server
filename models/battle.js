@@ -111,7 +111,7 @@ const BattleModel = function(db, DataTypes){
       type : DataTypes.JSONB,
       allowNull: true
     },
-    xpGain: {
+    ptGain: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
