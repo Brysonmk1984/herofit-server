@@ -5,7 +5,7 @@ const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
 const { col, literal } = require("sequelize");
-const { stackItems, parseAvatarProperties } = require('../helperFunctions');
+const { stackItems, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
 const { authenticateJWT } = require('../jwtValidation');
 
@@ -105,14 +105,14 @@ router.get('/get-default-items', (req, res) => {
 });
 
 // INSERT ITEM BY AVATAR ID - USER IN ADMIN PANEL
-router.post('/insert-item-by-avatar-id', body('item').isObject, authenticateJWT, (req, res) => {
+router.post('/insert-item-by-avatar-id', body('item').isObject(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /insert-item-by-avatar-id");
   }
 
-  const item = req.body;
-
+  const { item } = req.body;
+  console.log('the item - ', item);
   AvatarEquip.create(
     item, { returning: true }
   ).then((data) =>{
@@ -123,31 +123,52 @@ router.post('/insert-item-by-avatar-id', body('item').isObject, authenticateJWT,
 });
 
 // INSERT ITEM FOR ALL AVATARS - USER IN ADMIN PANEL
-router.post('/insert-item-for-all-avatars', body('item').isObject, authenticateJWT, (req, res) => {
+router.post('/insert-item-for-all-avatars', body('item').isObject(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for  POST /insert-item-for-all-avatars");
   }
-  const item = req.body;
-
-  Avatar.findAll({
+  const { item } = req.body;
+  console.log('item!',item);
+  function insertItemsForBatch(shard){
+    console.log('SHARD', shard);
+    return AvatarEquip.bulkCreate(shard);
+  }
+  
+  return Avatar.findAll({
     attributes : ['id']
   }).then((results) =>{
-    return allItemsWithAvIds = results.map((obj) =>{
+
+    const allItemsWithAvIds = results.map((obj) =>{
       const itemWithAvId = Object.assign({}, item, { avatarID : obj.id })
       return itemWithAvId;
     });
-  }).then((itemWithAvId) =>{
-    return AvatarEquip.bulkCreate(
-      itemWithAvId, { returning: true }
-    ).then((data) =>{
-      res.formatter.ok({ createdItem : data }, 'Successfully ran POST /insert-item-for-all-avatars');
+
+    itemShards = arrayChunker(allItemsWithAvIds, 50);
+
+    return Promise.allSettled(itemShards.map(async (shard, i) => {
+
+      // Update one batch every 2 seconds
+      const timeoutDuration = i * 2000;
+      // RUN BATTLES ON BATCH
+      return await new Promise((resolve) =>{
+        setTimeout(() => {
+          resolve(insertItemsForBatch(shard));
+        }, timeoutDuration);
+      });
+    })).then(() =>{
+      console.log('HERE');
+      res.formatter.ok('worked');
     }).catch((error) =>{
-      res.formatter.serverError(error.toString(), `Error running POST /insert-item-for-all-avatars`);
+      console.log('ERROR', error);
+      res.formatter.serverError(error.toString(), 'Inner Error');
     });
+
   }).catch((error) =>{
-    res.formatter.serverError(error.toString(), `Error running POST /insert-item-for-all-avatars`);
+    console.log('OUTER ERROR', error);
+    res.formatter.serverError(error.toString(), 'Outer Error');
   });
+
 
 });
 

@@ -337,23 +337,10 @@
     {
       "id" : 0,
       "type" : "consumable",
-      "name" : "Reset Capsul",
-      "description" : "Reset spent Quantum Points, hero retains all points earned thus far and can resdistribute as desired",
-      "lore" : "These mysterious pills are believed to be future technology brought back in time by Chrono Guy. He's too secretive to make the tech available to other heroes though. Rumor has it, a certain Scavenger Robot 'accidentally' cleaned out the stash thinking it was trash.",
-      "effect1" : "Reset QP by XP",
-      "effect2" : "",
-      "icon" : "GiPill",
-      "class" : "",
-      "exhaustible" : true,
-      "ptCost" : null
-    },
-    {
-      "id" : 1,
-      "type" : "consumable",
       "name" : "Retrocausality Capsul",
       "description" : "Reset spent Quantum Points, hero retains all points earned thus far and can resdistribute as desired",
       "lore" : "These mysterious pills are believed to be future technology brought back in time by Chrono Guy. He's too secretive to make the tech available to other heroes though. Rumor has it, a certain Scavenger Robot 'accidentally' cleaned out the stash thinking it was trash.",
-      "effect1" : "Reset QP",
+      "effect1" : "Reset Hero",
       "effect2" : "",
       "icon" : "GiPillDrop",
       "class" : "",
@@ -361,7 +348,7 @@
       "ptCost" : 1000
     },
     {
-      "id" : 2,
+      "id" : 1,
       "type" : "consumable",
       "name" : "Health Potion",
       "description" : "Heals Hero to full health",
@@ -374,7 +361,7 @@
       "ptCost" : 90
     },
     {
-      "id" : 3,
+      "id" : 2,
       "type" : "consumable",
       "name" : "Antidote Potion",
       "description" : "Cures a hero from the 'Infected' status",
