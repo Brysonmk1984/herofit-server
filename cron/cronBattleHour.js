@@ -119,7 +119,7 @@ function runBattlesOnBatch(shard, shardIndex){
       const b = doBattle(BRA, BRF, goesFirst);
 
       // SAVE DATA
-      let xpGain, ptGain;
+      let xpGain, ptGain = 0;
       
       // POST BATTLE ACTIONS
       const postBattleActions = allPbaArrays[i] || [];
@@ -127,12 +127,12 @@ function runBattlesOnBatch(shard, shardIndex){
       switch(b.outcomeData.outcome){
         case "Avatar Wins":
           xpGain = BRF.xpBounty; 
-          //ptGain = BRF.ptBounty; 
+          ptGain = BRF.ptBounty; 
           avatar.battleWins = avatar.battleWins + 1;
           //console.log('XP-bounty', xpGain);
           //console.log('PT-bounty', ptGain);
           //console.log('pbas after win before insertion - cron - ',postBattleActions);
-          //avatar.photonTokens += ptGain;
+          avatar.photonTokens += ptGain;
           allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
           tally.avatarWins += 1;
@@ -172,6 +172,7 @@ function runBattlesOnBatch(shard, shardIndex){
         fPhyDamage : b.fPhyDamage,
         aPhyReduction : b.aPhyReduction,
         xpGain,
+        ptGain,
         leveledUp : leveledUp,
         aHealthRemaining : b.aHealthRemaining,
         fHealthRemaining : b.fHealthRemaining,

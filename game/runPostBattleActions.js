@@ -32,7 +32,8 @@ function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 
 
 // PHOTON TOKENS AWARDED FOR DEFEATING FOES
 function determinePtBounty(heroLevel,bonusPt = 0){
-  const basePt = Math.pow(heroLevel, PT_EXPONENT);
+  //const basePt = Math.pow(heroLevel, PT_EXPONENT);
+  const basePt = 39;
   let randomModifier = Math.floor(Math.random() * 60) * .01;
   const positive = Math.floor(Math.random() * 2) === 1 ? true : false;
   const modifiedPt = positive ? basePt + (randomModifier * basePt) : basePt - (randomModifier * basePt) ;

@@ -1,6 +1,6 @@
 const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
-const { REGENERATION_RATE, RESTED_THRESHOLD } = require('../game/constants');
+const { RESTED_THRESHOLD } = require('../game/constants');
 //const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../helperFunctions');
@@ -18,7 +18,7 @@ Avatar.findAll(
 
     let avatarHealth = avatar.health;
     const maxHealth = avatar.maxHealth;
-    const adjRegenRate = REGENERATION_RATE + avatar.recovery;
+    const adjRegenRate = avatar.recovery;
     let avatarStatus = avatar.status;
     let avatarStatusFade = avatar.statusFade;
 

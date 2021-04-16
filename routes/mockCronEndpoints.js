@@ -43,7 +43,7 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
 
       let avatarHealth = avatar.health;
       const maxHealth = avatar.maxHealth;
-      const adjRegenRate = REGENERATION_RATE + avatar.recovery;
+      const adjRegenRate = avatar.recovery;
       let avatarStatus = avatar.status;
       let avatarStatusFade = avatar.statusFade;
 
@@ -365,7 +365,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         const b = doBattle(BRA, BRF, goesFirst);
 
         // SAVE DATA
-        let xpGain, ptGain;
+        let xpGain, ptGain = 0;
         
         //console.log('OUTCOME - ', b.outcomeData.outcome);
         //BRF.bonusXP = 50;
@@ -377,13 +377,13 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         switch(b.outcomeData.outcome){
           case "Avatar Wins":
             xpGain = BRF.xpBounty; 
-            //ptGain = BRF.ptBounty; 
+            ptGain = BRF.ptBounty; 
             avatar.battleWins = avatar.battleWins + 1;
             //console.log('XP-bounty', xpGain);
-            //console.log('PT-bounty', ptGain);
-            console.log('1pbas- ',postBattleActions);
-            //avatar.photonTokens += ptGain;
-            console.log('Avatar id should be 253', avatar.id);
+            console.log('PT-bounty', ptGain);
+            //console.log('1pbas- ',postBattleActions);
+            avatar.photonTokens += ptGain;
+            //console.log('Avatar id should be 253', avatar.id);
             allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
             // for email tally
             tally.avatarWins += 1;
@@ -422,6 +422,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           fPhyDamage : b.fPhyDamage,
           aPhyReduction : b.aPhyReduction,
           xpGain,
+          ptGain,
           leveledUp : leveledUp,
           aHealthRemaining : b.aHealthRemaining,
           fHealthRemaining : b.fHealthRemaining,

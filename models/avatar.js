@@ -144,11 +144,6 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
-      qpItems: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
       qpHealth: {
         type: DataTypes.INTEGER,
         allowNull: false,
