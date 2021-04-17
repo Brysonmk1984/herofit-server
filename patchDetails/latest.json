@@ -1,30 +1,35 @@
 {
-  "version": "1.1.10",
-  "headline": "New Update!  - version 1.1.9 - 1.1.10",
-  "openingRemarks": "New Item Window and Improved Security",
+  "version": "1.2.0",
+  "headline": "New Update! - version 1.2.0",
+  "openingRemarks": "Leveling changes, consumables items, and Photon Tokens!",
   "newFeatures": [
     {
-      "title": "Item Window",
-      "description": "Now when you click on items or item links, a window will pop up with more details about the item. You can see this in the Campaign, Profile, & Inventory pages, as well as the Awaiting Battle & Battle Report windows"
+      "title": "Leveling Changes",
+      "description": "The XP gained for activities remains the same, however the time it takes to level up has increased a moderate amount, depending on level. Additionally, Power is no longer acquired with activities and now is gained at a rate of 5 per level. Max health will also be gained this way. Armor, Recovery, and the elements remain unchanged. Quantum points must be reset by taking the 'Retrocausal Capsule in your inventory."
     },
     {
-      "title": "Improved UI for User Profiles",
-      "description": "Various UI improvements and all earned costumes are now showing up in profile"
+      "title": "Consumables Items",
+      "description": "One-time use items are now in HeroFit! Every player has been granted one 'Retrocausal Capsule' to reset their stats, but more items can be purchased with Photon Tokens when you click 'buy' in the inventory."
+    },
+    {
+      "title": "Photon Tokens",
+      "description": "The new in-game currency is here! PT is earned mostly through winning battles, but in the future may come from activities too. Spend your PT by going to the inventory page and clicking 'Buy'."
     }
   ],
   "bugFixes": [
-    "The server errors people experienced over the last week were related to implementation of improved security measures, and should be resolved",
-    "After Spending all your QP, the 'Quantum Points Activated' message will go away",
-    "Resolved error where sometimes users couldn't Go To Battle when they should have been able to"
+    "Battle history on the user profile page is now showing up in reverse chronological order",
+    "General workouts were showing 'NaN' on the Training page. This is resolved",
+    "Fixed bug with showing and clicking item rewards on the 'Go to Battle' window"
   ],
   "balanceChanges": [
-    "Reduced difficulty of foes slightly across the board",
-    "Reduced XP gained for battles in general"
+    "New users now only receive their previous 5 activities. This is to account for the initial hero levels being easier to achieve under the new XP curve",
+    "Phantom & Phantasm now will only trade their health/armor with yours if you have the higher value to being with. Previously, these dim-witted ghosts would make bad deals for themselves"
   ],
   "miscDetails": [
-    "The Hero Name input on the Select Hero page will now check to see if the name is available as they type. This was added to prevent naming collisions and improve new user's experience",
-    "Security has been improved across the application",
-    "Major code refactoring related to http requests both on the client side and server side has been completed"
+    "Big improvements to various window UIs and more content is visible within the windows",
+    "Battle Report Detail window is now easier to understand",
+    "Certain alerts are now clickable, this will be handy if I need to include links on things such as server-wide messages",
+    "Updating hero names from the account page now uses the same availability check as is on the select-hero page"
   ],
-  "closingRemarks": "More code refactoring ahead, but there's more new content in the works too ;)"
+  "closingRemarks": "I understand this patch has some drastic changes, and I appreciate your understanding. These balance changes really needed to happen sooner rather than later, and HeroFit will be better off because of it!"
 } 

@@ -5,8 +5,8 @@ const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./constants');
 
-// Reset Capsul (just meant for one time balance change)
-// Retrocausal Capsul
+
+// Retrocausal Capsule
 function resetHero(avatarID, email){
   let userTotals;
   
