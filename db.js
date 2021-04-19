@@ -73,6 +73,7 @@ AvatarEquip.belongsTo(Avatar, {foreignKey: 'avatarID'});
 // Items - AvatarItems JOIN
 Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID'});
 AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID'});
+
 Items.hasMany(AvatarItems, {foreignKey: 'itemID'});
 AvatarItems.belongsTo(Items, {foreignKey: 'itemID'});
 

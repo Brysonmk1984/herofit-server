@@ -10,10 +10,6 @@ const ItemsModel = function(db, DataTypes){
           defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
           allowNull: false
       },
-      avatarID : {
-        type : DataTypes.INTEGER,
-        allowNull: false,
-      },
       type : {
         type : DataTypes.STRING(15),
         allowNull : false,
@@ -29,11 +25,6 @@ const ItemsModel = function(db, DataTypes){
       lore : {
         type : DataTypes.STRING(500),
         allowNull : true,
-      },
-      equipped : {
-        type : DataTypes.BOOLEAN,
-        allowNull : false,
-        defaultValue: false,
       },
       effect1 : {
         type : DataTypes.STRING(75),
@@ -55,6 +46,10 @@ const ItemsModel = function(db, DataTypes){
         type : DataTypes.BOOLEAN,
         allowNull : false,
         defaultValue: false,
+      },
+      ptCost : {
+        type : DataTypes.INTEGER,
+        allowNull : true,
       }
   }, { freezeTableName: true });
 

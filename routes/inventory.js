@@ -4,6 +4,8 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
 const ALLITEMS = require('../game/allItems.json');
+const AvatarItems = require('../db').AvatarItems;
+const Items = require('../db').Items;
 const { col, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
@@ -16,9 +18,31 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
   }
   const avatarID = req.body.avatarID;
 
-  AvatarEquip.findAll(
-    { where : { avatarID } }
-  ).then((inventory) =>{ 
+  AvatarItems.findAll({
+    attributes : ['id','avatarID','itemID','equipped'],
+    where : { avatarID },
+    include: [{
+        model: Items,
+        as : 'item',
+        attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost'],
+        // Required is false by default, adding a where clause makes it true by default. 
+        // Still, false or true doesn't seem to have an impact here.
+        //required: false,
+      }],
+      raw : undefined,
+      nest : true,
+    }).then((rows) =>{ 
+
+    const inventory = rows.map((row)=>{
+      return {
+        id : row.id,
+        avatarID : row.avatarID,
+        itemID : row.itemID,
+        equipped : row.equipped,
+        ...row.item.dataValues
+      }
+    });
+
     // Massage the data for the frontend
     const inventoryObj = {
       pets : [],
@@ -32,24 +56,27 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
       }
     });
     inventoryObj.consumables = stackItems(inventoryObj.consumables);
- 
+    console.log(inventoryObj);
     res.formatter.ok(inventoryObj, 'Successfully ran /fetch-avatar-inventory');
   }).catch((error) =>{
+    console.log('ERR', error);
     res.formatter.serverError(error.toString(), `Error running /fetch-avatar-inventory`);
   });
+
+
 
 });
 
 router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
+  // }
   const equipId = req.body.equipId;
-  //console.log('EQUIP', equipId);
-  AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true })
+  console.log('GETEQUIP', equipId);
+  AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    //console.log('UI - ',updatedItem);
+    console.log('UI - ',updatedItem);
     res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
   }).catch((error) =>{
     res.formatter.serverError(error.toString(), `Error running /equip-item`);
@@ -66,8 +93,8 @@ router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId'
 
   const equipPromises = [];
 
-  equipPromises.push(AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true }));
-  equipPromises.push(AvatarEquip.update({ equipped : true }, { where : { id : equipId }, returning : true, raw : true }));
+  equipPromises.push(AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true }));
+  equipPromises.push(AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true }));
 
   Promise.allSettled(equipPromises)
   .then((result) =>{
@@ -87,7 +114,7 @@ router.post('/unequip-item', body('unequipId').isNumeric(), authenticateJWT, (re
   }
   const unequipId = req.body.unequipId;
   //console.log('UNEQUIP', unequipId);
-  AvatarEquip.update({ equipped : false }, { where : { id : unequipId }, returning : true, raw : true })
+  AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     //console.log('UI - ',updatedItem);
     res.formatter.ok({ unequippedItem : updatedItem[1][0] }, 'Successfully ran /unequip-item');
@@ -101,7 +128,16 @@ router.get('/get-default-items', (req, res) => {
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /get-default-items");
   }
-  res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
+  //res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
+
+  Items.findAll()
+  .then((items) =>{
+    console.log('itemz', items);
+    res.formatter.ok({ items }, 'Successfully ran /get-default-items');
+  }).catch((error)=>{
+    console.log('THE ERR', error);
+    res.formatter.serverError(error.toString(), `Error running GET /get-default-items`);
+  });
 });
 
 // INSERT ITEM BY AVATAR ID - USER IN ADMIN PANEL
@@ -113,7 +149,7 @@ router.post('/insert-item-by-avatar-id', body('item').isObject(), authenticateJW
 
   const { item } = req.body;
   console.log('the item - ', item);
-  AvatarEquip.create(
+  AvatarItems.create(
     item, { returning: true }
   ).then((data) =>{
     res.formatter.ok({ createdItem : data }, 'Successfully ran /insert-item-by-avatar-id');
@@ -132,7 +168,7 @@ router.post('/insert-item-for-all-avatars', body('item').isObject(), authenticat
   console.log('item!',item);
   function insertItemsForBatch(shard){
     console.log('SHARD', shard);
-    return AvatarEquip.bulkCreate(shard);
+    return AvatarItems.bulkCreate(shard);
   }
   
   return Avatar.findAll({
@@ -181,7 +217,7 @@ router.post('/buy-item-by-avatar-id', body('itemName').isString(), body('itemTyp
   }
   let { itemName, itemType, avatarID } = req.body;
   const item = Object.assign({}, ALLITEMS[`${itemType}s`].find(item => item.name === itemName), { avatarID });
-  delete item.id;
+  delete item.itemID;
 
   let remainingPT;
   Avatar.findOne({
@@ -198,9 +234,9 @@ router.post('/buy-item-by-avatar-id', body('itemName').isString(), body('itemTyp
   }).then((result) =>{
     remainingPT = result[1][0].photonTokens
     //console.log('PTTT - ', result[1], remainingPT);
-    return AvatarEquip.create( item, { returning: true });
+    return AvatarItems.create( item, { returning: true });
   }).then((result) =>{
-    return AvatarEquip.findAll({
+    return AvatarItems.findAll({
       where : { avatarID, type : 'consumable' }
     })
   }).then((consumables) =>{
@@ -234,10 +270,10 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
     console.log('DONE - ', data[0]);
     let avatar = parseAvatarProperties(data[0], true);
     console.log('DONE2 - ', avatar);
-    AvatarEquip.destroy({
-      where : { id }
+    AvatarItems.destroy({
+      where : { id },
     }).then((data) =>{
-      return AvatarEquip.findAll({
+      return AvatarItems.findAll({
         where : { avatarID, type : 'consumable' }
       });
     }).then((consumables) =>{
