@@ -240,7 +240,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     const startedTrackingSeasons = moment('2021-03-04', 'YYYY-MM-DD');
     const battleDate = moment(adjResult.createdAt);
     if(battleDate && battleDate.isAfter(startedTrackingSeasons)){
-      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
+      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt).element;
     }else{ adjResult.seasonalBonusElement = null; }
 
     res.formatter.ok({ adjResult });
