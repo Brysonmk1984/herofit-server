@@ -208,7 +208,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
      
     // IF the avatar won, Get the items aquired from the action types in the battle report
-    if(adjResult.outcome === 'Avatar Wins'){
+    if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
       adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
         let matchingPBA;
         for(let actionType in ALLPBAs){
