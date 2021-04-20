@@ -3,9 +3,10 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwtValidation');
 const db = require('../db').db;
-const { QueryTypes } = require('sequelize');
 const Avatar = require('../db').Avatar;
 const AvatarEquip = require('../db').AvatarEquip;
+const AvatarItems = require('../db').AvatarItems;
+const Items = require('../db').Items;
 const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AppMode = require('../appConfig').config.mode;
@@ -205,7 +206,7 @@ router.post('/check-avatar-name', body('name').isString(), (req, res) => {
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /check-avatar-name Endpoint");
   }
   const { name } = req.body;
-  console.log(name);
+
   Avatar.findOne({ where : { name : { [Op.iLike]: `%${name}%`} }, raw : true })
   .then((result) => {
     if(result){
@@ -242,7 +243,10 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
     attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
     include : [
       { model: User, attributes: ['username'] },
-      { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+      { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
+        where: { equipped : true }, 
+        required : false 
+      },
     ],
     order : [[ literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'), 'DESC' ]],
     raw : undefined,
@@ -257,6 +261,7 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
   Avatar.findAndCountAll(
     paginate(expression, { page, pageSize })
   ).then(({ rows, count }) =>{
+    const avatarCount = count;
     // SHould be 29 pages
     const actualRows = rows.map(r =>{
       const av = r.dataValues;
@@ -264,7 +269,7 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
       return r.dataValues;
     });
     const { currentLevelByInput } = xpCalc();
-
+    //console.log('AR - ', actualRows);
     // Sequelize requires us to loop over the returned data when 'raw : false'
     const avatars = actualRows.map((result, i) => {
       avatar = parseAvatarProperties(result);
@@ -272,16 +277,34 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
+      avatar.equipped = avatar.equipped.map((item) =>{
+        if(item){
+          return item.dataValues.itemID;
+        }
+        return;
+      });
+
       return avatar;
     });
-    const avatarCount = count;
-    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
-    res.formatter.ok({
-      avatars,
-      avatarCount,
-      pageCount,
-      currentPage : page + 1
+
+    Items.findAll({
+      attributes : ['id', 'type', 'name', 'icon', 'class'],
+      where : { [Op.not] : { type : 'consumable' } }
+    }).then((allItems) =>{
+      //console.log('ALL ITEMS - ', allItems);
+      const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
+      return res.formatter.ok({
+        avatars,
+        allItems,
+        avatarCount,
+        pageCount,
+        currentPage : page + 1
+      });
+    }).catch((error)=>{
+      console.log(`Couldn't get all Avatars DEBUG: ${error}`);
+      res.formatter.serverError(error.toString(), "Unable to retrieve ALLITEMS for POST fetch-avatars-by-page-and-ranking-type Endpoint");
     });
+
   }).catch((error)=>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), "Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint");
@@ -302,6 +325,7 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
   const searchInput = req.body.searchInput;
 
   const expression = { 
+    
     attributes : ['user', rankingType],
     where : { [rankingType] : { [Op.ne]: null} },
     order : [[literal(`"user_totals"."${rankingType}"->\'duration\'`), 'DESC']],
@@ -321,7 +345,10 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
       attributes : ['id','owner','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
       include : [
         { model: User, attributes: ['username'] },
-        { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+        { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
+          where: { equipped : true }, 
+          required : false 
+        },
       ],
       where : { owner : rows.map(userAndActivity => userAndActivity.user)},
       raw : undefined,
@@ -349,17 +376,39 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
         avatar.user = avatar.user ? avatar.user  : { username : '' };
         // Determine rank based on page and position within page
         avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
+        avatar.equipped = avatar.equipped.map((item) =>{
+          if(item){
+            return item.dataValues.itemID;
+          }
+          return;
+        });
         return avatar;
       });
-       res.formatter.ok({
-        avatars : avatarsWithRank,
-        pageCount,
-        currentPage : page + 1
-       });
-      }).catch((error) =>{
+
+
+      Items.findAll({
+        attributes : ['id', 'type', 'name', 'icon', 'class'],
+        where : { [Op.not] : { type : 'consumable' } }
+      }).then((allItems) =>{
+        //console.log('ALL ITEMS - ', allItems);
+        const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
+        return res.formatter.ok({
+          avatars : avatarsWithRank,
+          allItems,
+          avatarCount,
+          pageCount,
+          currentPage : page + 1
+        });
+      }).catch((error)=>{
         console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-        res.formatter.serverError(error, 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint' );
+        res.formatter.serverError(error.toString(), "Unable to retrieve ALLITEMS for POST fetch-avatars-by-page-and-ranking-type Endpoint");
       });
+
+
+    }).catch((error) =>{
+      console.log(`Couldn't get all Avatars DEBUG: ${error}`);
+      res.formatter.serverError(error, 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint' );
+    });
   }).catch((error) =>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint' );
@@ -383,7 +432,10 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
     attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
     include : [
       { model: User, attributes: ['username'] },
-      { model: AvatarEquip, as : 'equipped', attributes: ['name','type','equipped','class','description','icon'], where: { equipped : true }, required : false }
+      { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
+        where: { equipped : true }, 
+        required : false 
+      },
     ],
     where : { battleXP : { [Op.gt] : 0 } },
     order : [[ 'battleXP', 'DESC' ]],
@@ -395,7 +447,6 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
   if(searchInput){
     expression.where.name = { [Op.iLike] : `%${searchInput}%`};
   }
-  console.log('EX', expression);
 
   Avatar.findAndCountAll(
     paginate(expression, { page, pageSize })
@@ -415,16 +466,29 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
+      avatar.equipped = avatar.equipped.map((item) =>{
+        if(item){
+          return item.dataValues.itemID;
+        }
+        return;
+      });
       return avatar;
     });
     const avatarCount = count;
     const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
 
-    res.formatter.ok({
-      avatars,
-      avatarCount,
-      pageCount,
-      currentPage : page + 1
+    Items.findAll({
+      attributes : ['id', 'type', 'name', 'icon', 'class'],
+      where : { [Op.not] : { type : 'consumable' } }
+    }).then((allItems) =>{
+      const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
+      return res.formatter.ok({
+        avatars,
+        allItems,
+        avatarCount,
+        pageCount,
+        currentPage : page + 1
+      });
     });
   }).catch((error)=>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
