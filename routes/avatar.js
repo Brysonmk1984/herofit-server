@@ -5,7 +5,6 @@ const { authenticateJWT } = require('../jwtValidation');
 const db = require('../db').db;
 const Avatar = require('../db').Avatar;
 const AvatarItems = require('../db').AvatarItems;
-const Items = require('../db').Items;
 const User = require('../db').User;
 const UserTotal = require('../db').UserTotal;
 const AVATAR_COUNT_PER_PAGE = require('../appConfig').AVATAR_COUNT_PER_PAGE;
@@ -167,11 +166,11 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
   const q = `
     SELECT avatars.*, equipped 
     FROM avatars
-    LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2, 'equipped', equipped, 'class', class, 'description', description, 'icon', icon)) AS equipped
-      FROM avatar_equip WHERE avatar_equip.equipped=true group by 1) AS equipped ON(id="avatarID")
+    LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
+      FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
     WHERE avatars.owner = $1
   `;
-
+    // 'name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2,'class', class, 'description', description, 'icon', icon
   try{
     const [ results ] = await db.query(q, { bind : [email] });
     if(results.length === 0){
@@ -187,9 +186,9 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     avatar.thisLevelStartXp = getNextLevel(-1);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
-    //console.log('AVATAR - ', avatar);
-  
-    res.formatter.ok(avatar);
+
+    return res.formatter.ok( avatar );
+
   }catch(error){
     console.log(`Couldn't get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
@@ -285,24 +284,14 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
       return avatar;
     });
 
-    Items.findAll({
-      attributes : ['id', 'type', 'name', 'icon', 'class'],
-      where : { [Op.not] : { type : 'consumable' } }
-    }).then((allItems) =>{
-      //console.log('ALL ITEMS - ', allItems);
-      const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
-      return res.formatter.ok({
-        avatars,
-        allItems,
-        avatarCount,
-        pageCount,
-        currentPage : page + 1
-      });
-    }).catch((error)=>{
-      console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-      res.formatter.serverError(error.toString(), "Unable to retrieve ALLITEMS for POST fetch-avatars-by-page-and-ranking-type Endpoint");
-    });
+    const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
 
+    return res.formatter.ok({
+      avatars,
+      avatarCount,
+      pageCount,
+      currentPage : page + 1
+    });
   }).catch((error)=>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), "Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type Endpoint");
@@ -382,26 +371,12 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
         });
         return avatar;
       });
-
-
-      Items.findAll({
-        attributes : ['id', 'type', 'name', 'icon', 'class'],
-        where : { [Op.not] : { type : 'consumable' } }
-      }).then((allItems) =>{
-        //console.log('ALL ITEMS - ', allItems);
-        const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
-        return res.formatter.ok({
-          avatars : avatarsWithRank,
-          allItems,
-          avatarCount,
-          pageCount,
-          currentPage : page + 1
-        });
-      }).catch((error)=>{
-        console.log(`Couldn't get all Avatars DEBUG: ${error}`);
-        res.formatter.serverError(error.toString(), "Unable to retrieve ALLITEMS for POST fetch-avatars-by-page-and-ranking-type Endpoint");
+      return res.formatter.ok({
+        avatars : avatarsWithRank,
+        avatarCount,
+        pageCount,
+        currentPage : page + 1
       });
-
 
     }).catch((error) =>{
       console.log(`Couldn't get all Avatars DEBUG: ${error}`);
@@ -474,19 +449,11 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
     });
     const avatarCount = count;
     const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
-
-    Items.findAll({
-      attributes : ['id', 'type', 'name', 'icon', 'class'],
-      where : { [Op.not] : { type : 'consumable' } }
-    }).then((allItems) =>{
-      const pageCount = Math.ceil(avatarCount/AVATAR_COUNT_PER_PAGE);
-      return res.formatter.ok({
-        avatars,
-        allItems,
-        avatarCount,
-        pageCount,
-        currentPage : page + 1
-      });
+    return res.formatter.ok({
+      avatars,
+      avatarCount,
+      pageCount,
+      currentPage : page + 1
     });
   }).catch((error)=>{
     console.log(`Couldn't get all Avatars DEBUG: ${error}`);
