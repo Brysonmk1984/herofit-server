@@ -5,8 +5,7 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const User = require('../db').User;
 const Battle = require('../db').Battle;
-const AvatarEquip = require('../db').AvatarEquip;
-
+const AvatarItems = require('../db').AvatarItems;
 
 // UPDATE HERO NAME
 router.post('/update-avatar-name', body('owner').isEmail(), body('newHeroName').isString({ min: 3, max: 25 }), authenticateJWT, (req, res) => {
@@ -62,7 +61,7 @@ router.delete('/:username', body('email').isEmail(), body('id').isNumeric(), bod
   const { avatarId, email, id } = req.body;
 
   const promises = [];
-  promises.push(AvatarEquip.destroy({ where : {avatarID : avatarId }}));
+  promises.push(AvatarItems.destroy({ where : {avatarID : avatarId }}));
   promises.push(Battle.destroy({ where : { owner : email }}));
   
   Promise.allSettled(promises)

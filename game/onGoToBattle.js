@@ -1,6 +1,7 @@
 const Avatar = require('../db').Avatar;
 const Battle = require('../db').Battle;
-const AvatarEquip = require('../db').AvatarEquip;
+const AvatarItems = require('../db').AvatarItems;
+const Items = require('../db').Items;
 const { Op } = require("sequelize");
 const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require('../game/postBattleActions.json');
 const VILLAINS = require('../game/villains.json');
@@ -10,15 +11,20 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
   //console.log('av', avatar, 'foe', foe);
   const PBAs = [];
  
-  return AvatarEquip.findAll({
-    attributes : ["id", "avatarID", "type", "name"],
-    where : { avatarID : avatar.id }
-  }).then((equipment) =>{console.log('equipment', equipment);
+  return AvatarItems.findAll({
+    attributes : ["itemID"],
+    where : { avatarID : avatar.id },
+    include : [
+      { model: Items, 
+        attributes: ['name', 'type'], 
+        required : false 
+      },
+    ],
+  }).then((equipment) =>{
     const skinNamesArray = equipment.filter(item => item.type === 'skin').map(skin => skin.name);
     const titleNamesArray = equipment.filter(item => item.type === 'title').map(title => title.name);
     const petNamesArray = equipment.filter(item => item.type === 'pet').map(pet => pet.name);
 
-    console.log('SNA', skinNamesArray, 'TNA - ', titleNamesArray);
     const allPbaCheckPromises = [];
    
     // Win Totals Check
@@ -45,11 +51,10 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
 
     return Promise.allSettled(allPbaCheckPromises)
     .then((resolvedPromises)=>{
-      //console.log('ALL3RP - ', resolvedPromises);
+
       const totalCheck = resolvedPromises[0];
       const streakCheck = resolvedPromises[1];
       const defeatFoeCheck = resolvedPromises[2];
-      console.log('RP - ', totalCheck, streakCheck, defeatFoeCheck);
       
       // results from resolved promises
       const winTotalAction = totalCheck ? totalCheck.value : null;
@@ -74,7 +79,6 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
 
 
       // ALL PBAs as action strings in an array
-      console.log('PBA-ACTION-ARRAY - ', PBAs);
       resolve(PBAs);
 
     }).catch((err)=> {
@@ -110,20 +114,20 @@ function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName
       const fdNoDUpes = [...new Set(foesDefeated)];
 
       const hasBeenDefeated = fdNoDUpes.includes(currentFoeName) ? true : false;
-      console.log('hasBeenDefeated', hasBeenDefeated);
+      //console.log('hasBeenDefeated', hasBeenDefeated);
       // If last foe of type, return matching PBA action
       if(!hasBeenDefeated){
         
         // Consider moving the PBA action to the normal PBA JSON file
         const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];
         const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
-        console.log('action', action, 'MPBA - ', matchingPBA);
+        //console.log('action', action, 'MPBA - ', matchingPBA);
         // Check to make sure the user doesn't already have the item
         const isCriticalWin = !arrayOfPastRewards.includes(matchingPBA.name);
         
         // Win is critical if it's unearned
         if(isCriticalWin){
-          console.log('IS A CRITICAL WIN', isCriticalWin);
+          //console.log('IS A CRITICAL WIN', isCriticalWin);
           return action;
         }
         return undefined
@@ -190,14 +194,14 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
         const isLastOfType = allFoesMinusCurrent.every((val, i) => {
           return val === fdNoDUpes[i]
         });
-        console.log('isLastOfType', isLastOfType);
+        //console.log('isLastOfType', isLastOfType);
         // If last foe of type, return matching PBA action
         if(isLastOfType){
          
           // Consider moving the PBA action to the normal PBA JSON file
           const action = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
           const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
-          console.log('action', action, 'MPBA - ', matchingPBA);
+          //console.log('action', action, 'MPBA - ', matchingPBA);
           // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin
           const isCriticalWin = !skinNamesArray.includes(matchingPBA.name);
           
@@ -272,13 +276,13 @@ function _checkWinTotal(avatarId, titleNamesArray){
     const battleWinsIfWinTonight = battleWins + 1;
     // Check if the potential win total will match a new PBA
     const matchingPBA = WINTOTAL.find(pba => pba.requirement === battleWinsIfWinTonight);
-    
+    //console.log('TOTAL IF WIN -', battleWinsIfWinTonight, 'MAA-',matchingPBA);
     // If this win matches a new PBA
     if(matchingPBA){
       // Win is critical if it's unearned
       // Should theoretically never be i this array, but just incase to prevent duplicate titles
       const isCriticalWin = !titleNamesArray.includes(matchingPBA.name);
-
+      //console.log(isCriticalWin, titleNamesArray);
       //Add to PBAs if critical
       if(isCriticalWin){
         return matchingPBA.action;

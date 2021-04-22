@@ -4,7 +4,7 @@ const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const User = require('../db').User;
 const Avatar = require('../db').Avatar;
-const AvatarEquip = require('../db').AvatarEquip;
+const AvatarItems = require('../db').AvatarItems;
 const Battle = require('../db').Battle;
 const UserActivity = require('../db').UserActivity;
 const UserTotal = require('../db').UserTotal;
@@ -192,8 +192,8 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     activities = act;
     avatar = av;
     battles = bat;
-    return AvatarEquip.findAll({ where: { avatarID : avatar.value.id }, raw : true })
-  }).then((equipment) =>{
+    return AvatarItems.findAll({ where: { avatarID : avatar.value.id }, raw : true })
+  }).then((itemInstances) =>{
     userTotals = userTotals.value;
     activities = activities.value.map((act) =>act.activity);
     battles = battles.value;
@@ -201,7 +201,7 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     avatar = avatar.value;
     avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
-    res.formatter.ok({userTotals, activities, avatar, battles, equipment });
+    res.formatter.ok({userTotals, activities, avatar, battles, itemInstances });
   }).catch((error)=>{
     console.log('Error - ', error);
     res.formatter.serverError(error.toString(), `Error retrieving data for ${username} - POST /get-info-by-username Endpoint`);

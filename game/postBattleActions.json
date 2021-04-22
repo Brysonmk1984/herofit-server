@@ -1,70 +1,70 @@
 {
   "DEFEATEDFOE" : [
     {
-      "id" : 0,
+      "itemID" : 1,
       "action" : "Grant Shadow-Self",
       "name" : "Shadow Self",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 1,
+      "itemID" : 2,
       "action" : "Grant Shade",
       "name" : "Shade Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 2,
+      "itemID" : 3,
       "action" : "Grant Apparition",
       "name" : "Apparition Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 3,
+      "itemID" : 4,
       "action" : "Grant Phantasm",
       "name" : "Phantasm Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 4,
+      "itemID" : 5,
       "action" : "Grant Phantom",
       "name" : "Phantom Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 5,
+      "itemID" : 6,
       "action" : "Grant Wraith",
       "name" : "Wraith Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 6,
+      "itemID" : 7,
       "action" : "Grant Poltergeist",
       "name" : "Poltergeist Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 7,
+      "itemID" : 8,
       "action" : "Grant Specter",
       "name" : "Specter Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 8,
+      "itemID" : 9,
       "action" : "Grant Banshee",
       "name" : "Banshee Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
       "outcome" : "win"
     },{
-      "id" : 9,
+      "itemID" : 12,
       "action" : "Grant Plaguebringer",
       "name" : "Plagueling",
       "type" : "Award Pet",
@@ -75,7 +75,7 @@
 
   "WINSTREAK" : [
     {
-      "id" : 101,
+      "itemID" : 14,
       "requirement" : 3,
       "action" : "Grant Win Streak 3",
       "name" : "The Renowned",
@@ -84,7 +84,7 @@
       "outcome" : "win"
     },
     {
-      "id" : 102,
+      "itemID" : 15,
       "requirement" : 5,
       "action" : "Grant Win Streak 5",
       "name" : "The Acclaimed",
@@ -93,7 +93,7 @@
       "outcome" : "win"
     },
     {
-      "id" : 103,
+      "itemID" : 16,
       "requirement" : 10,
       "action" : "Grant Win Streak 10",
       "name" : "The Untouchable",
@@ -102,7 +102,7 @@
       "outcome" : "win"
     },
     {
-      "id" : 104,
+      "itemID" : 17,
       "requirement" : 15,
       "action" : "Grant Win Streak 15",
       "name" : "The Dominator",
@@ -111,7 +111,7 @@
       "outcome" : "win"
     },
     {
-      "id" : 105,
+      "itemID" : 18,
       "requirement" : 25,
       "action" : "Grant Win Streak 25",
       "name" : "The Legendary",
@@ -123,7 +123,7 @@
 
   "WINTOTAL" : [
     {
-      "id" : 200,
+      "itemID" : 19,
       "requirement" : 5,
       "action" : "Grant Win Total 5",
       "name" : "White Belt",
@@ -131,7 +131,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 201,
+      "itemID" : 20,
       "requirement" : 10,
       "action" : "Grant Win Total 10",
       "name" : "Yellow Belt",
@@ -139,7 +139,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 202,
+      "itemID" : 21,
       "requirement" : 25,
       "action" : "Grant Win Total 25",
       "name" : "Orange Belt",
@@ -147,7 +147,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 203,
+      "itemID" : 22,
       "requirement" : 50,
       "action" : "Grant Win Total 50",
       "name" : "Blue Belt",
@@ -155,7 +155,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 204,
+      "itemID" : 23,
       "requirement" : 75,
       "action" : "Grant Win Total 75",
       "name" : "Purple Belt",
@@ -163,7 +163,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 205,
+      "itemID" : 24,
       "requirement" : 100,
       "action" : "Grant Win Total 100",
       "name" : "Green Belt",
@@ -171,7 +171,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 206,
+      "itemID" : 25,
       "requirement" : 150,
       "action" : "Grant Win Total 150",
       "name" : "Red Belt",
@@ -179,7 +179,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 207,
+      "itemID" : 26,
       "requirement" : 250,
       "action" : "Grant Win Total 250",
       "name" : "Brown Belt",
@@ -187,7 +187,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 208,
+      "itemID" : 27,
       "requirement" : 500,
       "action" : "Grant Win Total 500",
       "name" : "Black Belt",
@@ -195,7 +195,7 @@
       "itemCategory" : "titles",
       "outcome" : "win"
     },{
-      "id" : 209,
+      "itemID" : 28,
       "requirement" : 1000,
       "action" : "Grant Win Total 1000",
       "name" : "Black Belt Sensei",
@@ -206,7 +206,7 @@
   ],
   "HELPER" : [
     {
-      "id" : 300,
+      "itemID" : 13,
       "requirement" : null,
       "action" : null,
       "name" : "White Light Warrior",

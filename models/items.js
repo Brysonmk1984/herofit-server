@@ -50,6 +50,10 @@ const ItemsModel = function(db, DataTypes){
       ptCost : {
         type : DataTypes.INTEGER,
         allowNull : true,
+      },
+      action : {
+        type : DataTypes.STRING(25),
+        allowNull : true,
       }
   }, { freezeTableName: true });
 

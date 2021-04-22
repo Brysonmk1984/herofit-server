@@ -3,11 +3,9 @@ const { body, validationResult } = require('express-validator');
 const { authenticateJWT, authenticateAdminJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const Avatar = require('../db').Avatar;
-const AvatarEquip = require('../db').AvatarEquip;
+const AvatarItems = require('../db').AvatarItems;
 const Battle = require('../db').Battle;
-const db = require('../db').db;
 const { Op, literal, col, fn, QueryTypes } = require("sequelize");
-const sequelize = require("sequelize");
 const { sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
 const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
@@ -20,9 +18,6 @@ const avCalc = require('../game/upgrades/avCalc');
 const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
-const ALLITEMS = require('../game/allItems.json');
-// { where: { health: { [Op.lt]: db.col('maxHealth') } }
-
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
 router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
@@ -227,20 +222,17 @@ router.get('/mock-run-pbas', authenticateAdminJWT, (req, res) => {
         }
       }
 
-      // Use the matchingPBA type and name to find the exact item referenced in the PBA
-      const matchingItem = ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
-      // remove ID, we use autoinc here
-      delete matchingItem.id;
-      //console.log('MATTCHITEM = ', matchingItem);
-      //console.log('AVID = ', avatarID);
-      const itemToInsert = Object.assign({}, matchingItem, { avatarID })
-      // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
-      itemsToInsert.push(itemToInsert);
+      // There should always be a matchingPBA here, if not, I forgot to add one to the postBattleActions.json
+      if(matchingPBA){
+        // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
+        itemsToInsert.push({ avatarID, itemID : matchingPBA.itemID });
+      }
+      
     });
 
     console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
     // INSERT all the items from the itemsToInsert array, gathered from the PBAs
-    return AvatarEquip.bulkCreate(itemsToInsert);
+    return AvatarItems.bulkCreate(itemsToInsert);
 
   }).then(() =>{
     res.formatter.ok({

@@ -4,8 +4,9 @@ const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
 const { Op } = require("sequelize");
 const Avatar = require('../db').Avatar;
-const AvatarEquip = require('../db').AvatarEquip;
+const AvatarItems = require('../db').AvatarItems;
 const Battle = require('../db').Battle;
+const Items = require('../db').Items;
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
@@ -15,7 +16,6 @@ const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleA
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const { OUTCOME_XP } = require('../game/constants'); 
 const ALLPBAs = require('../game/postBattleActions.json');
-const ALLITEMS = require('../game/allItems.json');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {
@@ -64,7 +64,6 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   }).then((pbas) =>{
     // Need parent context;
     postBattleActions = pbas;
-    //console.log('PBA BEFORE BATTLE INSERTION', pbas);
 
     return Battle.create({
       owner: req.body.email,
@@ -88,20 +87,6 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
         res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
       }
 
-      // const rewards = postBattleActions.map(action => {
-      //   let matchingPBA;
-      //   for(let actionType in ALLPBAs){
-      //     const match = ALLPBAs[actionType].find(pba => {
-      //       //console.log(pba.action, action);
-      //       return pba.action === action;
-      //     });
-      //     if(match){
-      //       return matchingPBA = match;
-      //     }
-      //   } 
-      //   return ALLITEMS[matchingPBA.itemCategory][matchingPBA.name]
-      // });
-
       // Get the items aquired from the action types in the battle report
       const rewards = postBattleActions.map(action => {
         let matchingPBA;
@@ -114,15 +99,30 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
             break;
           }
         } 
-        //console.log('MBPA - ',matchingPBA);
-        return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+        
+        return matchingPBA.itemID;
       });
 
-      res.formatter.ok({
-        goToBattle : true,
-        foe : foeWithStats,
-        rewards
-      });
+      if(rewards.length){
+        Items.findAll({
+          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+          where : { id : { [Op.in] : rewards }}
+        }).then((matchingItems) =>{
+          res.formatter.ok({
+            goToBattle : true,
+            foe : foeWithStats,
+            rewards : matchingItems
+          });
+        }).catch((error) =>{
+          res.formatter.serverError(error.toString(), `Couldn't retrieve upcoming rewards - ${avatarID}`);
+        });
+      }else{
+        res.formatter.ok({
+          goToBattle : true,
+          foe : foeWithStats,
+          rewards
+        });
+      }
 
     });
   }).catch((error)=>{
@@ -155,32 +155,31 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
       adjResult = result[0];
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-     
+
       // IF the avatar won, Get the items aquired from the action types in the battle report
       if(adjResult.outcome === 'Avatar Wins'){
-        adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
-          let matchingPBA;
-          for(let actionType in ALLPBAs){
-            const match = ALLPBAs[actionType].find(pba => {
-              return pba.action === action;
-            });
+        Items.findAll({
+          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+          where : { action : { [Op.in] : adjResult.postBattleActions } }
+        }).then((items) =>{
+          adjResult.itemsAquired = items;
+    
+          if(!result[0].seenReport){
+            // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+            const { determineAstrologySeason } = avCalc();
+            adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
 
-            if(match){
-              matchingPBA = match;
-            }
-          } 
-          return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+            res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
+          }else{
+            res.formatter.ok({ result : null }, 'Latest Report already viewed');
+          }
+
+        }).catch((error) =>{
+          console.log('ERR', error);
+          res.formatter.serverError(error.toString(), 'No Battle Results for /fetch-battle-report Endpoint');
         });
-      }
- 
-      if(!result[0].seenReport){
-        // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
-        const { determineAstrologySeason } = avCalc();
-        adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
-
-        res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
       }else{
-        res.formatter.ok({ result : null }, 'Latest Report already viewed');
+        res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
       }
     }else{
       res.formatter.ok({ result : null }, 'No Results, must be new user');
@@ -199,6 +198,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battle-report-by-id");
   }
 
+  let adjResult;
   Battle.findOne({
     where: { id },
     raw : true
@@ -207,33 +207,29 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
      
-    // IF the avatar won, Get the items aquired from the action types in the battle report
+     // IF the avatar won, Get the items aquired from the action types in the battle report
     if(adjResult.outcome === 'Avatar Wins'){
-      adjResult.itemsAquired = adjResult.postBattleActions.map(action => {
-        let matchingPBA;
-        for(let actionType in ALLPBAs){
-          const match = ALLPBAs[actionType].find(pba => {
-            return pba.action === action;
-          });
-
-          if(match){
-            matchingPBA = match;
-          }
-        } 
-        return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
+      return Items.findAll({
+        attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+        where : { action : { [Op.in] : adjResult.postBattleActions } }
       });
     }
+  }).then((items) =>{
+    adjResult.itemsAquired = items;
 
-
-    //console.log('FETCHING AVATAR INV FOR -', avatarID);
-    return AvatarEquip.findOne({ 
-      attributes : ['name'],
-      where : { avatarID, type : 'skin', equipped : true },
+    // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+    const { determineAstrologySeason } = avCalc();
+    adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
+  
+    // Need correct Skin :( just to show the user in the battle report modal on the Profile Page
+    return AvatarItems.findOne({ 
+      attributes : ['itemID','avatarID'],
+      where : { avatarID : id, equipped : true },
       raw : true
     });
-  }).then((skin) =>{
-    //console.log('SKIN - ', skin);
-    adjResult.avatarSkin = skin;
+
+  }).then((skinItemInstance) =>{
+    adjResult.avatarSkin = skinItemInstance;
 
     // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
     const { determineAstrologySeason } = avCalc();
@@ -259,7 +255,7 @@ router.post('/update-battle-report-seen', body('id').isNumeric(), authenticateJW
 
   Battle.update({ seenReport : true},{ where: { id : req.body.id } })
   .then(()=>{
-    console.log('updated seenBy');
+
     res.formatter.ok({ message : 'Successfully updated seenReport' });
   }).catch((error) =>{
     console.log("couldn't update seen by", error);
@@ -267,9 +263,9 @@ router.post('/update-battle-report-seen', body('id').isNumeric(), authenticateJW
   });
 });
 
-// USER goes to battle
+// USER opens upcoming battle window after having already gone
 router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
-  console.log(req.body);
+
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-upcoming-foe-and-rewards");
@@ -280,11 +276,11 @@ router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), aut
       raw : true, 
       attributes: ['foe', 'postBattleActions'] 
   }).then((battle) =>{
-    console.log(`upcoming battle for ${avatarID} - `, battle);
+    //console.log(`upcoming battle for ${avatarID} - `, battle);
     if(battle){
       let rewards = null;
       if(battle.postBattleActions){
-        //console.log(battle.postBattleActions);
+   
         // Get the items aquired from the action types in the battle report
         rewards = battle.postBattleActions.map(action => {
           let matchingPBA;
@@ -297,12 +293,24 @@ router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), aut
               break;
             }
           } 
-          //console.log('MBPA - ',matchingPBA);
-          return ALLITEMS[matchingPBA.itemCategory].find(item => item.name === matchingPBA.name);
-        });
-      }
 
-      res.formatter.ok({ foe : battle.foe, rewards });
+          return matchingPBA.itemID;
+        });
+        if(rewards.length){
+          Items.findAll({
+            attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+            where : { id : { [Op.in] : rewards }}
+          }).then((matchingItems) =>{
+            return res.formatter.ok({ foe : battle.foe, rewards : matchingItems });
+          }).catch((error) =>{
+            res.formatter.serverError(error.toString(), `Couldn't retrieve upcoming rewards - ${avatarID}`);
+          });
+        }else{
+          res.formatter.ok({ foe : battle.foe, rewards });
+        }
+      }else{
+        res.formatter.ok({ foe : battle.foe, rewards });
+      }
     }else{
       console.log(`COULDNT FIND BATTLE ${avatarID}`, battle);
 

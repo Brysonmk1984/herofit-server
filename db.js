@@ -4,7 +4,6 @@ const AvatarModel = require('./models/avatar.js');
 const UserActivityModel = require('./models/userActivity.js');
 const UserTotalModel = require('./models/userTotal.js');
 const BattleModel = require('./models/battle.js');
-const AvatarEquipModel = require('./models/avatarEquip.js');
 const AvatarItemsModel = require('./models/AvatarItems.js');
 const ItemsModel = require('./models/Items.js');
 let db;
@@ -61,20 +60,18 @@ const Avatar = AvatarModel(db, Sequelize);
 const UserActivity = UserActivityModel(db, Sequelize);
 const UserTotal = UserTotalModel(db, Sequelize);
 const Battle = BattleModel(db, Sequelize);
-const AvatarEquip = AvatarEquipModel(db, Sequelize);
 const AvatarItems = AvatarItemsModel(db, Sequelize);
 const Items = ItemsModel(db, Sequelize);
 // User - Avatar JOIN
 User.hasOne(Avatar, {foreignKey: 'userId'});
 Avatar.belongsTo(User, {foreignKey: 'userId'});
-// Avatar - AvatarEquip JOIN
-// Avatar.hasMany(AvatarEquip, {foreignKey: 'avatarID', as: 'equipped'});
-// AvatarEquip.belongsTo(Avatar, {foreignKey: 'avatarID'});
-// Items - AvatarItems JOIN
+
+// Avatar-AvatarItems
 Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID', as: 'equipped'});
 AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID'});
 
+// Items - AvatarItems
 Items.hasMany(AvatarItems, {foreignKey: 'itemID', as: 'items'});
 AvatarItems.belongsTo(Items, {foreignKey: 'itemID'});
 
-module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarEquip, AvatarItems, Items, db }
+module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarItems, Items, db }

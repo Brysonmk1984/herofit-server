@@ -126,11 +126,9 @@ router.get('/get-default-items', (req, res) => {
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /get-default-items");
   }
-  //res.formatter.ok({ items : ALLITEMS }, 'Successfully ran /get-default-items');
 
   Items.findAll()
   .then((items) =>{
-    console.log('itemz', items);
     res.formatter.ok({ items }, 'Successfully ran /get-default-items');
   }).catch((error)=>{
     console.log('THE ERR', error);
