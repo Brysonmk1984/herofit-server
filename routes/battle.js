@@ -56,7 +56,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase);
   foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase);
   
-  //console.log('FWS! - ', foeWithStats);
+  console.log('FWS! - ', foeWithStats, 'AVA! - ', avatar);
   let postBattleActions;
   // PROMISE - need to determine previous battles.
   new Promise((resolve, reject) =>{

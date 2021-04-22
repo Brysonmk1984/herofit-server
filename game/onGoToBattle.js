@@ -8,23 +8,32 @@ const VILLAINS = require('../game/villains.json');
 
 // ON GOTOBATTLE, DETERMINE POST BATTLE ACTIONS
 function determinePostBattleActions(avatar, foe, resolve, reject){
-  //console.log('av', avatar, 'foe', foe);
   const PBAs = [];
- 
   return AvatarItems.findAll({
     attributes : ["itemID"],
     where : { avatarID : avatar.id },
-    include : [
-      { model: Items, 
-        attributes: ['name', 'type'], 
-        required : false 
-      },
-    ],
-  }).then((equipment) =>{
-    const skinNamesArray = equipment.filter(item => item.type === 'skin').map(skin => skin.name);
-    const titleNamesArray = equipment.filter(item => item.type === 'title').map(title => title.name);
-    const petNamesArray = equipment.filter(item => item.type === 'pet').map(pet => pet.name);
-
+    include : [{ 
+      model: Items, 
+      attributes: ['name', 'type'], 
+      where : { id : { [Op.col] : 'avatar_items.itemID'  }, type : { [Op.not] : 'consumable' } },
+      required : false,
+      raw: true
+    }],
+    raw : undefined,
+    nest : true,
+  }).then((records) =>{
+   // Filter results by non consumables, and convert dataValues to actual javascript object
+    const avatarItems = records.filter(record => record.dataValues.item).map(record => {console.log('REC - ', record.dataValues);
+      const itemID = record.dataValues.itemID;
+      const item = record.dataValues.item.dataValues;
+      return Object.assign({},{ itemID }, item);
+    });
+    //console.log('CONVERTED-', avatarItems);
+    //Convert avatarItems into a series of different arrays based on type. This is to check if the player has already earned an award.
+    const skinNamesArray = avatarItems.filter(item => item.type === 'skin').map(skin => skin.name);
+    const titleNamesArray = avatarItems.filter(item => item.type === 'title').map(title => title.name);
+    const petNamesArray = avatarItems.filter(item => item.type === 'pet').map(pet => pet.name);
+    //console.log('SNA - ',skinNamesArray,'TNA - ', titleNamesArray,'PNA - ', petNamesArray);
     const allPbaCheckPromises = [];
    
     // Win Totals Check
@@ -88,7 +97,10 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
 
 
 
-  }).catch((error) => console.log('Error Getting all titles', error));
+  }).catch((error) => {
+    console.log('Error Getting all titles', error)
+    return reject(error);
+  });
   
 
 }
