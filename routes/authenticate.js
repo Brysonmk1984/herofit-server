@@ -62,8 +62,11 @@ router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
           lastName : jwtUser['custom:last_name'] || null
       })
       .then((result) =>{
-        let user = result.dataValues;
-        return res.formatter.ok(user);
+        let response = { user : result.dataValues }
+        if(config.globalMessage && config.globalMessage.length){
+          response.globalMessage = config.globalMessage;
+        }
+        return res.formatter.ok(response);
       })
       .catch((error) =>{console.log('error', error);
         res.serverError(error.toString(), `Couldn't find or create user, second attempt in catch ${jwtUser.email}`);
