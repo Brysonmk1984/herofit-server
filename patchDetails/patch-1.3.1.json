@@ -10,7 +10,7 @@
     {
       "title": "Kayaking now available as a Water Activity",
       "description": "Kayaking will now grant water points instead of just being a regular workout."
-    },
+    }
   ],
   "bugFixes": [
     "Fixed bug where if you spent points on Health in the QP window and you were at full health, you wouldn't regenerate your newly added health points",
