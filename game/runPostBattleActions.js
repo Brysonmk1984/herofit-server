@@ -1,8 +1,6 @@
-const AvatarEquip = require('../db').AvatarEquip;
 const AvatarItems = require('../db').AvatarItems;
 const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT } = require('./constants'); 
 const ALLPBAs = require('./postBattleActions.json');
-const ALLITEMS = require('./allItems.json');
 
 // XP GAIN FOR DEFEATING FOES
 function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 1, bonusXp = 0){
@@ -39,7 +37,7 @@ function determinePtBounty(heroLevel,bonusPt = 0){
   const positive = Math.floor(Math.random() * 2) === 1 ? true : false;
   const modifiedPt = positive ? basePt + (randomModifier * basePt) : basePt - (randomModifier * basePt) ;
   
-  console.log(basePt, modifiedPt);
+  //console.log(basePt, modifiedPt);
 
   // ADD in any villain bonus, adjusted by hero level
   if(bonusPt){
@@ -79,11 +77,9 @@ function doAllPbas(avatarID, postBattleActions){
     
   });
 
-
   console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
   // INSERT all the items from the itemsToInsert array, gathered from the PBAs
   return AvatarItems.bulkCreate(itemsToInsert);
-
 }
 
 function doPostBattleEffects(avatar, foe, outcome){
