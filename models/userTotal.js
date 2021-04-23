@@ -81,6 +81,10 @@ const UserTotalModel = function(db, DataTypes){
         type: DataTypes.JSONB,
         allowNull: true
       },
+      kayaking: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
       workout: {
         type: DataTypes.JSONB,
         allowNull: true

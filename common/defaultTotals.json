@@ -89,6 +89,11 @@
     "duration" : 0,
     "avgHeartrate" : 0
   },
+  "kayaking" : {
+    "instance" : 0,
+    "duration" : 0,
+    "avgHeartrate" : 0
+  },
   "workout" : {
     "instance" : 0,
     "duration" : 0,

@@ -57,6 +57,7 @@ function avCalc(userTotals){
           case 'ski':
           case 'snowboard':
           case 'snowshoe':
+          case 'kayaking':
             e.water += (adjustedActivityMinutes / MINUTES_PER_ELM);
             break;
           case 'workout':
