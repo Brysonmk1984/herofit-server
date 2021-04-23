@@ -26,7 +26,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
   if(avatar.status === 'New Recruit'){
     avatar.status = 'Rested';
   }
-
+  console.log('FINDORCREATE-', email, userId, avatar );
   Avatar.findOrCreate({
     where: { owner : email },
     // set the default properties if it doesn't exist

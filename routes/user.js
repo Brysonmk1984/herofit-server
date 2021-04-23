@@ -138,7 +138,7 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
   }
   const { email } = req.body;
 
-  UserActivity.findAll({ where: { user: email }, raw: true,
+  UserActivity.findAll({ where: { user: email }, raw: true, limit : 250,
     attributes : ['id', 'activity', 'activityDate']
   }).then((results) =>{
     if(results.length){
