@@ -20,7 +20,7 @@ function selectFoeTemplate(level){
     if(randomNum === 0){
       const randomNum2 = Math.floor(Math.random() * 3);
       // Probability of facing Plaguebringer = 2/3
-      if(randomNum === 0 || randomNum === 1){
+      if(randomNum2 === 0 || randomNum2 === 1){
         villain = villains.Titans[0];
       }else{
         villain = villains.Spirits[villains.Spirits.length -1];

@@ -1,0 +1,31 @@
+{
+  "version": "1.3.1",
+  "headline": "New Update! - version 1.3.0 - 1.3.1",
+  "openingRemarks": "Social Sharing, Kayaking, and Database Fixes",
+  "newFeatures": [
+    {
+      "title": "Social Sharing",
+      "description": "You can now share to Facebook, Facebook Messenger, Twitter, Reddit, or Email from the profile screen or the footer."
+    },
+    {
+      "title": "Kayaking now available as a Water Activity",
+      "description": "Kayaking will now grant water points instead of just being a regular workout."
+    },
+  ],
+  "bugFixes": [
+    "Fixed bug where if you spent points on Health in the QP window and you were at full health, you wouldn't regenerate your newly added health points",
+    "Fixed bug where Shadow Self wasn't accessible after level 20",
+    "Fixed display bug where on season change, the wrong element was highlighted for the bonus in the Battle Report Detail",
+    "Fixed bug where sometimes the last value in the 'Damage Received' column shows the incorrect value",
+    "Fixed display bug where some devices couldn't see the top of the Battle Report Detail window"
+  ],
+  "balanceChanges": [
+    "Lowered Photon Tokens earned from winning battles.",
+    "Made foes more difficult to compensate for the Big balance update to Heroes in the previous patch"
+  ],
+  "miscDetails": [
+    "Big Database changes with items. It's nothing players will notice but this change was crucial to the scalability of the game going forward",
+    "Now limiting the number of activities visible on the Training screen to 250"
+  ],
+  "closingRemarks": "Big announcement coming soon regarding the development path moving through the next few months, stay tuned!"
+} 
