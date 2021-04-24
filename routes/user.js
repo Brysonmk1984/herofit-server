@@ -121,8 +121,12 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       console.log('INSERTING USER ACTIVITIES');
       res.formatter.ok({ activities });
     }).catch((error)=>{
-      console.log(`Error bulk inserting user activities for ${email} DEBUG: ${error}`);
-      res.formatter.serverError(error.toString(), `Error bulk inserting user activities for ${email} - POST /insert-user-activitiesEndpoint`);
+      const actIdMap = entries.map((entry) =>{
+        console.log(entry.activityId);
+        return entry.Id
+      });
+      console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);
+      res.formatter.serverError(error.toString(), `Error bulk inserting user activities for ${email} ACTIDs-${actIdMap.join()} - POST /insert-user-activitiesEndpoint`);
     });
   }).catch((error)=>{
     console.log(`Error updating latest activity to user table for user ${email} DEBUG: ${error}`);
