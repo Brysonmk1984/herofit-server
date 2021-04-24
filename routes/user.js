@@ -122,7 +122,6 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       res.formatter.ok({ activities });
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
-        console.log(entry.activityId);
         return entry.Id
       });
       console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);
