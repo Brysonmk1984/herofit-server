@@ -66,10 +66,10 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
 });
 
 router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, res) => {
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
-  // }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
+  }
   const equipId = req.body.equipId;
   console.log('GETEQUIP', equipId);
   AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true })
@@ -77,6 +77,7 @@ router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, r
     console.log('UI - ',updatedItem);
     res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
   }).catch((error) =>{
+    console.log('EQUIP ERROR - ', error);
     res.formatter.serverError(error.toString(), `Error running /equip-item`);
   });
 });
@@ -90,7 +91,7 @@ router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId'
   const unequipId = req.body.unequipId;
 
   const equipPromises = [];
-
+  console.log('EID - ', equipId, 'UID - ', unequipId);
   equipPromises.push(AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true }));
   equipPromises.push(AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true }));
 
@@ -101,6 +102,7 @@ router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId'
 
     res.formatter.ok({ unequippedItem, equippedItem }, 'Successfully ran /equip-unequip-item');
   }).catch((error) =>{
+    console.log('EQUIP,UNEQUIP ERROR - ', error);
     res.formatter.serverError(error.toString(), `Error running /equip-unequip-item`);
   });
 });
@@ -111,12 +113,13 @@ router.post('/unequip-item', body('unequipId').isNumeric(), authenticateJWT, (re
     return res.formatter.badRequest(errors.array(), "Validation Error - for /unequip-item");
   }
   const unequipId = req.body.unequipId;
-  //console.log('UNEQUIP', unequipId);
+  console.log('UNEQUIP', unequipId);
   AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    //console.log('UI - ',updatedItem);
+    console.log('UI - ',updatedItem);
     res.formatter.ok({ unequippedItem : updatedItem[1][0] }, 'Successfully ran /unequip-item');
   }).catch((error) =>{
+    console.log('UNEQUIP ERROR - ', error);
     res.formatter.serverError(error.toString(), `Error running /unequip-item`);
   });
 });
@@ -321,9 +324,11 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
       const stackedItems = stackItems(consumables);
       res.formatter.ok({ consumables : stackedItems, avatar });
     }).catch((error) =>{
+      console.log('USE ITEM INNER ERROR - ', error);
       res.formatter.serverError(error.toString(), `Error destroying item -  DELETE /use-consumable-item`);
     });
   }).catch((error) =>{
+    console.log('USE ITEM OUTER ERROR - ', error);
     res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
   });
 });
