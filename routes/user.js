@@ -116,7 +116,8 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     { where: { email } }
   ).then(() => {
     // Front end is determining which activities are new, so everything passed here can be added to db.
-    UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
+    //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
+    UserActivity.bulkCreate(entries)
     .then((result) =>{
       console.log('INSERTING USER ACTIVITIES');
       res.formatter.ok({ activities });
