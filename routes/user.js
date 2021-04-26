@@ -103,7 +103,7 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
   let latestActivityUpdate = null;
   const entries = activities.map((activity) =>{
     activityId = activity.id;
-    console.log('ACT in question - ', activity, activityId);
+    //console.log('ACT in question - ', activity, activityId);
     const activityDate = moment.utc(activity.start_date);
     // Check for latest activity (doesn't include DB activities)
     if(latestActivityUpdate === null){
@@ -119,6 +119,7 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
     { where: { email } }
   ).then(() => {
+    console.log('ACTENTRIES - ',entries);
     // Front end is determining which activities are new, so everything passed here can be added to db.
     //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
     UserActivity.bulkCreate(entries)
@@ -127,8 +128,8 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       res.formatter.ok({ activities : activities });
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
-        console.log(entry.id);
-        return entry.id
+        console.log(entry.activityId);
+        return entry.activityId
       });
       console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);
       res.formatter.serverError(error.toString(), `Error bulk inserting user activities for ${email} ACTIDs-${actIdMap.join()} - POST /insert-user-activitiesEndpoint`);
