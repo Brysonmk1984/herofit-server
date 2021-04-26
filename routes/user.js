@@ -65,7 +65,7 @@ router.post('/update-user-totals', body('email').isEmail(), body('activities').i
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: email }, raw : true }
-  ).then((utData) => {
+  ).then((utData) => {console.log('UTD',utData);
     if(!utData){
       throw new Error(`No User Totals for user ${email}`);
     }
@@ -96,9 +96,11 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
   const { email, activities } = req.body;
   console.log('ALL PASSED ACTS - ', activities);
 
+  // In case the activities are invalid... this should eventually be moved to the validation middleware.
   if(!activities[0].id){
     return res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint, ACT 0 - ${activities[0]}`);
   }
+
   // Need latest Activity to be added to user's account
   let latestActivityUpdate = null;
   const entries = activities.map((activity) =>{
@@ -266,6 +268,54 @@ router.post('/get-user-by-email', body('email').isEmail(), (req, res) => {
     console.log('Error - ', error);
     res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-user-by-email Endpoint`);
   });
+});
+
+// ONE TIME USE FIX
+// Loop over all activities of a user and recalculate user totals.
+router.post('/recalculate-user-totals', body('email').isEmail(), (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /recalculate-user-totals Endpoint");
+  }
+  const { email } = req.body;
+
+  UserTotal.findOne(
+    { where: { user : email }, raw : true }
+  ).then((utData) => { console.log('UTD',utData);
+    if(!utData){
+      throw new Error(`No User Totals for user ${email}`);
+    }
+    // Then Update userTotals
+    const { update, initialUpdate, reset } = utCalc(utData);
+    const utAfterRest = reset();
+
+    console.log('UTAR', utAfterRest);
+    UserActivity.findAll({
+      where : { user : email }
+    }).then((activities) =>{
+      //console.log('THE RESULT - ', activities);
+      const actsWithoutExtraData = activities.map((a) =>{
+        return a.activity;
+      });
+      console.log(actsWithoutExtraData[0]);
+      const updatedUT = update(actsWithoutExtraData);
+
+      console.log('UDPATED - ', updatedUT);
+      // Finally, save to DB
+      return UserTotal.update(
+        updatedUT,
+        { where: { user: email }, returning : true }
+      );
+    }).then((data) =>{
+      console.log('THE END DATA - ', data);
+      res.formatter.ok('test');
+    }).catch((error) =>{
+      console.log('error - ', error);
+    });
+
+
+  });
+
 });
 
 module.exports = router;
