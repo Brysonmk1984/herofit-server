@@ -97,7 +97,7 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
   console.log('ALL PASSED ACTS - ', activities);
 
   if(!activities[0].id){
-    res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint, ACT 0 - ${activities[0]}`);
+    return res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint, ACT 0 - ${activities[0]}`);
   }
   // Need latest Activity to be added to user's account
   let latestActivityUpdate = null;
@@ -123,11 +123,12 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
     UserActivity.bulkCreate(entries)
     .then((result) =>{
-      console.log('INSERTING USER ACTIVITIES');
-      res.formatter.ok({ activities });
+      console.log('INSERTING USER ACTIVITIES, result - ', result);
+      res.formatter.ok({ activities : activities });
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
-        return entry.Id
+        console.log(entry.id);
+        return entry.id
       });
       console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);
       res.formatter.serverError(error.toString(), `Error bulk inserting user activities for ${email} ACTIDs-${actIdMap.join()} - POST /insert-user-activitiesEndpoint`);
