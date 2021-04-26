@@ -119,10 +119,14 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
     { where: { email } }
   ).then(() => {
-    console.log('ACTENTRIES - ',entries);
+    const actIdMap = entries.map((entry) =>{
+      //console.log(entry.activityId);
+      return entry.activityId
+    });
+    console.log('ACT ID MAP-', actIdMap);
     // Front end is determining which activities are new, so everything passed here can be added to db.
-    //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
-    UserActivity.bulkCreate(entries)
+    UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
+    //UserActivity.bulkCreate(entries)
     .then((result) =>{
       console.log('INSERTING USER ACTIVITIES, result - ', result);
       res.formatter.ok({ activities : activities });
