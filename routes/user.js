@@ -148,7 +148,7 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
   }
   const { email } = req.body;
 
-  UserActivity.findAll({ where: { user: email }, raw: true, limit : 250,
+  UserActivity.findAll({ where: { user: email }, raw: true, limit : 250, order:[["activityDate", 'DESC']],
     attributes : ['id', 'activity', 'activityDate']
   }).then((results) =>{
     if(results.length){
@@ -163,6 +163,7 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
       const activities = results.map((result, i) =>{
         return result.activity;
       });
+      console.log('LATEST _SAVED - ',maxDate);
       res.formatter.ok({ activities, latestActivityDate : maxDate });
     }else{
       res.formatter.ok({ activities : null });
