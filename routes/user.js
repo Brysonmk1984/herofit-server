@@ -95,6 +95,10 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
   }
   const { email, activities } = req.body;
   console.log('ALL PASSED ACTS - ', activities);
+
+  if(!activities[0].id){
+    res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint, ACT 0 - ${activities[0]}`);
+  }
   // Need latest Activity to be added to user's account
   let latestActivityUpdate = null;
   const entries = activities.map((activity) =>{
