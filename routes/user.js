@@ -94,12 +94,12 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-user-activities Endpoint");
   }
   const { email, activities } = req.body;
-
+  console.log('ALL PASSED ACTS - ', activities);
   // Need latest Activity to be added to user's account
   let latestActivityUpdate = null;
   const entries = activities.map((activity) =>{
     activityId = activity.id;
-    //console.log('ACT in question - ', activity, activityId);
+    console.log('ACT in question - ', activity, activityId);
     const activityDate = moment.utc(activity.start_date);
     // Check for latest activity (doesn't include DB activities)
     if(latestActivityUpdate === null){
