@@ -56,7 +56,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase);
   foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase);
   
-  console.log('FWS! - ', foeWithStats, 'AVA! - ', avatar);
+  //console.log('FWS! - ', foeWithStats, 'AVA! - ', avatar);
   let postBattleActions;
   // PROMISE - need to determine previous battles.
   new Promise((resolve, reject) =>{
@@ -157,7 +157,7 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
 
       // IF the avatar won, Get the items aquired from the action types in the battle report
-      if(adjResult.outcome === 'Avatar Wins'){
+      if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
         Items.findAll({
           attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
@@ -167,8 +167,8 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
           if(!result[0].seenReport){
             // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
             const { determineAstrologySeason } = avCalc();
-            adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
-
+            adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt);
+            
             res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
           }else{
             res.formatter.ok({ result : null }, 'Latest Report already viewed');
@@ -206,21 +206,17 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     adjResult = result;
     adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
-     
+
      // IF the avatar won, Get the items aquired from the action types in the battle report
-    if(adjResult.outcome === 'Avatar Wins'){
+    if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
       return Items.findAll({
         attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
         where : { action : { [Op.in] : adjResult.postBattleActions } }
       });
     }
+    return null;
   }).then((items) =>{
     adjResult.itemsAquired = items;
-
-    // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
-    const { determineAstrologySeason } = avCalc();
-    adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.createdAt).element;
-  
     // Need correct Skin :( just to show the user in the battle report modal on the Profile Page
     return AvatarItems.findOne({ 
       attributes : ['itemID','avatarID'],
@@ -236,7 +232,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     const startedTrackingSeasons = moment('2021-03-04', 'YYYY-MM-DD');
     const battleDate = moment(adjResult.createdAt);
     if(battleDate && battleDate.isAfter(startedTrackingSeasons)){
-      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt).element;
+      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt);
     }else{ adjResult.seasonalBonusElement = null; }
 
     res.formatter.ok({ adjResult });
