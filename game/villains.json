@@ -210,6 +210,31 @@
       }
     }
   ],
+  "Elementals": [
+    {
+      "class" : "Elementals",
+      "type" : "Gusty Rascal",
+      "foe" : [
+        "Alya",
+        "Eteri",
+        "Pilvi",
+        "Tsisia",
+        "Tuuli",
+        "Yun"
+      ],
+      "ability": {
+        "name" : "Air Attuned",
+        "effect" : "Air Emphasis",
+        "type" : "pre-battle"
+      },
+      "color" : null,
+      "pba" : ["Grant Gusty Rascal"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Gusty Rascal"
+      }
+    }
+  ],
   "Titans": [
     {
       "id": 9,
