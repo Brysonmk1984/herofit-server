@@ -65,14 +65,14 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
 
 });
 
-router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, res) => {
+router.post('/equip-item', body('avatarId'), body('equipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-item");
   }
-  const equipId = req.body.equipId;
-  console.log('GETEQUIP', equipId);
-  AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true })
+  const { avatarId, equipId } = req.body;
+
+  AvatarItems.update({ equipped : true }, { where : { avatarID : avatarId, itemID : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     console.log('UI - ',updatedItem);
     res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
@@ -82,18 +82,17 @@ router.post('/equip-item', body('equipId').isNumeric(), authenticateJWT, (req, r
   });
 });
 
-router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
+router.post('/equip-unequip-item', body('avatarId'), body('equipId').isNumeric(), body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /equip-unequip-item");
   }
-  const equipId = req.body.equipId;
-  const unequipId = req.body.unequipId;
+  const { avatarId, equipId, unequipId } = req.body;
 
   const equipPromises = [];
-  console.log('EID - ', equipId, 'UID - ', unequipId);
-  equipPromises.push(AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true }));
-  equipPromises.push(AvatarItems.update({ equipped : true }, { where : { itemID : equipId }, returning : true, raw : true }));
+  //console.log('EID - ', equipId, 'UID - ', unequipId);
+  equipPromises.push(AvatarItems.update({ equipped : false }, { where : { avatarID : avatarId, itemID : unequipId }, returning : true, raw : true }));
+  equipPromises.push(AvatarItems.update({ equipped : true }, { where : { avatarID : avatarId, itemID : equipId }, returning : true, raw : true }));
 
   Promise.allSettled(equipPromises)
   .then((result) =>{
@@ -107,14 +106,14 @@ router.post('/equip-unequip-item', body('equipId').isNumeric(), body('unequipId'
   });
 });
 
-router.post('/unequip-item', body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
+router.post('/unequip-item', body('avatarId'), body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /unequip-item");
   }
-  const unequipId = req.body.unequipId;
-  console.log('UNEQUIP', unequipId);
-  AvatarItems.update({ equipped : false }, { where : { itemID : unequipId }, returning : true, raw : true })
+  const { avatarId, unequipId } = req.body;
+
+  AvatarItems.update({ equipped : false }, { where : { avatarID : avatarId, itemID : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
     console.log('UI - ',updatedItem);
     res.formatter.ok({ unequippedItem : updatedItem[1][0] }, 'Successfully ran /unequip-item');
