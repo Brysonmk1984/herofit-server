@@ -14,9 +14,10 @@ router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /signup-or-signin");
   }
 
-  // res.status(500).json({
-  //   message: `SERVER DOWN FOR MAINTENANCE`,
-  // });
+  if(config.mode === 'maintenance'){
+    return res.formatter.serviceUnavailable('Server is down for maintentance, please try again later...');
+  }
+
     
   // TOKEN IS LEGIT
   const jwtUser = req.user;
