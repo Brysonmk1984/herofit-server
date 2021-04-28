@@ -225,14 +225,21 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
       const error = new Error("Not Enough Photon Tokens");
       return res.formatter.badRequest(error.toString(), `Not Enough Photon Tokens POST /buy-item-by-avatar-id`);
     }
-    return Avatar.update(
-      { photonTokens : literal(`"photonTokens" - ${ptCost}`) },
-      { where : { id : avatarID }, returning : true })
-  }).then((result) =>{console.log('LAKE');
-    remainingPT = result[1][0].photonTokens
+
     return AvatarItems.create( item, { returning: true });
   }).then((result) =>{
-    
+    if(result.dataValues && result.dataValues.id){
+      // If made it this far, then item was created... deduct PT
+      return Avatar.update(
+        { photonTokens : literal(`"photonTokens" - ${ptCost}`) },
+        { where : { id : avatarID }, returning : true })
+    }else{
+      throw new Error('Item Could not be created');
+    }
+  }).then((result) =>{
+    // PT was deducted from avatar, now fetch all Avatar inventory items
+
+    remainingPT = result[1][0].photonTokens
     AvatarItems.findAll({
       attributes : ['id','avatarID','itemID','equipped'],
       where : { avatarID },
@@ -266,7 +273,7 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
       }).catch((error) =>{
         res.formatter.serverError(error.toString(), 'Successfully ran POST /buy-item-by-avatar-id');
       });
-  }).catch((error) =>{console.log('error', error);
+  }).catch((error) =>{console.log('BUYITEMERROR-', error);
     res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
   });
 });
