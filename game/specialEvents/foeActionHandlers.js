@@ -4,12 +4,12 @@ const villains = require('../villains.json');
 const handleChanceForFoe = function({ eventName, foeActions, foes}){
   console.log('CAKE-',eventName, foeActions, foes);
 
-  const encounter33Percent = foeActions.includes("Increased Likelyhood Foe 33");
+  const encounterLikeliness = foeActions.includes("Increased Likelyhood Foe");
 
-  if(encounter33Percent){console.log(1);
-    const battleSpecialEventFoe = chance.bool({ likelihood: 99 });
-    if(eventName === 'Elemental Ambush'){console.log(11);
-      if(battleSpecialEventFoe){console.log(111);
+  if(encounterLikeliness){
+    if(eventName === 'Elemental Ambush'){
+      const battleSpecialEventFoe = chance.bool({ likelihood: 33 });
+      if(battleSpecialEventFoe){
         return villains.Elementals.find(foe => foe.type === foes[0]);
       }
     }
