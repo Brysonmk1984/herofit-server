@@ -182,7 +182,6 @@ function _calcDamage(aPower, rArmor){
   return { physicalDamage : Math.floor(netDamage), physicalReduction : Math.floor(reduction) }
 }
 
-
 function _determineOutcome(winner){
   if(winner === 'Avatar'){
     return { outcome : 'Avatar Wins', avatarStatus : 'Recovering', foeStatus : 'Knocked Out' }; 
@@ -269,83 +268,8 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
 
     return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals };
-
-
   }
 
-  /*switch(aggressorString){
-
-    case 'Avatar':
-      // elemental round, avatar is attacking
-      if(roundType === 'Elemental'){
-        //console.log('ROUND IS ELEMENTAL', aggressor);
-        // Calc elm damage, get back damage done and how much was prevented
-        const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
-        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total);
-        // Add to totals done for damage and reduction
-        for(let elm in totals.aElmDamage){
-          totals.aElmDamage[elm] += turnElmDamageDone[elm];
-        }
-        for(let elm in totals.fElmReduction){
-          totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
-        }
-
-
-
-        return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented };
-
-      // physical round, avatar is attacking
-      }else{
-        // Calc physical damage, get back damage done and how much was prevented
-        const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
-        totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, netDamage);
-
-        // Add to totals done for damage and reduction
-        totals.aPhyDamage += netDamage;
-        totals.fPhyReduction += reduction;
-
-
-        return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, damageDealt : netDamage, totals, reduction };
-
-      }
-
-    case 'Foe':
-      // elemental round, foe is attacking, foe is elemental
-      if(roundType === 'Elemental' && foeIsElemental){
-
-        // Calc elm damage, get back damage done and how much was prevented
-        const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
-        elementalDamageDealt = turnElmDamageDone;
-        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total);
-
-        // Add to totals done for damage and reduction
-        for(let elm in totals.fElmDamage){
-          totals.fElmDamage[elm] += elementalDamageDealt[elm];
-        }
-        for(let elm in totals.aElmReduction){
-          totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
-        }
-        
-        return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, damageDealt : turnElmDamageDone, totals, reduction : turnElmDamagePrevented }
-      
-      // physical round, foe is attacking
-      // Used for both regular physical damage turns or for elemental turns when the foe doesn't have any elemental power
-      }else{
-        // Calc physical damage, get back damage done and how much was prevented
-        const { netDamage, reduction } = _calcDamage(aggressor.power, defender.armor); 
-        totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, netDamage);
-
-        // Add to totals done for damage and reduction
-        totals.fPhyDamage += netDamage;
-        totals.aPhyReduction += reduction;
-
-        return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, damageDealt : netDamage, totals, reduction };
-
-      }
-
-    default:
-    return;
-  }*/
 }
 
 function doBattle(avatar, foe, goesFirst){
@@ -403,7 +327,7 @@ function doBattle(avatar, foe, goesFirst){
 
   }
 
-  console.log('Battle round results = ', roundBreakdown);
+  //console.log('Battle round results = ', roundBreakdown);
 
   const outcomeData = _determineOutcome(winnerString); 
 
