@@ -16,8 +16,8 @@
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 15,
-    "bonusPtBase": 30,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -34,8 +34,8 @@
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -56,7 +56,7 @@
     ],
     "ability": {
       "name" : "Earth Attuned",
-      "effect" : "Earth Emphasis",
+      "effect" : "Minor Earth Threat",
       "type" : "pre-battle"
     },
     "color" : null,
@@ -78,13 +78,13 @@
       "Tlalli"
     ],
     "ability": {
-      "name" : "Earth Attuned",
-      "effect" : "Earth Emphasis",
+      "name" : "Earth Proficiency",
+      "effect" : "Major Earth Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 15,
-    "bonusPtBase": 30,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -96,13 +96,13 @@
     "type" : "Earth Goddess",
     "foe" : ["Terra"],
     "ability": {
-      "name" : "Earth Attuned",
-      "effect" : "Earth Emphasis",
+      "name" : "Earth Mastery",
+      "effect" : "Profound Earth Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -124,7 +124,7 @@
     ],
     "ability": {
       "name" : "Fire Attuned",
-      "effect" : "Fire Emphasis",
+      "effect" : "Minor Fire Threat",
       "type" : "pre-battle"
     },
     "color" : null,
@@ -146,13 +146,13 @@
       "Vulcan"
     ],
     "ability": {
-      "name" : "Fire Attuned",
-      "effect" : "Fire Emphasis",
+      "name" : "Fire Proficiency",
+      "effect" : "Major Fire Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 15,
-    "bonusPtBase": 30,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -164,13 +164,13 @@
     "type" : "Fire God",
     "foe" : ["Helios"],
     "ability": {
-      "name" : "Fire Attuned",
-      "effect" : "Fire Emphasis",
+      "name" : "Fire Mastery",
+      "effect" : "Profound Fire Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -190,7 +190,7 @@
     ],
     "ability": {
       "name" : "Water Attuned",
-      "effect" : "Water Emphasis",
+      "effect" : "Minor Water Threat",
       "type" : "pre-battle"
     },
     "color" : null,
@@ -212,13 +212,13 @@
       "Yam"
     ],
     "ability": {
-      "name" : "Water Attuned",
-      "effect" : "Water Emphasis",
+      "name" : "Water Proficiency",
+      "effect" : "Major Water Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 15,
-    "bonusPtBase": 30,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
     "pba" : [],
     "reward" : {
       "type" : "",
@@ -230,13 +230,13 @@
     "type" : "Water Goddess",
     "foe" : ["Maya"],
     "ability": {
-      "name" : "Water Attuned",
-      "effect" : "Water Emphasis",
+      "name" : "Water Mastery",
+      "effect" : "Major Water Threat",
       "type" : "pre-battle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
     "pba" : [],
     "reward" : {
       "type" : "",

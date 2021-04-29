@@ -179,7 +179,7 @@ function _calcDamage(aPower, rArmor){
 
   const { reduction, netDamage } = _calcArmorDR(power, armor);
   //console.log('DAMAGE - ', netDamage, 'REDUCTION - ', reduction);
-  return { netDamage : Math.floor(netDamage), reduction : Math.floor(reduction) }
+  return { physicalDamage : Math.floor(netDamage), physicalReduction : Math.floor(reduction) }
 }
 
 
@@ -209,8 +209,72 @@ function _calcHealthLoss(health, damage){
   return Math.floor(health - damage);
 }
 
-function _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, totals){
-  switch(aggressorString){
+function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals){
+  // IF AVATAR ROUND
+  if(aggressorString === 'Avatar'){
+    // Calc physical damage, get back damage done and how much was prevented
+    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor); 
+    // Calc elm damage, get back damage done and how much was prevented
+    const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
+
+    // Add to totals done for damage and reduction
+    totals.aPhyDamage += physicalDamage;
+    totals.fPhyReduction += physicalReduction;
+    // Add to totals done for damage and reduction
+    for(let elm in totals.aElmDamage){
+      totals.aElmDamage[elm] += turnElmDamageDone[elm];
+    }
+    for(let elm in totals.fElmReduction){
+      totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
+    }
+
+    totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, (turnElmDamageDone.total + physicalDamage));
+
+    return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals };
+
+  // IF FOE ROUND
+  }else{
+    let physicalDamage, physicalReduction, turnElmDamageDone = { total : 0 }, turnElmDamagePrevented = { total : 0 };
+    // If foe has no elemental power, calc physical damage twice instead of physical + elemental
+    if(!foeIsElemental){
+      // Calc physical damage, get back damage done and how much was prevented
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor); 
+      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor); 
+      physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
+      physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
+    }else{
+      // Calc physical damage, get back damage done and how much was prevented
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor); 
+      physicalDamage = damageAndReduction1.physicalDamage;
+      physicalReduction = damageAndReduction1.physicalReduction
+      // Calc elm damage, get back damage done and how much was prevented
+      const elmDamageAndReduction = _calcElementDamage(aggressor, defender);
+      turnElmDamageDone = elmDamageAndReduction.turnElmDamageDone;
+      turnElmDamagePrevented = elmDamageAndReduction.turnElmDamagePrevented;
+
+      // Add to totals done for damage and reduction
+      for(let elm in totals.fElmDamage){
+        totals.fElmDamage[elm] += turnElmDamageDone[elm];
+      }
+      for(let elm in totals.aElmReduction){
+        totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
+      }
+
+    }
+
+    // Add to totals done for damage and reduction
+    totals.fPhyDamage += physicalDamage;
+    totals.aPhyReduction += physicalReduction;
+
+    totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
+
+    return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals };
+
+
+  }
+
+  /*switch(aggressorString){
+
     case 'Avatar':
       // elemental round, avatar is attacking
       if(roundType === 'Elemental'){
@@ -281,18 +345,14 @@ function _computeBattleTurn(aggressorString, defenderString, aggressor, defender
 
     default:
     return;
-  }
+  }*/
 }
 
 function doBattle(avatar, foe, goesFirst){
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
-  const elementalTurns = [2,3,6,7,10,11];
-  const roundBreakdown = [];
-
   const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
-
   const foeIsElemental = _checkIfElemental(foe);
-
+  const roundBreakdown = [];
 
   var grandTotals = {
     aElmDamage : { fire : 0, earth : 0, air : 0, water : 0, total : 0 },
@@ -324,14 +384,13 @@ function doBattle(avatar, foe, goesFirst){
     const defenderString = turnIsOdd ? goesFirst : goesSecond;
     const defender = defenderString === 'Avatar' ? avatar : foe;
 
-
-
-    const roundType = elementalTurns.includes(battleTurns[i]) ? 'Elemental' : 'Physical';
-
-    const { defenderHealthLeft, aggressorHealthLeft, damageDealt, totals, reduction } = _computeBattleTurn(aggressorString, defenderString, aggressor, defender, roundType, foeIsElemental, grandTotals);
+    // Compute battle turn and add results to total
+    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
+    
+    console.log('the deets', defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals);
     grandTotals = totals;
-
-    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, damageDealt, defenderHealthLeft, aggressorHealthLeft, reduction });
+    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, defenderHealthLeft, aggressorHealthLeft });
+    console.log('RB',roundBreakdown);
 
     if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
       winnerString = aggressorString;
@@ -344,7 +403,7 @@ function doBattle(avatar, foe, goesFirst){
 
   }
 
-  //console.log('Battle round results = ', roundBreakdown);
+  console.log('Battle round results = ', roundBreakdown);
 
   const outcomeData = _determineOutcome(winnerString); 
 

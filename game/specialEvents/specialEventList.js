@@ -4,14 +4,14 @@ const testSpecificFoe = {
   actionTypes : [{
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
-    odds : 40,
+    odds : 0,
     foe : 'Shadow-Self',
     foeClass : 'Spirits'
   },
   {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
-    odds : 80,
+    odds : 100,
     foe : 'Plaguebringer',
     foeClass : 'Titans'
   }],
@@ -23,7 +23,7 @@ const attackOfTheElements = {
   actionTypes : [{
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
-    odds : 33,
+    odds : 99,
     foe : 'Gusty Rascal',
     foeClass : 'Elementals'
   }],
