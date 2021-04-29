@@ -4,25 +4,22 @@ const { config } = require('../appConfig');
 const { handleChanceForFoe } = require('./specialEvents/foeActionHandlers');
 
 function selectFoeTemplate(level){
-  // 1 in 100 chance of fighting Titan
-  // Must be level 10
-  // const randomNum = Math.floor(Math.random() * 100);
-  // if(randomNum === 0 && level >= 10){
-  //   return villains.Titans[Math.floor(Math.random() * villains.Titans.length)];
-  // }
   let villain;
 
-  // Get specific foe foe testing purposes
-  //return villains.Spirits[3];
-
+  const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
-  if(config.specialEvent.isLive){
-    // Must return a villain
-    villain = handleChanceForFoe(config.specialEvent);
-
-    if(villain){
-      return villain;
+  if(event){
+    const foeLikelihoodAts = event.actionTypes.filter((at) => at.type === 'foeLikelihood');
+    // If the event contains foeLikelihood actions
+    if(foeLikelihoodAts.length){
+      // Result of handleChanceForFoe function could be a foe object, or null
+      villain = handleChanceForFoe(foeLikelihoodAts);
+      // If foe object, return it instead of randomly selecting below
+      if(villain){
+        return villain;
+      }
     }
+
   }
 
 
@@ -160,7 +157,7 @@ function generateFoeStats(avatar, foe){
       fws.water = powerEighth;
       fws.air = powerEighth;
       qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
-      
+
       break;
 
     default:
