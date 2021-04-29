@@ -311,10 +311,9 @@ function doBattle(avatar, foe, goesFirst){
     // Compute battle turn and add results to total
     const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
     
-    console.log('the deets', defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals);
     grandTotals = totals;
     roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, defenderHealthLeft, aggressorHealthLeft });
-    console.log('RB',roundBreakdown);
+    //console.log('RB',roundBreakdown);
 
     if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
       winnerString = aggressorString;
