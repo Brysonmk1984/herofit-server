@@ -1,5 +1,6 @@
 const chance = require('chance')();
 const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./constants');
+const { determineFireCrit, determineAirEvade, defermineWaterHeal, determineEarthThorns } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage){
@@ -69,7 +70,7 @@ function _determineElmMatchups(elm){
 
 
 function _calcElementDamage(attacker, receiver){
-
+  
   const attackerElms = {
     fire : Math.floor(chance.floating({ min: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
     earth : Math.floor(chance.floating({ min: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
@@ -84,7 +85,8 @@ function _calcElementDamage(attacker, receiver){
   };
   // console.log('AE = ', attackerElms);
   // console.log('RE = ', receiverElms);
-  const turnElmDamageDone = {
+
+  let turnElmDamageDone = {
     fire : 0,
     earth : 0,
     water : 0,
@@ -152,8 +154,27 @@ function _calcElementDamage(attacker, receiver){
       turnElmDamagePrevented.total += Math.floor(reduction);
     }
   }
+
+
+
+  /* 
+    THIS IS WHERE WE NEED TO INSERT ELEMENTAL SPECIALTIES
+  */
+  // First value is total fire of attacker, second is the 'd' factor, which is adjusted down for rounds
+  const fireProc = determineFireCrit(attacker.fire, attackerElms.fire);
+  attackerElms.fire = fireProc.netDamage;
+  console.log('fireProc - ', fireProc);
+
+  const airProc = determineAirEvade(receiver.air, turnElmDamageDone.total);
+  console.log(airProc);
+  if(airProc.evaded){
+    turnElmDamageDone = { fire : 0, earth : 0, water : 0, air : 0, total : 0 };
+  }
+
+
+
   //console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
-  return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented };
+  return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented, fireProc, airProc };
 }
 
 // Calculates damage done against an element's counter element (F on E)
@@ -214,7 +235,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     // Calc physical damage, get back damage done and how much was prevented
     const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor); 
     // Calc elm damage, get back damage done and how much was prevented
-    const { turnElmDamageDone, turnElmDamagePrevented } = _calcElementDamage(aggressor, defender);
+    const { turnElmDamageDone, turnElmDamagePrevented, fireProc, airProc } = _calcElementDamage(aggressor, defender);
 
     // Add to totals done for damage and reduction
     totals.aPhyDamage += physicalDamage;
@@ -227,9 +248,20 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
     }
 
-    totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, (turnElmDamageDone.total + physicalDamage));
+    const elementalProcs = {
+      fire : fireProc,
+      water : defermineWaterHeal(aggressor.water),
+      air : airProc,
+      earth : determineEarthThorns(defender.earth, turnElmDamageDone.total)
+    }
 
-    return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals };
+    // EARTH - Deal damage back to attacker based on earthProc
+    totals.avHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+    // WATER - Heal based on waterProc
+    totals.avHealthRemaining += elementalProcs.water.amountHealed;
+
+
+    return { defenderHealthLeft : totals.foeHealthRemaining, aggressorHealthLeft : totals.avHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals, elementalProcs };
 
   // IF FOE ROUND
   }else{
@@ -259,6 +291,18 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
       }
 
+      const elementalProcs = {
+        fire : fireProc,
+        water : defermineWaterHeal(aggressor.water),
+        air : airProc,
+        earth : determineEarthThorns(defender.earth, turnElmDamageDone.total)
+      }
+
+      // EARTH - Deal damage back to attacker based on earthProc
+      totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+      // WATER - Heal based on waterProc
+      totals.foeHealthRemaining += elementalProcs.water.amountHealed;
+
     }
 
     // Add to totals done for damage and reduction
@@ -267,7 +311,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
 
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
 
-    return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals };
+    return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals, elementalProcs };
   }
 
 }
@@ -309,11 +353,17 @@ function doBattle(avatar, foe, goesFirst){
     const defender = defenderString === 'Avatar' ? avatar : foe;
 
     // Compute battle turn and add results to total
-    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
+    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
     
+    if(elementalProcs){
+      console.log('PROCS FROM ELM ROUNDS - ', elementalProcs);
+    }
+
     grandTotals = totals;
-    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, defenderHealthLeft, aggressorHealthLeft });
+    roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, defenderHealthLeft, aggressorHealthLeft, elementalProcs });
     //console.log('RB',roundBreakdown);
+
+    
 
     if(grandTotals.avHealthRemaining <= 0 || grandTotals.foeHealthRemaining <= 0){
       winnerString = aggressorString;
@@ -326,7 +376,7 @@ function doBattle(avatar, foe, goesFirst){
 
   }
 
-  //console.log('Battle round results = ', roundBreakdown);
+  console.log('Battle round results = ', roundBreakdown);
 
   const outcomeData = _determineOutcome(winnerString); 
 

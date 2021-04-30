@@ -22,8 +22,6 @@ function selectFoeTemplate(level){
 
   }
 
-
-
   // Must be at least level 20 to have a shot at getting matched against Plaguebringer
   if(level >= 20){
     const randomNum = Math.floor(Math.random() * 18);
