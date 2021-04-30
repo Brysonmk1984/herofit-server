@@ -3,7 +3,7 @@ const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_EXPONENT, AIR_EVASION_CHANCE_MOD, EARTH
 
 // FIRE - offensive trait - takes in aggressor's fire amount, calculated on aggressors elemental attacking round
 function determineFireCrit(fire, d){
-  let critChance = Number((fire*10)/((fire*10)+(FIRE_CRIT_CHANCE_MOD*200))).toFixed(2) * 100;
+  let critChance = Number((fire*3)/((fire*3)+(FIRE_CRIT_CHANCE_MOD*500))).toFixed(2) * 100;
   if(critChance > 60){
     critChance = 60;
   }
@@ -29,6 +29,11 @@ function determineAirEvade(air, d){
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)
 function defermineWaterHeal(water){
+  console.log(water, WATER_HEAL_EXPONENT,Math.pow(water, WATER_HEAL_EXPONENT), (1/Math.pow(water, WATER_HEAL_EXPONENT)), Number((1/Math.pow(water, WATER_HEAL_EXPONENT))));
+  // early return to prevent infinity
+  if(water === 0){
+    return { healingFactor : 0, amountHealed : 0 };
+  }
   const healingFactor =  Number((1/Math.pow(water, WATER_HEAL_EXPONENT)).toFixed(2));
 	const amountHealed = Math.floor(water * healingFactor);
   
@@ -37,6 +42,12 @@ function defermineWaterHeal(water){
 
 // EARTH - defensive trait - takes in defender's earth amount, and aggressors damage calculated on aggressors elemental attacking round
 function determineEarthThorns(earth, d){
+  console.log(earth, EARTH_THORNS_EXPONENT, Math.pow(earth, EARTH_THORNS_EXPONENT), (1/Math.pow(earth, EARTH_THORNS_EXPONENT)), Number((1/Math.pow(earth, EARTH_THORNS_EXPONENT))));
+  
+  // early return to prevent infinity
+  if(earth === 0){
+    return { thornsFactor : 0, thornsDamageToAttacker : 0 };
+  }
   const thornsFactor =  Number((1/Math.pow(earth, EARTH_THORNS_EXPONENT)).toFixed(2));
 
   console.log('THORNS FACTOR!!!', thornsFactor);

@@ -249,10 +249,14 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     }
 
     const elementalProcs = {
-      fire : fireProc,
-      water : defermineWaterHeal(aggressor.water),
+      
+      water : 0,
       air : airProc,
-      earth : determineEarthThorns(defender.earth, turnElmDamageDone.total)
+      earth : 0
+      //fire : fireProc,
+      //water : defermineWaterHeal(aggressor.water),
+      //air : airProc,
+      //earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + totals.aPhyDamage))
     }
 
     // EARTH - Deal damage back to attacker based on earthProc
@@ -266,6 +270,12 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
   // IF FOE ROUND
   }else{
     let physicalDamage, physicalReduction, turnElmDamageDone = { total : 0 }, turnElmDamagePrevented = { total : 0 };
+    let elementalProcs = {
+      fire : null,
+      water : null,
+      air : null,
+      earth : null
+    }
     // If foe has no elemental power, calc physical damage twice instead of physical + elemental
     if(!foeIsElemental){
       // Calc physical damage, get back damage done and how much was prevented
@@ -273,15 +283,23 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor); 
       physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
+
+      elementalProcs = {
+        air : airProc,
+        earth : 0
+        // air : airProc,
+        // earth : determineEarthThorns(defender.earth, physicalDamage)
+      }
+
     }else{
       // Calc physical damage, get back damage done and how much was prevented
       const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor); 
       physicalDamage = damageAndReduction1.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction
       // Calc elm damage, get back damage done and how much was prevented
-      const elmDamageAndReduction = _calcElementDamage(aggressor, defender);
-      turnElmDamageDone = elmDamageAndReduction.turnElmDamageDone;
-      turnElmDamagePrevented = elmDamageAndReduction.turnElmDamagePrevented;
+      const { turnElmDamageDone, turnElmDamagePrevented, fireProc, airProc } = _calcElementDamage(aggressor, defender);
+
+
 
       // Add to totals done for damage and reduction
       for(let elm in totals.fElmDamage){
@@ -291,19 +309,24 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
       }
 
-      const elementalProcs = {
-        fire : fireProc,
-        water : defermineWaterHeal(aggressor.water),
+      elementalProcs = {
+        fire : 0,
+        water : 0,
         air : airProc,
-        earth : determineEarthThorns(defender.earth, turnElmDamageDone.total)
+        earth : 0
+        // fire : fireProc,
+        // water : defermineWaterHeal(aggressor.water),
+        // air : airProc,
+        // earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + physicalDamage))
       }
 
       // EARTH - Deal damage back to attacker based on earthProc
       totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
       // WATER - Heal based on waterProc
       totals.foeHealthRemaining += elementalProcs.water.amountHealed;
-
+      
     }
+    
 
     // Add to totals done for damage and reduction
     totals.fPhyDamage += physicalDamage;
