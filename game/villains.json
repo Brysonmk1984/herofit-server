@@ -218,7 +218,7 @@
       "foe": ["The Plaguebringer"],
       "ability": {
         "name" : "Infect",
-        "effect" : "Damage Over Time",
+        "effect" : "Damage After Battle",
         "type" : "post-battle"
       },
       "color": null,
@@ -228,6 +228,32 @@
       "reward" : {
         "type" : "pet",
         "name" : "Plagueling"
+      }
+    }
+  ],
+  "Elementals": [
+    {
+      "id": 10,
+      "class" : "Elementals",
+      "type" : "Gusty Rascal",
+      "foe" : [
+        "Alya",
+        "Eteri",
+        "Pilvi",
+        "Tsisia",
+        "Tuuli",
+        "Yun"
+      ],
+      "ability": {
+        "name" : "Air Attuned",
+        "effect" : "Minor Air Threat",
+        "type" : "pre-battle"
+      },
+      "color" : null,
+      "pba" : ["Grant Gusty Rascal"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Gusty Rascal"
       }
     }
   ]

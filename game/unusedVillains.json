@@ -1,10 +1,246 @@
-{
-  "Titans" : [
-    {
-      "id": 9,
-      "type": "Plaguebringer",
-      "foe": ["The Plaguebringer"],
-      "ability": null
+[
+  {
+    "class" : "Elementals",
+    "type" : "Air Jinn",
+    "foe" : [
+      "Amaterasu",
+      "Anemone",
+      "Caelestis",
+      "Houa",
+      "Tempest",
+      "Zephyr"
+    ],
+    "ability": {
+      "name" : "Air Attuned",
+      "effect" : "Air Emphasis",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
     }
-  ]
-}
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Wind God",
+    "foe" : ["Fūjin"],
+    "ability": {
+      "name" : "Air Attuned",
+      "effect" : "Air Emphasis",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+  
+  {
+    "class" : "Elementals",
+    "type" : "Rock Skipper",
+    "foe" : [
+      "Avani",
+      "Demeter",
+      "Ki",
+      "Sten",
+      "Thea",
+      "Tor"
+    ],
+    "ability": {
+      "name" : "Earth Attuned",
+      "effect" : "Minor Earth Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "pba" : ["Grant Earth Servant"],
+    "reward" : {
+      "type" : "pet",
+      "name" : "Rock Skipper"
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Earth Golem",
+    "foe" : [
+      "Bhumi",
+      "Eardwulf",
+      "Lambert",
+      "Papa",
+      "Roland",
+      "Tlalli"
+    ],
+    "ability": {
+      "name" : "Earth Proficiency",
+      "effect" : "Major Earth Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Earth Goddess",
+    "foe" : ["Terra"],
+    "ability": {
+      "name" : "Earth Mastery",
+      "effect" : "Profound Earth Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+
+
+  {
+    "class" : "Elementals",
+    "type" : "Fire Sycophant",
+    "foe" : [
+      "Azar",
+      "Fajra",
+      "Keahi",
+      "Iskra",
+      "Or",
+      "Zora"
+    ],
+    "ability": {
+      "name" : "Fire Attuned",
+      "effect" : "Minor Fire Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "pba" : ["Grant Fire Sycophant"],
+    "reward" : {
+      "type" : "pet",
+      "name" : "Fire Sycophant"
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Fire Jinn",
+    "foe" : [
+      "Agni",
+      "Helene",
+      "Heliodoro",
+      "Ravi",
+      "Sorin",
+      "Vulcan"
+    ],
+    "ability": {
+      "name" : "Fire Proficiency",
+      "effect" : "Major Fire Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Fire God",
+    "foe" : ["Helios"],
+    "ability": {
+      "name" : "Fire Mastery",
+      "effect" : "Profound Fire Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Water Lackey",
+    "foe" : [
+      "Aalto",
+      "Hai",
+      "Kai",
+      "Naia",
+      "Rio",
+      "Tasi"
+    ],
+    "ability": {
+      "name" : "Water Attuned",
+      "effect" : "Minor Water Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "pba" : ["Grant Water Lackey"],
+    "reward" : {
+      "type" : "pet",
+      "name" : "Water Lackey"
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Water Lord",
+    "foe" : [
+      "Asherah",
+      "Llyr",
+      "Nereus",
+      "Sarasvati",
+      "Undine",
+      "Yam"
+    ],
+    "ability": {
+      "name" : "Water Proficiency",
+      "effect" : "Major Water Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 25,
+    "bonusPtBase": 50,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  },
+  {
+    "class" : "Elementals",
+    "type" : "Water Goddess",
+    "foe" : ["Maya"],
+    "ability": {
+      "name" : "Water Mastery",
+      "effect" : "Major Water Threat",
+      "type" : "pre-battle"
+    },
+    "color" : null,
+    "bonusXpBase": 50,
+    "bonusPtBase": 100,
+    "pba" : [],
+    "reward" : {
+      "type" : "",
+      "name" : ""
+    }
+  }
+]

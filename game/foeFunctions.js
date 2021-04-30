@@ -1,17 +1,28 @@
 const { FOE_MOD } = require('./constants'); 
 const villains = require('./villains.json');
+const { config } = require('../appConfig');
+const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
 
 function selectFoeTemplate(level){
-  // 1 in 100 chance of fighting Titan
-  // Must be level 10
-  // const randomNum = Math.floor(Math.random() * 100);
-  // if(randomNum === 0 && level >= 10){
-  //   return villains.Titans[Math.floor(Math.random() * villains.Titans.length)];
-  // }
   let villain;
 
-  // Get specific foe foe testing purposes
-  //return villains.Spirits[3];
+  const event = config.specialEvent;
+  // If Special Event is live, run code to attempt any special foe events
+  if(event){
+    const foeLikelihoodAts = event.actionTypes.filter((at) => at.type === 'foeLikelihood');
+    // If the event contains foeLikelihood actions
+    if(foeLikelihoodAts.length){
+      // Result of handleChanceForFoe function could be a foe object, or null
+      villain = handleFoeLikelihood(foeLikelihoodAts);
+      // If foe object, return it instead of randomly selecting below
+      if(villain){
+        return villain;
+      }
+    }
+
+  }
+
+
 
   // Must be at least level 20 to have a shot at getting matched against Plaguebringer
   if(level >= 20){
@@ -49,21 +60,6 @@ function selectFoeTemplate(level){
 }
 
 function generateFoeStats(avatar, foe){
-  
-  // If it's the shadow boss, just return a mirror image of the avatar
-  if(foe.type === 'Shadow-Self'){
-    return {
-      health : avatar.health,
-      power : avatar.power,
-      armor : avatar.armor,
-      fire : avatar.fire,
-      earth : avatar.earth,
-      water : avatar.water,
-      air : avatar.air
-    };
-  }
-
-  // Otherwise, build foe as usual
   // GIVES CURRENT LEVEL based on XP input
   function currentLevel(xp){
     const exponent = 1.2;
@@ -73,9 +69,6 @@ function generateFoeStats(avatar, foe){
     return Math.floor(currentLevel) + 1;
   }
 
-  const level = currentLevel(avatar.activityXP + avatar.battleXP);
-  const qp = (level * 5) - 5;
-
   // Random modifier within -15% of base stat
   function randomizer(stat, modifierInteger = -15){
     let randomModifierDecimal = Math.floor(Math.random() * modifierInteger) * .01;
@@ -83,96 +76,125 @@ function generateFoeStats(avatar, foe){
     return { stat : Math.floor(modifiedStat), modifier : randomModifierDecimal };
   }
 
-
+  const level = currentLevel(avatar.activityXP + avatar.battleXP);
+  const qp = (level * 5) - 5; 
   const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
   const baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
+  
+  // Different foes adjust QP differently on their stats
+  // determined below in switch statement
+  let qpAdjustedStats = [];
 
-  let healthAfterMod;
-  let powerAfterMod;
-  let qpAfterMod;
-  // If boss, randomize higher stats
-  if(foe.class === 'Titans'){
-    healthAfterMod = randomizer(baseFoeHealth, -12);
-    powerAfterMod = randomizer(baseFoePower, -20);
-    qpAfterMod = randomizer(Math.floor(qp * FOE_MOD.QP), -5);
-  }else{
-    healthAfterMod = randomizer(baseFoeHealth);
-    powerAfterMod = randomizer(baseFoePower);
-    qpAfterMod = randomizer(Math.floor(qp * FOE_MOD.QP));
+  // Foe with stats
+  let fws = {
+    health : 0,
+    power : 0,
+    armor : 0,
+    fire : 0,
+    earth : 0,
+    water : 0,
+    air : 0,
+    difficulty : 0
+  };
+  let randomizedHealth, randomizedPower, randomizedQP;
+
+  switch(foe.class){
+    case 'Spirits':
+      // If it's the shadow boss, just return a mirror image of the avatar
+      if(foe.type === 'Shadow-Self'){
+        return {
+          health : avatar.health,
+          power : avatar.power,
+          armor : avatar.armor,
+          fire : avatar.fire,
+          earth : avatar.earth,
+          water : avatar.water,
+          air : avatar.air
+        };
+      }else{
+        randomizedHealth = randomizer(baseFoeHealth);
+        randomizedPower = randomizer(baseFoePower);
+        randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP));
+
+        fws.health = randomizedHealth.stat;
+        fws.power = randomizedPower.stat;
+
+
+        qpAdjustedStats = ["health","power","armor"];
+        break;
+      }
+    case 'Elementals':
+      randomizedHealth = randomizer(baseFoeHealth);
+      randomizedPower = randomizer(baseFoePower);
+      randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP));
+      
+
+      fws.health = randomizedHealth.stat;
+      fws.power = randomizedPower.stat;
+      console.log('FOE TYPE - ', foe.type);
+      //Need to check for for types here for different elements
+      switch(foe.type){
+        case "Gusty Rascal":
+          fws.air = 50;
+          qpAdjustedStats = ["air"]; 
+          break; 
+        case "Rock Skipper":
+          fws.earth = 50;
+          qpAdjustedStats = ["earth"]; 
+          break; 
+        default :
+          qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
+          break; 
+      }
+      break;
+    case 'Titans':
+      randomizedHealth = randomizer(baseFoeHealth, -12);
+      randomizedPower = randomizer(baseFoePower, -20);
+      randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP), -5);
+
+      // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
+      // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
+      const powerEighth = Math.floor(randomizedPower.stat / 8);
+      
+      fws.health = randomizedHealth.stat;
+      fws.power = randomizedPower.stat;
+      fws.fire = powerEighth;
+      fws.earth = powerEighth;
+      fws.water = powerEighth;
+      fws.air = powerEighth;
+      qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
+
+      break;
+
+    default:
+    // Shouldn't happen 
   }
+  // ON ALL FOES EXCEPT SHADOW-SELF:
 
-
-  const averageMod = -((healthAfterMod.modifier + powerAfterMod.modifier +  qpAfterMod.modifier) / 3).toFixed(3);
-
-  let foeWithStats;
-  let qpAdjustedStats;
-  // Spirits don't have elemental power, all others do
-  if(foe.class === 'Spirits'){
-    foeWithStats = {
-      health : healthAfterMod.stat,
-      power : powerAfterMod.stat,
-      armor : 0,
-      fire : 0,
-      earth : 0,
-      water : 0,
-      air : 0,
-      difficulty : averageMod
-    }
-    qpAdjustedStats = ["health","power","armor"];
-  // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
-  // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
-  }else if(foe.class === 'Titans'){
-    const powerQuarter = Math.floor(powerAfterMod.stat / 8);
-    foeWithStats = {
-      health : healthAfterMod.stat < 200 ? 200 : healthAfterMod.stat,
-      power : powerAfterMod.stat,
-      armor : 0,
-      fire : powerQuarter,
-      earth : powerQuarter,
-      water : powerQuarter,
-      air : powerQuarter,
-      difficulty : averageMod
-    }
-    qpAdjustedStats = ["health","power","armor","fire","earth","water","air"];
-  // Any other foe... still need to work on this. Just using the Spirit template right now.
-  }else{
-    foeWithStats = {
-      health : healthAfterMod.stat,
-      power : powerAfterMod.stat,
-      armor : 0,
-      fire : 0,
-      earth : 0,
-      water : 0,
-      air : 0,
-      difficulty : averageMod
-    }
-    qpAdjustedStats = ["health","power","armor"];
-  }
-
-
-  const baseFoeQp = qpAfterMod.stat;
-
-  for(let points = baseFoeQp; points > 0; points-- ){
+  // Calculates the overall difficulty modification after randomization. Used for pt and xp after battles
+  fws.difficulty = -((randomizedHealth.modifier + randomizedPower.modifier +  randomizedQP.modifier) / 3).toFixed(3);
+  
+  // Randomize the stat distribution for foes
+  const baseFoeQp = randomizedQP.stat;
+  for( let points = baseFoeQp; points > 0; points-- ){
     const attr = qpAdjustedStats[Math.floor(Math.random() * qpAdjustedStats.length)];
-    if(attr === "power"){
-      foeWithStats.power += 1;
-    }else if(attr === "health"){
-      foeWithStats.health += 1;
-    }else if(attr === "armor"){
-      foeWithStats.armor += 1;
-    }else if(attr === "fire"){
-      foeWithStats.fire += 1;
-    }else if(attr === "earth"){
-      foeWithStats.earth += 1;
-    }else if(attr === "water"){
-      foeWithStats.water += 1;
-    }else if(attr === "air"){
-      foeWithStats.air += 1;
+    fws[attr] += 1;
+  }
+
+  // Apply any special event actionTypes of type 'foeBonusToStats'
+  const event = config.specialEvent;
+  // If Special Event is live, run code to attempt any special foe events
+  if(event){
+    const foeBonusToStatsAts = event.actionTypes.filter((at) => at.type === 'foeBonusToStats');
+    // If the event contains foeLikelihood actions
+    if(foeBonusToStatsAts.length){
+      // Result of handleChanceForFoe function could be a foe object, or null
+      fws = handleFoeBonusToStats(foeBonusToStatsAts, fws);
     }
   }
 
-  return(foeWithStats);
-
+  // Return foe with stats to be saved for upcoming battle!
+  return fws;
 }
 
 module.exports = { generateFoeStats, selectFoeTemplate };

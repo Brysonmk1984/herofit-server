@@ -23,7 +23,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     nest : true,
   }).then((records) =>{
    // Filter results by non consumables, and convert dataValues to actual javascript object
-    const avatarItems = records.filter(record => record.dataValues.item).map(record => {console.log('REC - ', record.dataValues);
+    const avatarItems = records.filter(record => record.dataValues.item).map(record => {
       const itemID = record.dataValues.itemID;
       const item = record.dataValues.item.dataValues;
       return Object.assign({},{ itemID }, item);

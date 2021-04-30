@@ -53,8 +53,8 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
 
   
-  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase);
-  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase);
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase, foeWithStats.type);
+  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase, foeWithStats.type);
   
   //console.log('FWS! - ', foeWithStats, 'AVA! - ', avatar);
   let postBattleActions;
