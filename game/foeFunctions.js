@@ -1,7 +1,7 @@
 const { FOE_MOD } = require('./constants'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
-const { handleChanceForFoe } = require('./specialEvents/foeActionHandlers');
+const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
 
 function selectFoeTemplate(level){
   let villain;
@@ -13,7 +13,7 @@ function selectFoeTemplate(level){
     // If the event contains foeLikelihood actions
     if(foeLikelihoodAts.length){
       // Result of handleChanceForFoe function could be a foe object, or null
-      villain = handleChanceForFoe(foeLikelihoodAts);
+      villain = handleFoeLikelihood(foeLikelihoodAts);
       // If foe object, return it instead of randomly selecting below
       if(villain){
         return villain;
@@ -127,6 +127,7 @@ function generateFoeStats(avatar, foe){
       randomizedHealth = randomizer(baseFoeHealth);
       randomizedPower = randomizer(baseFoePower);
       randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP));
+      
 
       fws.health = randomizedHealth.stat;
       fws.power = randomizedPower.stat;
@@ -134,7 +135,12 @@ function generateFoeStats(avatar, foe){
       //Need to check for for types here for different elements
       switch(foe.type){
         case "Gusty Rascal":
+          fws.air = 50;
           qpAdjustedStats = ["air"]; 
+          break; 
+        case "Rock Skipper":
+          fws.earth = 50;
+          qpAdjustedStats = ["earth"]; 
           break; 
         default :
           qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
@@ -173,6 +179,18 @@ function generateFoeStats(avatar, foe){
   for( let points = baseFoeQp; points > 0; points-- ){
     const attr = qpAdjustedStats[Math.floor(Math.random() * qpAdjustedStats.length)];
     fws[attr] += 1;
+  }
+
+  // Apply any special event actionTypes of type 'foeBonusToStats'
+  const event = config.specialEvent;
+  // If Special Event is live, run code to attempt any special foe events
+  if(event){
+    const foeBonusToStatsAts = event.actionTypes.filter((at) => at.type === 'foeBonusToStats');
+    // If the event contains foeLikelihood actions
+    if(foeBonusToStatsAts.length){
+      // Result of handleChanceForFoe function could be a foe object, or null
+      fws = handleFoeBonusToStats(foeBonusToStatsAts, fws);
+    }
   }
 
   // Return foe with stats to be saved for upcoming battle!

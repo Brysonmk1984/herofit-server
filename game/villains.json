@@ -210,8 +210,30 @@
       }
     }
   ],
+  "Titans": [
+    {
+      "id": 9,
+      "class" : "Titans",
+      "type": "Plaguebringer",
+      "foe": ["The Plaguebringer"],
+      "ability": {
+        "name" : "Infect",
+        "effect" : "Damage After Battle",
+        "type" : "post-battle"
+      },
+      "color": null,
+      "bonusXpBase": 50,
+      "bonusPtBase": 75,
+      "pba" : ["Grant Plaguebringer"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Plagueling"
+      }
+    }
+  ],
   "Elementals": [
     {
+      "id": 10,
       "class" : "Elementals",
       "type" : "Gusty Rascal",
       "foe" : [
@@ -224,7 +246,7 @@
       ],
       "ability": {
         "name" : "Air Attuned",
-        "effect" : "Air Emphasis",
+        "effect" : "Minor Air Threat",
         "type" : "pre-battle"
       },
       "color" : null,
@@ -232,27 +254,6 @@
       "reward" : {
         "type" : "pet",
         "name" : "Gusty Rascal"
-      }
-    }
-  ],
-  "Titans": [
-    {
-      "id": 9,
-      "class" : "Titans",
-      "type": "Plaguebringer",
-      "foe": ["The Plaguebringer"],
-      "ability": {
-        "name" : "Infect",
-        "effect" : "Damage Over Time",
-        "type" : "post-battle"
-      },
-      "color": null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 75,
-      "pba" : ["Grant Plaguebringer"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Plagueling"
       }
     }
   ]

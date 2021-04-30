@@ -14,7 +14,12 @@ const testSpecificFoe = {
     odds : 100,
     foe : 'Plaguebringer',
     foeClass : 'Titans'
-  }],
+  },/*{
+    type : 'foeBonusToStats',
+    action : "Increase Air",
+    bonusPercent : .25,
+    stats : ['air']
+  }*/],
 }
 
 const attackOfTheElements = {
@@ -23,9 +28,19 @@ const attackOfTheElements = {
   actionTypes : [{
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
-    odds : 99,
+    odds :33,
     foe : 'Gusty Rascal',
     foeClass : 'Elementals'
+  },{
+    type : 'ptBooster',
+    action : "Increase PT Reward",
+    bonusPercent : 1.0,
+    requirements : [{ foeType : 'Gusty Rascal' }]
+  },{
+    type : 'xpBooster',
+    action : "Increase XP Reward",
+    bonusPercent : .5,
+    requirements : [{ foeType : 'Gusty Rascal' }]
   }],
 }
 
