@@ -70,6 +70,14 @@
       "type" : "Award Pet",
       "itemCategory": "pets",
       "outcome" : "win"
+    },
+    {
+      "itemID" : 32,
+      "action" : "Grant Gusty Rascal",
+      "name" : "Gusty Rascal",
+      "type" : "Award Pet",
+      "itemCategory": "pets",
+      "outcome" : "win"
     }
   ],
 
