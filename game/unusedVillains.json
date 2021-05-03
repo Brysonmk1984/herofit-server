@@ -113,7 +113,7 @@
 
   {
     "class" : "Elementals",
-    "type" : "Fire Sycophant",
+    "type" : "Flame Fiend",
     "foe" : [
       "Azar",
       "Fajra",
@@ -128,10 +128,10 @@
       "type" : "pre-battle"
     },
     "color" : null,
-    "pba" : ["Grant Fire Sycophant"],
+    "pba" : ["Grant Flame Fiend"],
     "reward" : {
       "type" : "pet",
-      "name" : "Fire Sycophant"
+      "name" : "Flame Fiend"
     }
   },
   {
@@ -179,7 +179,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Water Lackey",
+    "type" : "Splash Artist",
     "foe" : [
       "Aalto",
       "Hai",
