@@ -1,31 +1,33 @@
 {
-  "version": "1.3.1",
-  "headline": "New Update! - version 1.3.0 - 1.3.1",
-  "openingRemarks": "Social Sharing, Kayaking, and Database Fixes",
+  "version": "1.4.0",
+  "headline": "Attack of the Elements! - version 1.4.0",
+  "openingRemarks": "New Foes, New Elemental Traits, and a Special HeroFit Event",
   "newFeatures": [
     {
-      "title": "Social Sharing",
-      "description": "You can now share to Facebook, Facebook Messenger, Twitter, Reddit, or Email from the profile screen or the footer."
+      "title": "Elemental Foes",
+      "description": "Corruption has overtaken the Elementals of Earth Realm, becoming powerful adversaries in the process. Each element has 3 new foes, a minion, adept, and a god, each with more elemental power than the last."
     },
     {
-      "title": "Kayaking now available as a Water Activity",
-      "description": "Kayaking will now grant water points instead of just being a regular workout."
+      "title": "Elemental Traits",
+      "description": "Each of the 4 elements now have a unique battle trait! Fire: Critical Strike, Earth: Thorns Damage, Air: Evasion, Water: Life Leech. The more you've developed your Heroes' elements, the bigger impact the elemental traits will have in battles."
+    },
+    {
+      "title": "Attack of the Elements! A unique HeroFit Event",
+      "description": "Over the course of the next 12 weeks, one new Elemental Foe will be released, becoming available to battle. These foes will specialize in one of the four elements - Earth, Water, Air or Fire, challenging you in unique ways based on their elemental prowess. There will be an increased chance to engage the enemy of the week, plus bonus XP and PT!"
     }
   ],
   "bugFixes": [
-    "Fixed bug where if you spent points on Health in the QP window and you were at full health, you wouldn't regenerate your newly added health points",
-    "Fixed bug where Shadow Self wasn't accessible after level 20",
-    "Fixed display bug where on season change, the wrong element was highlighted for the bonus in the Battle Report Detail",
-    "Fixed bug where sometimes the last value in the 'Damage Received' column shows the incorrect value",
-    "Fixed display bug where some devices couldn't see the top of the Battle Report Detail window"
+    "Fixed a bug where heroes with more than 250 activities recorded experienced a bug with leveling up",
+    "Fixed bug where the elemental season bonus wasn't appearing in old Battle Reports",
+    "Fixed an issue with equipping items affecting other players",
+    "Refactored some code to prevent users from players losing PT in the event of an error buying consumable items"
   ],
   "balanceChanges": [
-    "Lowered Photon Tokens earned from winning battles",
-    "Made foes more difficult to compensate for the Big balance update to Heroes in the previous patch"
+    "Global changes to foe difficulty ahead of elemental trait addition",
+    "HeroFit needs your help to help judge and report any balance issues you see after this patch!"
   ],
   "miscDetails": [
-    "Big Database changes with items. It's nothing players will notice but this change was crucial to the scalability of the game going forward",
-    "Now limiting the number of activities visible on the Training screen to 250"
+    "UI changes to the Battle Report Detail, which now displays all damage types every round. Previously, physical and element rounds alternated."
   ],
-  "closingRemarks": "Big announcement coming soon regarding the development path moving through the next few months, stay tuned!"
+  "closingRemarks": "I'm very excited for this patch! It's been a goal to make the elements unique since the very beginning of HeroFit and now with the new traits, it's finally become a reality. How you workout and how you spend your Quantum Points will greatly affect your battles. Not only that, I finally get to reveal the amazing artwork that's being produced by Cold Beverage Studios, giving me more time to develop the game."
 } 
