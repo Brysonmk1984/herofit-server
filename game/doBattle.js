@@ -1,6 +1,6 @@
 const chance = require('chance')();
 const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./constants');
-const { determineFireCrit, determineAirEvade, defermineWaterHeal, determineEarthThorns } = require('./elementalProcs');
+const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage){
@@ -261,7 +261,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       fire : fireProc,
       air : airProc,
       earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + totals.aPhyDamage)),
-      water : defermineWaterHeal(aggressor.water, turnElmDamageDone.total),
+      water : determineWaterHeal(aggressor.water, turnElmDamageDone.total),
     }
 
     // EARTH - Deal damage back to attacker based on earthProc
@@ -341,7 +341,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         fire : fireProc,
         air : airProc,
         earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + physicalDamage)),
-        water : defermineWaterHeal(aggressor.water, turnElmDamageDone.total),
+        water : determineWaterHeal(aggressor.water, turnElmDamageDone.total),
       }
 
       // EARTH - Deal damage back to attacker based on earthProc

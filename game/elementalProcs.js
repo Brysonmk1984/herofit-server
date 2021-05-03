@@ -29,7 +29,7 @@ function determineAirEvade(air, d){
 }
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)
-function defermineWaterHeal(water, d){  
+function determineWaterHeal(water, d){  
   let healingFactor = Number((water*3)/((water*3)+(WATER_HEAL_MOD*500))).toFixed(2);
   const amountHealed = Math.floor(d * healingFactor);
   //console.log('WATER - ', { healingFactor, amountHealed });
@@ -44,4 +44,4 @@ function determineEarthThorns(earth, d){
   return { thornsFactor, thornsDamageToAttacker };
 }
 
-module.exports = { determineFireCrit, determineAirEvade, defermineWaterHeal, determineEarthThorns};
+module.exports = { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns};
