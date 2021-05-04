@@ -399,9 +399,6 @@ function doBattle(avatar, foe, goesFirst){
     // Compute battle turn and add results to total
     const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
 
-    if(elementalProcs){
-      console.log('PROCS FROM ELM ROUNDS - ', elementalProcs);
-    }
 
     grandTotals = totals;
     roundBreakdown.push({ turn : i, aggressor : aggressorString, defender : defenderString, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, defenderHealthLeft, aggressorHealthLeft, elementalProcs });
@@ -409,8 +406,10 @@ function doBattle(avatar, foe, goesFirst){
     const aHealth = grandTotals.avHealthRemaining;
     const fHealth = grandTotals.foeHealthRemaining;
     //console.log('GT-', grandTotals);
-    if(aHealth <= 0 || fHealth <= 0){
-      
+    if(aHealth <= 0 && fHealth <= 0){
+      // RARE - If thorns damage caused both Hero & Foe to drop below zero, DKO  
+      winnerString = 'DKO';
+    }else if(aHealth <= 0 || fHealth <= 0){
       const avatarHasMoreHealth = aHealth > fHealth;
       const foeHasMoreHealth =  fHealth > aHealth;
       if(avatarHasMoreHealth){
@@ -437,15 +436,10 @@ function doBattle(avatar, foe, goesFirst){
           winner = defender;
           loser = aggressor;
         }
-      }else{
-        // Both foe and avatar must have zero life, DKO
-        winnerString = 'DKO';
       }
-      //console.log('WINNER = ',aggressorString);
     }else if(battleTurns[i] === 11){
       winnerString = 'Draw';
     }
-
   }
 
   // console.log('Battle round results = ', roundBreakdown.map((r) =>{
