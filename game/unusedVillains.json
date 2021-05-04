@@ -1,7 +1,7 @@
 [
   {
     "class" : "Elementals",
-    "type" : "Air Jinn",
+    "type" : "Wheezing Jinn",
     "foe" : [
       "Amaterasu",
       "Anemone",
@@ -26,7 +26,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Wind God",
+    "type" : "Storming Oni",
     "foe" : ["Fūjin"],
     "ability": {
       "name" : "Air Attuned",
@@ -68,7 +68,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Earth Golem",
+    "type" : "Granite Golem",
     "foe" : [
       "Bhumi",
       "Eardwulf",
@@ -93,8 +93,8 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Earth Goddess",
-    "foe" : ["Terra"],
+    "type" : "Hulking Crag",
+    "foe" : ["Terran"],
     "ability": {
       "name" : "Earth Mastery",
       "effect" : "Profound Earth Threat",
@@ -136,7 +136,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Fire Jinn",
+    "type" : "Flaming Jinn",
     "foe" : [
       "Agni",
       "Helene",
@@ -161,7 +161,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Fire God",
+    "type" : "Scorching Archfiend",
     "foe" : ["Helios"],
     "ability": {
       "name" : "Fire Mastery",
@@ -202,7 +202,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Water Lord",
+    "type" : "Cyclonic Siren",
     "foe" : [
       "Asherah",
       "Llyr",
@@ -227,7 +227,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Water Goddess",
+    "type" : "Tidal-Borne  Dame",
     "foe" : ["Maya"],
     "ability": {
       "name" : "Water Mastery",
