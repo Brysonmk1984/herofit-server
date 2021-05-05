@@ -133,11 +133,11 @@ function generateFoeStats(avatar, foe){
       //Need to check for for types here for different elements
       switch(foe.type){
         case "Gusty Rascal":
-          fws.air = 100;
+          fws.air = 75;
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Rock Skipper":
-          fws.earth = 100;
+          fws.earth = 75;
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         default :
