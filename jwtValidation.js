@@ -56,8 +56,9 @@ const authenticateAdminJWT = (req, res, next) => {
    }
     const authHeader = req.headers.authorization;
     const token = authHeader.split(' ')[1];
-     //console.log('THE TOKEN in jwtValidation befor everify - ', token);
+     //console.log('THE TOKEN in jwtValidation before everify - ', token);
     jwt.verify(token,  pem, { algorithms: ['RS256'] }, (error, user) => {
+
        // TOKEN is invalid
        if(error) {
            const _error = {
@@ -68,6 +69,7 @@ const authenticateAdminJWT = (req, res, next) => {
           return res.formatter.forbidden(_error, 'JWT Invalid');
        // TOKEN has Expired
        } else if (Date.now() >= user.exp * 1000) {
+
           const error = {
              status : 403,
              message : 'COGNITO TOKEN EXPIRED',
@@ -77,16 +79,18 @@ const authenticateAdminJWT = (req, res, next) => {
  
        // AUDIENCE in token different from Client ID
        }else if(user.aud !== process.env.COGNITO_CLIENT_ID){
+
           const error = {
              status : 403,
              message : `AUD / CLIENT ID MISMATCH`,
              debug : `AUD : ${user.aud}, CLIENT ID: ${process.env.COGNITO_CLIENT_ID}`
           }
           return res.formatter.forbidden(error, 'JWT user mismatch');
-       }else if(user.email !== process.env.ADMIN_PANEL_EMAIL){
+       }else if((user.email !== process.env.ADMIN_PANEL_EMAIL) && (user.email !== process.env.ADMIN_PANEL_EMAIL_2)){
+
          const error = {
             status : 403,
-            message : `Unathorized - Non-Admin User`,
+            message : `Unauthorized - Non-Admin User`,
             debug : `${user.email} Attempted Access to Admin Panel`
          }
          return res.formatter.forbidden(error, 'Unauthorized Non-Admin User attempted access at control panel');

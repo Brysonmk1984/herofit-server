@@ -8,7 +8,7 @@ const Battle = require('../db').Battle;
 const { Op, literal, col, fn, QueryTypes } = require("sequelize");
 const { sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION } = require('../game/constants');
+const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
@@ -18,6 +18,7 @@ const avCalc = require('../game/upgrades/avCalc');
 const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
 const ALLPBAs = require('../game/postBattleActions.json');
+const chance = require('chance')();
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
 router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
@@ -301,7 +302,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
       //console.log('AV LENGTH - ', avatars.length);
       //console.log('AVS - ', avatars);
       avatars.forEach((avatar, i) =>{
-        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happends earlier when a user clicks 'Battle')
+        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
 
         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
         avatar = parseAvatarProperties(avatar);
@@ -309,9 +310,16 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         const itemsUsed = req.body.itemsUsed || null;
         const actionsChosen = req.body.actionsChosen || null;
 
+        // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
+        let beginnersLuck = false;
+        const avTXP = avatar.activityXP + avatar.battleXP;
+        if(avTXP < BEGINNERS_LUCK_MAX_XP){
+          beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
+        }
+
         const foeWithStats = allFoes[i];
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats));
+        const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
         
         // avatar and foe to be used for battle
         let BRA = Object.assign({}, sAvatar);
@@ -349,8 +357,13 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         }else if(scenario.id === 3){
           goesFirst = 'Foe';
         }else{
-          const randDecider = Math.floor(Math.random() * 2);
-          goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
+          // 75% Chance the Avatar will go first if below level 15
+          if(beginnersLuck){
+            goesFirst = 'Avatar';
+          }else{
+            const randDecider = Math.floor(Math.random() * 2);
+            goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
+          }
         }
 
         // BATTLE STEP 5 - EXCHANGE DAMAGE

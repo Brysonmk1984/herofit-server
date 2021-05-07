@@ -1,10 +1,4 @@
 let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES } = require('../constants.js');
-//let LEVEL_CURVE = 1.2;
-//let XP_BASE_LEVEL = 99;
-//let QP_PER_LEVEL = 5;
-XP_BASE_LEVEL = 66;
-LEVEL_CURVE = 1.39
-
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP){
@@ -26,6 +20,7 @@ function xpCalc(activityXP, battleXP){
     getCurrentLevel : function (){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
+
       const currentLevel = Math.pow((tXP/baseXP),(1 / exponent));
       return Math.floor(currentLevel) + 1;
     },
@@ -111,6 +106,7 @@ function xpCalc(activityXP, battleXP){
     currentLevelByInput : function (xp){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
+
       // Need to add 1 because I'm starting on level one rather than zero
       const currentLevel = Math.pow((xp/baseXP),(1 / exponent)) + 1;
     

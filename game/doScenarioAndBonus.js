@@ -18,16 +18,23 @@ function _calcScenarioBonuses(avatar, foe, scenario){
 }
 
 // Determines which of the 6 scenarios are going to be the stage for battle, chosen at random
-function _determineScenario(scenario){
-  if(scenario){
-    return BATTLE_SCENARIOS[scenario];
+function _determineScenario(scenario, beginnersLuck){
+  // This isn't in the game yet... I think it's for non random scenarios
+  // if(scenario){
+  //   return BATTLE_SCENARIOS[scenario];
+  // }
+
+  if(beginnersLuck){
+    const positiveScenarios = [0,2,4,5];
+    const scenarioIndex = positiveScenarios[Math.floor(Math.random() * positiveScenarios.length)];
+    return BATTLE_SCENARIOS[scenarioIndex];
   }
   return BATTLE_SCENARIOS[Math.floor(Math.random() * BATTLE_SCENARIOS.length)];
 }
 
 // Choose scenario then apply bonuses to Avatar & Foe. Return Avatar, Foe, and Scenario
-function doScenarioAndBonus(avatar, foe, scenarioNum = null){
-  const scenario = _determineScenario(scenarioNum);
+function doScenarioAndBonus(avatar, foe, beginnersLuck, scenarioNum = null){
+  const scenario = _determineScenario(scenarioNum, beginnersLuck);
   const { sAvatar, sFoe } = _calcScenarioBonuses(avatar, foe, scenario);
 
   return { sAvatar, sFoe, scenario };

@@ -360,6 +360,8 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
 }
 
 function doBattle(avatar, foe, goesFirst){
+  
+  
   //goesFirst = 'avatar';
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
   const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';

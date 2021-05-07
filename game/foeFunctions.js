@@ -1,4 +1,4 @@
-const { FOE_MOD } = require('./constants'); 
+const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./constants'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
 const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
@@ -60,12 +60,14 @@ function selectFoeTemplate(level){
 function generateFoeStats(avatar, foe){
   // GIVES CURRENT LEVEL based on XP input
   function currentLevel(xp){
-    const exponent = 1.2;
-    const baseXP = 99;
+    const exponent = LEVEL_CURVE;
+    const baseXP = XP_BASE_LEVEL;
     const currentLevel = Math.pow((xp/baseXP),(1 / exponent));
 
     return Math.floor(currentLevel) + 1;
   }
+
+
 
   // Random modifier within -15% of base stat
   function randomizer(stat, modifierInteger = -15){
@@ -74,10 +76,17 @@ function generateFoeStats(avatar, foe){
     return { stat : Math.floor(modifiedStat), modifier : randomModifierDecimal };
   }
 
+
   const level = currentLevel(avatar.activityXP + avatar.battleXP);
-  const qp = (level * 5) - 5; 
-  const baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
-  const baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
+  const isHighLevel = level >= HIGH_LEVEL ? true : false;
+
+  let baseQP = Math.floor((level * 5) - 5); 
+  let baseFoeHealth = Math.floor(avatar.health * FOE_MOD.HEALTH);
+  let baseFoePower = Math.floor(avatar.power * FOE_MOD.POWER);
+
+  
+
+
   
   // Different foes adjust QP differently on their stats
   // determined below in switch statement
@@ -110,9 +119,14 @@ function generateFoeStats(avatar, foe){
           air : avatar.air
         };
       }else{
+        baseQP = Math.floor(((level * 5) - 5) * LEVEL_DIFFICULTY_MOD);
+        if(isHighLevel){
+          baseQP = baseQP * HIGH_LEVEL_DIFFICULTY_MOD;
+        }
+      
         randomizedHealth = randomizer(baseFoeHealth);
         randomizedPower = randomizer(baseFoePower);
-        randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP));
+        randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
 
         fws.health = randomizedHealth.stat;
         fws.power = randomizedPower.stat;
@@ -122,9 +136,14 @@ function generateFoeStats(avatar, foe){
         break;
       }
     case 'Elementals':
+      baseQP = Math.floor(((level * 5) - 5) * LEVEL_DIFFICULTY_MOD);
+      if(isHighLevel){
+        baseQP = baseQP * HIGH_LEVEL_DIFFICULTY_MOD;
+      }
+
       randomizedHealth = randomizer(baseFoeHealth);
       randomizedPower = randomizer(baseFoePower);
-      randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP));
+      randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
       
 
       fws.health = randomizedHealth.stat;
@@ -156,7 +175,7 @@ function generateFoeStats(avatar, foe){
     case 'Titans':
       randomizedHealth = randomizer(baseFoeHealth, -12);
       randomizedPower = randomizer(baseFoePower, -20);
-      randomizedQP = randomizer(Math.floor(qp * FOE_MOD.QP), -5);
+      randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP), -5);
 
       // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
       // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
