@@ -70,18 +70,18 @@ function _determineElmMatchups(elm){
 
 
 function _calcElementDamage(attacker, receiver){
-  
+  // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms = {
-    fire : Math.floor(chance.floating({ min: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    earth : Math.floor(chance.floating({ min: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    water : Math.floor(chance.floating({ min: attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    air : Math.floor(chance.floating({ min: attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    fire : Math.ceil(chance.floating({ min: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    earth : Math.ceil(chance.floating({ min: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    water : Math.ceil(chance.floating({ min: attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    air : Math.ceil(chance.floating({ min: attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
   };
   const receiverElms = {
-    fire : Math.floor(chance.floating({ min: receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    earth : Math.floor(chance.floating({ min: receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    water : Math.floor(chance.floating({ min: receiver.water * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.water * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
-    air : Math.floor(chance.floating({ min: receiver.air * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.air * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    fire : Math.ceil(chance.floating({ min: receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    earth : Math.ceil(chance.floating({ min: receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    water : Math.ceil(chance.floating({ min: receiver.water * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.water * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
+    air : Math.ceil(chance.floating({ min: receiver.air * ELM_DAMAGE_VARIANCE_RANGE[0], max: receiver.air * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
   };
   // console.log('AE = ', attackerElms);
   // console.log('RE = ', receiverElms);
