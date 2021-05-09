@@ -462,6 +462,7 @@ function doBattle(avatar, foe, goesFirst){
     aHealthRemaining : grandTotals.avHealthRemaining,
     fHealthRemaining : grandTotals.foeHealthRemaining,
     outcomeData,
+    level : avatar.level,
     roundBreakdown
   }
 

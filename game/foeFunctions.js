@@ -1,4 +1,4 @@
-const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./constants'); 
+const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./constants'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
 const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
@@ -79,13 +79,24 @@ function generateFoeStats(avatar, foe){
 
   const level = currentLevel(avatar.activityXP + avatar.battleXP);
   const isHighLevel = level >= HIGH_LEVEL ? true : false;
+  const isMidLevel = (LOW_LEVEL < level && level < HIGH_LEVEL) ? true : false;
 
   let baseQP = Math.floor((level * 5) - 5); 
   let baseFoeHealth = Math.floor(((level * 5) + 100) * FOE_MOD.HEALTH);
   let baseFoePower = Math.floor(((level * 5) + 100) * FOE_MOD.POWER);
 
-  
+  if(isMidLevel || isHighLevel){
+    baseQP =  Math.floor(baseQP * LEVEL_DIFFICULTY_MOD); 
+    baseFoeHealth = Math.floor(baseFoeHealth * LEVEL_DIFFICULTY_MOD);
+    baseFoePower = Math.floor(baseFoePower * LEVEL_DIFFICULTY_MOD);
+    if(isHighLevel){
+      baseQP = Math.floor(baseQP * HIGH_LEVEL_DIFFICULTY_MOD); 
+      baseFoeHealth = Math.floor(baseFoeHealth * HIGH_LEVEL_DIFFICULTY_MOD);
+      baseFoePower = Math.floor(baseFoePower * HIGH_LEVEL_DIFFICULTY_MOD);
+    }
+  }
 
+  //console.log('HEALTH-', baseFoeHealth,'POWER', baseFoePower );
 
   
   // Different foes adjust QP differently on their stats
@@ -119,14 +130,12 @@ function generateFoeStats(avatar, foe){
           air : avatar.air
         };
       }else{
-        baseQP = Math.floor(((level * 5) - 5) * LEVEL_DIFFICULTY_MOD);
-        if(isHighLevel){
-          baseQP = baseQP * HIGH_LEVEL_DIFFICULTY_MOD;
-        }
-      
+
         randomizedHealth = randomizer(baseFoeHealth);
         randomizedPower = randomizer(baseFoePower);
         randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
+       
+        //console.log('BASE QP - ',baseQP, Math.floor(baseQP * FOE_MOD.QP),randomizedQP.stat );
 
         fws.health = randomizedHealth.stat;
         fws.power = randomizedPower.stat;
@@ -136,10 +145,6 @@ function generateFoeStats(avatar, foe){
         break;
       }
     case 'Elementals':
-      baseQP = Math.floor(((level * 5) - 5) * LEVEL_DIFFICULTY_MOD);
-      if(isHighLevel){
-        baseQP = baseQP * HIGH_LEVEL_DIFFICULTY_MOD;
-      }
       const elementalQp = FOE_MOD.QP * 1.2;
 
       randomizedHealth = randomizer(baseFoeHealth);
