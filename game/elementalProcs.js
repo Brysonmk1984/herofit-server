@@ -46,7 +46,7 @@ function determineEarthThorns(earth, d){
     thornsFactor = .6;
   }
   const thornsDamageToAttacker = Math.floor(thornsFactor * d);
-  console.log('EARTH - ', { thornsFactor, thornsDamageToAttacker });
+  //console.log('EARTH - ', { thornsFactor, thornsDamageToAttacker });
   return { thornsFactor, thornsDamageToAttacker };
 }
 
