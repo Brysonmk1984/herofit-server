@@ -8,7 +8,7 @@ const Battle = require('../db').Battle;
 const { Op, literal, col, fn, QueryTypes } = require("sequelize");
 const { sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { REVIVE_AMOUNT, KO_RECOVERY_RETARDER, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/constants');
+const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/constants');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
@@ -39,7 +39,9 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
 
       let avatarHealth = avatar.health;
       const maxHealth = avatar.maxHealth;
-      const adjRegenRate = avatar.recovery;
+      const recovery = avatar.recovery;
+      const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
+      const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
       let avatarStatus = avatar.status;
       let avatarStatusFade = avatar.statusFade;
 
@@ -117,27 +119,16 @@ router.get('/try-recovery', authenticateAdminJWT, (req, res) =>{
     if(results.length){
       // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
       results.forEach((result, i) =>{
-        result = parseAvatarProperties(result);
-        const recoveryChance = result.recovery >= 100 ? 100 : result.recovery;
+        const avatar = parseAvatarProperties(result);
 
-        // THESE ARE THE NUMBERS THAT IF MATCHED IN THE WHILE LOOP, WILL ALLOW AVATAR TO RECOVER EARLY
-        const recoveryWinners = [];
-        for(let i = 0; i < recoveryChance; i++){
-          recoveryWinners.push(Math.floor(Math.random() * 100));
-        }
-        const winningNum = Math.floor(Math.random() * 100);
-        const found = recoveryWinners.includes(winningNum);
-        
-        // Need to restrict how effective KO recovery is
-        let winnerRetarder = false;
-        if(Math.random() < KO_RECOVERY_RETARDER){
-          winnerRetarder = true;
-        }
-
+        const recovery = avatar.recovery
+        const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
+        const recoveredEarly = chance.bool({ likelihood: recoverEarlyChance });
+        //console.log('REC - ', recovery, 'REC EARLY CHANCE - ', recoverEarlyChance, recoveredEarly);
         // Revive avatar to the REVIVE_AMOUNT in constants.js
-        if(winnerRetarder && found){
-          console.log('Found & Recovering!', result.owner);
-          return recoveredAvatars.push(result.owner);
+        if(recoveredEarly){
+          console.log('Recovering!', avatar.owner);
+          return recoveredAvatars.push(avatar.owner);
         }
         return null;
       });
