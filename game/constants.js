@@ -70,9 +70,9 @@ const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  HEALTH : .7,
-  QP : .9,
-  POWER : .75
+  HEALTH : .77,
+  QP : .95,
+  POWER : .8
 };
 
 
@@ -120,9 +120,9 @@ const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 
 // Applies to mid level +
-const LEVEL_DIFFICULTY_MOD = 1.5;
+const LEVEL_DIFFICULTY_MOD = 1.24;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.2;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.35;
 
 
 module.exports = { 

@@ -113,9 +113,9 @@ describe('Battle all generated foes against av profiles', ()=>{
 
 
   const allBattles = preBattles.map((b) =>{
-    return doBattle(b.BRA, b.BRF, b.goesFirst);
+    return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), { foeType :  b.BRF.type, foeClass : b.BRF.class });
   });
-
+console.log('AB - ', allBattles[0]);
   const totals = {
     count : 0,
     // Overall - All levels
@@ -128,6 +128,14 @@ describe('Battle all generated foes against av profiles', ()=>{
     },
     // Below level 15
     lowLevel : {
+      wins : 0,
+      losses : 0,
+      draws : 0,
+      dkos : 0,
+      total : 0
+    },
+    // level 15-24
+    lowMidLevel : {
       wins : 0,
       losses : 0,
       draws : 0,
@@ -149,6 +157,16 @@ describe('Battle all generated foes against av profiles', ()=>{
       draws : 0,
       dkos : 0,
       total : 0
+    },
+    winsVs : {
+      spirits : 0,
+      elementals : 0,
+      titans : 0
+    },
+    totalsVs : {
+      spirits : 0,
+      elementals : 0,
+      titans : 0
     }
   }
 
@@ -163,12 +181,17 @@ describe('Battle all generated foes against av profiles', ()=>{
         }else if(level >= 15 && level < 60){
           totals.midLevel.wins ++;
           totals.midLevel.total ++;
+          // Start of extra difficulty curve
+          if(level >= 15 && level < 25){
+            totals.lowMidLevel.wins ++;
+            totals.lowMidLevel.total ++;
+          }
         }else if(level >= 60){
           totals.highLevel.wins ++;
           totals.highLevel.total ++;
         }
-        totals.count ++;
         totals.overall.wins ++;
+        totals.winsVs[b.foeClass.toLowerCase()] ++;
         break;
       case 'Foe Wins':
         if(level < 15){
@@ -177,11 +200,15 @@ describe('Battle all generated foes against av profiles', ()=>{
         }else if(level >= 15 && level < 60){
           totals.midLevel.losses ++;
           totals.midLevel.total ++;
+          // Start of extra difficulty curve
+          if(level >= 15 && level < 25){
+            totals.lowMidLevel.losses ++;
+            totals.lowMidLevel.total ++;
+          }
         }else if(level >= 60){
           totals.highLevel.losses ++;
           totals.highLevel.total ++;
         }
-        totals.count ++;
         totals.overall.losses ++;
         break;
       case 'Draw':
@@ -191,11 +218,15 @@ describe('Battle all generated foes against av profiles', ()=>{
         }else if(level >= 15 && level < 60){
           totals.midLevel.draws ++;
           totals.midLevel.total ++;
+          // Start of extra difficulty curve
+          if(level >= 15 && level < 25){
+            totals.lowMidLevel.draws ++;
+            totals.lowMidLevel.total ++;
+          }
         }else if(level >= 60){
           totals.highLevel.draws ++;
           totals.highLevel.total ++;
         }
-        totals.count ++;
         totals.overall.draws ++;
         break;
       case 'Double KO':
@@ -205,17 +236,24 @@ describe('Battle all generated foes against av profiles', ()=>{
         }else if(level >= 15 && level < 60){
           totals.midLevel.dkos ++;
           totals.midLevel.total ++;
+          // Start of extra difficulty curve
+          if(level >= 15 && level < 25){
+            totals.lowMidLevel.dkos ++;
+            totals.lowMidLevel.total ++;
+          }
         }else if(level >= 60){
           totals.highLevel.dkos ++;
           totals.highLevel.total ++;
         }
-        totals.count ++;
+        totals.overall.total ++;
         totals.overall.dkos ++;
         break;
     }
+    totals.count ++;
+    totals.totalsVs[b.foeClass.toLowerCase()] ++;
   });
 
-  console.log('Battle Totals - ', totals);
+  //console.log('Battle Totals - ', totals);
 
   const lowLevelPreBattles = preBattles.filter(battle => battle.BRA.level < 15);
   const lowLevelBattles = allBattles.slice(0,lowLevelPreBattles.length);
@@ -244,6 +282,13 @@ describe('Battle all generated foes against av profiles', ()=>{
   const midLevelDkoRates = totals.midLevel.dkos / totals.midLevel.total;
   const highLevelDkoRates = totals.highLevel.dkos / totals.highLevel.total;
   const overallLevelDkoRates = totals.overall.dkos / totals.count;
+
+  // WIN RATES VS FOE CLASS
+  const winRateVsSpirits = totals.winsVs.spirits / totals.totalsVs.spirits;
+  const winRateVsElementals = totals.winsVs.elementals / totals.totalsVs.elementals;
+  const winRateVsTitans = totals.winsVs.titans / totals.totalsVs.titans;
+
+  //console.log('TITANS - battles, winrate',totals.totalsVs.titans, winRateVsTitans);
 
 
   it('Win % for each avatar level group should be above the threshold', () =>{
@@ -280,6 +325,15 @@ describe('Battle all generated foes against av profiles', ()=>{
     expect(midLevelDkoRates).toBeLessThan(.15);
     expect(highLevelDkoRates).toBeLessThan(.15);
     expect(overallLevelDkoRates).toBeLessThan(.15);
+  });
+
+  it('Win % by class should be within threshold', () =>{
+    expect(winRateVsSpirits).toBeGreaterThanOrEqual(.65);
+    expect(winRateVsElementals).toBeGreaterThanOrEqual(.65);
+    if(totals.totalsVs.titans > 1){
+      expect(winRateVsTitans).toBeGreaterThanOrEqual(.33);
+      expect(winRateVsTitans).toBeLessThan(.66);
+    }
   });
 
 });
