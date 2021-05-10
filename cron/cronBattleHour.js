@@ -167,6 +167,7 @@ function runBattlesOnBatch(shard, shardIndex){
         case "Double KO":
           xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
           avatar.battleDkos = avatar.battleDkos + 1;
+          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
           // for email tally
           tally.doubleKO += 1;
           break;
