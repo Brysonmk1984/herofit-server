@@ -343,7 +343,7 @@ router.post('/fetch-battles-won', body('avatarID').isNumeric(), authenticateJWT,
   Battle.findAll({ 
       where : { 
         avatarID: req.body.avatarID, 
-        [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }] 
+        [Op.or]: [{ outcome: 'Avatar Wins' }] 
       }, 
       raw : true, 
       attributes: ['outcome', 'foe'] 

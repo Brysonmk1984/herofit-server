@@ -112,7 +112,7 @@ function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName
     attributes : ["foe"],
     where : {  
       avatarID : avatarId, 
-      [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }],
+      [Op.or]: [{ outcome: 'Avatar Wins' }],
       "foe.type" : { [Op.eq] : foeType  }
     },
     raw : true 
@@ -161,7 +161,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
     attributes : ["foe"],
     where : {  
       avatarID : avatarId, 
-      [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }],
+      [Op.or]: [{ outcome: 'Avatar Wins' }],
       "foe.type" : { [Op.eq] : foeType  }
     },
     raw : true 
