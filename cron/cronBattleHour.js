@@ -70,6 +70,7 @@ function runBattlesOnBatch(shard, shardIndex){
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
 
+      // IF equipped when went to battle, can apply item effects here.
       const itemsUsed = null;
       const actionsChosen = null;
 

@@ -26,6 +26,11 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
 
   const avatar = req.body.avatar;
   //console.log('GTB Avatar - ', avatar);
+  // HERE IS WHERE WE CAN APPLY BENEFITS FROM ITEMS FOR BATTLE
+  // 'avatar' already has items, and any modification I do to avatar stats wont save to the post battle avatar!
+
+
+
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
@@ -135,6 +140,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
 
 // USER Logs in after a battle, or clicks button to retrieve report
 router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
+
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battle-report");
@@ -149,31 +155,25 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
     order: [ [ 'createdAt', 'DESC' ]],
     raw : true
   }).then((result) =>{
-    if(result.length){
-      //console.log('RESBATTLE - ', result[0]);
 
+    if(result.length && !result[0].seenReport){
+      
       adjResult = result[0];
       adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
       adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
+      
+      // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
+      const { determineAstrologySeason } = avCalc();  
+      adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt);
 
-      // IF the avatar won, Get the items aquired from the action types in the battle report
+      // IF the avatar won, Get the items acquired from the action types in the battle report
       if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
         Items.findAll({
           attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
         }).then((items) =>{
           adjResult.itemsAquired = items;
-    
-          if(!result[0].seenReport){
-            // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
-            const { determineAstrologySeason } = avCalc();
-            adjResult.seasonalBonusElement =  determineAstrologySeason(adjResult.updatedAt);
-            
-            res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
-          }else{
-            res.formatter.ok({ result : null }, 'Latest Report already viewed');
-          }
-
+          res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
         }).catch((error) =>{
           console.log('ERR', error);
           res.formatter.serverError(error.toString(), 'No Battle Results for /fetch-battle-report Endpoint');

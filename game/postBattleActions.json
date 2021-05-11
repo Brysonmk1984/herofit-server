@@ -78,6 +78,62 @@
       "type" : "Award Pet",
       "itemCategory": "pets",
       "outcome" : "win"
+    },
+    {
+      "itemID" : 33,
+      "action" : "Grant Rock Skipper",
+      "name" : "Rock Skipper",
+      "type" : "Award Pet",
+      "itemCategory": "pets",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 34,
+      "action" : "Grant Flame Fiend",
+      "name" : "Flame Fiend",
+      "type" : "Award Pet",
+      "itemCategory": "pets",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 35,
+      "action" : "Grant Splash Artists",
+      "name" : "Splash Artists",
+      "type" : "Award Pet",
+      "itemCategory": "pets",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 37,
+      "action" : "Grant Fire Hunter",
+      "name" : "Fire Hunter",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 38,
+      "action" : "Grant Earth Trapper",
+      "name" : "Earth Trapper",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 39,
+      "action" : "Grant Water Predator",
+      "name" : "Water Predator",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : "win"
+    },
+    {
+      "itemID" : 40,
+      "action" : "Grant Air Stalker",
+      "name" : "Air Stalker",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : "win"
     }
   ],
 

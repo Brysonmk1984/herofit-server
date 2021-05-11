@@ -18,10 +18,10 @@
     "color" : null,
     "bonusXpBase": 25,
     "bonusPtBase": 50,
-    "pba" : [],
+    "pba" : ["Grant Air Stalker"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "title",
+      "name" : "Air Stalker"
     }
   },
   {
@@ -60,7 +60,7 @@
       "type" : "pre-battle"
     },
     "color" : null,
-    "pba" : ["Grant Earth Servant"],
+    "pba" : ["Grant Rock Skipper"],
     "reward" : {
       "type" : "pet",
       "name" : "Rock Skipper"
@@ -85,10 +85,10 @@
     "color" : null,
     "bonusXpBase": 25,
     "bonusPtBase": 50,
-    "pba" : [],
+    "pba" : ["Grant Earth Trapper"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "title",
+      "name" : "Earth Trapper"
     }
   },
   {
@@ -153,10 +153,10 @@
     "color" : null,
     "bonusXpBase": 25,
     "bonusPtBase": 50,
-    "pba" : [],
+    "pba" : ["Grant Fire Hunter"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "title",
+      "name" : "Fire Hunter"
     }
   },
   {
@@ -194,10 +194,10 @@
       "type" : "pre-battle"
     },
     "color" : null,
-    "pba" : ["Grant Water Lackey"],
+    "pba" : ["Grant Splash Artist"],
     "reward" : {
       "type" : "pet",
-      "name" : "Water Lackey"
+      "name" : "Splash Artist"
     }
   },
   {
@@ -219,10 +219,10 @@
     "color" : null,
     "bonusXpBase": 25,
     "bonusPtBase": 50,
-    "pba" : [],
+    "pba" : ["Grant Water Predator"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "title",
+      "name" : "Water Predator"
     }
   },
   {

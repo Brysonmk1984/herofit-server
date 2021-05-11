@@ -54,7 +54,7 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
       }
     });
     inventoryObj.consumables = stackItems(inventoryObj.consumables);
-    console.log(inventoryObj);
+
     res.formatter.ok(inventoryObj, 'Successfully ran /fetch-avatar-inventory');
   }).catch((error) =>{
     console.log('ERR', error);
@@ -74,7 +74,7 @@ router.post('/equip-item', body('avatarId'), body('equipId').isNumeric(), authen
 
   AvatarItems.update({ equipped : true }, { where : { avatarID : avatarId, itemID : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    console.log('UI - ',updatedItem);
+    //console.log('UI - ',updatedItem);
     res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
   }).catch((error) =>{
     console.log('EQUIP ERROR - ', error);
@@ -115,7 +115,7 @@ router.post('/unequip-item', body('avatarId'), body('unequipId').isNumeric(), au
 
   AvatarItems.update({ equipped : false }, { where : { avatarID : avatarId, itemID : unequipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    console.log('UI - ',updatedItem);
+    //console.log('UI - ',updatedItem);
     res.formatter.ok({ unequippedItem : updatedItem[1][0] }, 'Successfully ran /unequip-item');
   }).catch((error) =>{
     console.log('UNEQUIP ERROR - ', error);
