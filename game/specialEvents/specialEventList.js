@@ -29,18 +29,18 @@ const attackOfTheElements = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds :33,
-    foe : 'Gusty Rascal',
+    foe : 'Rock Skipper',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 1.0,
-    requirements : [{ foeType : 'Gusty Rascal' }]
+    requirements : [{ foeType : 'Rock Skipper' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : .5,
-    requirements : [{ foeType : 'Gusty Rascal' }]
+    requirements : [{ foeType : 'Rock Skipper' }]
   }],
 }
 

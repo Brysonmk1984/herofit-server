@@ -123,7 +123,7 @@ const HIGH_LEVEL = 60;
 // Applies to mid level +
 const LEVEL_DIFFICULTY_MOD = 1.24;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.35;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.28;
 
 
 module.exports = { 

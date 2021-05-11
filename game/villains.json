@@ -255,6 +255,28 @@
         "type" : "pet",
         "name" : "Gusty Rascal"
       }
+    },{
+      "class" : "Elementals",
+      "type" : "Rock Skipper",
+      "foe" : [
+        "Avani",
+        "Demeter",
+        "Ki",
+        "Sten",
+        "Thea",
+        "Tor"
+      ],
+      "ability": {
+        "name" : "Earth Attuned",
+        "effect" : "Minor Earth Threat",
+        "type" : "pre-battle"
+      },
+      "color" : null,
+      "pba" : ["Grant Rock Skipper"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Rock Skipper"
+      }
     }
   ]
 }

@@ -115,7 +115,9 @@ describe('Battle all generated foes against av profiles', ()=>{
   const allBattles = preBattles.map((b) =>{
     return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), { foeType :  b.BRF.type, foeClass : b.BRF.class });
   });
-console.log('AB - ', allBattles[0]);
+
+  //console.log('FIRST BATTLE - ', allBattles[0]);
+
   const totals = {
     count : 0,
     // Overall - All levels
@@ -253,7 +255,7 @@ console.log('AB - ', allBattles[0]);
     totals.totalsVs[b.foeClass.toLowerCase()] ++;
   });
 
-  //console.log('Battle Totals - ', totals);
+  console.log('Battle Totals - ', totals);
 
   const lowLevelPreBattles = preBattles.filter(battle => battle.BRA.level < 15);
   const lowLevelBattles = allBattles.slice(0,lowLevelPreBattles.length);
@@ -330,7 +332,7 @@ console.log('AB - ', allBattles[0]);
   it('Win % by class should be within threshold', () =>{
     expect(winRateVsSpirits).toBeGreaterThanOrEqual(.65);
     expect(winRateVsElementals).toBeGreaterThanOrEqual(.65);
-    if(totals.totalsVs.titans > 1){
+    if(totals.totalsVs.titans > 2){
       expect(winRateVsTitans).toBeGreaterThanOrEqual(.33);
       expect(winRateVsTitans).toBeLessThan(.66);
     }
