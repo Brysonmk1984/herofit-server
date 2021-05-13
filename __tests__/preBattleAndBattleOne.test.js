@@ -65,7 +65,7 @@ describe('Load profiles and generate foes from random Profile', ()=>{
 
 
   it('Should Create a foe from the random avatar', ()=>{
-    // MATCH PARTIAL, GOD WTF WHY WAS THIS SUCH A PAIN IN THE ASS
+    // MATCH PARTIAL
       expect(foeTemplate).toMatchObject(
         expect.objectContaining(
           {

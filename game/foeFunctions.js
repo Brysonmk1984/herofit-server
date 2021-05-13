@@ -140,8 +140,11 @@ function generateFoeStats(avatar, foe){
         fws.health = randomizedHealth.stat;
         fws.power = randomizedPower.stat;
 
-
-        qpAdjustedStats = ["health","power","armor"];
+        if(foe.type === 'Phantasm'){
+          qpAdjustedStats = ["health","health","armor"];
+        }else{
+          qpAdjustedStats = ["health","power","armor"];
+        }
         break;
       }
     case 'Elementals':

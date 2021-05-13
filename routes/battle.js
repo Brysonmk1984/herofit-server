@@ -335,7 +335,7 @@ router.get('/villain-list', (req, res) =>{
 });
 
 // Fetch battles won by a particular hero for Campaign page
-router.post('/fetch-battles-won', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
+router.post('/fetch-battles-won-or-dko', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battles-won");
@@ -343,7 +343,7 @@ router.post('/fetch-battles-won', body('avatarID').isNumeric(), authenticateJWT,
   Battle.findAll({ 
       where : { 
         avatarID: req.body.avatarID, 
-        [Op.or]: [{ outcome: 'Avatar Wins' }] 
+        [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }] 
       }, 
       raw : true, 
       attributes: ['outcome', 'foe'] 

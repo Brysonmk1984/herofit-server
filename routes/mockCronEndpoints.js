@@ -380,7 +380,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             //console.log('1pbas- ',postBattleActions);
             avatar.photonTokens += ptGain;
             //console.log('Avatar id should be 253', avatar.id);
-            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
+            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
             // for email tally
             tally.avatarWins += 1;
             break;
@@ -399,6 +399,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           case "Double KO":
             xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
             avatar.battleDkos = avatar.battleDkos + 1;
+            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
             // for email tally
             tally.doubleKO += 1;
             break;

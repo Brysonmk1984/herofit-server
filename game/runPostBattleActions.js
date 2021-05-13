@@ -91,7 +91,7 @@ function determinePtBounty(heroLevel,bonusPt = 0, foeType){
 }
 
 // DO POST BATTLE ACTIONS
-function doAllPbas(avatarID, postBattleActions){
+function doAllPbas(avatarID, postBattleActions, battleOutcome){
   console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID);
 
   const itemsToInsert = [];
@@ -103,8 +103,10 @@ function doAllPbas(avatarID, postBattleActions){
     for(let actionType in ALLPBAs){
       // Find the PBA that matches the pba.action property
       let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
+      // Usually a win is required, but might be DKO 
+      const matchesOutcomeCondition = matching.outcome.includes(battleOutcome);
       // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
-      if(matching){
+      if(matching && matchesOutcomeCondition){
         matchingPBA = matching;
         break;
       }

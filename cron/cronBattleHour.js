@@ -149,7 +149,7 @@ function runBattlesOnBatch(shard, shardIndex){
           //console.log('PT-bounty', ptGain);
           //console.log('pbas after win before insertion - cron - ',postBattleActions);
           avatar.photonTokens += ptGain;
-          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions));
+          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
           // for email tally
           tally.avatarWins += 1;
           break;
@@ -168,6 +168,7 @@ function runBattlesOnBatch(shard, shardIndex){
         case "Double KO":
           xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
           avatar.battleDkos = avatar.battleDkos + 1;
+          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
           // for email tally
           tally.doubleKO += 1;
           break;

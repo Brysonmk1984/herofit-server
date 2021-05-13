@@ -16,24 +16,42 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, ability){
       avatar.power = Math.floor(avatar.power - (avatar.power * .2));
       break;
     case "Unseen Swap":
-      const foePower = foe.power;
-      const avatarPower = avatar.power;
-      if(foePower > avatarPower){
-        break;
+      // Stat Scramble
+      const scrambledStats = {
+        power : 0,
+        health : 0,
+        armor : 0,
+        earth : 0,
+        water : 0,
+        air : 0,
+        fire : 0
+      };
+
+      const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
+      
+      for(let stat in scrambledStats){
+        const randomStat = stats[ Math.floor(Math.random() * stats.length) ];
+        const statPosition = stats.findIndex((s) => s === randomStat);
+        const statVal = stats.splice(statPosition,1);
+        scrambledStats[stat] = Math.floor(avatar[statVal[0]]);
       }
-      // Power Trade
-      foe.power = avatarPower;
-      avatar.power = foePower;
+      
+      // possibly swap power for health
+      // const swapHealthWithPower = Math.floor(Math.random() * 1);
+      // if(swapHealthWithPower){
+      //   const aHealth = avatar.health;
+      //   const aPower = avatar.power;
+      //   scrambledStats.power = aHealth;
+      //   scrambledStats.health = aPower;
+      // }
+      avatar = Object.assign({}, avatar, scrambledStats);
       break;
-    case "Armor Barter":
+    case "Unholy Armor":
       const foeArmor = foe.armor;
-      const avatarArmor = avatar.armor;
-      if(foeArmor > avatarArmor){
-        break;
-      }
-      // Armor Trade
-      foe.armor = avatarArmor;
-      avatar.armor = foeArmor;
+      // Unholy Armor
+      // Bonus to Armor
+      // Also has higher health from stats
+      foe.armor = Math.floor(foeArmor + (foeArmor * .33));
       break;
     case "Can't Hide from Me":
       // Armor Break

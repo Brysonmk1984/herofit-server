@@ -10,7 +10,7 @@ const pem = jwkToPem(key);
 const authenticateJWT = (req, res, next) => {
 
   if(!req.headers.authorization){
-    const error = new Error("Authentication error, please try again.");
+    const error = new Error("Authentication error, try refreshing the page.");
     return res.formatter.forbidden(error.toString(), `Token didn't get passed to authenticate function - ${req.method} ${req.url}`);
   }
    const authHeader = req.headers.authorization;

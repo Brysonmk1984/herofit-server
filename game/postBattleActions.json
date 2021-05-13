@@ -6,70 +6,70 @@
       "name" : "Shadow Self",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 2,
       "action" : "Grant Shade",
       "name" : "Shade Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 3,
       "action" : "Grant Apparition",
       "name" : "Apparition Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 4,
       "action" : "Grant Phantasm",
       "name" : "Phantasm Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 5,
       "action" : "Grant Phantom",
       "name" : "Phantom Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 6,
       "action" : "Grant Wraith",
       "name" : "Wraith Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 7,
       "action" : "Grant Poltergeist",
       "name" : "Poltergeist Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 8,
       "action" : "Grant Specter",
       "name" : "Specter Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 9,
       "action" : "Grant Banshee",
       "name" : "Banshee Tint",
       "type" : "Award Skin",
       "itemCategory": "skins",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },{
       "itemID" : 12,
       "action" : "Grant Plaguebringer",
       "name" : "Plagueling",
       "type" : "Award Pet",
       "itemCategory": "pets",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 32,
@@ -77,7 +77,7 @@
       "name" : "Gusty Rascal",
       "type" : "Award Pet",
       "itemCategory": "pets",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 33,
@@ -85,7 +85,7 @@
       "name" : "Rock Skipper",
       "type" : "Award Pet",
       "itemCategory": "pets",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 34,
@@ -93,7 +93,7 @@
       "name" : "Flame Fiend",
       "type" : "Award Pet",
       "itemCategory": "pets",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 35,
@@ -101,7 +101,7 @@
       "name" : "Splash Artists",
       "type" : "Award Pet",
       "itemCategory": "pets",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 37,
@@ -109,7 +109,7 @@
       "name" : "Fire Hunter",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 38,
@@ -117,7 +117,7 @@
       "name" : "Earth Trapper",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 39,
@@ -125,7 +125,7 @@
       "name" : "Water Predator",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "itemID" : 40,
@@ -133,7 +133,7 @@
       "name" : "Air Stalker",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins", "Double KO"]
     }
   ],
 
@@ -145,7 +145,7 @@
       "name" : "The Renowned",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },
     {
       "itemID" : 15,
@@ -154,7 +154,7 @@
       "name" : "The Acclaimed",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },
     {
       "itemID" : 16,
@@ -163,7 +163,7 @@
       "name" : "The Untouchable",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },
     {
       "itemID" : 17,
@@ -172,7 +172,7 @@
       "name" : "The Dominator",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },
     {
       "itemID" : 18,
@@ -181,7 +181,7 @@
       "name" : "The Legendary",
       "type" : "Award Title",
       "itemCategory": "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     }
   ],
 
@@ -193,7 +193,7 @@
       "name" : "White Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 20,
       "requirement" : 10,
@@ -201,7 +201,7 @@
       "name" : "Yellow Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 21,
       "requirement" : 25,
@@ -209,7 +209,7 @@
       "name" : "Orange Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 22,
       "requirement" : 50,
@@ -217,7 +217,7 @@
       "name" : "Blue Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 23,
       "requirement" : 75,
@@ -225,7 +225,7 @@
       "name" : "Purple Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 24,
       "requirement" : 100,
@@ -233,7 +233,7 @@
       "name" : "Green Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 25,
       "requirement" : 150,
@@ -241,7 +241,7 @@
       "name" : "Red Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 26,
       "requirement" : 250,
@@ -249,7 +249,7 @@
       "name" : "Brown Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 27,
       "requirement" : 500,
@@ -257,7 +257,7 @@
       "name" : "Black Belt",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     },{
       "itemID" : 28,
       "requirement" : 1000,
@@ -265,7 +265,7 @@
       "name" : "Black Belt Sensei",
       "type" : "Award Title",
       "itemCategory" : "titles",
-      "outcome" : "win"
+      "outcome" : ["Avatar Wins"]
     }
   ],
   "HELPER" : [
