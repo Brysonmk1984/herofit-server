@@ -318,7 +318,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
         //console.log('EFFECTS-', allEffects[i]);
         // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
-        if(allEffects[i].length){
+        if(allEffects[i] && allEffects[i].length){
           if(scenario.id !== AVATAR_NON_ACTION){
             // Buff or debuff hero and foe based on item effects
             const avBP = doAvatarBattlePrep(BRA, BRF, allEffects[i]);
