@@ -1,4 +1,4 @@
-const { BASE_POWER, BASE_HEALTH, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS');
+const { BASE_POWER, BASE_HEALTH, MINUTES_PER_POWER, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS.js');
 const moment = require('moment');
 const { cloneObj, adjustActivityMinutes } = require('../../helperFunctions');
 const avatarList = require('../../heroList.json');
