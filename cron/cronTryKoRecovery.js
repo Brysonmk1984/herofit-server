@@ -1,7 +1,7 @@
 const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
 const { parseAvatarProperties } = require('../helperFunctions');
-const { REVIVE_AMOUNT, RECOVER_EARLY_MOD } = require('../game/constants');
+const { REVIVE_AMOUNT, RECOVER_EARLY_MOD } = require('../game/CONSTANTS');
 const { sendCronErrorEmail } = require('../mail');
 const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');

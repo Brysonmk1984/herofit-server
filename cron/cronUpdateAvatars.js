@@ -1,6 +1,6 @@
 const Avatar = require('../db').Avatar;
 const { Op } = require("sequelize");
-const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/constants');
+const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/CONSTANTS');
 //const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../helperFunctions');
