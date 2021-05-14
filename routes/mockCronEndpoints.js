@@ -267,6 +267,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
     //console.log('ShardIndex - ', shardIndex);
     allBattleIds = [];
     allAvatarIds = [];
+    allEffects = [];
     allFoes = [];
     // array of arrays
     allPbaArrays = [];
@@ -277,6 +278,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
       //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
       allBattleIds.push(battle.id);
       allAvatarIds.push(battle.avatarID);
+      allEffects.push(battle.effects);
       allFoes.push(battle.foe);
       allPbaArrays.push(battle.postBattleActions);
       //console.log('BATTLE - ',battle);
@@ -297,9 +299,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
         avatar = parseAvatarProperties(avatar);
-
-        const itemsUsed = req.body.itemsUsed || null;
-        const actionsChosen = req.body.actionsChosen || null;
+        const foeWithStats  = allFoes[i];
 
         // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
         let beginnersLuck = false;
@@ -308,7 +308,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
         }
 
-        const foeWithStats = allFoes[i];
+        
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
         const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
         
@@ -316,18 +316,17 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         let BRA = Object.assign({}, sAvatar);
         let BRF = Object.assign({}, sFoe);
 
-        // Element by Seasonal Element Bonus
-        BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
-        BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
-
-        // BATTLE STEP 3 - NOT IMPLEMENTED YET - PLAYER USES ITEMS AND CHOOSED ACTIONS
-        if(itemsUsed || actionsChosen){
+        //console.log('EFFECTS-', allEffects[i]);
+        // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
+        if(allEffects[i].length){
           if(scenario.id !== AVATAR_NON_ACTION){
-            const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+            // Buff or debuff hero and foe based on item effects
+            const avBP = doAvatarBattlePrep(BRA, BRF, allEffects[i]);
             BRA = avBP.avatar;
             BRF = avBP.foe;
           }
         }
+
 
         // BATTLE STEP 4 - FOE USES PRE-BATTLE ABILITY
         if(foeWithStats.ability && foeWithStats.ability.type === 'pre-battle'){
@@ -337,6 +336,11 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             BRA = foeBP.avatar;
           }
         }
+
+        // Element by Seasonal Element Bonus
+        BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
+        BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
+
         //TEMP CHEAT
         //BRA.power += 1000;
         //BRA.health = 10;
@@ -380,7 +384,9 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             //console.log('1pbas- ',postBattleActions);
             avatar.photonTokens += ptGain;
             //console.log('Avatar id should be 253', avatar.id);
-            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+            if(postBattleActions){
+              allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+            }
             // for email tally
             tally.avatarWins += 1;
             break;
@@ -399,7 +405,9 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           case "Double KO":
             xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
             avatar.battleDkos = avatar.battleDkos + 1;
-            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+            if(postBattleActions){
+              allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+            }
             // for email tally
             tally.doubleKO += 1;
             break;
@@ -442,6 +450,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         avatar.qp += qpEarned;
 
         // If Any Post-Battle abilities exist, use them
+        // Now if i want, new items can do things in this function!
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
         avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
 

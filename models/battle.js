@@ -115,6 +115,10 @@ const BattleModel = function(db, DataTypes){
       type: DataTypes.INTEGER,
       allowNull: true
     },
+    effects: {
+      type : DataTypes.JSONB,
+      allowNull: true
+    }
   });
 
   return Battle;

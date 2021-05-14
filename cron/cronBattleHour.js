@@ -40,6 +40,7 @@ let tally= {
 function runBattlesOnBatch(shard, shardIndex){
   allBattleIds = [];
   allAvatarIds = [];
+  allEffects = [];
   allFoes = [];
   // array of arrays
   allPbaArrays = [];
@@ -49,6 +50,7 @@ function runBattlesOnBatch(shard, shardIndex){
     //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
     allBattleIds.push(battle.id);
     allAvatarIds.push(battle.avatarID);
+    allEffects.push(battle.effects);
     allFoes.push(battle.foe);
     allPbaArrays.push(battle.postBattleActions);
     //console.log('BATTLE - ',battle);
@@ -69,7 +71,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
-
+      const foeWithStats  = allFoes[i];
       // IF equipped when went to battle, can apply item effects here.
       const itemsUsed = null;
       const actionsChosen = null;
@@ -82,8 +84,6 @@ function runBattlesOnBatch(shard, shardIndex){
         beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
       }
 
-
-      const foeWithStats = allFoes[i];
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
       const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
       //console.log('sFOE - ', sFoe);
@@ -91,16 +91,11 @@ function runBattlesOnBatch(shard, shardIndex){
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
 
-      // Element by Seasonal Element Bonus
-      BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
-      BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
-
-
-      //console.log('BRABRF - ',BRA, BRF);
-      // BATTLE STEP 3 - NOT IMPLEMENTED YET - PLAYER USES ITEMS AND CHOOSED ACTIONS
-      if(itemsUsed || actionsChosen){
+      // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
+      if(allEffects[i].length){
         if(scenario.id !== AVATAR_NON_ACTION){
-          const avBP = doAvatarBattlePrep(BRA, BRF, itemsUsed, actionsChosen);
+          // Buff or debuff hero and foe based on item effects
+          const avBP = doAvatarBattlePrep(BRA, BRF, allEffects[i]);
           BRA = avBP.avatar;
           BRF = avBP.foe;
         }
@@ -114,6 +109,10 @@ function runBattlesOnBatch(shard, shardIndex){
           BRA = foeBP.avatar;
         }
       }
+
+      // Element by Seasonal Element Bonus
+      BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
+      BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
 
       // WHO SWINGS FIRST
       let goesFirst;
@@ -149,7 +148,10 @@ function runBattlesOnBatch(shard, shardIndex){
           //console.log('PT-bounty', ptGain);
           //console.log('pbas after win before insertion - cron - ',postBattleActions);
           avatar.photonTokens += ptGain;
-          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+          if(postBattleActions){
+            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+          }
+
           // for email tally
           tally.avatarWins += 1;
           break;
@@ -168,7 +170,9 @@ function runBattlesOnBatch(shard, shardIndex){
         case "Double KO":
           xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
           avatar.battleDkos = avatar.battleDkos + 1;
-          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+          if(postBattleActions){
+            allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
+          }
           // for email tally
           tally.doubleKO += 1;
           break;

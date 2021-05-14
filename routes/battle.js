@@ -13,7 +13,7 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
-const { determinePostBattleActions } = require('../game/onGoToBattle');
+const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
 const { OUTCOME_XP } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
 
@@ -68,19 +68,34 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
   }).then((pbas) =>{
     // Need parent context;
-    postBattleActions = pbas;
+    postBattleActions = pbas.length ? pbas : null;
 
-    return Battle.create({
-      owner: req.body.email,
-      avatarID: avatar.id,
-      avatarName: avatar.name,
-      foe : foeWithStats,
-      outcome: "TBD",
-      seenReport : false,
-      postBattleActions
-    }, 
-    {raw : true}
-    );
+    const battleObj = {
+        owner: req.body.email,
+        avatarID: avatar.id,
+        avatarName: avatar.name,
+        foe : foeWithStats,
+        outcome: "TBD",
+        seenReport : false,
+    };
+
+    // If there's postBattleActions, add them to initial battle record
+    if(postBattleActions){
+      battleObj.postBattleActions = postBattleActions;
+    }
+
+    // Determine item effects that will impact the battle
+    const itemBattleEffects = determineItemEffects(avatar.equipped);
+
+    //console.log('IBE - ', itemBattleEffects);
+    // If there are item effects that will impact battle, add them to initial battle record
+    if(itemBattleEffects.length){
+      battleObj.effects = itemBattleEffects;
+    }
+
+
+    
+    return Battle.create(battleObj, {raw : true});
   }).then(() =>{
     return Avatar.update({ 
       goToBattle : true,
@@ -93,22 +108,26 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
       }
 
       // Get the items aquired from the action types in the battle report
-      const rewards = postBattleActions.map(action => {
-        let matchingPBA;
-        for(let actionType in ALLPBAs){
-          const match = ALLPBAs[actionType].find(pba => {
-            return pba.action === action;
-          });
-          if(match){
-            matchingPBA = match;
-            break;
-          }
-        } 
-        
-        return matchingPBA.itemID;
-      });
+      let rewards = null;
+      if(postBattleActions){
+        rewards = postBattleActions.map(action => {
+          let matchingPBA;
+          for(let actionType in ALLPBAs){
+            const match = ALLPBAs[actionType].find(pba => {
+              return pba.action === action;
+            });
+            if(match){
+              matchingPBA = match;
+              break;
+            }
+          } 
+          
+          return matchingPBA.itemID;
+        });
+      }
 
-      if(rewards.length){
+
+      if(rewards){
         Items.findAll({
           attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
           where : { id : { [Op.in] : rewards }}

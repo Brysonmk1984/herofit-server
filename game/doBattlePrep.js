@@ -1,6 +1,20 @@
 
-function doAvatarBattlePrep(avatar, foe, itemsUsed, ability){
-
+function doAvatarBattlePrep(avatar, foe, effects){
+  effects.forEach((effect) =>{
+    switch(effect){
+      case "Battle: Hero +10 Health":
+        avatar.health += 10;
+        break;
+      case "Battle: Hero +5 Water":
+        avatar.water += 5;
+        break;
+      case "Battle: Foe -10 Health":
+        foe.health -= 10;
+        break;
+      default:
+        break;
+    }
+  });
   return { avatar, foe };
 }
 

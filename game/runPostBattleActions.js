@@ -6,24 +6,24 @@ const { handleBoostXP, handleBoostPT } = require('./specialEvents/boosterActionH
 
 // XP GAIN FOR DEFEATING FOES
 function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 1, bonusXp = 0, foeType){
-  console.log('parameters-',baseOutcomeXp,difficultyFactor, heroLevel, bonusXp );
+  //console.log('parameters-',baseOutcomeXp,difficultyFactor, heroLevel, bonusXp );
 
   // BASE OUTCOME XP + HERO LEVEL EXPONENT ADDITION
   const exponent = (1/BXP_LEVEL_CURVE);
   const xpGainBasedOnLevel = baseOutcomeXp + Math.pow(heroLevel, exponent);
-  console.log('hl-',heroLevel,'EX-',exponent,xpGainBasedOnLevel);
+  //console.log('hl-',heroLevel,'EX-',exponent,xpGainBasedOnLevel);
   // DIFFICULTY FACTOR SUBTRACTION (or addition in the future)
   const difficultyModMultiplier = xpGainBasedOnLevel * (difficultyFactor * FOE_DIFFICULTY_XP_MOD_FACTOR);
   
   // ADD the previous two values
   const afterModXpGain = Math.ceil(xpGainBasedOnLevel + difficultyModMultiplier);
-  console.log('xpbylevel', xpGainBasedOnLevel, 'difficultyModMultiplier', difficultyModMultiplier, 'aftermod', afterModXpGain);
+  //console.log('xpbylevel', xpGainBasedOnLevel, 'difficultyModMultiplier', difficultyModMultiplier, 'aftermod', afterModXpGain);
 
   // ADD in any villain bonus, adjusted by hero level
   if(bonusXp){
     bonusXp =  bonusXp + Math.pow(heroLevel, BONUS_XP_EXPONENT);
   }
-  console.log('XPBonus - ',bonusXp);
+  //console.log('XPBonus - ',bonusXp);
   // Add bonus xp from previous step with xp from battle
   let finalXpGain = Math.floor(afterModXpGain + bonusXp);
 
@@ -40,9 +40,7 @@ function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 
 
     // If the event contains foeLikelihood actions
     if(xpBoosterAts.length && isAMatchingFoe){
-      console.log('XPGAIN before event -', finalXpGain);
       finalXpGain = handleBoostXP(xpBoosterAts, finalXpGain);
-      console.log('XPGAIN after event -', finalXpGain);
     }
   }
 
@@ -92,7 +90,7 @@ function determinePtBounty(heroLevel,bonusPt = 0, foeType){
 
 // DO POST BATTLE ACTIONS
 function doAllPbas(avatarID, postBattleActions, battleOutcome){
-  console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID);
+  console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID, 'BO - ', battleOutcome);
 
   const itemsToInsert = [];
   
@@ -100,15 +98,23 @@ function doAllPbas(avatarID, postBattleActions, battleOutcome){
   postBattleActions.forEach(( ACTION )=>{
     let matchingPBA;
     // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
+    // ACTION TYPES = WINTOTAL, WINSTREAK, DEFEATEDFOE
     for(let actionType in ALLPBAs){
       // Find the PBA that matches the pba.action property
-      let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
-      // Usually a win is required, but might be DKO 
-      const matchesOutcomeCondition = matching.outcome.includes(battleOutcome);
+      let matching = ALLPBAs[actionType].find(pba => {
+ 
+        return pba.action === ACTION
+      });
+
+
       // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
-      if(matching && matchesOutcomeCondition){
-        matchingPBA = matching;
-        break;
+      if(matching){
+        // Usually a win is required, but might be DKO 
+        const matchesOutcomeCondition = matching.outcome.includes(battleOutcome);
+        if(matchesOutcomeCondition){
+          matchingPBA = matching;
+          break;
+        }
       }
     }
 

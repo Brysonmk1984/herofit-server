@@ -5,6 +5,31 @@ const Items = require('../db').Items;
 const { Op } = require("sequelize");
 const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require('../game/postBattleActions.json');
 const VILLAINS = require('../game/villains.json');
+const { ALL_BATTLE_EFFECTS } = require('../game/CONSTANTS');
+
+// ON GOTOBATTLE, save list of effects from avatar's items
+function determineItemEffects(equipment){
+  return equipment.reduce((filtered, item) => {
+    // Item primary effect, push it to array if it exists
+    if(item.effect1 || item.effect2){
+      // Determine if item effects are battle effects
+      const battleItemEffects = _determineIfBattleEffects([item.effect1, item.effect2]);
+      
+      //console.log('', battleItemEffects);
+      filtered.push(...battleItemEffects);
+    }
+    return filtered;
+  }, []);
+}
+
+// Filter item effects down to just battle effects
+function _determineIfBattleEffects(itemEffects){
+  const battleItemEffects = itemEffects.filter((effect) => ALL_BATTLE_EFFECTS.includes(effect));
+  return battleItemEffects;
+}
+
+
+
 
 // ON GOTOBATTLE, DETERMINE POST BATTLE ACTIONS
 function determinePostBattleActions(avatar, foe, resolve, reject){
@@ -305,4 +330,4 @@ function _checkWinTotal(avatarId, titleNamesArray){
   });
 }
 
-module.exports = { determinePostBattleActions };
+module.exports = { determineItemEffects, determinePostBattleActions };
