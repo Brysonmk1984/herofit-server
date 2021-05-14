@@ -14,7 +14,7 @@ const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
-const { OUTCOME_XP } = require('../game/constants'); 
+const { OUTCOME_XP } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
 
 // USER CLICKED 'GO TO BATTLE'

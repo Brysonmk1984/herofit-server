@@ -15,7 +15,7 @@ function doFoeBattlePrep(foe, avatar, itemsUsed, ability){
       // Power Reduction
       avatar.power = Math.floor(avatar.power - (avatar.power * .2));
       break;
-    case "Unseen Swap":
+    case "Paranormal Pandemonium":
       // Stat Scramble
       const scrambledStats = {
         power : 0,

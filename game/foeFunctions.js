@@ -1,4 +1,4 @@
-const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./constants'); 
+const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
 const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
@@ -161,19 +161,19 @@ function generateFoeStats(avatar, foe){
       //Need to check for for types here for different elements
       switch(foe.type){
         case "Gusty Rascal":
-          fws.air = 50;
+          fws.air = 25;
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Rock Skipper":
-          fws.earth = 50;
+          fws.earth = 25;
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Flame Fiend":
-          fws.earth = 50;
+          fws.earth = 25;
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Splash Artist":
-          fws.earth = 50;
+          fws.earth = 25;
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         default :

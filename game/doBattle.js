@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./constants');
+const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./CONSTANTS');
 const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)
@@ -32,7 +32,7 @@ function _calcTurnMirrorReduction(aDamage, rResistance){
   let d = aDamage;
   let r = rResistance;
 
-  const dr = (r*10)/((r*10)+(9*d));
+  const dr = (r*5)/((r*5)+(9*d));
   return { reduction : (d * dr), netDamage : (d - (d * dr)) };
 }
 

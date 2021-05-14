@@ -132,7 +132,7 @@
         "Keiran"
     ],
     "ability": {
-      "name" : "Unseen Swap",
+      "name" : "Paranormal Pandemonium",
       "effect" : "Stat Scramble",
       "type" : "pre-battle"
     },
@@ -256,6 +256,7 @@
         "name" : "Gusty Rascal"
       }
     },{
+      "id": 11,
       "class" : "Elementals",
       "type" : "Rock Skipper",
       "foe" : [

@@ -1,4 +1,4 @@
-const { BATTLE_SCENARIOS } = require('./constants');
+const { BATTLE_SCENARIOS } = require('./CONSTANTS');
 
 // Calculates the bonus to both Avatar and Foe depending on scenario
 function _calcScenarioBonuses(avatar, foe, scenario){

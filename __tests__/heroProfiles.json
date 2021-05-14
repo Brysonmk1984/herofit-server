@@ -146,6 +146,23 @@
   },
 
   {
+    "activityXP": 800,
+    "battleXP": 0,
+    "air": 2,
+    "earth": 2,
+    "fire": 2,
+    "water": 3,
+    "power": 135,
+    "health": 100,
+    "armor": 0,
+    "recovery": 1,
+    "character": "RePete",
+    "equipped": [],
+    "name": "newPower lvl 7",
+    "description":"Low Level, POWER Stats"
+  },
+
+  {
     "activityXP": 1262,
     "battleXP": 114,
     "air": 13,

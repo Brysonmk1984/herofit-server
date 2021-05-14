@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD } = require('./constants');
+const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD } = require('./CONSTANTS');
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire, d){

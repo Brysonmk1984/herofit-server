@@ -1,0 +1,131 @@
+[
+  {
+    "activityXP": 200,
+    "battleXP": 215,
+    "air": 5,
+    "earth": 2,
+    "fire": 2,
+    "water": 0,
+    "power": 120,
+    "health": 100,
+    "armor": 0,
+    "recovery": 1,
+    "character": "RePete",
+    "equipped": [],
+    "name": "newPower level 4",
+    "description":"Low Level, POWER Stats"
+  },
+
+  {
+    "activityXP": 800,
+    "battleXP": 0,
+    "air": 2,
+    "earth": 2,
+    "fire": 2,
+    "water": 3,
+    "power": 135,
+    "health": 100,
+    "armor": 0,
+    "recovery": 1,
+    "character": "RePete",
+    "equipped": [],
+    "name": "newPower lvl 7",
+    "description":"Low Level, POWER Stats"
+  },
+
+
+  {
+    "activityXP": 5914,
+    "battleXP": 1213,
+    "air": 20,
+    "earth":132,
+    "fire": 3,
+    "water": 35,
+    "power": 350,
+    "health": 240,
+    "armor": 45,
+    "recovery": 10,
+    "character": "Empath Aurellia",
+    "equipped": [],
+    "name": "Howdy Bro power",
+    "description":"mid Level, high power",
+    "level": 30
+  },
+
+  {
+    "activityXP": 6060,
+    "battleXP": 1413,
+    "air": 61,
+    "earth":13,
+    "fire": 126,
+    "water": 17,
+    "power": 348,
+    "health": 250,
+    "armor": 40,
+    "recovery": 15,
+    "character": "Wilhelm the WIld",
+    "equipped": [],
+    "name": "Chebu",
+    "description":"mid Level, natuarally high power",
+    "level": 30
+  },
+
+
+  {
+    "activityXP": 8525,
+    "battleXP": 3977,
+    "air": 77,
+    "earth": 165,
+    "fire": 46,
+    "water": 52,
+    "power": 390,
+    "health": 333,
+    "armor": 45,
+    "recovery": 50,
+    "character": "Boulder Bro",
+    "equipped": [],
+    "name": "POWERGrabbler",
+    "description":"mid Level, POWER Stats",
+    "level": 44
+  },
+
+
+
+
+
+
+  {
+    "activityXP": 24282,
+    "battleXP": 2292,
+    "air": 57,
+    "earth": 790,
+    "fire": 85,
+    "water": 50,
+    "power": 586,
+    "health": 470,
+    "armor": 90,
+    "recovery": 5,
+    "character": "Chrono Guy",
+    "equipped": [],
+    "name": "powerBicycle Beserker",
+    "description":"very high Level, balanced + POWER Stats",
+    "level": 75
+  },
+  {
+    "activityXP": 24282,
+    "battleXP": 2292,
+    "air": 208,
+    "earth": 208,
+    "fire": 208,
+    "water": 208,
+    "power": 820,
+    "health": 470,
+    "armor": 6,
+    "recovery": 5,
+    "character": "Compost Creature",
+    "equipped": [],
+    "name": "powerElmBalance",
+    "description":"very high Level, focused POWER + balance elms",
+    "level": 75
+  }
+]
