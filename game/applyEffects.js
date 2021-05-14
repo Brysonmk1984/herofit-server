@@ -3,7 +3,7 @@ const Avatar = require('../db').Avatar;
 const UserTotal = require('../db').UserTotal;
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./constants');
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./CONSTANTS');
 
 
 // Retrocausal Capsule

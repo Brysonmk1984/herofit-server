@@ -1,5 +1,5 @@
 const defaultTotals = require('../../common/defaultTotals.json');
-const { ACTIVITY_MAP } = require('../constants');
+const { ACTIVITY_MAP } = require('../CONSTANTS');
 
 const moment = require('moment');
 
