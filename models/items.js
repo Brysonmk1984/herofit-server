@@ -26,14 +26,6 @@ const ItemsModel = function(db, DataTypes){
         type : DataTypes.STRING(500),
         allowNull : true,
       },
-      effect1 : {
-        type : DataTypes.STRING(75),
-        allowNull : true,
-      },
-      effect2 : {
-        type : DataTypes.STRING(75),
-        allowNull : true,
-      },
       icon : {
         type : DataTypes.STRING(50),
         allowNull : true,
@@ -54,7 +46,11 @@ const ItemsModel = function(db, DataTypes){
       action : {
         type : DataTypes.STRING(25),
         allowNull : true,
-      }
+      },
+      effects : {
+        type : DataTypes.JSONB,
+        allowNull : true,
+      },
   }, { freezeTableName: true });
 
   return Items;

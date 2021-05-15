@@ -1,0 +1,34 @@
+[{
+  "name" : "Heal Hero Completely",
+  "type" : "instant",
+  "description" : "Heroes health is set to 100% of max health."
+},
+{
+  "name" : "Remove Infected Status",
+  "type" : "instant",
+  "description" : "Status of Hero is changed from infected to recovering."
+},
+{
+  "name" : "Reset Hero",
+  "type" : "instant",
+  "description" : "Reset Hero to default state, then recalculate stats based on workout activity totals."
+},
+
+{
+  "name" : "Hero +10 Health",
+  "type" : "prebattle",
+  "description" : "Hero receives a +10 health buff before battle."
+},
+{
+  "name" : "Hero +5 Water",
+  "type" : "prebattle",
+  "description" : "Hero receives a +5 water buff before battle."
+},
+{
+  "name" : "Foe -10 Health",
+  "type" : "prebattle",
+  "description" : "Foe receives a -10 health debuff before battle."
+}]
+
+
+

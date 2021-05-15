@@ -129,7 +129,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
 
       if(rewards){
         Items.findAll({
-          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
           where : { id : { [Op.in] : rewards }}
         }).then((matchingItems) =>{
           res.formatter.ok({
@@ -188,7 +188,7 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
       // IF the avatar won, Get the items acquired from the action types in the battle report
       if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
         Items.findAll({
-          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
         }).then((items) =>{
           adjResult.itemsAquired = items;
@@ -229,7 +229,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
      // IF the avatar won, Get the items aquired from the action types in the battle report
     if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
       return Items.findAll({
-        attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+        attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
         where : { action : { [Op.in] : adjResult.postBattleActions } }
       });
     }
@@ -313,7 +313,7 @@ router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), aut
         });
         if(rewards.length){
           Items.findAll({
-            attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost','action'],
+            attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
             where : { id : { [Op.in] : rewards }}
           }).then((matchingItems) =>{
             return res.formatter.ok({ foe : battle.foe, rewards : matchingItems });

@@ -22,7 +22,7 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
     include: [{
         model: Items,
         as : 'item',
-        attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost'],
+        attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost'],
         // Required is false by default, adding a where clause makes it true by default. 
         // Still, false or true doesn't seem to have an impact here.
         //required: false,
@@ -246,7 +246,7 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
       include: [{
           model: Items,
           as : 'item',
-          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost'],
+          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost'],
           // Required is false by default, adding a where clause makes it true by default. 
           // Still, false or true doesn't seem to have an impact here.
           //required: false,
@@ -308,7 +308,7 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
           model: Items,
           as : 'item',
           where : { type : 'consumable' },
-          attributes: ['type','name','description','lore','effect1','effect2','icon','class','exhaustible','ptCost'],
+          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost'],
           // Required is false by default, adding a where clause makes it true by default. 
           // Still, false or true doesn't seem to have an impact here.
           //required: false,

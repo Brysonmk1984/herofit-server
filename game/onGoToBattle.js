@@ -11,9 +11,9 @@ const { ALL_BATTLE_EFFECTS } = require('../game/CONSTANTS');
 function determineItemEffects(equipment){
   return equipment.reduce((filtered, item) => {
     // Item primary effect, push it to array if it exists
-    if(item.effect1 || item.effect2){
+    if(item.effects.length){
       // Determine if item effects are battle effects
-      const battleItemEffects = _determineIfBattleEffects([item.effect1, item.effect2]);
+      const battleItemEffects = _determineIfBattleEffects([item.effects]);
       
       //console.log('', battleItemEffects);
       filtered.push(...battleItemEffects);
@@ -24,7 +24,7 @@ function determineItemEffects(equipment){
 
 // Filter item effects down to just battle effects
 function _determineIfBattleEffects(itemEffects){
-  const battleItemEffects = itemEffects.filter((effect) => ALL_BATTLE_EFFECTS.includes(effect));
+  const battleItemEffects = itemEffects.filter((effect) => effect.type === 'prebattle' || effect.type === 'postbattle');
   return battleItemEffects;
 }
 
