@@ -1,10 +1,11 @@
+const chance = require('chance')();
 const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
 const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
 
+// Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level){
-  let villain;
 
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
@@ -13,48 +14,40 @@ function selectFoeTemplate(level){
     // If the event contains foeLikelihood actions
     if(foeLikelihoodAts.length){
       // Result of handleChanceForFoe function could be a foe object, or null
-      villain = handleFoeLikelihood(foeLikelihoodAts);
+      const foe = handleFoeLikelihood(foeLikelihoodAts);
       // If foe object, return it instead of randomly selecting below
-      if(villain){
-        return villain;
+      if(foe){
+        return foe;
       }
     }
-
   }
 
-  // Must be at least level 20 to have a shot at getting matched against Plaguebringer
-  if(level >= 20){
-    const randomNum = Math.floor(Math.random() * 18);
-    // Probability of facing one of many bosses = 1/18
-    if(randomNum === 0){
-      const randomNum2 = Math.floor(Math.random() * 3);
-      // Probability of facing Plaguebringer = 2/3
-      if(randomNum2 === 0 || randomNum2 === 1){
-        villain = villains.Titans[0];
+  // Merge all minor foes into one array, and all bosses in another
+  const minorFoes = [];
+  const levelRequiredFoes = [];
+  // Each class of foes
+  for(let fClass in villains){
+    // assign foes to two different arrays depending on if there is a level requirement
+    villains[fClass].forEach(foe => {
+      const req = foe.levelRequirement;
+      if(req && req <= level){
+        levelRequiredFoes.push(foe);
       }else{
-        villain = villains.Spirits[villains.Spirits.length -1];
+        minorFoes.push(foe);
       }
-    }else{
-      villain = villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
-    }
-  // Must be at least level 10 to have a shot at getting matched against shadow self
-  }else if(level >= 10){
-    // 1 in 18 will face Shadow-Self
-    const randomNum = Math.floor(Math.random() * 18);
-    
-    // Shadow-Self
-    if(randomNum === 0){
-      villain = villains.Spirits[villains.Spirits.length -1];
-
-    }else{
-      // Otherwise, they'll face another random spirit
-      // Math.floor ensures the last array item will never be picked, it gets rounded down.
-      villain = villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
-    }
-  }else{
-    villain = villains.Spirits[Math.floor(Math.random() * (villains.Spirits.length -1))];
+    });
   }
-  return villain;
+  //console.log('FCF-', minorFoes, levelRequiredFoes);
+  
+  // Decide which array of foes to randomly pick from...
+  let bossEncounter = false
+  if(levelRequiredFoes.length){
+    bossEncounter = chance.bool({ likelihood: 5.5});
+  }
+  let finalFoeArray =  bossEncounter ? levelRequiredFoes : minorFoes;
+
+  // Randomly select from finalFoeArray and return it as the selected foe
+  return finalFoeArray[Math.floor(Math.random() * levelRequiredFoes.length)];
 }
 
 function generateFoeStats(avatar, foe){

@@ -207,7 +207,8 @@
       "reward" : {
         "type" : "skin",
         "name" : "Shadow Self"
-      }
+      },
+      "levelRequirement" : 10
     }
   ],
   "Titans": [
@@ -228,7 +229,8 @@
       "reward" : {
         "type" : "pet",
         "name" : "Plagueling"
-      }
+      },
+      "levelRequirement" : 20
     }
   ],
   "Elementals": [
