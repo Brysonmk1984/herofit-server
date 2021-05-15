@@ -34,7 +34,6 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
-
   const foeTemplate = selectFoeTemplate(currentLevel);
 
   let foeName;
@@ -46,6 +45,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     //foeName = foeTemplate.foe[5];
     
     foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
+
   }
 
   const foe = {
@@ -87,7 +87,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     // Determine item effects that will impact the battle
     const itemBattleEffects = determineItemEffects(avatar.equipped);
 
-    //console.log('IBE - ', itemBattleEffects);
+    console.log('IBE - ', itemBattleEffects);
     // If there are item effects that will impact battle, add them to initial battle record
     if(itemBattleEffects.length){
       battleObj.effects = itemBattleEffects;

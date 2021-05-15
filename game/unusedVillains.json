@@ -13,7 +13,7 @@
     "ability": {
       "name" : "Air Attuned",
       "effect" : "Air Emphasis",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 25,
@@ -31,7 +31,7 @@
     "ability": {
       "name" : "Air Attuned",
       "effect" : "Air Emphasis",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 50,
@@ -56,7 +56,7 @@
     "ability": {
       "name" : "Earth Proficiency",
       "effect" : "Major Earth Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 25,
@@ -74,7 +74,7 @@
     "ability": {
       "name" : "Earth Mastery",
       "effect" : "Profound Earth Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 50,
@@ -101,7 +101,7 @@
     "ability": {
       "name" : "Fire Attuned",
       "effect" : "Minor Fire Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "pba" : ["Grant Flame Fiend"],
@@ -124,7 +124,7 @@
     "ability": {
       "name" : "Fire Proficiency",
       "effect" : "Major Fire Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 25,
@@ -142,7 +142,7 @@
     "ability": {
       "name" : "Fire Mastery",
       "effect" : "Profound Fire Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 50,
@@ -167,7 +167,7 @@
     "ability": {
       "name" : "Water Attuned",
       "effect" : "Minor Water Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "pba" : ["Grant Splash Artist"],
@@ -190,7 +190,7 @@
     "ability": {
       "name" : "Water Proficiency",
       "effect" : "Major Water Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 25,
@@ -208,7 +208,7 @@
     "ability": {
       "name" : "Water Mastery",
       "effect" : "Major Water Threat",
-      "type" : "pre-battle"
+      "type" : "prebattle"
     },
     "color" : null,
     "bonusXpBase": 50,

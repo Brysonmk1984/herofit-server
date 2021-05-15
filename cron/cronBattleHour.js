@@ -91,18 +91,18 @@ function runBattlesOnBatch(shard, shardIndex){
       let BRA = Object.assign({}, sAvatar);
       let BRF = Object.assign({}, sFoe);
 
-      // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
-      if(allEffects[i] && allEffects[i].length){
-        if(scenario.id !== AVATAR_NON_ACTION){
+        // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
+        if(allEffects[i] && allEffects[i].length){
+          const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
           // Buff or debuff hero and foe based on item effects
-          const avBP = doAvatarBattlePrep(BRA, BRF, allEffects[i]);
+          // If new item effects are added, they need to be added in this function:
+          const avBP = doAvatarBattlePrep(BRA, BRF, preBattleEffects);
           BRA = avBP.avatar;
           BRF = avBP.foe;
         }
-      }
 
-      // BATTLE STEP 4 - FOE USES PRE-BATTLE ABILITY
-      if(foeWithStats.ability && foeWithStats.ability.type === 'pre-battle'){
+      // BATTLE STEP 4 - FOE USES prebattle ABILITY
+      if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
         if(scenario.id !== FOE_NON_ACTION){
           const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
           BRF = foeBP.foe;
@@ -215,7 +215,7 @@ function runBattlesOnBatch(shard, shardIndex){
       avatar.battleXP += xpGain;
       avatar.qp += qpEarned;
 
-      // If Any Post-Battle abilities exist, use them
+      // If Any postbattle abilities exist, use them
       avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
       //console.log('AVATAR CHECK - ', avatar);
       avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };

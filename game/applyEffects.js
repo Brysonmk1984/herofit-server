@@ -77,7 +77,7 @@ function resetHero(avatarID, email){
 // Health Potion
 function healCompletely(avatarID){
   return Avatar.update(
-    { health : col('maxHealth') } , { where : { id : avatarID }, returning : true }
+    { health : col('maxHealth'), status : 'Rested' } , { where : { id : avatarID }, returning : true }
   ).then((data) =>{
     //RETURN UPDATED AVATAR
     return data[1][0];
@@ -104,7 +104,7 @@ function removeInfected(avatarID){
 function itemEffects(effects, avatarID, email){
   const effectPromises = [];
   effects.forEach((effect) =>{
-      switch(effect){
+      switch(effect.name){
         case 'Reset Hero':
           effectPromises.push(resetHero(avatarID, email)); 
         case 'Heal Hero Completely':

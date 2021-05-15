@@ -133,7 +133,7 @@ function doAllPbas(avatarID, postBattleActions, battleOutcome){
 
 function doPostBattleEffects(avatar, foe, outcome){
   const fAbility = foe.ability;
-  if(fAbility.type === 'post-battle'){
+  if(fAbility.type === 'postbattle'){
     switch(fAbility.name){
       //PLAGUEBRINGER
       case 'Infect':

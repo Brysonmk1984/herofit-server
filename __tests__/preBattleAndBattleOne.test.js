@@ -135,8 +135,8 @@ xdescribe('Do battle setup with random av and generated foe template', ()=>{
 
     // BATTLE STEP 3 - NOT IN GAME YET
 
-    // BATTLE STEP 4 - FOE USES PRE-BATTLE ABILITY
-    if(foeWithStats.ability && foeWithStats.ability.type === 'pre-battle'){
+    // BATTLE STEP 4 - FOE USES prebattle ABILITY
+    if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
       if(scenario.id !== FOE_NON_ACTION){
         const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
         BRF = foeBP.foe;

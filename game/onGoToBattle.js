@@ -9,22 +9,31 @@ const { ALL_BATTLE_EFFECTS } = require('../game/CONSTANTS');
 
 // ON GOTOBATTLE, save list of effects from avatar's items
 function determineItemEffects(equipment){
-  return equipment.reduce((filtered, item) => {
+  const reduced = equipment.reduce((filtered, item) => {
+    console.log('itemname', item.name);
+    console.log(item.effects);
     // Item primary effect, push it to array if it exists
-    if(item.effects.length){
+    if(item.effects && item.effects.length){
       // Determine if item effects are battle effects
-      const battleItemEffects = _determineIfBattleEffects([item.effects]);
+      const battleItemEffects = _determineIfBattleEffects(item.effects);
       
-      //console.log('', battleItemEffects);
+      console.log('', battleItemEffects);
       filtered.push(...battleItemEffects);
     }
     return filtered;
   }, []);
+
+  console.log(reduced);
+
+  return reduced;
 }
 
 // Filter item effects down to just battle effects
 function _determineIfBattleEffects(itemEffects){
-  const battleItemEffects = itemEffects.filter((effect) => effect.type === 'prebattle' || effect.type === 'postbattle');
+  const battleItemEffects = itemEffects.filter((effect) => {
+    console.log('EFFECTTT - ', effect);
+    return effect.type === 'prebattle' || effect.type === 'postbattle';
+  });
   return battleItemEffects;
 }
 

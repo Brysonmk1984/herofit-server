@@ -170,7 +170,6 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
       FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
     WHERE avatars.owner = $1
   `;
-    // 'name', name, 'type', type, 'id', id, 'avatarID', 'avatarID', 'lore', lore, 'effect1', effect1, 'effect2', effect2,'class', class, 'description', description, 'icon', icon
   try{
     const [ results ] = await db.query(q, { bind : [email] });
     if(results.length === 0){
