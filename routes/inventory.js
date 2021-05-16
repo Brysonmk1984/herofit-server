@@ -4,7 +4,7 @@ const router = express.Router();
 const Avatar = require('../db').Avatar;
 const AvatarItems = require('../db').AvatarItems;
 const Items = require('../db').Items;
-const { col, literal } = require("sequelize");
+const { Op, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
 const { authenticateJWT } = require('../jwtValidation');
@@ -123,6 +123,7 @@ router.post('/unequip-item', body('avatarId'), body('unequipId').isNumeric(), au
   });
 });
 
+// Get all default items
 router.get('/get-default-items', (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -135,6 +136,24 @@ router.get('/get-default-items', (req, res) => {
   }).catch((error)=>{
     console.log('THE ERR', error);
     res.formatter.serverError(error.toString(), `Error running GET /get-default-items`);
+  });
+});
+
+// Fetch items for sale by type
+router.post('/fetch-items-of-type-for-sale', body('type').isString(), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /fetch-items-of-type-for-sale");
+  }
+
+  const { type } = req.body;
+
+  Items.findAll({ where : { type, disabled : false } })
+  .then((items) =>{
+    res.formatter.ok({ items }, 'Successfully ran POST /fetch-items-of-type-for-sale');
+  }).catch((error)=>{
+    console.log('THE ERR', error);
+    res.formatter.serverError(error.toString(), `Error running POST /fetch-items-of-type-for-sale`);
   });
 });
 
