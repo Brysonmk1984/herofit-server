@@ -72,10 +72,6 @@ function runBattlesOnBatch(shard, shardIndex){
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
       avatar = parseAvatarProperties(avatar);
       const foeWithStats  = allFoes[i];
-      // IF equipped when went to battle, can apply item effects here.
-      const itemsUsed = null;
-      const actionsChosen = null;
-
 
       // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
       let beginnersLuck = false;
@@ -86,33 +82,32 @@ function runBattlesOnBatch(shard, shardIndex){
 
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
       const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
-      //console.log('sFOE - ', sFoe);
-      // avatar and foe to be used for battle
-      let BRA = Object.assign({}, sAvatar);
-      let BRF = Object.assign({}, sFoe);
 
-        // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
-        if(allEffects[i] && allEffects[i].length){
-          const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
-          // Buff or debuff hero and foe based on item effects
-          // If new item effects are added, they need to be added in this function:
-          const avBP = doAvatarBattlePrep(BRA, BRF, preBattleEffects);
-          BRA = avBP.avatar;
-          BRF = avBP.foe;
-        }
+      // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
+      if(allEffects[i] && allEffects[i].length){
+        const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
+        // Buff or debuff hero and foe based on item effects
+        // If new item effects are added, they need to be added in this function:
+        const abp = doAvatarBattlePrep(sAvatar, sFoe, preBattleEffects, scenario.id);
+        sAvatar = abp.avatar;
+        sFoe = abp.foe;
+      }
 
       // BATTLE STEP 4 - FOE USES prebattle ABILITY
       if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
         if(scenario.id !== FOE_NON_ACTION){
-          const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
-          BRF = foeBP.foe;
-          BRA = foeBP.avatar;
+          const fbp = doFoeBattlePrep(sAvatar, sFoe, foeWithStats.ability);
+          sAvatar = fbp.avatar;
+          sFoe = fbp.foe;
         }
       }
 
       // Element by Seasonal Element Bonus
-      BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
-      BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
+      sAvatar[seasonalBonusElement] *= 1.25;
+      sFoe[seasonalBonusElement] *= 1.25;
+
+      const BRA = sAvatar;
+      const BRF = sFoe;
 
       // WHO SWINGS FIRST
       let goesFirst;

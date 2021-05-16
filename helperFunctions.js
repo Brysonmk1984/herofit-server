@@ -95,7 +95,34 @@ function stackItems(allItems){
    });
 
    return stackedItems;
- }
+}
 
-module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems };
+// Used by The Poltergeist and Octopus to mix up all non zero stats of a hero or foe
+function scrambleStats(possibleStats, objectWithStats){
+   const stats = possibleStats.filter((stat) =>{
+      if(objectWithStats[stat] > 0){
+         return true;
+      }
+      return false;
+   });
+   let modifiedObjectWithStats = { ...objectWithStats };
+   const scrambledStats = {};
+
+    stats.forEach((stat) =>{
+      const isGreaterThanZero = objectWithStats[stat] > 0;
+      if(isGreaterThanZero){
+         scrambledStats[stat] = undefined;
+      }
+    });
+
+    for(let stat in scrambledStats){
+      const randomStat = stats[ Math.floor(Math.random() * stats.length) ];
+      const statPosition = stats.findIndex((s) => s === randomStat);
+      const statVal = stats.splice(statPosition, 1);
+      scrambledStats[stat] = Math.floor(objectWithStats[statVal[0]]);
+    }
+    return Object.assign({}, modifiedObjectWithStats, scrambledStats);
+}
+
+module.exports = { cloneObj, parseAvatarProperties, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats };
 

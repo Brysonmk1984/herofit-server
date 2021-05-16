@@ -1,98 +1,180 @@
+const chance = require('chance')();
+const { scrambleStats } = require('../helperFunctions');
 
-function doAvatarBattlePrep(avatar, foe, effects){
+function doAvatarBattlePrep(avatar, foe, effects, scenario){
+  const eAvatar = { ...avatar };
+  let eFoe = { ...foe };
   effects.forEach((effect) =>{
     switch(effect.name){
-      case "Hero +10 Health":
-        avatar.health += 10;
-        break;
       case "Hero +5 Water":
-        avatar.water += 5;
+        eAvatar.water += 5;
+        break;
+      case "Hero +5 Air":
+        eAvatar.air += 5;
+        break;
+      case "Hero +5 Earth":
+        eAvatar.earth += 5;
+        break;
+      case "Hero +10 Health":
+        eAvatar.health += 10;
         break;
       case "Foe -10 Health":
-        foe.health -= 10;
+        eFoe.health -= 10;
+        break;
+      case "Foe -15 Health":
+        eFoe.health -= 15;
+        break;
+      case "Hero +10 Power":
+        eAvatar.power += 10;
+        break;
+      case "Hero +25 Water":
+        eAvatar.water += 25;
+        break;
+      case "Hero +25 Air":
+        eAvatar.air += 25;
+        break;
+      case "Hero +25 Earth":
+        eAvatar.earth += 25;
+        break;
+      case "Hero +25 Fire":
+        eAvatar.fire += 25;
+        break;
+      case "Ill Omen":
+        const isNegativeScenario = scenario === 1 || scenario === 3 ? true : false;
+        const isHigherDifficulty = foe.difficulty >= .07 || foe.class === 'titan' || foe.type === "Shadow Self";
+
+        let illOmenProc = false;
+        if(isNegativeScenario && isHigherDifficulty){
+          illOmenProc = chance.bool({ likelihood: 75 });
+        }
+        if(illOmenProc){
+          eAvatar.health = avatar.health * 1.2;
+        }
+
+        break;
+      case "Bad Luck":
+        const badLuckProc = chance.bool({ likelihood: 15 });
+        
+        // If badluck effect happens, randomly reduce a non-zero foe stat to 50%
+        if(badLuckProc){
+          const possibleStats = ['power','armor','health','water','air','fire','earth'];
+          const foeStatArr = [];
+
+          for(let stat in eFoe){
+            if(possibleStats.includes(stat)){
+              if(eFoe[stat] > 0){
+                foeStatArr.push(stat);
+              }
+            }
+          }
+
+          const statToReduce = foeStatArr[Math.floor(Math.random() * foeStatArr.length)];
+          eFoe[statToReduce] = Math.floor(foe[statToReduce] * .5);
+        }
+        break;
+      case 'Lethal Surprise':
+        const lethalSurpriseProc = chance.bool({ likelihood: 1 });
+        if(lethalSurpriseProc){
+          eFoe.health = 1;
+        }
+        break;
+      case 'Eight-Legged Ingenuity':
+        const ingenuityProc = chance.bool({ likelihood: 25 });
+        if(ingenuityProc){
+          const possibleStats = ['power','armor','health','water','air','fire','earth'];
+          eFoe = { ...scrambleStats(possibleStats, foe) };
+        }
+        break;
+      case 'Frisky Mischief':
+        const friskyProc = chance.bool({ likelihood: 50 });
+        if(friskyProc){
+          const possibleStats = ['power','armor','health','water','air','fire','earth'];
+          const mappedToOb = possibleStats.filter(stat => avatar[stat] > 0).map(stat => {
+            return { [stat] : avatar[stat] || 0 }
+          });
+
+          // Only return the lowest value
+          const lowestAvVal = mappedToOb.reduce((m, k)=> {
+            return Math.min(m,avatar[Object.keys(k)[0]]);
+          }, Infinity);
+
+          // Finds the property of that value
+          const avStatObj = mappedToOb.find(obj => {
+            const currentKey = Object.keys(obj)[0];
+            if(obj[currentKey] === lowestAvVal){
+              return Object.keys(lowestAvVal);
+            }
+          });
+
+          const avStat = Object.keys(avStatObj)[0];
+          const avStatValue = Object.values(avStatObj)[0];
+          const foeStatVal = foe[avStat];
+
+          if(foeStatVal > avStatValue){
+            eAvatar[avStat] = foeStatVal;
+            eFoe[avStat] = lowestAvVal;
+          }
+
+        }          
         break;
       default:
         break;
     }
   });
-  return { avatar, foe };
+
+  return { avatar : eAvatar, foe : eFoe };
 }
 
-function doFoeBattlePrep(foe, avatar, itemsUsed, ability){
-
+function doFoeBattlePrep(avatar, foe, ability){
+  let fAvatar = { ...avatar };
+  let fFoe = { ...foe };
   switch(ability.name){
     case "From the Shadows":
       // Increased Power
-      foe.power = Math.floor(foe.power + (foe.power * .2));
+      fFoe.power = Math.floor(foe.power + (foe.power * .2));
       break;
     case "Intimidation":
       // Power Reduction
-      avatar.power = Math.floor(avatar.power - (avatar.power * .2));
+      fAvatar.power = Math.floor(avatar.power - (avatar.power * .2));
       break;
     case "Paranormal Pandemonium":
       // Stat Scramble
-      const scrambledStats = {
-        power : 0,
-        health : 0,
-        armor : 0,
-        earth : 0,
-        water : 0,
-        air : 0,
-        fire : 0
-      };
-
       const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
-      
-      for(let stat in scrambledStats){
-        const randomStat = stats[ Math.floor(Math.random() * stats.length) ];
-        const statPosition = stats.findIndex((s) => s === randomStat);
-        const statVal = stats.splice(statPosition,1);
-        scrambledStats[stat] = Math.floor(avatar[statVal[0]]);
-      }
-      
-      // possibly swap power for health
-      // const swapHealthWithPower = Math.floor(Math.random() * 1);
-      // if(swapHealthWithPower){
-      //   const aHealth = avatar.health;
-      //   const aPower = avatar.power;
-      //   scrambledStats.power = aHealth;
-      //   scrambledStats.health = aPower;
-      // }
-      avatar = Object.assign({}, avatar, scrambledStats);
+    
+      fAvatar = {...scrambleStats(stats, avatar)};
       break;
     case "Unholy Armor":
       const foeArmor = foe.armor;
       // Unholy Armor
       // Bonus to Armor
       // Also has higher health from stats
-      foe.armor = Math.floor(foeArmor + (foeArmor * .33));
+      fFoe = Math.floor(foeArmor + (foeArmor * .33));
       break;
     case "Can't Hide from Me":
       // Armor Break
-      avatar.armor = 0;
+      fAvatar.armor = 0;
       break;
     case "Shadowy Influx":
       // Health Bonus
-      foe.health = Math.floor(foe.health + (foe.health * .2));
+      fFoe = Math.floor(foe.health + (foe.health * .2));
       break;
     case "Breath Bane":
       // Health Reduction
-      avatar.health = Math.floor(avatar.health - (avatar.health * .2));
+      fAvatar.health = Math.floor(avatar.health - (avatar.health * .2));
       break;
     case "Sadistic Siphon":
       // Health Steal
-      const foeHealth = foe.health;
       const avatarHealth = avatar.health;
       const stolenHealth =  avatarHealth * .125;
 
-      foe.health = foe.health + stolenHealth;
-      avatar.health = avatar.health - stolenHealth;
+      fFoe = foe.health + stolenHealth;
+      fAvatar.health = avatar.health - stolenHealth;
       break ;
       default:
       break;
   }
 
-  return { foe, avatar };
+  return { avatar : fAvatar, foe : fFoe };
 }
 
 

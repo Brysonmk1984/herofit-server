@@ -107,7 +107,7 @@ describe('Load profiles and generate foes from random Profile', ()=>{
 });
 
 
-xdescribe('Do battle setup with random av and generated foe template', ()=>{
+describe('Do battle setup with random av and generated foe template', ()=>{
   let BRA;
   let BRF;
   let goesFirst;
@@ -138,7 +138,7 @@ xdescribe('Do battle setup with random av and generated foe template', ()=>{
     // BATTLE STEP 4 - FOE USES prebattle ABILITY
     if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
       if(scenario.id !== FOE_NON_ACTION){
-        const foeBP = doFoeBattlePrep(BRF, BRA, null, foeWithStats.ability);
+        const foeBP = doFoeBattlePrep(BRA, BRF, foeWithStats.ability);
         BRF = foeBP.foe;
         BRA = foeBP.avatar;
       }

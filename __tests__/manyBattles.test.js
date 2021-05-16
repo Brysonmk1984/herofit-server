@@ -61,7 +61,7 @@ function generateBrs(avatars, foesWithStats){
     // BATTLE STEP 4 - FOE USES prebattle ABILITY
     if(foesWithStats[i].ability && foesWithStats[i].ability.type === 'prebattle'){
       if(scenario.id !== FOE_NON_ACTION){
-        const foeBP = doFoeBattlePrep(BRF, BRA, null, foesWithStats[i].ability);
+        const foeBP = doFoeBattlePrep(BRA, BRF, foesWithStats[i].ability);
         BRF = foeBP.foe;
         BRA = foeBP.avatar;
       }
