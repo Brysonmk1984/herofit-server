@@ -74,12 +74,14 @@ router.post('/equip-item', body('avatarId'), body('equipId').isNumeric(), authen
 
   AvatarItems.update({ equipped : true }, { where : { avatarID : avatarId, itemID : equipId }, returning : true, raw : true })
   .then((updatedItem) =>{
-    //console.log('UI - ',updatedItem);
-    res.formatter.ok({equippedItem : updatedItem[1][0]}, 'Successfully ran /equip-item');
+    return Items.findOne({ where : { id : updatedItem[1][0].itemID } })
+  }).then((item) => {
+    res.formatter.ok({equippedItem : item}, 'Successfully ran /equip-item');
   }).catch((error) =>{
     console.log('EQUIP ERROR - ', error);
     res.formatter.serverError(error.toString(), `Error running /equip-item`);
   });
+
 });
 
 router.post('/equip-unequip-item', body('avatarId'), body('equipId').isNumeric(), body('unequipId').isNumeric(), authenticateJWT, (req, res) => {
@@ -98,6 +100,11 @@ router.post('/equip-unequip-item', body('avatarId'), body('equipId').isNumeric()
   .then((result) =>{
     const unequippedItem = result[0].value[1][0];
     const equippedItem = result[1].value[1][0];
+    // Need to access the actual item rather than the avatar_item instance
+    return Items.findAll({ where : { [Op.or] : [{ id : unequippedItem.itemID }, { id : equippedItem.itemID }] } })
+  }).then((items) => {
+    const unequippedItem = items.find(item => item.id === unequipId);
+    const equippedItem = items.find(item => item.id === equipId);
 
     res.formatter.ok({ unequippedItem, equippedItem }, 'Successfully ran /equip-unequip-item');
   }).catch((error) =>{

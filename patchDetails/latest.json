@@ -1,34 +1,31 @@
 {
-  "version": "1.4.0",
-  "headline": "Attack of the Elements! - version 1.4.0",
-  "openingRemarks": "New Foes, New Elemental Traits, and a Special HeroFit Event",
+  "version": "1.4.6",
+  "headline": "Pets, with teeth! - versions 1.4.1 - 1.4.6",
+  "openingRemarks": "New Pets w/ battle effects, Foe ability changes & ongoing balance",
   "newFeatures": [
     {
-      "title": "Elemental Foes",
-      "description": "Corruption has overtaken the Elementals of Earth Realm, becoming powerful adversaries in the process. Each element has 3 new foes, a minion, adept, and a leviathan, each with more elemental power than the last."
+      "title": "Pets, with teeth!",
+      "description": "Six new pets have arrived to help you battle the Dark Forces, and existing pets now have battle effects! They all have their unique effects in battle and can be bought with Photon Tokens from the inventory page 'pets' section."
     },
     {
-      "title": "Elemental Traits",
-      "description": "Each of the 4 elements now have a unique battle trait! Fire: Critical Strike, Earth: Thorns Damage, Air: Evasion, Water: Vampiric Touch. The more you've developed your Heroes' elements, the bigger impact the elemental traits will have in battles."
-    },
-    {
-      "title": "Attack of the Elements! A unique HeroFit Event",
-      "description": "Over the course of the next 12 weeks, one new Elemental Foe will be released, becoming available to battle. These foes will specialize in one of the four elements - Earth, Water, Air or Fire, challenging you in unique ways based on their elemental prowess. There will be an increased chance to engage the enemy of the week, plus bonus XP and PT!"
+      "title": "Poltergeist, Phantom, & Phantasm ability changes",
+      "description": "The Poltergeist now has 'Paranormal Pandemonium', which will randomly scramble your non-zero stats before battle. The Phantom now has the old Poltergeist ability: 'Shadowy Influx' (health bonus). The Phantasm now has 'Unholy Armor' (high defense - armor & health)."
     }
   ],
   "bugFixes": [
-    "Fixed a bug where heroes with more than 250 activities recorded experienced a bug with leveling up",
-    "Fixed bug where the elemental season bonus wasn't appearing in old Battle Reports",
-    "Fixed an issue with equipping items affecting other players",
-    "Refactored some code to prevent users from players losing PT in the event of an error buying consumable items"
+    "Fixed a bug that prevented the 'Leveled up' window from popping up. The Owl wasn't too happy with this.",
+    "Fixed a bug that made the 'QP Activated' message persist longer than it was meant to."
   ],
   "balanceChanges": [
-    "Global changes to foe difficulty ahead of elemental trait addition",
-    "HeroFit needs your help to help judge and report any balance issues you see after this patch!"
+    "Effectiveness of armor has been decreased by a moderate amount.",
+    "Power & health stats received a relative buff: the foes health & power now don't scale as effectively against your own. This will make power and/or health builds more viable.",
+    "Recovery - both the health gain per hour and chance to revive from KO early have been nerfed, as mentioned in a reddit thread last week.",
+    "Lastly, various smaller difficulty tweaks are being made to make the game balanced at low, medium, and high levels."
   ],
   "miscDetails": [
-    "Changes to the Battle Report Detail, which now displays all damage types every round. Previously, physical and element rounds alternated",
-    "Added a fresh background image inspired by the special event"
+    "Improved the code behind the scenes for matching up against foes.",
+    "When trying to go to battle and you're below 80% health, the message now displays how much health is required before you can go to battle. This message also now accurately displays your actual recovery per hour.",
+    "SuperPoekie, your cat wandered into the game. Please come pick him up."
   ],
-  "closingRemarks": "I'm very excited for this patch! It's been a goal to make the elements unique since the very beginning of HeroFit and now with the new traits, it's finally become a reality. How you workout and how you spend your Quantum Points will greatly affect your battles. Not only that, I finally get to reveal the amazing artwork that's being produced by Cold Beverage Studios, giving me more time to develop the game."
+  "closingRemarks": "A lot of the hard work from months ago is slowly paying off. Big technical challenges solved from this winter are allowing for cool new features like pets with battle effects. Each improvement you're seeing is built on a previous one. Let me know what you think or would like to see!"
 } 

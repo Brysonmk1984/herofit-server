@@ -1,4 +1,4 @@
-let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS.js');
+let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD } = require('../CONSTANTS.js');
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP){
@@ -85,6 +85,13 @@ function xpCalc(activityXP, battleXP){
       
       return Math.floor(newActivityXP);
  
+    },
+
+    // DETERMINE HOW MUCH HEALTH IS RECOVERED PER HOUR
+    determineRecoveryPerHour : function(recovery){
+      const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
+      const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
+      return adjRegenRate;
     },
 
     /**** 

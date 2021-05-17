@@ -95,7 +95,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
     
     // Then, Update Avatar Totals
-    const { checkLevelUp, calcNewActivityXPFromUt, currentLevelByInput } = xpCalc(avatar.activityXP, avatar.battleXP);
+    const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { updatePower, updateHealth, updateElements } = avCalc(ut);  
     
     // Updated aXP
@@ -122,12 +122,13 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
   }).then((result) =>{
     let avatar = parseAvatarProperties(result[1]);
-    const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.level = getCurrentLevel();
     avatar.nextLevelStartXp = getNextLevel();
     avatar.thisLevelStartXp = getNextLevel(-1);
+    avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
 
     // Calc gains here to be displayed on frontend
     const improvements = {
@@ -179,12 +180,13 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
   
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
-    const { getCurrentLevel, getNextLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     avatar.level = getCurrentLevel();
     avatar.nextLevelStartXp = getNextLevel();
     avatar.thisLevelStartXp = getNextLevel(-1);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
+    avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
 
     return res.formatter.ok( avatar );
 
