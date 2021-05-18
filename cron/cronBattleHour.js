@@ -81,7 +81,7 @@ function runBattlesOnBatch(shard, shardIndex){
       }
 
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-      const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
+      let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
 
       // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
       if(allEffects[i] && allEffects[i].length){
