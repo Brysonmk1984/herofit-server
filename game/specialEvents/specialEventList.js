@@ -29,7 +29,7 @@ const attackOfTheElements = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds :33,
-    foe : 'Rock Skipper',
+    foe : 'Flame Fiend',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',

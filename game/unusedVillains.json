@@ -87,29 +87,7 @@
   },
 
 
-  {
-    "class" : "Elementals",
-    "type" : "Flame Fiend",
-    "foe" : [
-      "Azar",
-      "Fajra",
-      "Keahi",
-      "Iskra",
-      "Or",
-      "Zora"
-    ],
-    "ability": {
-      "name" : "Fire Attuned",
-      "effect" : "Minor Fire Threat",
-      "type" : "prebattle"
-    },
-    "color" : null,
-    "pba" : ["Grant Flame Fiend"],
-    "reward" : {
-      "type" : "pet",
-      "name" : "Flame Fiend"
-    }
-  },
+
   {
     "class" : "Elementals",
     "type" : "Flaming Jinn",
