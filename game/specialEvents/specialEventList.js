@@ -35,12 +35,12 @@ const attackOfTheElements = {
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 1.0,
-    requirements : [{ foeType : 'Rock Skipper' }]
+    requirements : [{ foeType : 'Flame Fiend' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : .5,
-    requirements : [{ foeType : 'Rock Skipper' }]
+    requirements : [{ foeType : 'Flame Fiend' }]
   }],
 }
 
