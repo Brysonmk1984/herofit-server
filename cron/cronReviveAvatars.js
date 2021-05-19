@@ -6,7 +6,7 @@ const { sendCronErrorEmail } = require('../mail');
 console.log('*** RUNNING CRON REVIVE ***');
 
 return Avatar.update(
-    { health : REVIVE_AMOUNT, status : 'Recovering' },
+    { health : REVIVE_AMOUNT, status : 'Recovering', goToBattle : false },
     { where: { status: 'Knocked Out' }}
 ).then(()=>{
   console.log('REVIVED ALL KOED');

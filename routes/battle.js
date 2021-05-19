@@ -69,7 +69,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   }).then((pbas) =>{
     // Need parent context;
     postBattleActions = pbas.length ? pbas : null;
-
+    console.log('PBAS on insert = ', postBattleActions);
     const battleObj = {
         owner: req.body.email,
         avatarID: avatar.id,
@@ -83,7 +83,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     if(postBattleActions){
       battleObj.postBattleActions = postBattleActions;
     }
-
+    console.log('Battle obj-', battleObj);
     // Determine item effects that will impact the battle
     const itemBattleEffects = determineItemEffects(avatar.equipped);
 
@@ -92,63 +92,61 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     if(itemBattleEffects.length){
       battleObj.effects = itemBattleEffects;
     }
-
-
-    
+    console.log('Battle obj before insert-', battleObj);
     return Battle.create(battleObj, {raw : true});
-  }).then(() =>{
+  }).then((data) =>{
+    console.log('IF IM HERE, BATTLE WAS SHOULD HAVE BEEN CREATED... SETTING Avatar goToBattle to true.', data);
     return Avatar.update({ 
       goToBattle : true,
     },{ where: { owner: req.body.email }, raw: true })
-    .then((result) =>{
-      // SHOULD NEVER HAPPEN
-      if(!result){ console.log('THIS ERROR SHOULD NEVER HAPPEN');
-        const error =  new Error(`No Avatar associated with user ${req.body.email}`);
-        res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
-      }
+  }).then((result) =>{
+    // SHOULD NEVER HAPPEN
+    if(!result){ console.log('THIS ERROR SHOULD NEVER HAPPEN');
+      const error =  new Error(`No Avatar associated with user ${req.body.email}`);
+      res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
+    }
 
-      // Get the items aquired from the action types in the battle report
-      let rewards = null;
-      if(postBattleActions){
-        rewards = postBattleActions.map(action => {
-          let matchingPBA;
-          for(let actionType in ALLPBAs){
-            const match = ALLPBAs[actionType].find(pba => {
-              return pba.action === action;
-            });
-            if(match){
-              matchingPBA = match;
-              break;
-            }
-          } 
-          
-          return matchingPBA.itemID;
-        });
-      }
-
-
-      if(rewards){
-        Items.findAll({
-          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
-          where : { id : { [Op.in] : rewards }}
-        }).then((matchingItems) =>{
-          res.formatter.ok({
-            goToBattle : true,
-            foe : foeWithStats,
-            rewards : matchingItems
+    // Get the items acquired from the action types in the battle report
+    let rewards = null;
+    if(postBattleActions){
+      rewards = postBattleActions.map(action => {
+        let matchingPBA;
+        for(let actionType in ALLPBAs){
+          const match = ALLPBAs[actionType].find(pba => {
+            return pba.action === action;
           });
-        }).catch((error) =>{
-          res.formatter.serverError(error.toString(), `Couldn't retrieve upcoming rewards - ${avatarID}`);
-        });
-      }else{
+          if(match){
+            matchingPBA = match;
+            break;
+          }
+        } 
+        
+        return matchingPBA.itemID;
+      });
+    }
+
+
+    if(rewards){
+      Items.findAll({
+        attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
+        where : { id : { [Op.in] : rewards }}
+      }).then((matchingItems) =>{
         res.formatter.ok({
           goToBattle : true,
           foe : foeWithStats,
-          rewards
+          rewards : matchingItems
         });
-      }
+      }).catch((error) =>{
+        res.formatter.serverError(error.toString(), `Couldn't retrieve upcoming rewards - ${avatarID}`);
+      });
+    }else{
+      res.formatter.ok({
+        goToBattle : true,
+        foe : foeWithStats,
+        rewards
+      });
+    }
 
-    });
   }).catch((error)=>{
     error = error.toString();
     console.log(`Couldn't Send Avatar to battle: ${error}`);

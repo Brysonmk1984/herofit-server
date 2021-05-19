@@ -4,6 +4,7 @@ const { parseAvatarProperties } = require('../helperFunctions');
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD } = require('../game/CONSTANTS');
 const { sendCronErrorEmail } = require('../mail');
 const db = require('../db').db;
+const chance = require('chance')();
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 
 // Get all avatars who are KOed
