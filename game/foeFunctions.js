@@ -162,11 +162,11 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Flame Fiend":
-          fws.earth = 25;
+          fws.fire = 25;
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Splash Artist":
-          fws.earth = 25;
+          fws.water = 25;
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         default :
