@@ -92,10 +92,9 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     if(itemBattleEffects.length){
       battleObj.effects = itemBattleEffects;
     }
-    console.log('Battle obj before insert-', battleObj);
+
     return Battle.create(battleObj, {raw : true});
-  }).then((data) =>{
-    console.log('IF IM HERE, BATTLE WAS SHOULD HAVE BEEN CREATED... SETTING Avatar goToBattle to true.', data);
+  }).then(() =>{
     return Avatar.update({ 
       goToBattle : true,
     },{ where: { owner: req.body.email }, raw: true })

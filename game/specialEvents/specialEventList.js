@@ -5,7 +5,7 @@ const testSpecificFoe = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds : 100,
-    foe : 'Poltergeist',
+    foe : 'Banshee',
     foeClass : 'Spirits'
   },
   {

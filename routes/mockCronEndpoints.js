@@ -308,7 +308,6 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
         }
 
-
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
         let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
 
@@ -321,7 +320,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           sAvatar = abp.avatar;
           sFoe = abp.foe;
         }
-
+  
         // BATTLE STEP 4 - FOE USES prebattle ABILITY
         if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
           if(scenario.id !== FOE_NON_ACTION){
@@ -330,13 +329,14 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             sFoe = fbp.foe;
           }
         }
-
+ 
         // Element by Seasonal Element Bonus
         sAvatar[seasonalBonusElement] *= 1.25;
         sFoe[seasonalBonusElement] *= 1.25;
 
         const BRA = sAvatar;
         const BRF = sFoe;
+
         //TEMP CHEAT
         //BRA.power += 1000;
         //BRA.health = 10;
@@ -376,7 +376,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             ptGain = BRF.ptBounty; 
             avatar.battleWins = avatar.battleWins + 1;
             //console.log('XP-bounty', xpGain);
-            console.log('PT-bounty', ptGain);
+            //console.log('PT-bounty', ptGain);
             //console.log('1pbas- ',postBattleActions);
             avatar.photonTokens += ptGain;
             //console.log('Avatar id should be 253', avatar.id);
@@ -444,7 +444,6 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
-
         // If Any postbattle abilities exist, use them
         // Now if i want, new items can do things in this function!
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
@@ -455,12 +454,12 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
       return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
     }).then((data) => {
-      console.log('UPDATED ALL BATTLES AND RAN PBAS');
-      console.log('data after all battles and pbas settled - ', data);
+      //console.log('UPDATED ALL BATTLES AND RAN PBAS');
+      //console.log('data after all battles and pbas settled - ', data);
       const allUpdateAvatarPromises = [];
       allAvatarIds.forEach((avatarId, i) =>{
-        //console.log('this will update - ');
-        //console.log('alpaca ID and update - ',avatarId, avatarUpdates[avatarId]);
+        // console.log('this will update - ');
+        // console.log('alpaca ID and update - ',avatarId, avatarUpdates[avatarId]);
 
         allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[avatarId],{ where: { id: avatarId } }));
       });

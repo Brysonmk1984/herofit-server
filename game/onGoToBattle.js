@@ -10,20 +10,20 @@ const { ALL_BATTLE_EFFECTS } = require('../game/CONSTANTS');
 // ON GOTOBATTLE, save list of effects from avatar's items
 function determineItemEffects(equipment){
   const reduced = equipment.reduce((filtered, item) => {
-    console.log('itemname', item.name);
-    console.log(item.effects);
+    //console.log('itemname', item.name);
+    //console.log(item.effects);
     // Item primary effect, push it to array if it exists
     if(item.effects && item.effects.length){
       // Determine if item effects are battle effects
       const battleItemEffects = _determineIfBattleEffects(item.effects);
       
-      console.log('', battleItemEffects);
+      //console.log('', battleItemEffects);
       filtered.push(...battleItemEffects);
     }
     return filtered;
   }, []);
 
-  console.log(reduced);
+  //console.log(reduced);
 
   return reduced;
 }
@@ -31,7 +31,7 @@ function determineItemEffects(equipment){
 // Filter item effects down to just battle effects
 function _determineIfBattleEffects(itemEffects){
   const battleItemEffects = itemEffects.filter((effect) => {
-    console.log('EFFECTTT - ', effect);
+    //console.log('EFFECTTT - ', effect);
     return effect.type === 'prebattle' || effect.type === 'postbattle';
   });
   return battleItemEffects;
@@ -88,6 +88,19 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
         const allPastRewards = [...skinNamesArray, ...titleNamesArray, ...petNamesArray];
         // Check if foe has been defeated
         allPbaCheckPromises.push(_checkDefeatedParticularFoe(avatar.id, foe.type, 'Titans', foe.name, allPastRewards));
+      }
+    }
+
+    if(foe.class === 'Elementals'){
+      const minorFoes = ['Gusty Rascal', 'Rock Skipper', 'Flame Fiend', 'Splash Artist'];
+      const midLevelFoes = ['Wheezing Jinn', 'Granite Golem', 'Flaming Jinn', 'Cyclonic Siren'];
+      
+      if(minorFoes.includes(foe.type)){
+        // Check if current foe is last of type of foe
+        allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, 'Elementals', foe.name, petNamesArray));
+      }else if(midLevelFoes.includes(foe.type)){
+        // Check if current foe is last of type of foe
+        allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, 'Elementals', foe.name, titleNamesArray));
       }
     }
 
@@ -189,13 +202,13 @@ function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName
 }
 
 // CHECKS IF THE CURRENT FOE WILL GRANT A NEW SKIN FOR BEING LAST OF TYPE
-function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentFoeName, skinNamesArray){
-  // FIND ALL BATTLES WHERE THE AVATAR WON AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
+function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentFoeName, itemTypeNamesArray){
+  // FIND ALL BATTLES WHERE THE AVATAR WON or DKO AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
   return Battle.findAll({
     attributes : ["foe"],
     where : {  
       avatarID : avatarId, 
-      [Op.or]: [{ outcome: 'Avatar Wins' }],
+      [Op.or]: [{ outcome: 'Avatar Wins' }, { outcome: 'Double KO' }],
       "foe.type" : { [Op.eq] : foeType  }
     },
     raw : true 
@@ -211,7 +224,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
 
       // Remove duplicates from foesDefeated
       const fdNoDUpes = [...new Set(foesDefeated)];
-
+      //console.log('ASDASD-', VILLAINS[foeClass]);
       // All foes of a certain type
       const allFoes = VILLAINS[foeClass].find(foe => foe.type === foeType).foe.slice().sort();
       //console.log('AF',allFoes);
@@ -224,7 +237,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
       if(currentFoeName.includes('Shadow')){
         const currentFoeName = 'Shadow-Self';
         // If Shadow self was already defeated, or f user already has the Shadow Self Skin, just return undefined
-        if(fdNoDUpes.includes('Shadow-Self') || skinNamesArray.includes('Shadow Self')){
+        if(fdNoDUpes.includes('Shadow-Self') || itemTypeNamesArray.includes('Shadow Self')){
           return undefined;
         // If Shadow-Self wasn't defeated, then add the GRANT Shadow-Self award
         }else{
@@ -245,11 +258,11 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
         if(isLastOfType){
          
           // Consider moving the PBA action to the normal PBA JSON file
-          const action = VILLAINS['Spirits'].find(f => f.type === foeType).pba[0];
+          const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];
           const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
           //console.log('action', action, 'MPBA - ', matchingPBA);
           // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin
-          const isCriticalWin = !skinNamesArray.includes(matchingPBA.name);
+          const isCriticalWin = !itemTypeNamesArray.includes(matchingPBA.name);
           
           // Win is critical if it's unearned
           if(isCriticalWin){

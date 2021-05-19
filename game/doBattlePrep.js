@@ -167,7 +167,7 @@ function doFoeBattlePrep(avatar, foe, ability){
       const avatarHealth = avatar.health;
       const stolenHealth =  avatarHealth * .125;
 
-      fFoe = foe.health + stolenHealth;
+      fFoe.health = foe.health + stolenHealth;
       fAvatar.health = avatar.health - stolenHealth;
       break ;
       default:
