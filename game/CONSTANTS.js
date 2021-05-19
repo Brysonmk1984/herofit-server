@@ -70,9 +70,9 @@ const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  HEALTH : .75,
+  HEALTH : .79,
   QP : 1,
-  POWER : .75
+  POWER : .79
 };
 
 
@@ -123,7 +123,7 @@ const HIGH_LEVEL = 60;
 // Applies to mid level +
 const LEVEL_DIFFICULTY_MOD = 1.31;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.21;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.29;
 
 // BATTLE EFFECTS
 const AVATAR_BATTLE_EFFECTS = ["Battle: Hero +10 Health", "Battle: Hero +5 Water"];

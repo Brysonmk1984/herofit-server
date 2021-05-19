@@ -298,22 +298,22 @@ describe('Battle all generated foes against av profiles', ()=>{
     //console.log('RRR-', totals.lowLevel.wins, totals.count, (totals.lowLevel.wins / totals.count), ((totals.lowLevel.wins / totals.count) > .65));
     // Above min threshold
     
-    expect(lowLevelWinRate).toBeGreaterThanOrEqual(.65);
-    expect(midLevelWinRate).toBeGreaterThanOrEqual(.65);
-    expect(highLevelWinRate).toBeGreaterThanOrEqual(.65);
-    expect(overallWinRate).toBeGreaterThanOrEqual(.65);
+    expect(lowLevelWinRate).toBeGreaterThanOrEqual(.60);
+    expect(midLevelWinRate).toBeGreaterThanOrEqual(.60);
+    expect(highLevelWinRate).toBeGreaterThanOrEqual(.60);
+    expect(overallWinRate).toBeGreaterThanOrEqual(.60);
     // Below max threshold
-    expect(lowLevelWinRate).toBeLessThan(.80);
-    expect(midLevelWinRate).toBeLessThan(.80);
-    expect(highLevelWinRate).toBeLessThan(.80);
-    expect(overallWinRate).toBeLessThan(.80);
+    expect(lowLevelWinRate).toBeLessThan(.75);
+    expect(midLevelWinRate).toBeLessThan(.75);
+    expect(highLevelWinRate).toBeLessThan(.75);
+    expect(overallWinRate).toBeLessThan(.75);
   });
 
   it('Loss % for each avatar level group should be below the threshold', () =>{
-    expect(lowLevelLossRate).toBeLessThan(.33);
-    expect(midLevelLossRate).toBeLessThan(.33);
-    expect(highLevelLossRate).toBeLessThan(.33);
-    expect(overallLossRate).toBeLessThan(.33);
+    expect(lowLevelLossRate).toBeLessThan(.35);
+    expect(midLevelLossRate).toBeLessThan(.35);
+    expect(highLevelLossRate).toBeLessThan(.35);
+    expect(overallLossRate).toBeLessThan(.35);
   });
 
   it('Draw % for each avatar level group should be below the threshold', () =>{
@@ -331,8 +331,8 @@ describe('Battle all generated foes against av profiles', ()=>{
   });
 
   it('Win % by class should be within threshold', () =>{
-    expect(winRateVsSpirits).toBeGreaterThanOrEqual(.65);
-    expect(winRateVsElementals).toBeGreaterThanOrEqual(.65);
+    expect(winRateVsSpirits).toBeGreaterThanOrEqual(.60);
+    expect(winRateVsElementals).toBeGreaterThanOrEqual(.60);
     if(totals.totalsVs.titans > 2){
       expect(winRateVsTitans).toBeGreaterThanOrEqual(.33);
       expect(winRateVsTitans).toBeLessThan(.66);

@@ -141,7 +141,7 @@ function generateFoeStats(avatar, foe){
         break;
       }
     case 'Elementals':
-      const elementalQp = FOE_MOD.QP * 1.2;
+      const elementalQp = FOE_MOD.QP * 1.3;
 
       randomizedHealth = randomizer(baseFoeHealth);
       randomizedPower = randomizer(baseFoePower);
