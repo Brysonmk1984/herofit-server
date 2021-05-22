@@ -188,7 +188,7 @@ describe('Racoon effects should correctly modify stats', ()=>{
       {
       "name" : "Frisky Mischief",
       "type" : "prebattle",
-      "description" : "The Scrappy Coon has a chance to exchange your lowest stat for the foe''s same stat."
+      "description" : "The Feisty Coon has a chance to exchange your lowest stat for the foe''s same stat."
       }];
 
       const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);

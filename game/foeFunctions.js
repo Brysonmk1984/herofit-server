@@ -169,6 +169,22 @@ function generateFoeStats(avatar, foe){
           fws.water = 25;
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
+        case "Wheezing Jinn":
+          fws.air = 75;
+          qpAdjustedStats = ["air", "armor","power","health"]; 
+          break; 
+        case "Granite Golem":
+          fws.air = 75;
+          qpAdjustedStats = ["earth", "armor","power","health"]; 
+          break; 
+        case "Flaming Jinn":
+          fws.air = 75;
+          qpAdjustedStats = ["fire", "armor","power","health"]; 
+          break; 
+        case "Cyclonic Siren":
+          fws.air = 75;
+          qpAdjustedStats = ["water", "armor","power","health"]; 
+          break; 
         default :
           qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
           break; 

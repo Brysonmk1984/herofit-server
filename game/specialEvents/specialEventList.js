@@ -5,8 +5,8 @@ const testSpecificFoe = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds : 100,
-    foe : 'Banshee',
-    foeClass : 'Spirits'
+    foe : 'Wheezing Jinn',
+    foeClass : 'Elementals'
   },
   {
     type : 'foeLikelihood',
@@ -21,6 +21,12 @@ const testSpecificFoe = {
     stats : ['air']
   }*/],
 }
+
+/*
+
+DONT FORGET, FOR LVL 2 FOES, NEED TO CHANGE BONUS PERCENTS FOR XP & PT
+
+*/
 
 const attackOfTheElements = {
   eventName : "Attack of the Elements",

@@ -184,6 +184,7 @@ router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJW
 
       // IF the avatar won, Get the items acquired from the action types in the battle report
       if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
+
         Items.findAll({
           attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
