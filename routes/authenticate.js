@@ -6,6 +6,8 @@ const User = require('../db').User;
 const moment = require('moment');
 const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
+// mobile app only
+const heroList = require('../heroList.json');
 
 // Handles both Register and login. 
 router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
@@ -149,11 +151,19 @@ router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT
   ).then((data) =>{
     res.formatter.ok({ data : "seen latest patch set to true" });
   }).catch((error) =>{
-    console.log(`Couldnt update seenLatestPatch boolean for userID ${id}`);
+    console.log(`Couldn't update seenLatestPatch boolean for userID ${id}`);
     res.formatter.serverError(error.toString(), "Database or server code error for /update-seen-latest-patch");
   });
 });
 
+// Mobile app only
+router.get('/hero-list', (req, res) =>{
+  if(!heroList){
+    const error = new Error("Couldn't retrieve hero list!")
+    res.formatter.serverError(error.toString());
+  }
+  res.formatter.ok(heroList);
+});
 
 module.exports = router;
 
