@@ -303,6 +303,29 @@
         "type" : "pet",
         "name" : "Flame Fiend"
       }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Splash Artist",
+      "foe" : [
+        "Aalto",
+        "Hai",
+        "Kai",
+        "Naia",
+        "Rio",
+        "Tasi"
+      ],
+      "ability": {
+        "name" : "Water Attuned",
+        "effect" : "Minor Water Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Splash Artist"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Splash Artist"
+      }
     }
   ]
 }

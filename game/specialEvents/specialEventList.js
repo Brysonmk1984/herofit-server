@@ -34,19 +34,19 @@ const attackOfTheElements = {
   actionTypes : [{
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
-    odds :33,
-    foe : 'Flame Fiend',
+    odds : 33,
+    foe : 'Splash Artist',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 1.0,
-    requirements : [{ foeType : 'Flame Fiend' }]
+    requirements : [{ foeType : 'Splash Artist' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : .5,
-    requirements : [{ foeType : 'Flame Fiend' }]
+    requirements : [{ foeType : 'Splash Artist' }]
   }],
 }
 
