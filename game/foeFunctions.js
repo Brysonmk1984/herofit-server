@@ -47,7 +47,7 @@ function selectFoeTemplate(level){
   let finalFoeArray =  bossEncounter ? levelRequiredFoes : minorFoes;
 
   // Randomly select from finalFoeArray and return it as the selected foe
-  return finalFoeArray[Math.floor(Math.random() * levelRequiredFoes.length)];
+  return finalFoeArray[Math.floor(Math.random() * finalFoeArray.length)];
 }
 
 function generateFoeStats(avatar, foe){
