@@ -440,12 +440,13 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         },
         { where: { id: allBattleIds[i] }, raw : true }
         ));
-
+        
         const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
+        console.log('AVATAR CHECK adj - ', avatar, limitedAHealthRemaining, b.outcomeData.avatarStatus,xpGain, qpEarned);
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
-        console.log('AVATAR CHECK BEFORE PBA - ', avatar);
+
         // If Any postbattle abilities exist, use them
         // Now if i want, new items can do things in this function!
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
