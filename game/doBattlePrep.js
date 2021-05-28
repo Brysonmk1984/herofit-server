@@ -148,7 +148,7 @@ function doFoeBattlePrep(avatar, foe, ability){
       // Unholy Armor
       // Bonus to Armor
       // Also has higher health from stats
-      fFoe = Math.floor(foeArmor + (foeArmor * .33));
+      fFoe.armor = Math.floor(foeArmor + (foeArmor * .33));
       break;
     case "Can't Hide from Me":
       // Armor Break
@@ -156,7 +156,7 @@ function doFoeBattlePrep(avatar, foe, ability){
       break;
     case "Shadowy Influx":
       // Health Bonus
-      fFoe = Math.floor(foe.health + (foe.health * .2));
+      fFoe.health = Math.floor(foe.health + (foe.health * .2));
       break;
     case "Breath Bane":
       // Health Reduction

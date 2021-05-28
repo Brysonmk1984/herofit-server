@@ -63,7 +63,7 @@ function runBattlesOnBatch(shard, shardIndex){
   return Promise.allSettled(allAvatarPromises)
 
   .then((results) =>{
-    results.forEach((result) => console.log('Find Avatar Promises', result.status));
+    //results.forEach((result) => console.log('Find Avatar Promises', result.status));
     const avatars = results.map((result) => result.value);
     
     //console.log('AV LENGTH - ', avatars.length);
@@ -214,7 +214,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
       // If Any postbattle abilities exist, use them
       avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
-      //console.log('AVATAR CHECK - ', avatar);
+      console.log('AVATAR CHECK - ', avatar);
       avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
       
       // End Avatar for each
@@ -222,7 +222,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
     return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
   }).then((data) => {
-    data.forEach((result) => console.log('Battle & PBS Promises:', result.status));
+    //data.forEach((result) => console.log('Battle & PBS Promises:', result.status));
     console.log(`SHARD ${shardIndex} - UPDATED ALL BATTLES AND RAN ALL PBAS - cron`, data);
     
     const allUpdateAvatarPromises = [];
@@ -232,7 +232,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
     return Promise.allSettled(allUpdateAvatarPromises);
   }).then((results) =>{
-    results.forEach((result) => console.log('AvatarUpdate Promises', result.status));
+    //results.forEach((result) => console.log('AvatarUpdate Promises', result.status));
   }).catch((error) =>{
     console.log(`SHARD ${shardIndex} - BATTLE ERROR - `, error);
   });
@@ -261,7 +261,7 @@ Battle.findAll({
   }));
 
 }).then((results) => {
-  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+  //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;

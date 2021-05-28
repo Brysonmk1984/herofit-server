@@ -299,7 +299,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
 
         // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-        avatar = parseAvatarProperties(avatar);
+        avatar = parseAvatarProperties(avatar, true);
         const foeWithStats  = allFoes[i];
 
         // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
@@ -311,7 +311,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
         let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
-        console.log('SAV1', sAvatar);
+        console.log('sFoe1', sFoe);
         // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
         if(allEffects[i] && allEffects[i].length){
           const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
@@ -321,20 +321,21 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           sAvatar = abp.avatar;
           sFoe = abp.foe;
         }
-        console.log('SAV2', sAvatar);
+        
         // BATTLE STEP 4 - FOE USES prebattle ABILITY
         if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
           if(scenario.id !== FOE_NON_ACTION){
+            console.log('sFoe2', sFoe, foeWithStats.ability);
             const fbp = doFoeBattlePrep(sAvatar, sFoe, foeWithStats.ability);
             sAvatar = fbp.avatar;
             sFoe = fbp.foe;
           }
         }
-        console.log('SAV3', sAvatar);
+        console.log('sFoe3', sFoe);
         // Element by Seasonal Element Bonus
         sAvatar[seasonalBonusElement] *= 1.25;
         sFoe[seasonalBonusElement] *= 1.25;
-
+        console.log('sFoe4', sFoe);
         const BRA = sAvatar;
         const BRF = sFoe;
 
@@ -357,7 +358,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
           }
         }
-        console.log('BRA=', BRA);
+        console.log('BRF=', BRA, BRF);
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const b = doBattle(BRA, BRF, goesFirst);
 
