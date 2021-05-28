@@ -90,7 +90,7 @@ function determinePtBounty(heroLevel,bonusPt = 0, foeType){
 
 // DO POST BATTLE ACTIONS
 function doAllPbas(avatarID, postBattleActions, battleOutcome){
-  console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID, 'BO - ', battleOutcome);
+  //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID, 'BO - ', battleOutcome);
 
   const itemsToInsert = [];
   
@@ -126,7 +126,7 @@ function doAllPbas(avatarID, postBattleActions, battleOutcome){
     
   });
 
-  console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
+  //console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
   // INSERT all the items from the itemsToInsert array, gathered from the PBAs
   return AvatarItems.bulkCreate(itemsToInsert);
 }

@@ -415,7 +415,6 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         // Check for lvl up
         const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
         const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-          console.log('B=', b);
         allBattlePromises.push(Battle.update({
           scenario : scenario.id,
           outcome : b.outcomeData.outcome,
@@ -443,7 +442,6 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         ));
         
         const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
-        console.log('AVATAR CHECK adj - ', avatar, limitedAHealthRemaining, b.outcomeData.avatarStatus,xpGain, qpEarned);
         avatar.status = b.outcomeData.avatarStatus;
         avatar.battleXP += xpGain;
         avatar.qp += qpEarned;
@@ -451,7 +449,6 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         // If Any postbattle abilities exist, use them
         // Now if i want, new items can do things in this function!
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
-        console.log('AVATAR CHECK - ', avatar);
         avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
 
         // End Avatar for each
