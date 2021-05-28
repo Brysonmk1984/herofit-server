@@ -311,7 +311,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
         // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
         let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
-
+        console.log('SAV1', sAvatar);
         // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
         if(allEffects[i] && allEffects[i].length){
           const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
@@ -321,7 +321,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
           sAvatar = abp.avatar;
           sFoe = abp.foe;
         }
-  
+        console.log('SAV2', sAvatar);
         // BATTLE STEP 4 - FOE USES prebattle ABILITY
         if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
           if(scenario.id !== FOE_NON_ACTION){
@@ -330,7 +330,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             sFoe = fbp.foe;
           }
         }
- 
+        console.log('SAV3', sAvatar);
         // Element by Seasonal Element Bonus
         sAvatar[seasonalBonusElement] *= 1.25;
         sFoe[seasonalBonusElement] *= 1.25;
@@ -357,7 +357,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
             goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
           }
         }
-
+        console.log('BRA=', BRA);
         // BATTLE STEP 5 - EXCHANGE DAMAGE
         const b = doBattle(BRA, BRF, goesFirst);
 
