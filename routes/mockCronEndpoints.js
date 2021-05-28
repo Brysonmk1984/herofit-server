@@ -414,7 +414,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         // Check for lvl up
         const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
         const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-
+          console.log('B=', b);
         allBattlePromises.push(Battle.update({
           scenario : scenario.id,
           outcome : b.outcomeData.outcome,
