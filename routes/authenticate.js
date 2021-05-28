@@ -160,9 +160,15 @@ router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT
 router.get('/hero-list', (req, res) =>{
   if(!heroList){
     const error = new Error("Couldn't retrieve hero list!")
-    res.formatter.serverError(error.toString());
+    return res.formatter.serverError(error.toString());
   }
-  res.formatter.ok(heroList);
+  const heroListForApp = heroList.map(heroData => {
+    return { character : heroData.character, alias : heroData.alias, description : heroData.description, history : heroData.history,
+      fire : heroData.elms.fire, earth : heroData.elms.earth, water  : heroData.elms.water, air : heroData.elms.air
+    }
+  })
+
+  res.formatter.ok(heroListForApp);
 });
 
 module.exports = router;

@@ -290,6 +290,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
     return Promise.allSettled(allAvatarPromises)
 
     .then((results) =>{
+      results.forEach((result) => console.log('Find Avatar Promises', result.status));
       const avatars = results.map((result) => result.value);
 
       //console.log('AV LENGTH - ', avatars.length);
@@ -447,6 +448,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
         // If Any postbattle abilities exist, use them
         // Now if i want, new items can do things in this function!
         avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
+        console.log('AVATAR CHECK - ', avatar);
         avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
 
         // End Avatar for each
@@ -454,6 +456,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
       return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
     }).then((data) => {
+      data.forEach((result) => console.log('Battle & PBS Promises:', result.status));
       //console.log('UPDATED ALL BATTLES AND RAN PBAS');
       //console.log('data after all battles and pbas settled - ', data);
       const allUpdateAvatarPromises = [];
@@ -465,7 +468,8 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
       });
 
       return Promise.allSettled(allUpdateAvatarPromises);
-      
+    }).then((results) =>{
+      results.forEach((result) => console.log('AvatarUpdate Promises', result.status));
     }).catch((error) =>{
       console.log('ERROR - ', error);
     });
@@ -498,7 +502,8 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
     }));
 
   // TALLY UP THE RESULTS AND SEND EMAIL
-  }).then(() => {
+  }).then((results) => {
+      results.forEach((result) => console.log('All battle Promise Results - ', result.status))
       console.log('ALL AVATARS UPDATED');
       tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
       tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;

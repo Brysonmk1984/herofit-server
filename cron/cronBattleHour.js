@@ -58,10 +58,12 @@ function runBattlesOnBatch(shard, shardIndex){
       { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
     ));
   });
-  // NOT SURE WHY THIS NEEDS to be promise.all instead of allSettled
+
+
   return Promise.allSettled(allAvatarPromises)
 
   .then((results) =>{
+    results.forEach((result) => console.log('Find Avatar Promises', result.status));
     const avatars = results.map((result) => result.value);
     
     //console.log('AV LENGTH - ', avatars.length);
@@ -220,6 +222,7 @@ function runBattlesOnBatch(shard, shardIndex){
 
     return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
   }).then((data) => {
+    data.forEach((result) => console.log('Battle & PBS Promises:', result.status));
     console.log(`SHARD ${shardIndex} - UPDATED ALL BATTLES AND RAN ALL PBAS - cron`, data);
     
     const allUpdateAvatarPromises = [];
@@ -228,7 +231,8 @@ function runBattlesOnBatch(shard, shardIndex){
     });
 
     return Promise.allSettled(allUpdateAvatarPromises);
-    
+  }).then((results) =>{
+    results.forEach((result) => console.log('AvatarUpdate Promises', result.status));
   }).catch((error) =>{
     console.log(`SHARD ${shardIndex} - BATTLE ERROR - `, error);
   });
@@ -241,13 +245,13 @@ Battle.findAll({
 }).then((battles) =>{
   console.log('BATTLECOUNT - ', battles.length);
   // Need to divide records into groups of 7
-  battleShards = arrayChunker(battles, 9);
+  battleShards = arrayChunker(battles, 6);
   console.log('BattleShard length = ', battleShards.length);
   
   return Promise.allSettled(battleShards.map(async (shard, i) => {
     //console.log('I - ', i);
-    // Update one batch every 9 seconds
-    const timeoutDuration = i * 9000;
+    // Update one batch every 6 seconds
+    const timeoutDuration = i * 6000;
 
     return await new Promise((resolve) =>{
       setTimeout(() => {
@@ -256,8 +260,8 @@ Battle.findAll({
     });
   }));
 
-}).then(() => {
-  //results.forEach((result) => console.log('All battle Promise Results - ', result.status))
+}).then((results) => {
+  results.forEach((result) => console.log('All battle Promise Results - ', result.status))
   tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
   tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
   tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
