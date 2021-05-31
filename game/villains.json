@@ -326,6 +326,29 @@
         "type" : "pet",
         "name" : "Splash Artist"
       }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Wheezing Jinn",
+      "foe" : [
+        "Amaterasu",
+        "Anemone",
+        "Caelestis",
+        "Houa",
+        "Tempest",
+        "Zephyr"
+      ],
+      "ability": {
+        "name" : "Air Proficiency",
+        "effect" : "Major Air Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Air Stalker"],
+      "reward" : {
+        "type" : "title",
+        "name" : "Air Stalker"
+      }
     }
   ]
 }

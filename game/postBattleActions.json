@@ -104,7 +104,7 @@
       "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
-      "itemID" : 38,
+      "itemID" : 37,
       "action" : "Grant Fire Hunter",
       "name" : "Fire Hunter",
       "type" : "Award Title",
@@ -112,7 +112,7 @@
       "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
-      "itemID" : 39,
+      "itemID" : 38,
       "action" : "Grant Earth Trapper",
       "name" : "Earth Trapper",
       "type" : "Award Title",
@@ -120,7 +120,7 @@
       "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
-      "itemID" : 40,
+      "itemID" : 39,
       "action" : "Grant Water Predator",
       "name" : "Water Predator",
       "type" : "Award Title",
@@ -128,7 +128,7 @@
       "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
-      "itemID" : 41,
+      "itemID" : 40,
       "action" : "Grant Air Stalker",
       "name" : "Air Stalker",
       "type" : "Award Title",

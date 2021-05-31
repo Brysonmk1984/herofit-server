@@ -48,7 +48,7 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
     foeName = `Shadow ${avatar.name}`;
   }else{
     // specific foe for testing purposes
-    //foeName = foeTemplate.foe[5];
+    //foeName = foeTemplate.foe[1];
     
     foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
 
@@ -231,7 +231,8 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
 
      // IF the avatar won, Get the items aquired from the action types in the battle report
-    if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
+    // STILL NOT HANDLING DKO fetch item for beating foe list
+     if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
       return Items.findAll({
         attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
         where : { action : { [Op.in] : adjResult.postBattleActions } }

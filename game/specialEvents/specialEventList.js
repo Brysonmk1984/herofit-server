@@ -35,18 +35,18 @@ const attackOfTheElements = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds : 33,
-    foe : 'Splash Artist',
+    foe : 'Wheezing Jinn',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
-    bonusPercent : 1.0,
-    requirements : [{ foeType : 'Splash Artist' }]
+    bonusPercent : 2.0,
+    requirements : [{ foeType : 'Wheezing Jinn' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
-    bonusPercent : .5,
-    requirements : [{ foeType : 'Splash Artist' }]
+    bonusPercent : 1.0,
+    requirements : [{ foeType : 'Wheezing Jinn' }]
   }],
 }
 

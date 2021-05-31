@@ -1,36 +1,12 @@
 [
-  {
-    "class" : "Elementals",
-    "type" : "Wheezing Jinn",
-    "foe" : [
-      "Amaterasu",
-      "Anemone",
-      "Caelestis",
-      "Houa",
-      "Tempest",
-      "Zephyr"
-    ],
-    "ability": {
-      "name" : "Air Attuned",
-      "effect" : "Air Emphasis",
-      "type" : "prebattle"
-    },
-    "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
-    "pba" : ["Grant Air Stalker"],
-    "reward" : {
-      "type" : "title",
-      "name" : "Air Stalker"
-    }
-  },
+  
   {
     "class" : "Elementals",
     "type" : "Storming Oni",
     "foe" : ["Fūjin"],
     "ability": {
-      "name" : "Air Attuned",
-      "effect" : "Air Emphasis",
+      "name" : "Air Mastery",
+      "effect" : "Profound Air Threat",
       "type" : "prebattle"
     },
     "color" : null,
@@ -59,8 +35,6 @@
       "type" : "prebattle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
     "pba" : ["Grant Earth Trapper"],
     "reward" : {
       "type" : "title",
@@ -69,7 +43,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Hulking Crag",
+    "type" : "Hulking Aggro Crag",
     "foe" : ["Terran"],
     "ability": {
       "name" : "Earth Mastery",
@@ -90,7 +64,7 @@
 
   {
     "class" : "Elementals",
-    "type" : "Flaming Jinn",
+    "type" : "Burning Jinn",
     "foe" : [
       "Agni",
       "Helene",
@@ -105,8 +79,6 @@
       "type" : "prebattle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
     "pba" : ["Grant Fire Hunter"],
     "reward" : {
       "type" : "title",
@@ -149,8 +121,6 @@
       "type" : "prebattle"
     },
     "color" : null,
-    "bonusXpBase": 25,
-    "bonusPtBase": 50,
     "pba" : ["Grant Water Predator"],
     "reward" : {
       "type" : "title",
@@ -159,7 +129,7 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Tidal-Borne  Dame",
+    "type" : "High Priestess of the Tides",
     "foe" : ["Maya"],
     "ability": {
       "name" : "Water Mastery",

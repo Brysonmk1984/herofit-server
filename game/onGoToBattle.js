@@ -93,7 +93,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
 
     if(foe.class === 'Elementals'){
       const minorFoes = ['Gusty Rascal', 'Rock Skipper', 'Flame Fiend', 'Splash Artist'];
-      const midLevelFoes = ['Wheezing Jinn', 'Granite Golem', 'Flaming Jinn', 'Cyclonic Siren'];
+      const midLevelFoes = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
       
       if(minorFoes.includes(foe.type)){
         // Check if current foe is last of type of foe
