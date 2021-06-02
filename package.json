@@ -1,17 +1,19 @@
 {
   "name": "stravat-cognito",
-  "version": "1.4.9",
+  "version": "1.4.10",
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest --verbose",
+    "test:watch": "jest --watch --verbose",
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js"
   },
   "jest": {
-    "testEnvironment": "node"
-  },
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["./__tests__/nullOrAny.setup.js"],
+    "testPathIgnorePatterns": ["./__tests__/battles", "./__tests__/nullOrAny.setup.js"]
+    },
   "author": "Bryson Kruk",
   "license": "MIT",
   "devDependencies": {

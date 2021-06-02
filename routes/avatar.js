@@ -13,6 +13,7 @@ const { parseAvatarProperties, paginate } = require('../helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
+const activityItemFind = require('../game/activityItemFind');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 // Create Avatar in DB after Signup
@@ -139,6 +140,12 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       fire : Math.floor(avatar.fire - avStatSnapshot.fire),
       earth : Math.floor(avatar.earth - avStatSnapshot.earth),
     };
+
+    // RUN FUNCTION TO CHECK FOR FOUND ITEMS
+    activityItemFind(aXPDiff, avatar.level);
+
+
+
     //console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
     res.formatter.ok({
       avatar,
