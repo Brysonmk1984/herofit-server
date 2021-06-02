@@ -114,7 +114,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     const updatedHealth = updateHealth(endingLevel, avatar.qpHealth);
     const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
     const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : lvlUp ? updatedHealth : avatar.health, maxHealth : updatedHealth, fire, earth, water, air, hasBeenUpgraded : true });
-    //console.log(avatar, updatedAvatar);
+        
     // Finally, Update Avatar in DB
     return Avatar.update(
       {...updatedAvatar},
@@ -133,18 +133,32 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
     // Calc gains here to be displayed on frontend
     const improvements = {
-      power : Math.floor(avatar.power - avStatSnapshot.power),
-      Health : Math.floor(avatar.maxHealth - avStatSnapshot.maxHealth),
-      air : Math.floor(avatar.air - avStatSnapshot.air),
-      water : Math.floor(avatar.water - avStatSnapshot.water),
-      fire : Math.floor(avatar.fire - avStatSnapshot.fire),
-      earth : Math.floor(avatar.earth - avStatSnapshot.earth),
+      power : avatar.power - avStatSnapshot.power,
+      Health : avatar.maxHealth - avStatSnapshot.maxHealth,
+      air : Number((avatar.air - avStatSnapshot.air).toFixed(2)),
+      water : Number((avatar.water - avStatSnapshot.water).toFixed(2)),
+      fire : Number((avatar.fire - avStatSnapshot.fire).toFixed(2)),
+      earth : Number((avatar.earth - avStatSnapshot.earth).toFixed(2)),
     };
 
+    // Needed for activity-specific items
+    const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
+    const weightedElms = {
+      air : (improvements.air / totalElmImprove) * 100,
+      water : (improvements.water / totalElmImprove) * 100,
+      fire : (improvements.fire / totalElmImprove) * 100,
+      earth : (improvements.earth / totalElmImprove) * 100,
+    }
     // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-    //activityItemFind(aXPDiff, avatar.level);
+    //const { items, pt } = activityItemFind(aXPDiff, avatar.level, weightedElms);
+    //console.log(items, pt);
+    // Now we need to add any items acquired from activities to a user's inventory
+    // And also update the avatar's PT
 
 
+    for(elm in improvements){
+      improvements[elm] = Math.floor(improvements[elm]);
+    }
 
     //console.log('LVL UP - ', lvlUp, 'REACHEDLEVEL - ', lvlAfterBuff, 'QPE - ', qpe);
     res.formatter.ok({
@@ -212,14 +226,11 @@ router.post('/check-avatar-name', body('name').isString(), (req, res) => {
   }
   const { name } = req.body;
 
-  Avatar.findOne({ where : { name : { [Op.iLike]: `%${name}%`} }, raw : true })
-  .then((result) => {
-    if(result){
-      const resultName = result.name.toLowerCase();
-      if(resultName === name){
-        return res.formatter.ok({ availability : false });
-      }
-      return res.formatter.ok({ availability : true });
+  Avatar.findAll({ where : { name : { [Op.iLike]: `%${name}%`} }, raw : true })
+  .then((results) => {
+    const match = results.find(av => av.name.toLowerCase() === name.toLowerCase());
+    if(match){
+      return res.formatter.ok({ availability : false });
     }
     return res.formatter.ok({ availability : true });
   }).catch((error) =>{
