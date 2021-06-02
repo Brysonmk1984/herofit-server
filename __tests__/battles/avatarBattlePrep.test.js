@@ -1,7 +1,7 @@
 const avatarProfiles = require('./heroProfiles.json');
-const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
-const doScenarioAndBonus = require('../game/doScenarioAndBonus');
-const { doAvatarBattlePrep } = require("../game/doBattlePrep"); 
+const { selectFoeTemplate, generateFoeStats } = require('../../game/foeFunctions');
+const doScenarioAndBonus = require('../../game/doScenarioAndBonus');
+const { doAvatarBattlePrep } = require("../../game/doBattlePrep"); 
 
 let randomAv;
 let foeTemplate;

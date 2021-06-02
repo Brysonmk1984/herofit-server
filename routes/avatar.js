@@ -13,7 +13,7 @@ const { parseAvatarProperties, paginate } = require('../helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
-//const activityItemFind = require('../game/activityItemFind');
+const activityItemFind = require('../game/activityItemFind');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 // Create Avatar in DB after Signup
@@ -150,8 +150,8 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       earth : (improvements.earth / totalElmImprove) * 100,
     }
     // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-    //const { items, pt } = activityItemFind(aXPDiff, avatar.level, weightedElms);
-    //console.log(items, pt);
+    const { items, pt } = activityItemFind(aXPDiff, avatar.level, weightedElms);
+    console.log(items, pt);
     // Now we need to add any items acquired from activities to a user's inventory
     // And also update the avatar's PT
 
