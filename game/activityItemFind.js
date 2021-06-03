@@ -14,8 +14,9 @@ function _pickElementSpecificItem(weightedElms, itemTupleArray){
 // Expects a tuple where the first index is an array of items and the second is an array of weights for likelyhood of being selected
 // Randomly & based on weights, pick from items and return selected
 function _pickFromGeneralItems(itemTuple, remainderPercent){
-  // 5% chance per hour to find a general item
-  const percentChance = remainderPercent ? ((remainderPercent * .01) * .03) * 100 : 3;
+  // 3% chance per hour to find a general item
+  const GENERALITEMCHANCE = { percent : 3, decimal : .03 };
+  const percentChance = remainderPercent ? ((remainderPercent * .01) * GENERALITEMCHANCE.decimal) * 100 : GENERALITEMCHANCE.percent;
   const foundItem = chance.bool({ likelihood : percentChance });
   if(foundItem){
     // select the item based on weights
@@ -29,7 +30,7 @@ function _ptFind(remainderPercent = null){
 
   const CHANCETOFINDPT = { percent : 33, decimal : .33 };
   const percentChance = remainderPercent ? ((remainderPercent * .01) * CHANCETOFINDPT.decimal) * 100 : CHANCETOFINDPT.percent;
-  const PTFINDBASE = 50;
+  const PTFINDBASE = 15;
   //console.log('IN PTFIND=', remainderPercent, 'PERCENT CHANCE', percentChance);
 
   const foundItem = chance.bool({ likelihood : percentChance });
@@ -45,10 +46,10 @@ function _ptFind(remainderPercent = null){
 // will possibly return a level 3 item acquired based on a 10% chance for a full hour's worth of activity
 // Second parameter is optional and represents a percentChance lower than 10 which is for partial hours
 function _elmLvl3Items(level, remainderPercent, weightedElms){
-  //console.log('LOOK=',level, remainderPercent, weightedElms);
   // If a remainderPercent is passed in, it means only a fraction of the whole 6% chance should be used in the calculation,
   // Multiplied by .01 to get decimal value, then multiplied by the decimal value of the base chance (.06), and finally multiplied by 100 to get the non-decimal percent value for this partial hour
-  const percentChance = remainderPercent ? ((remainderPercent * .01) * .6) * 100 : 6;
+  const T3ITEMCHANCE = { percent : 6, decimal : .06 };
+  const percentChance = remainderPercent ? ((remainderPercent * .01) * T3ITEMCHANCE.decimal) * 100 : T3ITEMCHANCE.percent;
   //console.log(percentChance);
   // Only test for lvl 3 elm item if player is over level 30
   if(level >= ELM_LEVEL_3_REQ){
@@ -123,6 +124,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms){
 }
 
 function activityItemFind(xpGain, level, weightedElms){
+  //console.log('XP GIAN', xpGain);
   const activityItemSessions = xpGain / 60;
   const integer = Math.floor(activityItemSessions);
   const remainder =  activityItemSessions % 1;
