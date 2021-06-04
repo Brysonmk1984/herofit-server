@@ -3,7 +3,7 @@ const passport = require('passport');
 const { genPassword } = require('../lib/passwordUtils');
 const { User } = require('../config/db');
 const { body, header, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT } = require('../jwt/jwtValidation');
 //db connection
 
 router.post('./login', (req, res)=>{

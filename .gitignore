@@ -2,7 +2,7 @@ node_modules
 # misc
 .DS_Store
 .env
-
+.pem
 pg_upgrade_internal.log
 pg_upgrade_server.log
 pg_upgrade_utility.log

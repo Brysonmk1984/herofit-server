@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT, authenticateAdminJWT } = require('../jwtValidation');
+const { authenticateAdminJWT } = require('..//jwt/jwtValidation');
 const router = express.Router(); 
 const { Avatar, AvatarItems, Battle } = require('../config/db');
 const { Op } = require("sequelize");

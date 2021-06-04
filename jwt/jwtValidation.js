@@ -2,9 +2,7 @@ const moment = require('moment');
 const jwt = require('jsonwebtoken');
 const jwkToPem = require('jwk-to-pem');
 const jwkJson =  require('./jwk.json');
-const key = jwkJson['keys'].find(key => {
-   return key.kid;
-})
+const key = jwkJson['keys'].find(key => key.kid);
 const pem = jwkToPem(key);
 
 const authenticateJWT = (req, res, next) => {
@@ -15,7 +13,7 @@ const authenticateJWT = (req, res, next) => {
   }
    const authHeader = req.headers.authorization;
    const token = authHeader.split(' ')[1];
-    //console.log('THE TOKEN in jwtValidation befor everify - ', token);
+    //console.log('THE TOKEN in jwtValidation before verify - ', token);
    jwt.verify(token,  pem, { algorithms: ['RS256'] }, (error, user) => {
       // TOKEN is invalid
       if(error) {
