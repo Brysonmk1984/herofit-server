@@ -6,7 +6,6 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
-const bodyParser = require("body-parser");
 const responseEnhancer = require('express-response-formatter').responseEnhancer;
 
 // COMMON
@@ -27,8 +26,8 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
   // logger
   app.use(morgan('dev'));
   app.use(cors({credentials: true, origin : true}));
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(responseEnhancer());
   app.set('trust proxy', 1);
