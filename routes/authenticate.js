@@ -1,8 +1,8 @@
 const express = require('express');
-const { body, header, validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
-const User = require('./config/db').User;
+const { User } = require('../config/db');
 const moment = require('moment');
 const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
@@ -17,7 +17,7 @@ router.get('/signup-or-signin', authenticateJWT,  (req, res) => {
   }
 
   if(config.mode === 'maintenance'){
-    return res.formatter.serviceUnavailable('Server is down for maintentance, please try again later...');
+    return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
     

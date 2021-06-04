@@ -1,9 +1,8 @@
-const Avatar = require('../routes/config/db').Avatar;
+const { Avatar } = require('../config/db');
 const { Op } = require("sequelize");
 const { parseAvatarProperties } = require('../lib/helperFunctions');
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD } = require('../game/CONSTANTS');
 const { sendCronErrorEmail } = require('../mail');
-const db = require('../routes/config/db').db;
 const chance = require('chance')();
 console.log('*** RUNNING CRON REVIVE ATTEMPT ***');
 

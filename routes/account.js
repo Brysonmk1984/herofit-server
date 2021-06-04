@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwtValidation');
 const router = express.Router(); 
-const { Avatar, User, Battle, AvatarItems } = require('./config/db');
+const { Avatar, User, Battle, AvatarItems } = require('../config/db');
 
 // UPDATE HERO NAME
 router.post('/update-avatar-name', body('owner').isEmail(), body('newHeroName').isString({ min: 3, max: 25 }), authenticateJWT, (req, res) => {

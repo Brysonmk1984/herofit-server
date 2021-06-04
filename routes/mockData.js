@@ -6,15 +6,12 @@ const fs = require('fs');
 const path = require("path");
 const moment = require('moment');
 const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../lib/helperFunctions');
+const { User, UserActivity, Avatar } = require('../config/db');
+const db = require('../config/db').db;
 // MOCK DATA
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
 const heroList = require('../heroList');
-// MODELS
-const User = require('./config/db').User;
-const UserActivity = require('./config/db').UserActivity;
-const Avatar = require('./config/db').Avatar;
-const db = require('./config/db').db;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end

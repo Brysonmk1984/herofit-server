@@ -1,7 +1,6 @@
-const Avatar = require('../routes/config/db').Avatar;
+const { Avatar } = require('../config/db');
 const { Op } = require("sequelize");
 const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/CONSTANTS');
-//const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
 const { parseAvatarProperties } = require('../lib/helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');

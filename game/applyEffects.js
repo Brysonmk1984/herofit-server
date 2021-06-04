@@ -1,5 +1,5 @@
 const { col } = require("sequelize");
-const { Avatar, UserTotal } = require('../routes/config/db');
+const { Avatar, UserTotal } = require('../config/db');
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./CONSTANTS');

@@ -1,5 +1,4 @@
-const Avatar = require('../routes/config/db').Avatar;
-const Battle = require('../routes/config/db').Battle;
+const { Avatar, Battle } = require('../config/db');
 const { sendBattleReportEmail, sendCronErrorEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
