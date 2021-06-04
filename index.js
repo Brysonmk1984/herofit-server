@@ -37,10 +37,10 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
   app.use(passport.initialize());
   // I think this is needed for serialize/deserialize user in passport
   //app.use(passport.session());
-  app.use((req, res, next) => {
-    console.log('PASSPORT USER=', req.user);
-    next();
-  });
+  // app.use((req, res, next) => {
+  //   console.log('PASSPORT USER=', req.user);
+  //   next();
+  // });
   
   app.options('*', cors())
   // HTTP Routes
