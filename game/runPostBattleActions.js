@@ -1,4 +1,4 @@
-const AvatarItems = require('../db').AvatarItems;
+const { AvatarItems } = require('../routes/config/db');
 const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT } = require('./CONSTANTS'); 
 const ALLPBAs = require('./postBattleActions.json');
 const { config } = require('../appConfig');

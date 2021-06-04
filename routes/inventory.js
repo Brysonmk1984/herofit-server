@@ -1,9 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Items = require('../db').Items;
+const { Avatar, AvatarItems, Items } = require('./config/db');
 const { Op, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
