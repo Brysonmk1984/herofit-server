@@ -5,7 +5,7 @@ const Avatar = require('../db').Avatar;
 const AvatarItems = require('../db').AvatarItems;
 const Items = require('../db').Items;
 const { Op, literal } = require("sequelize");
-const { stackItems, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
+const { stackItems, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
 const { authenticateJWT } = require('../jwtValidation');
 

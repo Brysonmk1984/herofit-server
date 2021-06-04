@@ -5,7 +5,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require("path");
 const moment = require('moment');
-const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../helperFunctions');
+const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../lib/helperFunctions');
 // MOCK DATA
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');

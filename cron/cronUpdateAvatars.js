@@ -3,7 +3,7 @@ const { Op } = require("sequelize");
 const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/CONSTANTS');
 //const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
-const { parseAvatarProperties } = require('../helperFunctions');
+const { parseAvatarProperties } = require('../lib/helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health

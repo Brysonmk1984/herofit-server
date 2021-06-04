@@ -17,7 +17,7 @@ const { determineItemEffects, determinePostBattleActions } = require('../game/on
 const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
 // All needed only for new single battle function
-const { parseAvatarProperties, cloneObj } = require('../helperFunctions');
+const { parseAvatarProperties, cloneObj } = require('../lib/helperFunctions');
 const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');

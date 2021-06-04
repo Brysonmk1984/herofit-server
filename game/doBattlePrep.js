@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { scrambleStats } = require('../helperFunctions');
+const { scrambleStats } = require('../lib/helperFunctions');
 
 function doAvatarBattlePrep(avatar, foe, effects, scenario){
   const eAvatar = { ...avatar };
