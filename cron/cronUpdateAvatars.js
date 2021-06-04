@@ -1,4 +1,4 @@
-const Avatar = require('../db').Avatar;
+const Avatar = require('../routes/config/db').Avatar;
 const { Op } = require("sequelize");
 const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/CONSTANTS');
 //const db = require('../db').db;

@@ -11,10 +11,10 @@ const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
 const heroList = require('../heroList');
 // MODELS
-const User = require('../db').User;
-const UserActivity = require('../db').UserActivity;
-const Avatar = require('../db').Avatar;
-const db = require('../db').db;
+const User = require('./config/db').User;
+const UserActivity = require('./config/db').UserActivity;
+const Avatar = require('./config/db').Avatar;
+const db = require('./config/db').db;
 
 
 // Create fake account from passed COGNITO EMAIL and return to front end

@@ -1,11 +1,11 @@
 const Sequelize = require('sequelize');
-const UserModel = require('./models/user.js');
-const AvatarModel = require('./models/avatar.js');
-const UserActivityModel = require('./models/userActivity.js');
-const UserTotalModel = require('./models/userTotal.js');
-const BattleModel = require('./models/battle.js');
-const AvatarItemsModel = require('./models/avatarItems.js');
-const ItemsModel = require('./models/items.js');
+const UserModel = require('../../models/user.js');
+const AvatarModel = require('../../models/avatar.js');
+const UserActivityModel = require('../../models/userActivity.js');
+const UserTotalModel = require('../../models/userTotal.js');
+const BattleModel = require('../../models/battle.js');
+const AvatarItemsModel = require('../../models/avatarItems.js');
+const ItemsModel = require('../../models/items.js');
 let db;
 let dbUrl;
 let sequelizeSettings;
