@@ -9,6 +9,7 @@ const cors = require('cors');
 const responseEnhancer = require('express-response-formatter').responseEnhancer;
 const passport = require('passport');
 // COMMON
+const authRoutes = require('./routes/auth');
 const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
 const accountRoutes = require('./routes/account');
@@ -32,20 +33,15 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
   app.use(responseEnhancer());
   app.set('trust proxy', 1);
 
-  // Passport Authentication
-  require('./config/passport');
+  // Passport JWT Authentication
+  require('./config/passport-jwt')(passport);
   app.use(passport.initialize());
-  // I think this is needed for serialize/deserialize user in passport
-  //app.use(passport.session());
-  // app.use((req, res, next) => {
-  //   console.log('PASSPORT USER=', req.user);
-  //   next();
-  // });
   
   app.options('*', cors())
   // HTTP Routes
 
   // Protected routes
+  app.use('/auth', authRoutes);
   app.use('/authenticate', authenticateRoutes);
   app.use('/avatar', avatarRoutes);
   app.use('/account', accountRoutes);

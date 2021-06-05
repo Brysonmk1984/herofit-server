@@ -1,7 +1,7 @@
 const express = require('express');
+const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/jwtValidation');
-const router = express.Router(); 
 const { User } = require('../config/db');
 const moment = require('moment');
 const { config } = require('../appConfig');
@@ -112,7 +112,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
       })
       .catch((error)=>{
         console.log(`Couldn't update Strava tokens for user ${email}, DEBUG: ${error}`);
-        res.serverError(error.toString(), `Couldn't update Strava tokens for user ${email}`);
+        res.formatter.serverError(error.toString(), `Couldn't update Strava tokens for user ${email}`);
       });
     } else {
       console.log('User not found!');

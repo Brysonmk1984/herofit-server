@@ -60,7 +60,15 @@ const UserModel = function(db, DataTypes){
         type : DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-    }
+    },
+    hash : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
+    salt : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
   });
 
       
