@@ -1,8 +1,7 @@
 
-const Avatar = require('../db').Avatar;
+const { Avatar } = require('../config/db');
 const { REVIVE_AMOUNT } = require('../game/CONSTANTS');
 const { sendCronErrorEmail } = require('../mail');
-//const db = require('../db').db;
 console.log('*** RUNNING CRON REVIVE ***');
 
 return Avatar.update(
