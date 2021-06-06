@@ -9,7 +9,7 @@ const { genPassword, validatePassword } = require('../lib/passwordUtils');
 // mobile app only
 const heroList = require('../heroList.json');
 
-router.post('/login', (req, res)=>{
+router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /login");
@@ -20,7 +20,7 @@ router.post('/login', (req, res)=>{
   }
 
   const { email, password } = req.body;
-
+  console.log(email, password);
 
   User.findOne({ where : { email }, raw : true })
   .then((user) =>{
@@ -31,9 +31,10 @@ router.post('/login', (req, res)=>{
     const isValid = validatePassword(password, user.hash, user.salt);
     if(isValid){
       const tokenObject = issueJWT(user);
-      res.formatter.ok({ user, tokenObject });
+      console.log(tokenObject);
+      return res.formatter.ok({ user, tokenObject });
     }else{
-      res.formatter.unauthorized(`Incorrect password, please try again.`);
+      return res.formatter.unauthorized(`Incorrect password, please try again.`);
     }
 
   }).catch((error) =>{
@@ -43,7 +44,7 @@ router.post('/login', (req, res)=>{
 
 });
 
-router.post('/register', (req, res)=>{
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('lastName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -56,12 +57,10 @@ router.post('/register', (req, res)=>{
   const { email, username, password, firstName, lastName } = req.body;
 
   const saltHash = genPassword(password);
-  const salt = saltHash.salt;
-  const hash = saltHash.hash;
+  const { salt, hash } = saltHash;
 
   const newUser = { 
     email,
-    // The new frontend should give the user an option for their display name, which is auto populated with firstName & last initial (Bryson K)
     username,
     firstName,
     lastName,
@@ -69,15 +68,13 @@ router.post('/register', (req, res)=>{
     salt 
   };
 
-  
-
   User.create(newUser)
   .then((result) => {
     // Not sure why sequelize can't do raw : true, so we need this:
     const user = result.get({ plain : true });
 
-    const jwt = issueJWT(user);
-    const response = { user, ...jwt };
+    const tokenObject = issueJWT(user);
+    const response = { user, tokenObject };
 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;

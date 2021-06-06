@@ -14,9 +14,9 @@ const UserModel = function(db, DataTypes){
       },
       username : {
         type : DataTypes.STRING,
-        unique : true,
+        unique: false,
         allowNull: false,
-        },
+    },
       email : {
           type : DataTypes.STRING,
           unique : true,
