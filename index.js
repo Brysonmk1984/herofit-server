@@ -10,7 +10,6 @@ const responseEnhancer = require('express-response-formatter').responseEnhancer;
 const passport = require('passport');
 // COMMON
 const authRoutes = require('./routes/auth');
-const authenticateRoutes = require('./routes/authenticate');
 const avatarRoutes = require('./routes/avatar');
 const accountRoutes = require('./routes/account');
 const inventoryRoutes = require('./routes/inventory');
@@ -42,7 +41,6 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
 
   // Protected routes
   app.use('/auth', authRoutes);
-  app.use('/authenticate', authenticateRoutes);
   app.use('/avatar', avatarRoutes);
   app.use('/account', accountRoutes);
   app.use('/inventory', inventoryRoutes);

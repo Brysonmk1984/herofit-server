@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwt/jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require('../config/db');
 const moment = require('moment');
@@ -48,7 +48,7 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
   });
 });
 
-// Update existing user's totals, happends FIRST in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
+// Update existing user's totals, happens FIRST in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
 router.post('/update-user-totals', body('email').isEmail(), body('activities').isArray(), body('hasBeenUpgraded').isBoolean(), body('accountDate').isString(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){

@@ -5,7 +5,7 @@ const { Avatar, AvatarItems, Items } = require('../config/db');
 const { Op, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
-const { authenticateJWT } = require('../jwt/jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 
 router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);

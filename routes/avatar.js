@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwt/jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const db = require('../config/db').db;
 const { Avatar, AvatarItems, User, UserTotal } = require('../config/db');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
