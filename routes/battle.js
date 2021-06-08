@@ -11,7 +11,7 @@ const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
 const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
-const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
+const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
 // All needed only for new single battle function
 const { parseAvatarProperties, cloneObj } = require('../lib/helperFunctions');
@@ -19,6 +19,7 @@ const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
+const chance = require('chance')();
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {

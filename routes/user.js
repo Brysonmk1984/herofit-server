@@ -10,13 +10,12 @@ const { Op } = require('sequelize');
 const passport = require('passport');
 
 // If an email is passed, get that user, otherwise get user based on JWT
-router.get('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
+    console.log(errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
   }
-  console.log('REQBODY', req.body);
-  console.log('REQUSER', req.user);
   const { email } = req.body;
   const user = req.user;
 
@@ -145,12 +144,12 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       //console.log(entry.activityId);
       return entry.activityId
     });
-    console.log('ACT ID MAP-', actIdMap);
+    //console.log('ACT ID MAP-', actIdMap);
     // Front end is determining which activities are new, so everything passed here can be added to db.
     UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
     //UserActivity.bulkCreate(entries)
     .then((result) =>{
-      console.log('INSERTING USER ACTIVITIES, result - ', result);
+      //console.log('INSERTING USER ACTIVITIES, result - ', result);
       res.formatter.ok({ activities : activities });
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
