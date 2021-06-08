@@ -8,6 +8,12 @@ const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 // mobile app only
 const heroList = require('../heroList.json');
+const passport = require('passport');
+
+// router.get('/protected', authenticateJWT, (req, res)=>{
+//   console.log('INSIDE');
+//   res.formatter.ok();
+// });
 
 router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
@@ -18,9 +24,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
   if(config.mode === 'maintenance'){
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
-
   const { email, password } = req.body;
-  console.log(email, password);
 
   User.findOne({ where : { email }, raw : true })
   .then((user) =>{
@@ -87,12 +91,6 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   });
 
 });
-
-router.get('/logout', (req, res) => {
-  req.logout();
-  res.formatter.ok();
-});
-
 
 router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
   res.formatter.ok({

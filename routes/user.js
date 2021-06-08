@@ -7,6 +7,31 @@ const moment = require('moment');
 const utCalc = require('../game/upgrades/utCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
+const passport = require('passport');
+
+// If an email is passed, get that user, otherwise get user based on JWT
+router.get('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
+  }
+  console.log('REQBODY', req.body);
+  console.log('REQUSER', req.user);
+  const { email } = req.body;
+  const user = req.user;
+
+  User.findOne({ where : email ? { email } : { id : user.id }, raw : true })
+  .then((user) =>{
+    if(!user){
+      res.formatter.unauthorized(`Couldn't find a user with that email.`);
+    }
+    return res.formatter.ok({ user });
+  }).catch((error) =>{
+    console.log('Passport Auth error - ', error);
+    res.formatter.serverError(error.toString(), `Error Logging in User - for GET /user`);
+  })
+
+});
 
 // Initialize the user_totals instance for a new user
 router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId').isNumeric(), authenticateJWT, (req, res) => {

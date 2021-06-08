@@ -6,6 +6,7 @@ const pathToKey = path.join(__dirname, 'id_rsa_priv.pem');
 const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 function issueJWT(user){
+  // Frontend expects 'd' for days
   const expiresIn = '14d';
   const payload = {
     sub : user.id,
@@ -15,7 +16,7 @@ function issueJWT(user){
   console.log(payload);
   return {
     token : `Bearer ${signedToken}`,
-    expires : expiresIn
+    expiresIn : expiresIn
   }
 }
 
