@@ -10,11 +10,6 @@ const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const heroList = require('../heroList.json');
 const passport = require('passport');
 
-// router.get('/protected', authenticateJWT, (req, res)=>{
-//   console.log('INSIDE');
-//   res.formatter.ok();
-// });
-
 router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -29,7 +24,10 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
   User.findOne({ where : { email }, raw : true })
   .then((user) =>{
     if(!user){
-      res.formatter.unauthorized(`Couldn't find a user with that email.`);
+      return res.formatter.unauthorized(`Couldn't find a user with that email.`);
+    }
+    if(!user.hash){
+      return res.formatter.unauthorized('Unable to verify account, please reset password.');
     }
 
     const isValid = validatePassword(password, user.hash, user.salt);
@@ -83,10 +81,16 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;
     }
+    console.log('sending OK RESPONSE');
     return res.formatter.ok(response);
 
   }).catch((error)=>{
     console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
+    const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
+    if(error.toString() === uniqueConstraint){
+      const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
+      return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
+    }
     res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
   });
 
