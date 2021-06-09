@@ -96,6 +96,38 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 });
 
+router.post('/reset-password', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
+  }
+
+  const { email, password} = req.body;
+
+  const saltHash = genPassword(password);
+  const { salt, hash } = saltHash;
+
+  const updateObj = { salt, hash };
+  /*
+    STILL NEED TO ADD EMAIL VERIFICATION BEFORE PASSWORD RESET
+  */
+  
+  User.update(updateObj, { where : { email }})
+  .then((result) =>{
+    if(!result[0]){
+      const error = new Error('No matching Email');
+      return res.formatter.badRequest(error.toString());
+    }
+    console.log('THE RESULT', result);
+    return res.formatter.ok();
+  }).catch((error) =>{
+    console.log('ERROR', error);
+    res.formatter.serverError(error.toString(), 'Unable to update Password');
+  });
+
+
+});
+
 router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
   res.formatter.ok({
     clientId: process.env.STRAVA_CLIENT_ID,
