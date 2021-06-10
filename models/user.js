@@ -69,6 +69,15 @@ const UserModel = function(db, DataTypes){
         type : DataTypes.STRING,
         allowNull: true,
     },
+    active : {
+        type : DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    emailCode : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
   });
 
       

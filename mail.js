@@ -1,26 +1,27 @@
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken')
 
-  // create reusable transporter object using the default SMTP transport
-  let transporter = (process.env.NODE_ENV === 'development') ? 
-    nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-          user: 'vhrks3qs5lf6x3rg@ethereal.email',
-          pass: '1AAZg6Z86MYFBPPYwu'
-      }
-    })
-  :
-    nodemailer.createTransport({
-      host: process.env.MAIL_PROVIDER,
-      port: 465,
-      secure: true,
-      auth: {
-          user: process.env.INFO_EMAIL,
-          pass: process.env.EMAIL_PASSWORD
-      }
-    });
+// create reusable transporter object using the default SMTP transport
+let transporter = (process.env.NODE_ENV === 'development') ? 
+  nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'vhrks3qs5lf6x3rg@ethereal.email',
+        pass: '1AAZg6Z86MYFBPPYwu'
+    }
+  })
+:
+  nodemailer.createTransport({
+    host: process.env.MAIL_PROVIDER,
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.INFO_EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+    }
+  });
 
 
 const sendContactEmail = function(formData, resolve, reject){
@@ -253,5 +254,80 @@ const sendBattleReportEmail = function(tally){
 
 };
 
+// VERIFICATION EMAIL For Verifying Account
+const sendVerificationEmail = function(email, code){
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAIL_PROVIDER,
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.INFO_EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+    }
+  });
 
-module.exports = { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail };
+  const baseUrl = process.env.NODE_ENV === 'development' ? process.env.EMAIL_REDIRECT_DEV 
+  : process.env.NODE_ENV === 'production' ? process.env.EMAIL_REDIRECT_PROD : process.env.EMAIL_REDIRECT_STAGING;
+
+  const url = `${baseUrl}/welcome?verify=${code}`;
+
+  const mailOptions = {
+    from: `${process.env.INFO_EMAIL}`,
+    to: email,
+    subject: `HeroFit - Account Verification`, 
+    text: "Click on the link below to verify your account\n\n" + url,
+  }
+  return new Promise((resolve, reject) =>{
+    transporter.sendMail(mailOptions, (error, info) => {
+      if(error) {
+        console.log(error)
+        reject(error);
+      }else{
+        console.log('Message sent successfully!');
+        resolve(info);
+      }
+    });
+  });
+
+};
+
+// RESET PASSWORD email verification
+const sendResetPasswordEmail = function(email, code){
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAIL_PROVIDER,
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.INFO_EMAIL,
+        pass: process.env.EMAIL_PASSWORD
+    }
+  });
+
+  const baseUrl = process.env.NODE_ENV === 'development' ? process.env.EMAIL_REDIRECT_DEV 
+  : process.env.NODE_ENV === 'production' ? process.env.EMAIL_REDIRECT_PROD : process.env.EMAIL_REDIRECT_STAGING;
+
+  const url = `${baseUrl}/welcome?verifyPassword=${code}`;
+
+  const mailOptions = {
+    from: `${process.env.INFO_EMAIL}`,
+    to: email,
+    subject: `HeroFit - Account Verification`, 
+    text: "Click on the link below to verify your email address: \n\n" + url,
+  }
+  return new Promise((resolve, reject) =>{
+    transporter.sendMail(mailOptions, (error, info) => {
+      if(error) {
+        console.log(error)
+        reject(error);
+      }else{
+        console.log('Message sent successfully!');
+        resolve(info);
+      }
+    });
+  });
+
+
+};
+
+
+module.exports = { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendVerificationEmail, sendResetPasswordEmail };

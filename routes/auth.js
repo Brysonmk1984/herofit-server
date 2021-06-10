@@ -1,14 +1,18 @@
 const router = require('express').Router();
 const { body, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const issueJWT = require('../jwt/issueJWT');
-const { User } = require('../config/db');
+const { User, Avatar } = require('../config/db');
 const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
+const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
+const passport = require('passport');
+const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
 // mobile app only
 const heroList = require('../heroList.json');
-const passport = require('passport');
+
 
 router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
@@ -25,8 +29,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
   .then((user) =>{
     if(!user){
       return res.formatter.unauthorized(`Couldn't find a user with that email.`);
-    }
-    if(!user.hash){
+    }else if(!user.hash){
       return res.formatter.unauthorized('Unable to verify account, please reset password.');
     }
 
@@ -60,14 +63,16 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
   const saltHash = genPassword(password);
   const { salt, hash } = saltHash;
-
+  const emailCode =  randomEmailString();
+  console.log(emailCode);
   const newUser = { 
     email,
     username,
     firstName,
     lastName,
     hash,
-    salt 
+    salt,
+    emailCode
   };
 
   User.create(newUser)
@@ -81,8 +86,19 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;
     }
-    console.log('sending OK RESPONSE');
-    return res.formatter.ok(response);
+    sendVerificationEmail(email, emailCode)
+    .then((data) =>{
+      console.log(data);
+      if(data.error){
+        return res.formatter.serverError(error.toString());
+      }
+
+      console.log('sending OK RESPONSE');
+      return res.formatter.ok(response);
+    }).catch((error) =>{
+      console.log('THE ERROR', error);
+    });
+
 
   }).catch((error)=>{
     console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
@@ -96,35 +112,117 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 });
 
-router.post('/reset-password', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
+router.post('/reset-password-confirm-email', body('email').isEmail(), (req, res)=>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
+  }
+  const { email } = req.body;
+
+  User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
+  .then((result) =>{
+    console.log('DB email result = ', result);
+    if(result){
+      const token = usePasswordHashToMakeToken(result);
+      sendResetPasswordEmail(email, token)
+      .then((result) =>{
+        console.log(result);
+        return res.formatter.ok({ result });
+      }).catch((error) =>{
+        console.log('Error', error);
+        res.formatter.serverError(error.toString(), "Server Error Sending Email - for POST /reset-password-confirm-email");
+      });
+    }else{
+      return res.formatter.badRequest("No matching email.");
+    }
+    
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
+  });
+
+});
+
+router.post('/reset-password', body('email').isEmail(), body('token').isString(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
 
-  const { email, password} = req.body;
+  const { email, token, password } = req.body;
 
-  const saltHash = genPassword(password);
-  const { salt, hash } = saltHash;
-
-  const updateObj = { salt, hash };
-  /*
-    STILL NEED TO ADD EMAIL VERIFICATION BEFORE PASSWORD RESET
-  */
-  
-  User.update(updateObj, { where : { email }})
+  User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
   .then((result) =>{
-    if(!result[0]){
-      const error = new Error('No matching Email');
-      return res.formatter.badRequest(error.toString());
+    if(result){
+      const { hash, createdAt } = result;
+      const secret = hash + "-" + createdAt;
+      const payload = jwt.decode(token, secret);
+      if (payload.email === email) {
+        const saltHash = genPassword(password);
+        const { salt, hash } = saltHash;
+        const updateObj = { salt, hash };
+      
+        User.update(updateObj, { where : { email }})
+        .then((result) =>{
+          if(!result[0]){
+            const error = new Error('No matching Email');
+            return res.formatter.badRequest(error.toString());
+          }
+          return res.formatter.ok();
+        }).catch((error) =>{
+          console.log('ERROR', error);
+          res.formatter.serverError(error.toString(), 'Unable to update Password');
+        });
+      }else{
+        res.formatter.badRequest('Email Mismatch!');
+      }
+    }else{
+      return res.formatter.badRequest("No matching email.");
     }
-    console.log('THE RESULT', result);
-    return res.formatter.ok();
-  }).catch((error) =>{
-    console.log('ERROR', error);
-    res.formatter.serverError(error.toString(), 'Unable to update Password');
   });
 
+});
+
+
+
+router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString(), (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
+  }
+  
+  const { email, emailCode } = req.body;
+  console.log(email, emailCode);
+  sendVerificationEmail(email, emailCode)
+  .then((data) => {
+    console.log(data);
+    if(data.error){
+      return res.formatter.serverError(error.toString());
+    }
+
+    console.log('sending OK RESPONSE');
+    return res.formatter.ok({});
+  }).catch((error) => {
+    console.log('THE ERROR', error);
+    return res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
+  });
+
+});
+
+router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /validated-email");
+  }
+
+  const { emailCode } = req.body;
+
+  User.update({ active : true }, { where : { emailCode }, returning : true, plain : true })
+  .then((data) => {
+    return res.formatter.ok({ user : data[1] });
+  }).catch((error) => {
+    console.log(error);
+    return res.formatter.serverError(error.toString(), "SERVER Error - for POST /validated-email");
+  });
 
 });
 

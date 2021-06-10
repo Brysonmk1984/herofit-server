@@ -84,7 +84,7 @@ router.post('/update-user-totals', body('email').isEmail(), body('activities').i
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: email }, raw : true }
-  ).then((utData) => {console.log('UTD',utData);
+  ).then((utData) => {
     if(!utData){
       throw new Error(`No User Totals for user ${email}`);
     }
