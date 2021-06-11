@@ -51,8 +51,8 @@ Avatar.findAll(
         }else{
           avatarHealth += adjRegenRate;
         }
-        // Update status to 'Rested' if over 'Rested' threshold
-        if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+        // Update status to 'Rested' if at max health
+        if(avatarHealth >= maxHealth){
           avatarStatus = 'Rested';
         }
         break;
