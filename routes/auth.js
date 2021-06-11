@@ -30,7 +30,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
     if(!user){
       return res.formatter.unauthorized(`Couldn't find a user with that email.`);
     }else if(!user.hash){
-      return res.formatter.unauthorized('Unable to verify account, please reset password.');
+      return res.formatter.unauthorized({ oldUserMigration : true, message : 'HeroFit has upgraded to a new login system. Please verify your account.' });
     }
 
     const isValid = validatePassword(password, user.hash, user.salt);
@@ -149,17 +149,24 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
   }
 
   const { email, token, password } = req.body;
-
-  User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
+  
+  User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
   .then((result) =>{
     if(result){
-      const { hash, createdAt } = result;
+      const { hash, createdAt, active, emailCode } = result;
       const secret = hash + "-" + createdAt;
       const payload = jwt.decode(token, secret);
       if (payload.email === email) {
         const saltHash = genPassword(password);
         const { salt, hash } = saltHash;
         const updateObj = { salt, hash };
+        
+        // Legacy Users migrating to new Auth System
+        if(!active && !emailCode){
+          console.log('OLDDD');
+          updateObj.active = true;
+          updateObj.emailCode = 'legacy-user';
+        }
       
         User.update(updateObj, { where : { email }})
         .then((result) =>{
