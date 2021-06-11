@@ -1,31 +1,23 @@
 {
-  "version": "1.4.6",
-  "headline": "Pets, with teeth! - versions 1.4.1 - 1.4.6",
-  "openingRemarks": "New Pets w/ battle effects, Foe ability changes & ongoing balance",
+  "version": "1.5.0",
+  "headline": "New Login System - version 1.5.0",
+  "openingRemarks": "Fully Self-Contained Authentication System & various important bug fixes",
   "newFeatures": [
     {
-      "title": "Pets, with teeth!",
-      "description": "Six new pets have arrived to help you battle the Dark Forces, and existing pets now have battle effects! They all have their unique effects in battle and can be bought with Photon Tokens from the inventory page 'pets' section."
-    },
-    {
-      "title": "Poltergeist, Phantom, & Phantasm ability changes",
-      "description": "The Poltergeist now has 'Paranormal Pandemonium', which will randomly scramble your non-zero stats before battle. The Phantom now has the old Poltergeist ability: 'Shadowy Influx' (health bonus). The Phantasm now has 'Unholy Armor' (high defense - armor & health)."
+      "title": "New Login System",
+      "description": "A new and improved experience for new users as well as a quicker login process overall! Because HeroFit doesn't have access to passwords directly (that's a big nono), returning users will need to reconfirm their email & password."
     }
   ],
   "bugFixes": [
-    "Fixed a bug that prevented the 'Leveled up' window from popping up. The Owl wasn't too happy with this.",
-    "Fixed a bug that made the 'QP Activated' message persist longer than it was meant to."
+    "Fixed a bug that wasn't always accurately checking if an existing hero name is taken.",
+    "Fixed a bug that was causing heroes to occasionally stop recovering health before they were at full health",
+    "Fixed a bug where users activities were not being saved, but causing the hero to upgrade regardless, resulting in continuous upgrades on page refresh."
   ],
   "balanceChanges": [
-    "Effectiveness of armor has been decreased by a moderate amount.",
-    "Power & health stats received a relative buff: the foes health & power now don't scale as effectively against your own. This will make power and/or health builds more viable.",
-    "Recovery - both the health gain per hour and chance to revive from KO early have been nerfed, as mentioned in a reddit thread last week.",
-    "Lastly, various smaller difficulty tweaks are being made to make the game balanced at low, medium, and high levels."
+    "Further Decreased the effectiveness of Recovery."
   ],
   "miscDetails": [
-    "Improved the code behind the scenes for matching up against foes.",
-    "When trying to go to battle and you're below 80% health, the message now displays how much health is required before you can go to battle. This message also now accurately displays your actual recovery per hour.",
-    "SuperPoekie, your cat wandered into the game. Please come pick him up."
+    "Added a 'we use cookies' prompt to prevent being sued for using basic internet technology."
   ],
-  "closingRemarks": "A lot of the hard work from months ago is slowly paying off. Big technical challenges solved from this winter are allowing for cool new features like pets with battle effects. Each improvement you're seeing is built on a previous one. Let me know what you think or would like to see!"
+  "closingRemarks": "This new login system was a ton of work, but a necessary component for the upcoming mobile app. I decided it also made sense to enable it on the web version now to work out any kinks ahead of time, so let me know if you have any problems. Another bonus of the new system, it removed Amazon as a dependency, speeding up the whole process. I'm excited about taking a break from the app for a little while & getting back to programming the fun stuff; more content on the way soon!"
 } 

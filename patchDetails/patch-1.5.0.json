@@ -1,0 +1,23 @@
+{
+  "version": "1.5.0",
+  "headline": "New Login System - version 1.5.0",
+  "openingRemarks": "Fully Self-Contained Authentication System & various important bug fixes",
+  "newFeatures": [
+    {
+      "title": "New Login System",
+      "description": "A new and improved experience for new users as well as a quicker login process overall! Because HeroFit doesn't have access to passwords directly (that's a big nono), returning users will need to reconfirm their email & password."
+    }
+  ],
+  "bugFixes": [
+    "Fixed a bug that wasn't always accurately checking if an existing hero name is taken.",
+    "Fixed a bug that was causing heroes to occasionally stop recovering health before they were at full health",
+    "Fixed a bug where users activities were not being saved, but causing the hero to upgrade regardless, resulting in continuous upgrades on page refresh."
+  ],
+  "balanceChanges": [
+    "Further Decreased the effectiveness of Recovery."
+  ],
+  "miscDetails": [
+    "Added a 'we use cookies' prompt to prevent being sued for using basic internet technology."
+  ],
+  "closingRemarks": "This new login system was a ton of work, but a necessary component for the upcoming mobile app. I decided it also made sense to enable it on the web version now to work out any kinks ahead of time, so let me know if you have any problems. Another bonus of the new system, it removed Amazon as a dependency, speeding up the whole process. I'm excited about taking a break from the app for a little while & getting back to programming the fun stuff; more content on the way soon!"
+} 
