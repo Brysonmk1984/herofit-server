@@ -163,7 +163,6 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
         
         // Legacy Users migrating to new Auth System
         if(!active && !emailCode){
-          console.log('OLDDD');
           updateObj.active = true;
           updateObj.emailCode = 'legacy-user';
         }
