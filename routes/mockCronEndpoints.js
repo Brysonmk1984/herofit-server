@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const { authenticateAdminJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { Avatar, AvatarItems, Battle } = require('../config/db');
-const { Op } = require("sequelize");
+const { Op, col } = require("sequelize");
 const { sendBattleReportEmail } = require('../mail');
 const { cloneObj, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, OUTCOME_XP, FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
@@ -26,8 +26,9 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   }
   
   //Get all avatars who aren't at full health
-  return Avatar.findAll(
-    { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
+  return Avatar.findAll({ 
+    where: { health : { [Op.lt] : col('maxHealth') } },
+    raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
   ).then((results) => {
     const allPromises = []
     
