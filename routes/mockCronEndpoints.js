@@ -31,19 +31,19 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   ).then((results) => {
     const allPromises = []
     
-    // Loop over each avatar and either regen health if recovering or other status effects
-    results.forEach((avatar) =>{
-      avatar = parseAvatarProperties(avatar);
+      // Loop over each avatar and either regen health if recovering or other status effects
+      results.forEach((avatar) =>{
+        avatar = parseAvatarProperties(avatar);
 
-      let avatarHealth = avatar.health;
-      const maxHealth = avatar.maxHealth;
-      const recovery = avatar.recovery;
-      const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
-      const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
-      let avatarStatus = avatar.status;
-      let avatarStatusFade = avatar.statusFade;
+        let avatarHealth = avatar.health;
+        const maxHealth = avatar.maxHealth;
+        const recovery = avatar.recovery;
+        const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
+        const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
+        let avatarStatus = avatar.status;
+        let avatarStatusFade = avatar.statusFade;
 
-      // Check avatar status and run appropriate action
+            // Check avatar status and run appropriate action
       switch(avatarStatus){
         case 'Infected':
           const infectAmount = Math.floor(adjRegenRate / 2);
@@ -71,8 +71,8 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
           }else{
             avatarHealth += adjRegenRate;
           }
-          // Update status to 'Rested' if over 'Rested' threshold
-          if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+          // Update status to 'Rested' if at max health
+          if(avatarHealth >= maxHealth){
             avatarStatus = 'Rested';
           }
           break;
