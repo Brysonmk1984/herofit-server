@@ -1,12 +1,9 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { Op } = require("sequelize");
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Battle = require('../db').Battle;
-const Items = require('../db').Items;
+const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
@@ -14,14 +11,15 @@ const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
 const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
 const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
-const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
+const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
 // All needed only for new single battle function
-const { parseAvatarProperties, cloneObj } = require('../helperFunctions');
+const { parseAvatarProperties, cloneObj } = require('../lib/helperFunctions');
 const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
+const chance = require('chance')();
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {

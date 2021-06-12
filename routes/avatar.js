@@ -1,20 +1,17 @@
 const express = require('express');
 const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
-const db = require('../db').db;
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Items = require('../db').Items;
-const User = require('../db').User;
-const UserTotal = require('../db').UserTotal;
+const { authenticateJWT } = require('../jwt/validateJWT');
+const db = require('../config/db').db;
+const { Avatar, AvatarItems, User, UserTotal } = require('../config/db');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
-const { literal, Op, col, where, fn } = require("sequelize");
-const { parseAvatarProperties, paginate } = require('../helperFunctions');
+const { literal, Op } = require("sequelize");
+const { parseAvatarProperties, paginate } = require('../lib/helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
-const activityItemFind = require('../game/activityItemFind');
+const passport = require('passport');
+//const activityItemFind = require('../game/activityItemFind');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 // Create Avatar in DB after Signup
@@ -86,16 +83,17 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
   return db.transaction(t => {
     let improvements;
     
-    // First, retrieve userTotals AND avatar from DB
-    return UserTotal.findOne(
-      { where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true }
-    ).then((userTotals) =>{
-      ut = userTotals;
-      
-      return Avatar.findOne(
-        { where: { owner: email },transaction: t, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens'], raw : true }
-      ).then((avatar) =>{
-        avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, photonTokens : avatar.photonTokens});
+    //console.log('AXP - ', aXP, avStatSnapshot.activityXP);
+    
+    const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
+    lvlUp = leveledUp;
+    lvlAfterBuff = endingLevel;
+    qpe = qpEarned;
+    
+    const updatedPower = updatePower(endingLevel, avatar.qpPower);
+    const updatedHealth = updateHealth(endingLevel, avatar.qpHealth);
+    const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
+    const updatedAvatar = Object.assign({}, avatar, { activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : lvlUp ? updatedHealth : avatar.health, maxHealth : updatedHealth, fire, earth, water, air, hasBeenUpgraded : true, status : lvlUp ? 'Rested' : avatar.status });
         
         // Then, Update Avatar Totals
         const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);

@@ -349,6 +349,29 @@
         "type" : "title",
         "name" : "Air Stalker"
       }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Granite Golem",
+      "foe" : [
+        "Bhumi",
+        "Eardwulf",
+        "Lambert",
+        "Terran",
+        "Roland",
+        "Tlalli"
+      ],
+      "ability": {
+        "name" : "Earth Proficiency",
+        "effect" : "Major Earth Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Earth Trapper"],
+      "reward" : {
+        "type" : "title",
+        "name" : "Earth Trapper"
+      }
     }
   ]
 }

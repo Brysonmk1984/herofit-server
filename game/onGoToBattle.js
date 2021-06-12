@@ -1,11 +1,7 @@
-const Avatar = require('../db').Avatar;
-const Battle = require('../db').Battle;
-const AvatarItems = require('../db').AvatarItems;
-const Items = require('../db').Items;
+const { Avatar, Battle, AvatarItems, Items } = require('../config/db');
 const { Op } = require("sequelize");
 const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require('../game/postBattleActions.json');
 const VILLAINS = require('../game/villains.json');
-const { ALL_BATTLE_EFFECTS } = require('../game/CONSTANTS');
 
 // ON GOTOBATTLE, save list of effects from avatar's items
 function determineItemEffects(equipment){

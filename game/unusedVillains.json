@@ -20,31 +20,8 @@
   },
   {
     "class" : "Elementals",
-    "type" : "Granite Golem",
-    "foe" : [
-      "Bhumi",
-      "Eardwulf",
-      "Lambert",
-      "Papa",
-      "Roland",
-      "Tlalli"
-    ],
-    "ability": {
-      "name" : "Earth Proficiency",
-      "effect" : "Major Earth Threat",
-      "type" : "prebattle"
-    },
-    "color" : null,
-    "pba" : ["Grant Earth Trapper"],
-    "reward" : {
-      "type" : "title",
-      "name" : "Earth Trapper"
-    }
-  },
-  {
-    "class" : "Elementals",
     "type" : "Hulking Aggro Crag",
-    "foe" : ["Terran"],
+    "foe" : ["Papa"],
     "ability": {
       "name" : "Earth Mastery",
       "effect" : "Profound Earth Threat",

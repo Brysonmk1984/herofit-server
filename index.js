@@ -6,11 +6,10 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
-const bodyParser = require("body-parser");
 const responseEnhancer = require('express-response-formatter').responseEnhancer;
-
+const passport = require('passport');
 // COMMON
-const authenticateRoutes = require('./routes/authenticate');
+const authRoutes = require('./routes/auth');
 const avatarRoutes = require('./routes/avatar');
 const accountRoutes = require('./routes/account');
 const inventoryRoutes = require('./routes/inventory');
@@ -27,19 +26,21 @@ const mockCronRoutes = require('./routes/mockCronEndpoints');
   // logger
   app.use(morgan('dev'));
   app.use(cors({credentials: true, origin : true}));
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(responseEnhancer());
   app.set('trust proxy', 1);
 
-
+  // Passport JWT Authentication
+  require('./config/passport-jwt')(passport);
+  app.use(passport.initialize());
   
   app.options('*', cors())
   // HTTP Routes
 
   // Protected routes
-  app.use('/authenticate', authenticateRoutes);
+  app.use('/auth', authRoutes);
   app.use('/avatar', avatarRoutes);
   app.use('/account', accountRoutes);
   app.use('/inventory', inventoryRoutes);

@@ -1,13 +1,11 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Items = require('../db').Items;
+const { Avatar, AvatarItems, Items } = require('../config/db');
 const { Op, literal } = require("sequelize");
-const { stackItems, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
+const { stackItems, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { itemEffects } = require('../game/applyEffects');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 
 router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);

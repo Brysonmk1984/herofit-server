@@ -1,15 +1,15 @@
-const Avatar = require('../db').Avatar;
-const { Op } = require("sequelize");
+const { Avatar } = require('../config/db');
+const { Op, col } = require("sequelize");
 const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require('../game/CONSTANTS');
-//const db = require('../db').db;
 const { sendCronErrorEmail } = require('../mail');
-const { parseAvatarProperties } = require('../helperFunctions');
+const { parseAvatarProperties } = require('../lib/helperFunctions');
 console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health
-Avatar.findAll(
-  { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
-).then((results) => {
+Avatar.findAll({ 
+  where: { health : { [Op.lt] : col('maxHealth') } },
+  raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] 
+}).then((results) => {
   
   const allPromises = []
   // Loop over each avatar and either regen health if recovering or other status effects
@@ -52,8 +52,8 @@ Avatar.findAll(
         }else{
           avatarHealth += adjRegenRate;
         }
-        // Update status to 'Rested' if over 'Rested' threshold
-        if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+        // Update status to 'Rested' if at max health
+        if(avatarHealth >= maxHealth){
           avatarStatus = 'Rested';
         }
         break;

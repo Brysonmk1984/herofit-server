@@ -1,12 +1,9 @@
 const express = require('express');
-const { body, header, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { body, validationResult } = require('express-validator');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const User = require('../db').User;
-const sendDataCollectionEmail = require('../mail.js').sendDataCollectionEmail;
-const sendSurveyEmail = require('../mail.js').sendSurveyEmail;
-const sendContactEmail = require('../mail.js').sendContactEmail;
-const sendAppErrorEmail = require('../mail.js').sendAppErrorEmail;
+const { User } = require('../config/db');
+const { sendDataCollectionEmail, sendSurveyEmail, sendContactEmail, sendAppErrorEmail } = require('../mail.js');
 
 router.post('/feedback-data', body('email').isEmail(), body('username').isString(), body('title').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), body('opinion').isString(), body('openResponse').isString(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);

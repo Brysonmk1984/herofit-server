@@ -1,14 +1,12 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT, authenticateAdminJWT } = require('../jwtValidation');
+const { authenticateAdminJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Battle = require('../db').Battle;
-const { Op, literal, col, fn, QueryTypes } = require("sequelize");
+const { Avatar, AvatarItems, Battle } = require('../config/db');
+const { Op, col } = require("sequelize");
 const { sendBattleReportEmail } = require('../mail');
-const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
-const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, REGENERATION_RATE, BATTLE_SCENARIOS, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
+const { cloneObj, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
+const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, OUTCOME_XP, FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
@@ -28,24 +26,25 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   }
   
   //Get all avatars who aren't at full health
-  return Avatar.findAll(
-    { where: { [Op.or]: [{status: 'Recovering'}, {status: 'Infected'}] }, raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
+  return Avatar.findAll({ 
+    where: { health : { [Op.lt] : col('maxHealth') } },
+    raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
   ).then((results) => {
     const allPromises = []
     
-    // Loop over each avatar and either regen health if recovering or other status effects
-    results.forEach((avatar) =>{
-      avatar = parseAvatarProperties(avatar);
+      // Loop over each avatar and either regen health if recovering or other status effects
+      results.forEach((avatar) =>{
+        avatar = parseAvatarProperties(avatar);
 
-      let avatarHealth = avatar.health;
-      const maxHealth = avatar.maxHealth;
-      const recovery = avatar.recovery;
-      const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
-      const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
-      let avatarStatus = avatar.status;
-      let avatarStatusFade = avatar.statusFade;
+        let avatarHealth = avatar.health;
+        const maxHealth = avatar.maxHealth;
+        const recovery = avatar.recovery;
+        const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
+        const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
+        let avatarStatus = avatar.status;
+        let avatarStatusFade = avatar.statusFade;
 
-      // Check avatar status and run appropriate action
+            // Check avatar status and run appropriate action
       switch(avatarStatus){
         case 'Infected':
           const infectAmount = Math.floor(adjRegenRate / 2);
@@ -73,8 +72,8 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
           }else{
             avatarHealth += adjRegenRate;
           }
-          // Update status to 'Rested' if over 'Rested' threshold
-          if((avatarHealth / maxHealth) >= RESTED_THRESHOLD){
+          // Update status to 'Rested' if at max health
+          if(avatarHealth >= maxHealth){
             avatarStatus = 'Rested';
           }
           break;

@@ -1,6 +1,6 @@
 {
   "name": "stravat-cognito",
-  "version": "1.4.10",
+  "version": "1.5.0",
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
@@ -11,9 +11,14 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["./__tests__/nullOrAny.setup.js"],
-    "testPathIgnorePatterns": ["./__tests__/battles", "./__tests__/nullOrAny.setup.js"]
-    },
+    "setupFilesAfterEnv": [
+      "./__tests__/nullOrAny.setup.js"
+    ],
+    "testPathIgnorePatterns": [
+      "./__tests__/battles",
+      "./__tests__/nullOrAny.setup.js"
+    ]
+  },
   "author": "Bryson Kruk",
   "license": "MIT",
   "devDependencies": {
@@ -28,7 +33,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
+    "base64url": "^3.0.1",
     "body-parser": "^1.19.0",
     "chance": "^1.1.7",
     "connect-flash": "^0.1.1",
@@ -42,14 +47,13 @@
     "jwk-to-pem": "^2.0.4",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
-    "nodemailer": "^5.1.1",
+    "nodemailer": "^6.6.1",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^6.1.5",
     "pg-hstore": "^2.3.3",
-    "ramda": "^0.27.1",
     "sequelize": "4.44.4",
     "verify-cognito-token": "^1.2.2"
   },

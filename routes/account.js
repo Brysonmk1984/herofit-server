@@ -1,11 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const Avatar = require('../db').Avatar;
-const User = require('../db').User;
-const Battle = require('../db').Battle;
-const AvatarItems = require('../db').AvatarItems;
+const { Avatar, User, Battle, AvatarItems } = require('../config/db');
 
 // UPDATE HERO NAME
 router.post('/update-avatar-name', body('owner').isEmail(), body('newHeroName').isString({ min: 3, max: 25 }), authenticateJWT, (req, res) => {
@@ -53,23 +50,21 @@ router.post('/update-owner-username', body('owner').isEmail(), body('newUsername
 });
 
 // DELETE ACCOUNT
-router.delete('/:username', body('email').isEmail(), body('id').isNumeric(), body('avatarId').isNumeric(), authenticateJWT, (req, res) => {
+router.delete('/:username', authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
   }
-  const { avatarId, email, id } = req.body;
 
+  const { id, email } = req.user;
   const promises = [];
-  promises.push(AvatarItems.destroy({ where : {avatarID : avatarId }}));
+  promises.push(AvatarItems.destroy({ where : { owner : email }}));
   promises.push(Battle.destroy({ where : { owner : email }}));
-  
+
   Promise.allSettled(promises)
   .then(() =>{
-    console.log('Deleted battles and Items, now deleting avatar');
-    return Avatar.destroy({ where : { owner : req.body.email } });
+    return Avatar.destroy({ where : { owner : email } });
   }).then(() =>{
-    console.log('Deleted Avatar, now deleting User');
     return User.destroy({ where : { id }});
   }).then(() =>{
     return res.formatter.ok({ message : 'Successfully deleted account!' });

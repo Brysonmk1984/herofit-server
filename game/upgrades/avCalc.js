@@ -1,6 +1,6 @@
 const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS');
 const moment = require('moment');
-const { cloneObj, adjustActivityMinutes } = require('../../helperFunctions');
+const { cloneObj, adjustActivityMinutes } = require('../../lib/helperFunctions');
 const avatarList = require('../../heroList.json');
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS

@@ -14,9 +14,9 @@ const UserModel = function(db, DataTypes){
       },
       username : {
         type : DataTypes.STRING,
-        unique : true,
+        unique: false,
         allowNull: false,
-        },
+    },
       email : {
           type : DataTypes.STRING,
           unique : true,
@@ -60,7 +60,24 @@ const UserModel = function(db, DataTypes){
         type : DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-    }
+    },
+    hash : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
+    salt : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
+    active : {
+        type : DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    emailCode : {
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
   });
 
       

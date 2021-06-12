@@ -1,17 +1,36 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { authenticateJWT } = require('../jwtValidation');
+const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const User = require('../db').User;
-const Avatar = require('../db').Avatar;
-const AvatarItems = require('../db').AvatarItems;
-const Battle = require('../db').Battle;
-const UserActivity = require('../db').UserActivity;
-const UserTotal = require('../db').UserTotal;
+const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require('../config/db');
 const moment = require('moment');
 const utCalc = require('../game/upgrades/utCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
+const passport = require('passport');
+
+// If an email is passed, get that user, otherwise get user based on JWT
+router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    console.log(errors);
+    return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
+  }
+  const { email } = req.body;
+  const user = req.user;
+
+  User.findOne({ where : email ? { email } : { id : user.id }, raw : true })
+  .then((user) =>{
+    if(!user){
+      res.formatter.unauthorized(`Couldn't find a user with that email.`);
+    }
+    return res.formatter.ok({ user });
+  }).catch((error) =>{
+    console.log('Passport Auth error - ', error);
+    res.formatter.serverError(error.toString(), `Error Logging in User - for GET /user`);
+  })
+
+});
 
 // Initialize the user_totals instance for a new user
 router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId').isNumeric(), authenticateJWT, (req, res) => {
@@ -53,7 +72,7 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
   });
 });
 
-// Update existing user's totals, happends FIRST in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
+// Update existing user's totals, happens FIRST in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
 router.post('/update-user-totals', body('email').isEmail(), body('activities').isArray(), body('hasBeenUpgraded').isBoolean(), body('accountDate').isString(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -65,7 +84,7 @@ router.post('/update-user-totals', body('email').isEmail(), body('activities').i
   // First, retrieve userTotals from DB
   UserTotal.findOne(
     { where: { user: email }, raw : true }
-  ).then((utData) => {console.log('UTD',utData);
+  ).then((utData) => {
     if(!utData){
       throw new Error(`No User Totals for user ${email}`);
     }
@@ -125,16 +144,13 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       //console.log(entry.activityId);
       return entry.activityId
     });
-    console.log('ACT ID MAP-', actIdMap);
     // Front end is determining which activities are new, so everything passed here can be added to db.
-    UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
-    //UserActivity.bulkCreate(entries)
+    //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
+    UserActivity.bulkCreate(entries)
     .then((result) =>{
-      console.log('INSERTING USER ACTIVITIES, result - ', result);
       res.formatter.ok({ activities : activities });
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
-        console.log(entry.activityId);
         return entry.activityId
       });
       console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);

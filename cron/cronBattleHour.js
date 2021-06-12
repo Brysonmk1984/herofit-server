@@ -1,7 +1,6 @@
-const Avatar = require('../db').Avatar;
-const Battle = require('../db').Battle;
+const { Avatar, Battle } = require('../config/db');
 const { sendBattleReportEmail, sendCronErrorEmail } = require('../mail');
-const { cloneObj, parseAvatarProperties, arrayChunker } = require('../helperFunctions');
+const { cloneObj, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
