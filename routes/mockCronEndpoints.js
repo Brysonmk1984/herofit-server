@@ -28,8 +28,8 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   //Get all avatars who aren't at full health
   return Avatar.findAll({ 
     where: { health : { [Op.lt] : col('maxHealth') } },
-    raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] },
-  ).then((results) => {
+    raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] 
+  }).then((results) => {
     const allPromises = []
     
       // Loop over each avatar and either regen health if recovering or other status effects
@@ -65,6 +65,8 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
             break;
           }
         case 'Recovering':
+          // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
+        case 'Rested':
           // If one tick of health recovery is over maxHealth, just assign maxHealth
           if((avatarHealth + adjRegenRate) > maxHealth){
             avatarHealth = maxHealth;
@@ -75,6 +77,8 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
           // Update status to 'Rested' if at max health
           if(avatarHealth >= maxHealth){
             avatarStatus = 'Rested';
+          }else if(avatar.status !== 'Infected'){
+            avatarStatus = 'Recovering';
           }
           break;
         default: 

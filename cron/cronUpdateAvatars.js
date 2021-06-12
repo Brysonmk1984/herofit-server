@@ -45,6 +45,8 @@ Avatar.findAll({
           break;
         }
       case 'Recovering':
+      // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
+      case 'Rested':
         // If one tick of health recovery is over maxHealth, just assign maxHealth
         if((avatarHealth + adjRegenRate) > maxHealth){
           avatarHealth = maxHealth;
@@ -55,6 +57,8 @@ Avatar.findAll({
         // Update status to 'Rested' if at max health
         if(avatarHealth >= maxHealth){
           avatarStatus = 'Rested';
+        }else if(avatar.status !== 'Infected'){
+          avatarStatus = 'Recovering';
         }
         break;
       default: 
