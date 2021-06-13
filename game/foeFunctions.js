@@ -1,3 +1,6 @@
+const xpCalc = require('./upgrades/xpCalc');
+const { determineXpBounty, determinePtBounty } = require('./runPostBattleActions');
+const { OUTCOME_XP } = require('./CONSTANTS'); 
 const chance = require('chance')();
 const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
 const villains = require('./villains.json');
@@ -6,7 +9,7 @@ const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/
 
 // Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level){
-
+  
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if(event){
@@ -256,4 +259,50 @@ function generateFoeStats(avatar, foe){
   return fws;
 }
 
-module.exports = { generateFoeStats, selectFoeTemplate };
+// Foe param is usually null, unless an item created the battle
+function determineFoeWithStats(avatar, foeTemplate = null){
+  const { currentLevelByInput } = xpCalc();
+  const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+  
+  // Use passed in foe template, otherwise randomly pick one
+  foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(currentLevel);
+
+  
+  let foeName;
+  
+  if(foeTemplate.type === 'Shadow-Self'){
+    foeName = `Shadow ${avatar.name}`;
+  }else{
+    // specific foe for testing purposes
+    //foeName = foeTemplate.foe[1];
+    
+    foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
+  }
+  
+  const foe = {
+    id : foeTemplate.id,
+    type : foeTemplate.type,
+    name : foeName,
+    ability : foeTemplate.ability,
+    class : foeTemplate.class
+  }
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
+  
+  
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase, foeWithStats.type);
+  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase, foeWithStats.type);
+  
+  return foeWithStats;
+}
+
+
+function findFoeByType(foeType){
+  const allFoes = [];
+  for(let foeClass in villains){
+    allFoes.push(...villains[foeClass]);
+  }
+
+  return allFoes.find(foe => foe.type === foeType);
+};
+
+module.exports = { generateFoeStats, selectFoeTemplate, determineFoeWithStats, findFoeByType };

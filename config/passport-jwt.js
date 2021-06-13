@@ -37,7 +37,8 @@ const strategy = new Strategy(options, (payload, done) =>{
   console.log('PAYLOADS', payload);
   // payload.sub should contain the user id & findByPk is a sequelize method for retrieving by id
   User.findByPk(payload.sub)
-  .then((user) => {console.log('USR', user);
+  .then((user) => {
+    //console.log('USR', user);
     if(!user) {
       return done(null, false);
     }

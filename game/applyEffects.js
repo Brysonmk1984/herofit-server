@@ -1,9 +1,12 @@
+const db = require('../config/db').db;
 const { col } = require("sequelize");
 const { Avatar, UserTotal } = require('../config/db');
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./CONSTANTS');
-
+const insertBattle = require('./insertBattle');
+const { findFoeByType } = require('./foeFunctions');
+const { parseAvatarProperties } = require('../lib/helperFunctions');
 
 // Retrocausal Capsule
 function resetHero(avatarID, email){
@@ -99,6 +102,31 @@ function removeInfected(avatarID){
   });
 }
 
+function instantiateBattle(avatarID, foeType){
+  // attributes : ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens', 'owner'],
+
+  const q = `
+  SELECT avatars.*, equipped 
+  FROM avatars
+  LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
+    FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
+  WHERE avatars.id = $1
+`;
+
+  // GET AVATAR
+  return db.query(q, { bind : [avatarID], plain: true })
+  .then((results) =>{
+    console.log(results);
+    const avatar = parseAvatarProperties(results);
+    const foe = findFoeByType(foeType);
+ 
+    return insertBattle(avatar, foe);
+  }).catch((error) =>{
+    console.log('Error Instantiating Battle', error);
+    return error;
+  });
+}
+
 
 function itemEffects(effects, avatarID, email){
   const effectPromises = [];
@@ -106,15 +134,29 @@ function itemEffects(effects, avatarID, email){
       switch(effect.name){
         case 'Reset Hero':
           effectPromises.push(resetHero(avatarID, email)); 
+          break;
         case 'Heal Hero Completely':
           effectPromises.push(healCompletely(avatarID)); 
+          break;
         case 'Remove Infected Status':
           effectPromises.push(removeInfected(avatarID)); 
+          break;
+        case 'Summon Storming Oni':
+          effectPromises.push(instantiateBattle(avatarID, 'Storming Oni')); 
+          break;
+        case 'Summon Hulking Aggro Crag':
+          effectPromises.push(instantiateBattle(avatarID, 'Hulking Aggro Crag')); 
+          break;
+        case 'Summon Scorching Archfiend': 
+          effectPromises.push(instantiateBattle(avatarID, 'Scorching Archfiend'));  
+          break;
+        case 'High Priestess of the Tides':
+          effectPromises.push(instantiateBattle(avatarID, 'High Priestess of the Tides')); 
+          break;
         default:
           break;
       }
   });
-
   return Promise.all(effectPromises);
 }
 
