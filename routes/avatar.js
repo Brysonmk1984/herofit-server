@@ -91,26 +91,28 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       ut = userTotals;
 
       return Avatar.findOne({ 
-        where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens'], raw : true, transaction: t, 
+        where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
       });
     }).then((avatar) =>{
       avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
-
-  
-      const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
-      const { updatePower, updateHealth, updateElements } = avCalc(ut);  
-      const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
-      lvlUp = leveledUp;
-      lvlAfterBuff = endingLevel;
-      qpe = qpEarned;
       
-      const updatedPower = updatePower(endingLevel, avatar.qpPower);
-      const updatedHealth = updateHealth(endingLevel, avatar.qpHealth);
-      const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
+      const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
+      const { updatePower, updateHealth, updateElements, updateStatus } = avCalc(ut);  
       
       // Updated aXP
       const aXP = calcNewActivityXPFromUt(ut);
       aXPDiff = aXP - avStatSnapshot.activityXP;
+      const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
+      lvlUp = leveledUp;
+      lvlAfterBuff = endingLevel;
+      qpe = qpEarned;
+      console.log('prelim', lvlUp);
+      const updatedPower = updatePower(endingLevel, avatar.qpPower);
+      const { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
+      const updatedStatus = updateStatus(avatar.status, lvlUp);
+      const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
+      console.log('US123',updatedStatus);
+
       
       //console.log('AXP - ', aXP, avStatSnapshot.activityXP);
 
@@ -139,9 +141,10 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       console.log('ITEMS AND PT',items, pt);
       foundItems = items;
       improvements["Photon Tokens"] = pt;
+
       // Now we need to add any items acquired from activities to a user's inventory
       // And also update the avatar's PT
-      const updatedAvatar = Object.assign({}, avatar, { photonTokens : avatar.photonTokens += pt, activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : lvlUp ? updatedHealth : avatar.health, maxHealth : updatedHealth, fire, earth, water, air, hasBeenUpgraded : true, status : lvlUp ? 'Rested' : avatar.status });
+      const updatedAvatar = Object.assign({}, avatar, { photonTokens : avatar.photonTokens += pt, activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : updatedHealth, maxHealth : updatedMaxHealth, fire, earth, water, air, hasBeenUpgraded : true, status : updatedStatus });
 
       // Finally, Update Avatar in DB
       return Avatar.update(
