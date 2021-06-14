@@ -16,7 +16,9 @@
     "reward" : {
       "type" : "",
       "name" : ""
-    }
+    },
+    "levelRequirement" : 30,
+    "itemSummonOnly" : true
   },
   {
     "class" : "Elementals",
@@ -34,7 +36,9 @@
     "reward" : {
       "type" : "",
       "name" : ""
-    }
+    },
+    "levelRequirement" : 30,
+    "itemSummonOnly" : true
   },
 
 
@@ -78,7 +82,9 @@
     "reward" : {
       "type" : "",
       "name" : ""
-    }
+    },
+    "levelRequirement" : 30,
+    "itemSummonOnly" : true
   },
 
   {
@@ -120,6 +126,8 @@
     "reward" : {
       "type" : "",
       "name" : ""
-    }
+    },
+    "levelRequirement" : 30,
+    "itemSummonOnly" : true
   }
 ]

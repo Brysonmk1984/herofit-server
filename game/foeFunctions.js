@@ -33,11 +33,15 @@ function selectFoeTemplate(level){
     // assign foes to two different arrays depending on if there is a level requirement
     villains[fClass].forEach(foe => {
       const req = foe.levelRequirement;
-      if(req && req <= level){
-        levelRequiredFoes.push(foe);
-      }else{
-        minorFoes.push(foe);
+      // If foe is not an item only foe
+      if(!foe.itemSummonOnly){
+        if(req && req <= level){
+          levelRequiredFoes.push(foe);
+        }else{
+          minorFoes.push(foe);
+        }
       }
+
     });
   }
   //console.log('FCF-', minorFoes, levelRequiredFoes);
@@ -264,7 +268,7 @@ function determineFoeWithStats(avatar, foeTemplate = null){
   
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-  
+
   // Use passed in foe template, otherwise randomly pick one
   foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(currentLevel);
 

@@ -10,9 +10,8 @@ const { parseAvatarProperties } = require('../lib/helperFunctions');
 // FoeType is null unless an item created the battle
 function instantiateBattle(avatarID, foeType = null){
 
-  // attributes : ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens', 'owner'],
   const q = `
-  SELECT avatars.*, equipped 
+  SELECT id, avatars.name, avatars.character, avatars.qp, avatars.health, avatars.power, avatars.armor, avatars.fire, avatars.air, avatars.water, avatars.earth, avatars.status, avatars."statusFade", avatars."activityXP", avatars."battleXP", avatars."battleWins", avatars."battleLosses", avatars."battleDraws", avatars."battleDkos", avatars."photonTokens", avatars.owner, equipped 
   FROM avatars
   LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
     FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")

@@ -389,7 +389,9 @@
       "reward" : {
         "type" : "",
         "name" : ""
-      }
+      },
+      "levelRequirement" : 30,
+      "itemSummonOnly" : true
     }
   ]
 }
