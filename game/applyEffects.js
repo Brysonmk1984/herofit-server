@@ -1,12 +1,9 @@
-const db = require('../config/db').db;
 const { col } = require("sequelize");
-const { Avatar, UserTotal } = require('../config/db');
+const { Avatar, UserTotal, Items } = require('../config/db');
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./CONSTANTS');
-const insertBattle = require('./insertBattle');
-const { findFoeByType } = require('./foeFunctions');
-const { parseAvatarProperties } = require('../lib/helperFunctions');
+const instantiateBattle = require('./instantiateBattle');
 
 // Retrocausal Capsule
 function resetHero(avatarID, email){
@@ -102,32 +99,6 @@ function removeInfected(avatarID){
   });
 }
 
-function instantiateBattle(avatarID, foeType){
-  // attributes : ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens', 'owner'],
-
-  const q = `
-  SELECT avatars.*, equipped 
-  FROM avatars
-  LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
-    FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
-  WHERE avatars.id = $1
-`;
-
-  // GET AVATAR
-  return db.query(q, { bind : [avatarID], plain: true })
-  .then((results) =>{
-    console.log(results);
-    const avatar = parseAvatarProperties(results);
-    const foe = findFoeByType(foeType);
- 
-    return insertBattle(avatar, foe);
-  }).catch((error) =>{
-    console.log('Error Instantiating Battle', error);
-    return error;
-  });
-}
-
-
 function itemEffects(effects, avatarID, email){
   const effectPromises = [];
   effects.forEach((effect) =>{
@@ -157,7 +128,18 @@ function itemEffects(effects, avatarID, email){
           break;
       }
   });
-  return Promise.all(effectPromises);
+  return Promise.all(effectPromises)
+  .then((results) =>{
+    results.forEach((result) => {
+      if(result.error){
+        throw result.error;
+      }
+    });
+    return results;
+  }).catch((error) =>{
+    console.log('ALL EFFECTS ERROR', error);
+    return { error };
+  })
 }
 
 module.exports = { itemEffects };

@@ -1,0 +1,62 @@
+const db = require('../config/db').db;
+const { Op } = require("sequelize");
+const { Items } = require('../config/db');
+const xpCalc = require('./upgrades/xpCalc');
+const insertBattle = require('./insertBattle');
+const { findFoeTemplateByType, selectFoeTemplate, determineFoeWithStats } = require('./foeFunctions');
+const { parseAvatarProperties } = require('../lib/helperFunctions');
+
+// Used to insert a battle into the DB for both random midnight battles or item-instantiated battles
+// FoeType is null unless an item created the battle
+function instantiateBattle(avatarID, foeType = null){
+
+  // attributes : ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'statusFade', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens', 'owner'],
+  const q = `
+  SELECT avatars.*, equipped 
+  FROM avatars
+  LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
+    FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
+  WHERE avatars.id = $1
+`;
+
+  // GET AVATAR
+  return db.query(q, { bind : [avatarID], plain: true })
+  .then((results) =>{
+    if(results.goToBattle){
+      throw new Error('Hero is already queued for another battle, please try again later.')
+    }
+    // Preparing avatar
+    const avatar = parseAvatarProperties(results);
+    const equippedItemIds = avatar.equipped.map(item => item.itemID);
+    const { getCurrentLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+    avatar.level = getCurrentLevel();  
+    // Getting Foe Template
+    const foe = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(avatar.level);
+    // Adding stats to Foe
+    const foeWithStats = determineFoeWithStats(avatar, foe);
+
+    
+    // Get corresponding items for avatar
+    return Items.findAll({
+      where : { id : { [Op.in] : equippedItemIds } }, attributes : ['id', 'type', 'name', 'effects', 'action']
+    }).then((items) =>{
+      avatar.equipped = items;
+      // Insert Battle into DB
+      return insertBattle(avatar, foeWithStats);
+    }).then((result) =>{
+      if(result.error){
+        throw new Error('Failed to Insert Battle')
+      }
+      return result;
+    }).catch((error) =>{
+      console.log('Error with items before instantiating battle', error);
+      return { error };
+    });
+
+  }).catch((error) =>{
+    console.log('Error Instantiating Battle', error);
+    return { error };
+  });
+}
+
+module.exports = instantiateBattle;

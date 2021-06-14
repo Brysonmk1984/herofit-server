@@ -4,7 +4,7 @@ const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { Op } = require("sequelize");
 const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
-const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
+const { determineFoeWithStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
 const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
@@ -20,6 +20,7 @@ const doScenarioAndBonus = require('../game/doScenarioAndBonus');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
 const doBattle = require('../game/doBattle');
 const chance = require('chance')();
+const instantiateBattle = require('../game/instantiateBattle');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {
@@ -27,128 +28,22 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /insert-battle endpoint");
   }
-
   const avatar = req.body.avatar;
-  //console.log('GTB Avatar - ', avatar);
-  // HERE IS WHERE WE CAN APPLY BENEFITS FROM ITEMS FOR BATTLE
-  // 'avatar' already has items, and any modification I do to avatar stats wont save to the post battle avatar!
-
-
-
-  const { currentLevelByInput } = xpCalc();
-  const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-
-  const foeTemplate = selectFoeTemplate(currentLevel);
-
-  let foeName;
-
-  if(foeTemplate.type === 'Shadow-Self'){
-    foeName = `Shadow ${avatar.name}`;
-  }else{
-    // specific foe for testing purposes
-    //foeName = foeTemplate.foe[1];
-    
-    foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
-
-  }
-
-  const foe = {
-    id : foeTemplate.id,
-    type : foeTemplate.type,
-    name : foeName,
-    ability : foeTemplate.ability,
-    class : foeTemplate.class
-  }
-  const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
-
-  
-  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase, foeWithStats.type);
-  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase, foeWithStats.type);
-  
-  //console.log('FWS! - ', foeWithStats, 'AVA! - ', avatar);
-  let postBattleActions;
-  // PROMISE - need to determine previous battles.
-  new Promise((resolve, reject) =>{
-    return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
-  }).then((pbas) =>{
-    // Need parent context;
-    postBattleActions = pbas.length ? pbas : null;
-    console.log('PBAS on insert = ', postBattleActions);
-    const battleObj = {
-        owner: req.body.email,
-        avatarID: avatar.id,
-        avatarName: avatar.name,
-        foe : foeWithStats,
-        outcome: "TBD",
-        seenReport : false,
-    };
-
-    // If there's postBattleActions, add them to initial battle record
-    if(postBattleActions){
-      battleObj.postBattleActions = postBattleActions;
+  let battleObj;
+  instantiateBattle(avatar.id)
+  .then((result) =>{
+    if(result.error){
+      throw result.error;
     }
-    console.log('Battle obj-', battleObj);
-    // Determine item effects that will impact the battle
-    const itemBattleEffects = determineItemEffects(avatar.equipped);
-
-    console.log('IBE - ', itemBattleEffects);
-    // If there are item effects that will impact battle, add them to initial battle record
-    if(itemBattleEffects.length){
-      battleObj.effects = itemBattleEffects;
-    }
-
-    return Battle.create(battleObj, {raw : true});
-  }).then(() =>{
+    battleObj = result;
     return Avatar.update({ 
       goToBattle : true,
     },{ where: { owner: req.body.email }, raw: true })
   }).then((result) =>{
-    // SHOULD NEVER HAPPEN
-    if(!result){ console.log('THIS ERROR SHOULD NEVER HAPPEN');
-      const error =  new Error(`No Avatar associated with user ${req.body.email}`);
-      res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
+    if(result.error){
+      throw result.error;
     }
-
-    // Get the items acquired from the action types in the battle report
-    let rewards = null;
-    if(postBattleActions){
-      rewards = postBattleActions.map(action => {
-        let matchingPBA;
-        for(let actionType in ALLPBAs){
-          const match = ALLPBAs[actionType].find(pba => {
-            return pba.action === action;
-          });
-          if(match){
-            matchingPBA = match;
-            break;
-          }
-        } 
-        
-        return matchingPBA.itemID;
-      });
-    }
-
-
-    if(rewards){
-      Items.findAll({
-        attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
-        where : { id : { [Op.in] : rewards }}
-      }).then((matchingItems) =>{
-        res.formatter.ok({
-          goToBattle : true,
-          foe : foeWithStats,
-          rewards : matchingItems
-        });
-      }).catch((error) =>{
-        res.formatter.serverError(error.toString(), `Couldn't retrieve upcoming rewards - ${avatarID}`);
-      });
-    }else{
-      res.formatter.ok({
-        goToBattle : true,
-        foe : foeWithStats,
-        rewards
-      });
-    }
+    res.formatter.ok(battleObj);
 
   }).catch((error)=>{
     error = error.toString();

@@ -194,7 +194,7 @@ function generateFoeStats(avatar, foe){
           break; 
         case "Hulking Aggro Crag":
           fws.earth = 200;
-          qpAdjustedStats = ["earth", "armor","power","health"]; 
+          qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
           fws.fire = 200;
@@ -261,6 +261,7 @@ function generateFoeStats(avatar, foe){
 
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar, foeTemplate = null){
+  
   const { currentLevelByInput } = xpCalc();
   const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
   
@@ -296,7 +297,7 @@ function determineFoeWithStats(avatar, foeTemplate = null){
 }
 
 
-function findFoeByType(foeType){
+function findFoeTemplateByType(foeType){
   const allFoes = [];
   for(let foeClass in villains){
     allFoes.push(...villains[foeClass]);
@@ -305,4 +306,4 @@ function findFoeByType(foeType){
   return allFoes.find(foe => foe.type === foeType);
 };
 
-module.exports = { generateFoeStats, selectFoeTemplate, determineFoeWithStats, findFoeByType };
+module.exports = { generateFoeStats, selectFoeTemplate, determineFoeWithStats, findFoeTemplateByType };

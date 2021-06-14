@@ -1,27 +1,24 @@
 const { Op } = require("sequelize");
 const { Avatar, Battle, Items } = require('../config/db');
 const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
-const { determineFoeWithStats } = require('./foeFunctions');
 const ALLPBAs = require('../game/postBattleActions.json');
 
 // Used for inserting a battle for an individual user
 function insertBattle(avatar, foe){
-  const foeWithStats = determineFoeWithStats(avatar, foe);
 
-  
   let postBattleActions;
   // PROMISE - need to determine previous battles.
   return new Promise((resolve, reject) =>{
-    return determinePostBattleActions(avatar, foeWithStats, resolve, reject);
+    return determinePostBattleActions(avatar, foe, resolve, reject);
   }).then((pbas) =>{
     // Need parent context;
     postBattleActions = pbas.length ? pbas : null;
-    console.log('PBAS on insert = ', postBattleActions);
+    //console.log('PBAS on insert = ', postBattleActions);
     const battleObj = {
         owner: avatar.owner,
         avatarID: avatar.id,
         avatarName: avatar.name,
-        foe : foeWithStats,
+        foe,
         outcome: "TBD",
         seenReport : false,
     };
@@ -30,11 +27,15 @@ function insertBattle(avatar, foe){
     if(postBattleActions){
       battleObj.postBattleActions = postBattleActions;
     }
-    console.log('Battle obj-', battleObj);
+
+    // HERE IS WHERE WE CAN APPLY BENEFITS FROM ITEMS FOR BATTLE
+    // 'avatar' already has items, and any modification I do to avatar stats wont save to the post battle avatar!
+    
+    //console.log('Battle obj-', battleObj);
     // Determine item effects that will impact the battle
     const itemBattleEffects = determineItemEffects(avatar.equipped);
   
-    console.log('IBE - ', itemBattleEffects);
+    //console.log('IBE - ', itemBattleEffects);
     // If there are item effects that will impact battle, add them to initial battle record
     if(itemBattleEffects.length){
       battleObj.effects = itemBattleEffects;
@@ -47,9 +48,10 @@ function insertBattle(avatar, foe){
     },{ where: { owner: avatar.owner }, raw: true })
   }).then((result) =>{console.log('UPDATED AV GOTOBATTLE', result);
     // SHOULD NEVER HAPPEN
-    if(!result){ console.log('THIS ERROR SHOULD NEVER HAPPEN');
+    if(!result){ 
+      console.log('THIS ERROR SHOULD NEVER HAPPEN', error);
       const error =  new Error(`No Avatar associated with user ${avatar.owner}`);
-      res.formatter.serverError(error, 'Attempted to update Avatar goToBattle status but no results');
+      return error
     }
   
     // Get the items acquired from the action types in the battle report
@@ -71,31 +73,36 @@ function insertBattle(avatar, foe){
       });
     }
 
-    if(rewards){
-      return Items.findAll({
-        attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
-        where : { id : { [Op.in] : rewards }}
-      }).then((matchingItems) =>{
-        return {
+    return new Promise((resolve, reject) =>{
+      if(rewards){
+        return Items.findAll({
+          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
+          where : { id : { [Op.in] : rewards }}
+        }).then((matchingItems) =>{
+          resolve({
+            goToBattle : true,
+            foe,
+            rewards : matchingItems
+          });
+        }).catch((error) =>{
+          reject(error);
+        });
+      }else{
+        const battleObj = {
           goToBattle : true,
-          foe : foeWithStats,
-          rewards : matchingItems
+          foe,
+          rewards
         };
-      }).catch((error) =>{
-        return error;
-      });
-    }else{
-      return {
-        goToBattle : true,
-        foe : foeWithStats,
-        rewards
-      };
-    }
-  
+        resolve(battleObj);
+      }
+    }).then((result) =>{
+      return result;
+    }).catch(error => reject(error));
+
   }).catch((error)=>{
     error = error.toString();
     console.log(`Couldn't Send Avatar to battle: ${error}`);
-    return error;
+    return { error };
   });
 }
 
