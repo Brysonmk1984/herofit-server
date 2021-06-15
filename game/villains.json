@@ -372,26 +372,6 @@
         "type" : "title",
         "name" : "Earth Trapper"
       }
-    }, 
-    {
-      "class" : "Elementals",
-      "type" : "Hulking Aggro Crag",
-      "foe" : ["Jötnar"],
-      "ability": {
-        "name" : "Earth Mastery",
-        "effect" : "Profound Earth Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
-      "pba" : [],
-      "reward" : {
-        "type" : "",
-        "name" : ""
-      },
-      "levelRequirement" : 30,
-      "itemSummonOnly" : true
     }
   ]
 }
