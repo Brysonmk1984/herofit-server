@@ -372,6 +372,29 @@
         "type" : "title",
         "name" : "Earth Trapper"
       }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Burning Jinn",
+      "foe" : [
+        "Agni",
+        "Helene",
+        "Heliodoro",
+        "Ravi",
+        "Sorin",
+        "Vulcan"
+      ],
+      "ability": {
+        "name" : "Fire Proficiency",
+        "effect" : "Major Fire Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Fire Hunter"],
+      "reward" : {
+        "type" : "title",
+        "name" : "Fire Hunter"
+      }
     }
   ]
 }
