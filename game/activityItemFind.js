@@ -1,13 +1,20 @@
 const chance = require('chance')();
 const { ELM_LEVEL_3_REQ } = require('./CONSTANTS');
+const { config } = require('../appConfig');
 
 // Used for randomly selecting items based on elements exercised during activities
 function _pickElementSpecificItem(weightedElms, itemTupleArray){
+
   // select the elm based on weighted average
   const selectedElm = chance.weighted(['fire', 'earth', 'water', 'air'], [weightedElms.fire, weightedElms.earth, weightedElms.water, weightedElms.air]);      
+
   // grab the array of element-matching items
   const listOfMatchingElmItems = itemTupleArray.find(tuple => tuple[0] === selectedElm);
   // pick one from element-matching items
+
+  if(!listOfMatchingElmItems){
+    return null;
+  }
   return chance.pickone(listOfMatchingElmItems[1]);
 }
 
@@ -49,6 +56,24 @@ function _elmLvl3Items(level, remainderPercent, weightedElms){
   // If a remainderPercent is passed in, it means only a fraction of the whole 6% chance should be used in the calculation,
   // Multiplied by .01 to get decimal value, then multiplied by the decimal value of the base chance (.06), and finally multiplied by 100 to get the non-decimal percent value for this partial hour
   const T3ITEMCHANCE = { percent : 6, decimal : .06 };
+  
+  
+  const event = config.specialEvent;
+  // If Special Event is live, run code to attempt any special item find event
+  if(event){
+    const itemFindAts = event.actionTypes.filter((at) => (at.type === 'itemFind'));
+    // If the event contains foeLikelihood actions
+    if(itemFindAts.length){
+      const t3 = itemFindAts.filter(at => at.itemCategory === 'tier3Summon');
+      t3.forEach((at) =>{
+        T3ITEMCHANCE.percent = T3ITEMCHANCE.percent + (T3ITEMCHANCE.percent * at.bonusPercent);
+        T3ITEMCHANCE.decimal = T3ITEMCHANCE.decimal + (T3ITEMCHANCE.decimal * at.bonusPercent);
+      });
+    }
+  }
+  
+  
+  
   const percentChance = remainderPercent ? ((remainderPercent * .01) * T3ITEMCHANCE.decimal) * 100 : T3ITEMCHANCE.percent;
   //console.log(percentChance);
   // Only test for lvl 3 elm item if player is over level 30
@@ -57,10 +82,10 @@ function _elmLvl3Items(level, remainderPercent, weightedElms){
     // Small chance to find elemental lvl 3 item to begin with
     if(foundItem){
       const elmLvl3Items = [
-        ['air',['Storm Crow Bone Chimes']],
-        ['fire',['Smoldering Skull Torch']],
-        ['water',['Wave-Swept Battle Conch']],
-        ['earth',['Petrified Power Totem']]
+        // ['air',['Storm Crow Bone Chimes']],
+        // ['fire',['Smoldering Skull Torch']],
+        // ['water',['Wave-Swept Battle Conch']],
+        // ['earth',['Petrified Power Totem']]
       ];
 
       // return result of function that takes in weighted elms, and an array of items to pick from for each element
