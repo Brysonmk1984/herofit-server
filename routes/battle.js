@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const { Op } = require("sequelize");
+const { Op, col } = require("sequelize");
 const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
 const { determineFoeWithStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
@@ -278,71 +278,38 @@ router.post('/fetch-battles-won-or-dko', body('avatarID').isNumeric(), authentic
 
 // Runs one specific battle... currently only used if a battle fails and debug purposes
 // Soon will be used when users earn an item that starts a battle
-router.post('/run-specific-battle', body('avatarID').isNumeric(), body('itemID').isNumeric().optional({ nullable: true }), authenticateJWT, (req, res) => {
+router.post('/run-specific-battle', body('avatar').isObject(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /run-specific-battle");
   }
 
-  const { avatarID, itemID } = req.body;
+  let { avatar } = req.body;
 
   // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
   const { determineAstrologySeason } = avCalc();
   const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
 
-  const promises = [];
-
-  const avPromise = Avatar.findOne({ where : { id: avatarID }, raw : true, include : [
-    { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
-      where: { equipped : true }, 
-      required : false,
-    },
-  ],
-  raw : undefined,
-  nest : true,
-  distinct : true,
-  attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] })
-
-  promises.push(avPromise);
-
-
-  // If there's an itemID, handle battle with certain foe
-  if(itemID){
-    // Not implemented yet, need function here that creates battle on the fly
-    // takes into account equipped items
-    
-  }else{
-    // GET TBD BATTLE from avatar with passed in ID
-    promises.push(Battle.findAll({ where: { outcome : 'TBD', avatarID }, raw : true }));
-  }
-
-  
-  
   let battle = null;
   let battleResult = null;
   let battleScenario = null;
   let xpGain, ptGain = 0;
   let leveledUp = false;
-  let avatar, foe;
+  let foe;
   let BRA, BRF;
   let _checkLevelUp;
-  
-  Promise.allSettled(promises)
-  .then((promises) =>{
-    avatar = promises[0].value.dataValues;
-    avatar.equipped = avatar.equipped.map(itemInstance => itemInstance.dataValues);
-    battle = promises[1].value[0];
+
+  Battle.findOne({ where: { outcome : 'TBD', avatarID : avatar.id }, raw : true })
+  .then((battleInstance) =>{
+    battle = battleInstance;
+    console.log('BATTLE', battle, avatar);
     const foeWithStats = battle.foe;
     foe = foeWithStats;
- 
-    // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
-
-    // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    avatar = parseAvatarProperties(avatar, true);
-    const { getCurrentLevel, checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
-    avatar.level = getCurrentLevel();
+    const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
     _checkLevelUp = checkLevelUp;
-
+   
+    // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
+    
 
     // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
     let beginnersLuck = false;
@@ -453,7 +420,6 @@ router.post('/run-specific-battle', body('avatarID').isNumeric(), body('itemID')
     return Promise.allSettled(allPbaPromises);
   }).then(() =>{
     // Check for lvl up
-    
     const leveledUpResults = _checkLevelUp(xpGain);
     
     //Needed for next then

@@ -23,7 +23,7 @@
   {
     "class" : "Elementals",
     "type" : "Hulking Aggro Crag",
-    "foe" : ["Papa"],
+    "foe" : ["Jötnar"],
     "ability": {
       "name" : "Earth Mastery",
       "effect" : "Profound Earth Threat",
