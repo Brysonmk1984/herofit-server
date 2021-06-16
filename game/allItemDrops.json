@@ -1,0 +1,44 @@
+[
+  {
+    "name" : "Health Potion",
+    "chance" : 2.25,
+    "activityRestriction" : [],
+    "levelRestriction" : null,
+    "disabled" : false
+  },
+  {
+    "name" : "Antidote Potion",
+    "chance" : 0.75,
+    "activityRestriction" : [],
+    "levelRestriction" : null,
+    "disabled" : false
+  },
+  {
+    "name" : "Storm Crow Bone Chimes",
+    "chance" : 6.0,
+    "activityRestriction" : ["air"],
+    "levelRestriction" : 30,
+    "disabled" : false
+  },
+  {
+    "name" : "Smoldering Skull Torch",
+    "chance" : 6.0,
+    "activityRestriction" : ["fire"],
+    "levelRestriction" : 30,
+    "disabled" : false
+  },
+  {
+    "name" : "Wave-Swept Battle Conch",
+    "chance" : 6.0,
+    "activityRestriction" : ["water"],
+    "levelRestriction" : 30,
+    "disabled" : false
+  },
+  {
+    "name" : "Petrified Power Totem",
+    "chance" : 6.0,
+    "activityRestriction" : ["earth"],
+    "levelRestriction" : 30,
+    "disabled" : false
+  }
+]

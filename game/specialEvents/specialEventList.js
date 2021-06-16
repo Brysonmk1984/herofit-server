@@ -42,16 +42,12 @@ const attackOfTheElements = {
     bonusPercent : 1.0,
     requirements : [{ foeType : 'Granite Golem' }]
   },
-  
-  // // REMEMBER TO UNCOMMENT ITEMS IN activityItemFind.js!!!!
-  // {
-  //   type : 'itemFind',
-  //   action : "Increased Likelyhood Item",
-  //   bonusPercent : .5,
-  //   itemCategory : "tier3Summon",
-  //   // Not used yet... need to build functionality for boosting specific item chances
-  //   //items : ['Petrified Power Totem', 'Wave-Swept Battle Conch', 'Smoldering Skull Torch', 'Storm Crow Bone Chimes'],
-  // }
+  {
+    type : 'itemFind',
+    action : "Increased Likelyhood Item",
+    bonusPercent : .5,
+    items : ['Petrified Power Totem', 'Wave-Swept Battle Conch', 'Smoldering Skull Torch', 'Storm Crow Bone Chimes'],
+  }
 ],
 }
 

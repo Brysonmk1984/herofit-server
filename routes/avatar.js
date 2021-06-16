@@ -134,7 +134,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
       //console.log(weightedElms);
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-      const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms);
+      const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms, null, null);
     
       foundItems = items;
       improvements["Photon Tokens"] = pt;

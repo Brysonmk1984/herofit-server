@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { _elmLvl3Items, _callXTimes, _itemFind, _ptFind, activityItemFind } = require('../../game/activityItemFind');
+const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require('../../game/activityItemFind');
 
 let weightedElms;
 beforeAll(() =>{
@@ -26,22 +26,7 @@ beforeAll(() =>{
 // });
 
 
-// it('PARTIAL HOUR = Should return an array of items awarded or null if none were awarded', () =>{
-//   const NUMBER_OF_RUNS = 20;
-//   const testRuns = [];
-//   for (let index = 0; index < NUMBER_OF_RUNS; index++) {
-//     const randomLevel = chance.integer({ min : 1, max : 100 });
-//     // 10% chance for a full hour of getting a lvl 3 item. This const below represents a percent from a partial hour
-//     const randomPartialPercent = 7;
-//     const result = _elmLvl3Items(randomLevel, randomPartialPercent, weightedElms);
-//     //console.log('partial', result);
-//     testRuns.push(expect(result).nullOrAny(String));
-//   }
-//   return Promise.all(testRuns);
-// });
-
-
-// it('Should call _ptFind, which will return either null or the amount found in PT', ()=>{
+// it('Should call _chancePTFind, which will return either null or the amount found in PT', ()=>{
 //   const NUMBER_OF_RUNS = 1;
 //   const testRuns = [];
 
@@ -51,7 +36,7 @@ beforeAll(() =>{
 //     const remainder =  activityItemSessions % 1;
 //     const remainderPercent = remainder * 100;
 
-//     const result = _ptFind(null, remainderPercent);
+//     const result = _chancePTFind(null, remainderPercent);
 //     //console.log(result);
 //     testRuns.push(expect(result).nullOrAny(Number));
 
@@ -88,13 +73,14 @@ beforeAll(() =>{
 
 it('Should Run Whole Item find sequence, starting with activityItemFind, an object with ptgained and items found (or null for each) will be returned', ()=>{
   const xpGain = 62;
-  const NUMBER_OF_RUNS = 1;
+  const NUMBER_OF_RUNS = 20;
   const testRuns = [];
 
   for (let index = 0; index < NUMBER_OF_RUNS; index++) {
     const randomLevel = chance.integer({ min : 1, max : 100 });
-    const result = activityItemFind(xpGain, randomLevel, weightedElms);
-    console.log('RES', result);
+    // Last two params are itemFind and ptFind stats (percentages that boost base of each)
+    const result = activityItemFind(xpGain, randomLevel, weightedElms, null, null);
+ 
     testRuns.push(
       expect(result).toEqual(expect.objectContaining({
         items : expect.nullOrAny(Array),
