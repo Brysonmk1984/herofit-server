@@ -1,5 +1,6 @@
 const chance = require('chance')();
 const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require('../../game/activityItemFind');
+const mockItemDrops = require('./mockItemDrops.json');
 
 let weightedElms;
 beforeAll(() =>{
@@ -78,9 +79,10 @@ it('Should Run Whole Item find sequence, starting with activityItemFind, an obje
 
   for (let index = 0; index < NUMBER_OF_RUNS; index++) {
     const randomLevel = chance.integer({ min : 1, max : 100 });
-    // Last two params are itemFind and ptFind stats (percentages that boost base of each)
-    const result = activityItemFind(xpGain, randomLevel, weightedElms, null, null);
- 
+    // the last param is an array of possible items drops
+    // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
+    const result = activityItemFind(xpGain, randomLevel, weightedElms, null, null, mockItemDrops);
+    console.log('item and pt find result = ', result);
     testRuns.push(
       expect(result).toEqual(expect.objectContaining({
         items : expect.nullOrAny(Array),

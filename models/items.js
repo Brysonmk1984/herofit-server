@@ -51,6 +51,20 @@ const ItemsModel = function(db, DataTypes){
         type : DataTypes.JSONB,
         allowNull : true,
       },
+      dropRate : {
+        type : DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull : true,
+      },
+      levelRestriction : {
+        type : DataTypes.INTEGER,
+        allowNull : true,
+      },
+      activityRestriction : {
+        type : DataTypes.JSONB,
+        allowNull : true,
+      },
   }, { freezeTableName: true });
 
   return Items;

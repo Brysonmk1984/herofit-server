@@ -90,10 +90,17 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     ).then((userTotals) =>{
       ut = userTotals;
 
-      return Avatar.findOne({ 
-        where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
-      });
-    }).then((avatar) =>{
+      // Get Avatar to buff as well as all possible items that can drop from activities
+      return Promise.all([
+        Avatar.findOne({ 
+          where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
+        }), 
+        Items.findAll({ 
+          where: { dropRate: { [Op.ne]: null }, disabled : false }, attributes : ['name', 'dropRate', 'levelRestriction', 'activityRestriction', 'disabled'], raw : true, transaction: t, 
+        })])
+    }).then((result) =>{console.log('RESSS', result);
+      const avatar = result[0];
+      const possibleItemDrops = result[1];
       avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
       
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
@@ -132,9 +139,11 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         earth : (improvements.earth / totalElmImprove) * 100,
       } 
 
-      //console.log(weightedElms);
+      console.log('POSSIBLE DROPS', possibleItemDrops);
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-      const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms, null, null);
+      // the last param is an array of possible items drops
+      // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
+      const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms, null, null, possibleItemDrops);
     
       foundItems = items;
       improvements["Photon Tokens"] = pt;
@@ -172,26 +181,26 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         items : foundItems
       }
     }).then((returnPackage) =>{
-      console.log('RP=', returnPackage);
+      //console.log('RP=', returnPackage);
       if(returnPackage.items === null){
         return null;
       }
+      // Find matching item Templates
       return Items.findAll({
         where : { name : { [Op.in] : returnPackage.items } },
         transaction : t
       }).then((matchingItems) =>{
-        console.log('matchingItems', matchingItems);
         const itemsToInsert = []
-        
-        matchingItems.forEach((item) => {
-          console.log(item.id);
-          itemsToInsert.push({ avatarID : returnPackage.avatar.id, itemID : item.id });
+        // for each item earned, find it's matching item template and push a new item instance into the DB
+        returnPackage.items.forEach((item) => {
+          const matchingItem = matchingItems.find(itemTemplate => itemTemplate.name === item)
+          itemsToInsert.push({ avatarID : returnPackage.avatar.id, itemID : matchingItem.id });
         });
         return AvatarItems.bulkCreate(itemsToInsert, { where: { owner : email }, transaction : t })
       });
 
 
-    }).then((result) =>{console.log('RESULT!!!', result, returnPackage);
+    }).then((result) =>{
       // Transaction has been committed
       // result is whatever the result of the promise chain returned to the transaction callback
       return res.formatter.ok(returnPackage);

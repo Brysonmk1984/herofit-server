@@ -3,14 +3,14 @@ const testSpecificFoe = {
   description : "Used for selecting a specific foe",
   actionTypes : [{
     type : 'foeLikelihood',
-    action : "Increased Likelyhood Foe",
+    action : "Increased Likelihood Foe",
     odds : 0,
     foe : 'Wheezing Jinn',
     foeClass : 'Elementals'
   },
   {
     type : 'foeLikelihood',
-    action : "Increased Likelyhood Foe",
+    action : "Increased Likelihood Foe",
     odds : 100,
     foe : 'Plaguebringer',
     foeClass : 'Titans'
@@ -27,7 +27,7 @@ const attackOfTheElements = {
   description : "For twelve weeks, a new Elemental foe will be released in the game! During this time, there will be an increased chance to battle the new foe, as well as bonus Photon Tokens and XP for winning!",
   actionTypes : [{
     type : 'foeLikelihood',
-    action : "Increased Likelyhood Foe",
+    action : "Increased Likelihood Foe",
     odds : 33,
     foe : 'Granite Golem',
     foeClass : 'Elementals'
@@ -44,7 +44,7 @@ const attackOfTheElements = {
   },
   {
     type : 'itemFind',
-    action : "Increased Likelyhood Item",
+    action : "Increased Likelihood Item",
     bonusPercent : .5,
     items : ['Petrified Power Totem', 'Wave-Swept Battle Conch', 'Smoldering Skull Torch', 'Storm Crow Bone Chimes'],
   }

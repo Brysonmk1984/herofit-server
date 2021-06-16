@@ -2,7 +2,6 @@ const chance = require('chance')();
 const { specialEvent } = require('../appConfig').config;
 const { roundNumber, cloneObj } = require('../lib/helperFunctions');
 const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require('./CONSTANTS');
-const ALLITEMDROPS = require('./allItemDrops.json');
 
  //ptFindStatBoost
  function _calcPtBoost(ptFind){
@@ -24,7 +23,7 @@ const ALLITEMDROPS = require('./allItemDrops.json');
   }
 }
 
-// Expects a tuple where the first index is an array of items and the second is an array of weights for likelyhood of being selected
+// Expects a tuple where the first index is an array of items and the second is an array of weights for Likelihood of being selected
 // Randomly & based on weights, pick from items and return selected
 function _chanceItemFind(itemTuples, remainderPercent){
 
@@ -62,7 +61,7 @@ function _chancePTFind(remainderPercent = null, ptDropRate, ptDropAmount){
 
 // Run ALL functions that check for various items
   // weightedElms is an object of the elements with full percents of total workout
-function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost){
+function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
 
   // If Special Event is live, run code to attempt any special item find event
   let eventItemFindBonusArray = [];
@@ -75,7 +74,7 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
   
   // For each item that drops in the game, determine the exact drop rate based on initial drop rate of item and any bonus to drop rate via specialEvents or itemFind stat
   // Level Restriction and disabled properties will prevent items from going into the pool of possible drop items 
-  ALLITEMDROPS.forEach((itemObj) => {
+  possibleItemDrops.forEach((itemObj) => {
     const item = Object.assign({},itemObj);
     // If item level is at least as high as hero level, add too tuple for potential item finds
     if(item.levelRestriction <= level && item.disabled === false){
@@ -101,7 +100,7 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
 
       // Further modify drop chance by activity ELM resitriction
       // Should take into account 2 things for drop chance: weightedElms (if activity restricted) & item.chance
-      if(item.activityRestriction.length){
+      if(item.activityRestriction && item.activityRestriction.length){
         // ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE * WEIGHT OF WORKOUT WITHIN ACTIVITY ELM TYPE
         let chanceToFind = 0;
         // an array of elms that the hero could possibly find items from
@@ -129,12 +128,12 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
 }
 
 // WORKS! - calls a function multiple times with the last time possibly being with a parameter that reduces likelihood of finding an item
-function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemFindStatBoost, ptFindStatBoost){
+function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
   const acquiredItems = [];
   let ptFound = 0;
   // Loop over each full hours worth of activity and check if item was acquired
   for(let i = 0; i < integer; i++){
-    const result = func(level, null, weightedElms, itemFindStatBoost, ptFindStatBoost);
+    const result = func(level, null, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
     if(result.items){
       acquiredItems.push(...result.items);
     }
@@ -145,7 +144,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
 
   // Check partial hour
   if(remainderPercent){
-    const result = func(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost);
+    const result = func(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
     if(result.items){
       acquiredItems.push(...result.items);
     }
@@ -159,12 +158,12 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
   }
 }
 
-function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost){
+function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
   const activityItemSessions = xpGain / 60;
   const integer = Math.floor(activityItemSessions);
   const remainder =  activityItemSessions % 1;
   const remainderPercent = remainder * 100;
-  const foundItemsAndPt =  _callXTimes(_itemFind, integer, remainderPercent, level, weightedElms, itemFindStatBoost, ptFindStatBoost);
+  const foundItemsAndPt =  _callXTimes(_itemFind, integer, remainderPercent, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
   //console.log('DONE', foundItemsAndPt);
   return foundItemsAndPt;
 }
@@ -172,4 +171,4 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
 module.exports = activityItemFind;
 
 // testing
-//module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
+// module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
