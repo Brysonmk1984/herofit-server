@@ -106,15 +106,12 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       lvlUp = leveledUp;
       lvlAfterBuff = endingLevel;
       qpe = qpEarned;
-      console.log('prelim', lvlUp);
+
       const updatedPower = updatePower(endingLevel, avatar.qpPower);
       const { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
       const updatedStatus = updateStatus(avatar.status, lvlUp);
       const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
-      console.log('US123',updatedStatus);
 
-      
-      //console.log('AXP - ', aXP, avStatSnapshot.activityXP);
 
       // Calc gains here to be displayed on frontend
       improvements = {
@@ -138,7 +135,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       //console.log(weightedElms);
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS
       const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms);
-      console.log('ITEMS AND PT',items, pt);
+    
       foundItems = items;
       improvements["Photon Tokens"] = pt;
 
@@ -511,5 +508,6 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for POST fetch-avatars-by-page-and-ranking-type-battle Endpoint' );
   });
 });
+
 
 module.exports = router;
