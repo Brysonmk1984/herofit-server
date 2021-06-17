@@ -34,11 +34,13 @@ const attackOfTheElements = {
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
+    // BOOSt tHIS TO 3.0 for t3
     bonusPercent : 2.0,
     requirements : [{ foeType : 'Burning Jinn' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
+    // BOOSt tHIS TO 1.5 for t3
     bonusPercent : 1.0,
     requirements : [{ foeType : 'Burning Jinn' }]
   }],
