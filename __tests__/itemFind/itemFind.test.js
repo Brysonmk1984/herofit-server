@@ -74,7 +74,7 @@ beforeAll(() =>{
 
 it('Should Run Whole Item find sequence, starting with activityItemFind, an object with ptgained and items found (or null for each) will be returned', ()=>{
   const xpGain = 62;
-  const NUMBER_OF_RUNS = 20;
+  const NUMBER_OF_RUNS = 1;
   const testRuns = [];
 
   for (let index = 0; index < NUMBER_OF_RUNS; index++) {

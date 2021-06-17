@@ -29,7 +29,7 @@ function _chanceItemFind(itemTuples, remainderPercent){
 
   // itemTuples LOOKS SOMETHING LIKE: [['Health Potion', 'Antidote Potion'],[75,25]];
   //itemTuple gives exact percent chance for drop
-
+  //console.log(itemTuples);
   const foundItems = [];
   // run chance function on each percentage in second part of tuple
   itemTuples[1].forEach((likelihood, i) =>{
@@ -71,23 +71,24 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
   
   // Run ALL item find functions here
   const generalItemTuple =[[],[]];
-  
   // For each item that drops in the game, determine the exact drop rate based on initial drop rate of item and any bonus to drop rate via specialEvents or itemFind stat
   // Level Restriction and disabled properties will prevent items from going into the pool of possible drop items 
   possibleItemDrops.forEach((itemObj) => {
     const item = Object.assign({},itemObj);
+
     // If item level is at least as high as hero level, add too tuple for potential item finds
-    if(item.levelRestriction <= level && item.disabled === false){
+    if((item.levelRestriction === null || item.levelRestriction <= level)  && item.disabled === false){
+
       generalItemTuple[0].push(item.name);
       // NEED TO modify chance of find here based on event bonus and stat bonus
       // Special Event Item Find Bonus
       eventItemFindBonusArray.forEach((eventBonusObj) =>{
         const matchingItem = eventBonusObj.items.find(name => name === item.name);
         if(matchingItem){
-          //console.log('MATCH = ', item.name,item.chance, eventBonusObj.bonusPercent, (item.chance *(eventBonusObj.bonusPercent)));
+          //console.log('MATCH = ', item.name,item.dropRate, eventBonusObj.bonusPercent, (item.dropRate *(eventBonusObj.bonusPercent)));
           // adjust item find chance of this item by the percent bonus
-          item.chance += (item.chance *(eventBonusObj.bonusPercent));
-          //console.log('IC=',item.chance);
+          item.dropRate += (item.dropRate *(eventBonusObj.bonusPercent));
+          //console.log('IC=',item.dropRate);
         }
    
       });
@@ -95,23 +96,25 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
       // Item Find - the stat bonus modifier
       // itemFindStatBoost is a percent (not decimal)
       if(itemFindStatBoost){
-        item.chance += (item.chance * (itemFindStatBoost * .01))
+        item.dropRate += (item.dropRate * (itemFindStatBoost * .01))
       }
 
       // Further modify drop chance by activity ELM resitriction
-      // Should take into account 2 things for drop chance: weightedElms (if activity restricted) & item.chance
+      // Should take into account 2 things for drop chance: weightedElms (if activity restricted) & item.dropRate
       if(item.activityRestriction && item.activityRestriction.length){
         // ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE * WEIGHT OF WORKOUT WITHIN ACTIVITY ELM TYPE
         let chanceToFind = 0;
         // an array of elms that the hero could possibly find items from
         item.activityRestriction.forEach((elm) =>{
           // Total the possible chance from each element multiplied by item chance
-          chanceToFind += ((weightedElms[elm] * .01) * item.chance);
+          chanceToFind += ((weightedElms[elm] * .01) * item.dropRate);
         });
+        //console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
         generalItemTuple[1].push(roundNumber(chanceToFind, 4));
       }else{
+        //console.log('NOT ACT RESTRICTED ', item.name, item.dropRate);
         // NOT ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE ONLY
-        generalItemTuple[1].push(item.chance);
+        generalItemTuple[1].push(item.dropRate);
       }
     }
   });
@@ -171,4 +174,4 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
 module.exports = activityItemFind;
 
 // testing
-// module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
+//module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
