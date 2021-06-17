@@ -6,9 +6,9 @@ const config = {
   specialEvent : attackOfTheElements,
 
 
-  // globalMessage : [
-  //   { type : 'info', link : null, persist : false, message : "Thanks for your feedback about the mobile app! Development is underway but don't worry, the web app will be around for a long time and more content is on the horizon!" }
-  // ],
+  globalMessage : [
+    { type : 'info', link : '/elemental-event#percentTable', persist : false, message : "Thorns Damage and Vampiric Touch have been nerfed by 25%. Overall foe difficulty reduced slightly. Click here to see the updated values." }
+  ],
 
   // RANKING PAGE
   AVATAR_COUNT_PER_PAGE : 20

@@ -123,9 +123,9 @@ const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 
 // Applies to mid level +
-const LEVEL_DIFFICULTY_MOD = 1.31;
+const LEVEL_DIFFICULTY_MOD = 1.29;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.29;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.25;
 
 // ITEM FIND DURING ACTIVITIES
 const ELM_LEVEL_3_REQ = 30;

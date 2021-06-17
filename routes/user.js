@@ -8,15 +8,16 @@ const utCalc = require('../game/upgrades/utCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
 const passport = require('passport');
+const { config } = require('../appConfig');
 
 // If an email is passed, get that user, otherwise get user based on JWT
-router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), body('initMessage').isBoolean().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     console.log(errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
   }
-  const { email } = req.body;
+  const { email, initMessage } = req.body;
   const user = req.user;
 
   User.findOne({ where : email ? { email } : { id : user.id }, raw : true })
@@ -24,7 +25,14 @@ router.post('/user-details', body('email').isEmail().optional({ nullable: true, 
     if(!user){
       res.formatter.unauthorized(`Couldn't find a user with that email.`);
     }
-    return res.formatter.ok({ user });
+
+    const response = { user };
+    // For initial load, also return any global message
+    if(config.globalMessage && config.globalMessage.length){
+      response.globalMessage = config.globalMessage;
+    }
+
+    return res.formatter.ok(response);
   }).catch((error) =>{
     console.log('Passport Auth error - ', error);
     res.formatter.serverError(error.toString(), `Error Logging in User - for GET /user`);
