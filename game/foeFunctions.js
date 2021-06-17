@@ -162,7 +162,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Flame Fiend":
-          fws.fire = 25;
+          fws.fire = 50;
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Splash Artist":
@@ -178,7 +178,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = 75;
+          fws.fire = 100;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
@@ -194,7 +194,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
-          fws.fire = 200;
+          fws.fire = 250;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
