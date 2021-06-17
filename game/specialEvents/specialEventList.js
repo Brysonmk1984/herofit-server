@@ -29,18 +29,18 @@ const attackOfTheElements = {
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
     odds : 33,
-    foe : 'Granite Golem',
+    foe : 'Burning Jinn',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 2.0,
-    requirements : [{ foeType : 'Granite Golem' }]
+    requirements : [{ foeType : 'Burning Jinn' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : 1.0,
-    requirements : [{ foeType : 'Granite Golem' }]
+    requirements : [{ foeType : 'Burning Jinn' }]
   },
   {
     type : 'itemFind',

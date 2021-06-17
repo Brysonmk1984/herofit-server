@@ -519,4 +519,13 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 });
 
 
+/*
+  MIGRATION
+*/
+
+// Write code to reset all avatars that hasResetStats = false
+// router.post('/reset-migration', body('email').isEmail(), (req, res) => {
+
+// });
+
 module.exports = router;
