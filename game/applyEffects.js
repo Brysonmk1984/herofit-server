@@ -1,4 +1,4 @@
-const { col } = require("sequelize");
+const { col, literal } = require("sequelize");
 const { Avatar, UserTotal } = require('../config/db');
 const xpCalc = require('./upgrades/xpCalc');
 const avCalc = require('./upgrades/avCalc');
@@ -99,6 +99,18 @@ function removeInfected(avatarID){
   });
 }
 
+function setToHalfHealth(avatarID){
+  return Avatar.update(
+    { health : literal(`"maxHealth" / 2`), status : 'Recovering' } , { where : { id : avatarID }, returning : true }
+  ).then((data) =>{
+    //RETURN UPDATED AVATAR
+    return data[1][0];
+  }).catch((error) =>{
+    console.log('error', error);
+    return error;
+  });
+}
+
 
 function itemEffects(effects, avatarID, email){
   const effectPromises = [];
@@ -110,6 +122,8 @@ function itemEffects(effects, avatarID, email){
           effectPromises.push(healCompletely(avatarID)); 
         case 'Remove Infected Status':
           effectPromises.push(removeInfected(avatarID)); 
+        case 'Distasteful Temptation':
+          effectPromises.push(setToHalfHealth(avatarID)); 
         default:
           break;
       }
