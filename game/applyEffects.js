@@ -137,7 +137,6 @@ function itemEffects(effects, avatarID, email){
     });
     return results;
   }).catch((error) =>{
-    console.log('ALL EFFECTS ERROR', error);
     return { error };
   })
 }
