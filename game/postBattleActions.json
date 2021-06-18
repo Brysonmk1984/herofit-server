@@ -134,6 +134,39 @@
       "type" : "Award Title",
       "itemCategory": "titles",
       "outcome" : ["Avatar Wins", "Double KO"]
+    },
+
+    {
+      "itemID" : 85,
+      "action" : "Grant Fire Tint",
+      "name" : "Fire Tint",
+      "type" : "Award Skin",
+      "itemCategory": "skins",
+      "outcome" : ["Avatar Wins", "Double KO"]
+    },
+    {
+      "itemID" : 86,
+      "action" : "Grant Earth Tint",
+      "name" : "Earth Tint",
+      "type" : "Award Skin",
+      "itemCategory": "skins",
+      "outcome" : ["Avatar Wins", "Double KO"]
+    },
+    {
+      "itemID" : 87,
+      "action" : "Grant Water Tint",
+      "name" : "Water Tint",
+      "type" : "Award Skin",
+      "itemCategory": "skins",
+      "outcome" : ["Avatar Wins", "Double KO"]
+    },
+    {
+      "itemID" : 88,
+      "action" : "Grant Air Tint",
+      "name" : "Air Tint",
+      "type" : "Award Skin",
+      "itemCategory": "skins",
+      "outcome" : ["Avatar Wins", "Double KO"]
     }
   ],
 

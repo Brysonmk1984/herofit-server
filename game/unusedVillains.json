@@ -1,5 +1,4 @@
 [
-  
   {
     "class" : "Elementals",
     "type" : "Storming Oni",
@@ -12,13 +11,11 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Air Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
-    },
-    "levelRequirement" : 30,
-    "itemSummonOnly" : true
+      "type" : "skin",
+      "name" : "Air Tint"
+    }
   },
   {
     "class" : "Elementals",
@@ -32,13 +29,11 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Earth Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
-    },
-    "levelRequirement" : 30,
-    "itemSummonOnly" : true
+      "type" : "skin",
+      "name" : "Earth Tint"
+    }
   },
   {
     "class" : "Elementals",
@@ -52,15 +47,12 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Fire Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
-    },
-    "levelRequirement" : 30,
-    "itemSummonOnly" : true
+      "type" : "skin",
+      "name" : "Fire Tint"
+    }
   },
-
   {
     "class" : "Elementals",
     "type" : "Cyclonic Siren",
@@ -96,12 +88,10 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Water Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
-    },
-    "levelRequirement" : 30,
-    "itemSummonOnly" : true
+      "type" : "skin",
+      "name" : "Water Tint"
+    }
   }
 ]
