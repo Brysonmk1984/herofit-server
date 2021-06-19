@@ -15,7 +15,7 @@
       "./__tests__/nullOrAny.setup.js"
     ],
     "testPathIgnorePatterns": [
-      "./__tests__/battles",
+      "./__tests__/itemFind",
       "./__tests__/nullOrAny.setup.js"
     ]
   },

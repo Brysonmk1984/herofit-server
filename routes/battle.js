@@ -2,25 +2,14 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const { Op, col } = require("sequelize");
+const { Op } = require("sequelize");
 const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
-const { determineFoeWithStats } = require('../game/foeFunctions');
 const villains = require('../game/villains.json');
-const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
-const { determineXpBounty, determinePtBounty } = require('../game/runPostBattleActions');
-const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
-const { OUTCOME_XP, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD, FOE_NON_ACTION } = require('../game/CONSTANTS'); 
 const ALLPBAs = require('../game/postBattleActions.json');
-// All needed only for new single battle function
-const { parseAvatarProperties, cloneObj } = require('../lib/helperFunctions');
-const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
-const doScenarioAndBonus = require('../game/doScenarioAndBonus');
-const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
-const doBattle = require('../game/doBattle');
-const chance = require('chance')();
 const instantiateBattle = require('../game/instantiateBattle');
+const battleProcess = require('../game/battle/battleProcess');
 
 // USER CLICKED 'GO TO BATTLE'
 router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject(), body('avatar.goToBattle').isBoolean().custom((goToBattle) => goToBattle === false), authenticateJWT, (req, res) => {
@@ -286,187 +275,11 @@ router.post('/run-specific-battle', body('avatar').isObject(), authenticateJWT, 
 
   let { avatar } = req.body;
 
-  // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
-  const { determineAstrologySeason } = avCalc();
-  const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
-
-  let battle = null;
-  let battleResult = null;
-  let battleScenario = null;
-  let xpGain, ptGain = 0;
-  let leveledUp = false;
-  let foe;
-  let BRA, BRF;
-  let _checkLevelUp;
-
   Battle.findOne({ where: { outcome : 'TBD', avatarID : avatar.id }, raw : true })
-  .then((battleInstance) =>{
-    battle = battleInstance;
-    console.log('BATTLE', battle, avatar);
-    const foeWithStats = battle.foe;
-    foe = foeWithStats;
-    const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
-    _checkLevelUp = checkLevelUp;
-   
-    // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
-    
-
-    // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
-    let beginnersLuck = false;
-    const avTXP = avatar.activityXP + avatar.battleXP;
-    if(avTXP < BEGINNERS_LUCK_MAX_XP){
-      beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
-    }
-
-
-    // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
-    // Needed for further down
-    battleScenario = scenario;
-
-    // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
-    if(battle.effects && battle.effects.length){
-      const preBattleEffects = battle.effects.filter(effect => effect.type === 'prebattle');
-      // Buff or debuff hero and foe based on item effects
-      // If new item effects are added, they need to be added in this function:
-      const abp = doAvatarBattlePrep(sAvatar, sFoe, preBattleEffects, scenario.id);
-      sAvatar = abp.avatar;
-      sFoe = abp.foe;
-    }
-
-    // BATTLE STEP 4 - FOE USES prebattle ABILITY
-    if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
-      if(scenario.id !== FOE_NON_ACTION){
-        const fbp = doFoeBattlePrep(sAvatar, sFoe, foeWithStats.ability);
-        sAvatar = fbp.avatar;
-        sFoe = fbp.foe;
-      }
-    }
-    
-
-    // Element by Seasonal Element Bonus
-    sAvatar[seasonalBonusElement] *= 1.25;
-    sFoe[seasonalBonusElement] *= 1.25;
-    BRA = sAvatar;
-    BRF = sFoe;
-
-    //TEMP CHEAT
-    //BRA.power += 1000;
-    //BRA.health = 10;
-
-    // WHO SWINGS FIRST
-    let goesFirst;
-    if(scenario.id === 0){
-      goesFirst = 'Avatar';
-    }else if(scenario.id === 3){
-      goesFirst = 'Foe';
-    }else{
-      // 75% Chance the Avatar will go first if below level 15
-      if(beginnersLuck){
-        goesFirst = 'Avatar';
-      }else{
-        const randDecider = Math.floor(Math.random() * 2);
-        goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
-      }
-    }
-
-    //console.log('BRF=', BRA, BRF);
-    // BATTLE STEP 5 - EXCHANGE DAMAGE
-    b = doBattle(BRA, BRF, goesFirst);
-    // Needed for further down
-    battleResult = b;
-
-
-    //console.log('OUTCOME - ', b.outcomeData.outcome);
-    //BRF.bonusXP = 50;
-    //BRF.bonusPT = 50;
-
-
-    // POST BATTLE ACTIONS
-    const postBattleActions = battle.postBattleActions;
-    const allPbaPromises = [];   
-    switch(b.outcomeData.outcome){
-      case "Avatar Wins":
-        xpGain = BRF.xpBounty; 
-        ptGain = BRF.ptBounty; 
-        avatar.battleWins = avatar.battleWins + 1;
-        //console.log('XP-bounty', xpGain);
-        //console.log('PT-bounty', ptGain);
-        //console.log('1pbas- ',postBattleActions);
-        avatar.photonTokens += ptGain;
-        //console.log('Avatar id should be 253', avatar.id);
-        if(postBattleActions){
-          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
-        }
-        break;
-      case "Foe Wins":
-        xpGain = BRF.xpBounty * OUTCOME_XP.lossMultiplier;
-        avatar.battleLosses = avatar.battleLosses + 1;
-        break;
-      case "Draw":
-        xpGain = BRF.xpBounty * OUTCOME_XP.drawMultiplier;
-        avatar.battleDraws = avatar.battleDraws + 1; 
-        break;
-      case "Double KO":
-        xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
-        avatar.battleDkos = avatar.battleDkos + 1;
-        if(postBattleActions){
-          allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
-        }
-        break;
-      default:
-    }
-
-    return Promise.allSettled(allPbaPromises);
-  }).then(() =>{
-    // Check for lvl up
-    const leveledUpResults = _checkLevelUp(xpGain);
-    
-    //Needed for next then
-    leveledUp = leveledUpResults.leveledUp;
-    
-    const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
-    avatar.status = b.outcomeData.avatarStatus;
-    avatar.battleXP += xpGain;
-    avatar.qp += leveledUpResults.qpEarned;
-
-    // If Any postbattle abilities exist, use them
-    // Now if i want, new items can do things in this function!
-    avatar = doPostBattleEffects(avatar, foe, b.outcomeData.outcome);
-    const avatarUpdates = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
-
-
-    // Update Av first, then the battle record
-    return Avatar.update(avatarUpdates, { where: { id: avatar.id } })
-
-  }).then(() =>{
-    return Battle.update({
-      scenario : battleScenario.id,
-      outcome : battleResult.outcomeData.outcome,
-      aStatus : battleResult.outcomeData.avatarStatus,
-      aPhyDamage : battleResult.aPhyDamage,
-      fPhyReduction : battleResult.fPhyReduction,
-      fPhyDamage : battleResult.fPhyDamage,
-      aPhyReduction : battleResult.aPhyReduction,
-      xpGain,
-      ptGain,
-      leveledUp : leveledUp,
-      aHealthRemaining : battleResult.aHealthRemaining,
-      fHealthRemaining : battleResult.fHealthRemaining,
-      foe,
-      avatar,
-      bra : BRA,
-      brf : BRF,
-      aElmDamage : battleResult.aElmDamage,
-      fElmReduction : battleResult.fElmReduction,
-      fElmDamage : battleResult.fElmDamage,
-      aElmReduction : battleResult.aElmReduction,
-      roundBreakdown : battleResult.roundBreakdown
-    },
-    { where: { id: battle.id }, raw : true }
-    );
-
+  .then((battle) =>{
+    return battleProcess(battle, avatar);
   }).then((data) =>{
+    console.log('MADE IT OUT THE OTHER SIDE', data);
     res.formatter.ok(data);
   }).catch((error) =>{console.log('ERROR', error);
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for /run-specific-battle');

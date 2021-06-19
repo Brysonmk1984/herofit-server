@@ -1,5 +1,6 @@
+const { FOE_NON_ACTION } = require('../CONSTANTS'); 
 const chance = require('chance')();
-const { scrambleStats } = require('../lib/helperFunctions');
+const { scrambleStats } = require('../../lib/helperFunctions');
 
 function doAvatarBattlePrep(avatar, foe, effects, scenario){
   const eAvatar = { ...avatar };
@@ -125,56 +126,65 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
   return { avatar : eAvatar, foe : eFoe };
 }
 
-function doFoeBattlePrep(avatar, foe, ability){
-  let fAvatar = { ...avatar };
-  let fFoe = { ...foe };
-  switch(ability.name){
-    case "From the Shadows":
-      // Increased Power
-      fFoe.power = Math.floor(foe.power + (foe.power * .2));
-      break;
-    case "Intimidation":
-      // Power Reduction
-      fAvatar.power = Math.floor(avatar.power - (avatar.power * .2));
-      break;
-    case "Paranormal Pandemonium":
-      // Stat Scramble
-      const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
-    
-      fAvatar = {...scrambleStats(stats, avatar)};
-      break;
-    case "Unholy Armor":
-      const foeArmor = foe.armor;
-      // Unholy Armor
-      // Bonus to Armor
-      // Also has higher health from stats
-      fFoe.armor = Math.floor(foeArmor + (foeArmor * .33));
-      break;
-    case "Can't Hide from Me":
-      // Armor Break
-      fAvatar.armor = 0;
-      break;
-    case "Shadowy Influx":
-      // Health Bonus
-      fFoe.health = Math.floor(foe.health + (foe.health * .2));
-      break;
-    case "Breath Bane":
-      // Health Reduction
-      fAvatar.health = Math.floor(avatar.health - (avatar.health * .2));
-      break;
-    case "Sadistic Siphon":
-      // Health Steal
-      const avatarHealth = avatar.health;
-      const stolenHealth =  avatarHealth * .125;
+function doFoeBattlePrep(avatar, foe, scenarioId){
+  const ability = foe.ability;
+  if(ability && ability.type === 'prebattle'){
+    if(scenarioId !== FOE_NON_ACTION){
+      let fAvatar = { ...avatar };
+      let fFoe = { ...foe };
+      switch(ability.name){
+        case "From the Shadows":
+          // Increased Power
+          fFoe.power = Math.floor(foe.power + (foe.power * .2));
+          break;
+        case "Intimidation":
+          // Power Reduction
+          fAvatar.power = Math.floor(avatar.power - (avatar.power * .2));
+          break;
+        case "Paranormal Pandemonium":
+          // Stat Scramble
+          const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
+        
+          fAvatar = {...scrambleStats(stats, avatar)};
+          break;
+        case "Unholy Armor":
+          const foeArmor = foe.armor;
+          // Unholy Armor
+          // Bonus to Armor
+          // Also has higher health from stats
+          fFoe.armor = Math.floor(foeArmor + (foeArmor * .33));
+          break;
+        case "Can't Hide from Me":
+          // Armor Break
+          fAvatar.armor = 0;
+          break;
+        case "Shadowy Influx":
+          // Health Bonus
+          fFoe.health = Math.floor(foe.health + (foe.health * .2));
+          break;
+        case "Breath Bane":
+          // Health Reduction
+          fAvatar.health = Math.floor(avatar.health - (avatar.health * .2));
+          break;
+        case "Sadistic Siphon":
+          // Health Steal
+          const avatarHealth = avatar.health;
+          const stolenHealth =  avatarHealth * .125;
 
-      fFoe.health = foe.health + stolenHealth;
-      fAvatar.health = avatar.health - stolenHealth;
-      break ;
-      default:
-      break;
+          fFoe.health = foe.health + stolenHealth;
+          fAvatar.health = avatar.health - stolenHealth;
+          break ;
+          default:
+          break;
+      }
+
+      return { avatar : fAvatar, foe : fFoe };
+
+    }
   }
-
-  return { avatar : fAvatar, foe : fFoe };
+  
+  return { avatar, foe };
+  
 }
 
 

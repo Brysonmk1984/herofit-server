@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./CONSTANTS');
+const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('../CONSTANTS');
 const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)

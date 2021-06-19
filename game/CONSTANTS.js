@@ -25,10 +25,10 @@ const RESTED_THRESHOLD = 1;
 const BATTLE_SCENARIOS = [{
   id : 0,
   description : "Avatar attacked unprepared foe",
-  avatarPowerMod : .075,
+  avatarPowerMod : .05,
   avatarHealthMod : 0,
   foePowerMod : 0,
-  foeHealthMod : -.075,
+  foeHealthMod : -.05,
 },{
   id : 1,
   description : "Avatar attacked defending foe",
@@ -47,8 +47,8 @@ const BATTLE_SCENARIOS = [{
   id : 3,
   description : "Foe attacked unprepared avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : -.075,
-  foePowerMod : .075,
+  avatarHealthMod : -.05,
+  foePowerMod : .05,
   foeHealthMod : 0,
 },{
   id : 4,
@@ -118,7 +118,7 @@ const EARTH_THORNS_MOD = 5;
 
 // MUST MAKE GAME EASIER FOR BEGINNERS AND MORE DIFFICULT FOR VETERANS
 const BEGINNERS_LUCK_MAX_XP = 2587; // Level 15
-const BEGINNERS_LUCK_LIKELIHOOD = 75;
+const BEGINNERS_LUCK_LIKELIHOOD = 66;
 const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 

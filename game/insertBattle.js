@@ -63,7 +63,6 @@ function insertBattle(avatar, foe){
         for(let actionType in ALLPBAs){
           
           const match = ALLPBAs[actionType].find(pba => {
-            console.log(pba.action,action, pba.action === action);
             return pba.action === action;
           });
           if(match){
@@ -71,8 +70,7 @@ function insertBattle(avatar, foe){
             break;
           }
         } 
-        console.log('REW = ', rewards);
-        console.log(matchingPBA.itemID);
+  
         return matchingPBA.itemID;
       });
     }

@@ -32,7 +32,7 @@ function resetHero(avatarID, email){
     return { power, health, maxHealth,  fire, earth, water, air, heroLevel };
   }).then(({ power, health, maxHealth,  fire, earth, water, air, heroLevel }) =>{
     const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
-    console.log('THEG', theGoods);
+
     
     const updatedAttributes = {
       /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */

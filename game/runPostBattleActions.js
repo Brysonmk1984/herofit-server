@@ -3,6 +3,7 @@ const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXP
 const ALLPBAs = require('./postBattleActions.json');
 const { config } = require('../appConfig');
 const { handleBoostXP, handleBoostPT } = require('./specialEvents/boosterActionHandlers');
+const chance = require('chance')();
 
 // XP GAIN FOR DEFEATING FOES
 function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 1, bonusXp = 0, foeType){
@@ -89,67 +90,8 @@ function determinePtBounty(heroLevel,bonusPt = 0, foeType){
 }
 
 // DO POST BATTLE ACTIONS
-function doAllPbas(avatarID, postBattleActions, battleOutcome){
-  //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', avatarID, 'BO - ', battleOutcome);
-
-  const itemsToInsert = [];
-  
-  // ALL PBAs FROM BATTLE
-  postBattleActions.forEach(( ACTION )=>{
-    let matchingPBA;
-    // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
-    // ACTION TYPES = WINTOTAL, WINSTREAK, DEFEATEDFOE
-    for(let actionType in ALLPBAs){
-      // Find the PBA that matches the pba.action property
-      let matching = ALLPBAs[actionType].find(pba => {
- 
-        return pba.action === ACTION
-      });
 
 
-      // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
-      if(matching){
-        // Usually a win is required, but might be DKO 
-        const matchesOutcomeCondition = matching.outcome.includes(battleOutcome);
-        if(matchesOutcomeCondition){
-          matchingPBA = matching;
-          break;
-        }
-      }
-    }
 
-    // There should always be a matchingPBA here, if not, I forgot to add one to the postBattleActions.json
-    if(matchingPBA){
-      // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
-      itemsToInsert.push({ avatarID, itemID : matchingPBA.itemID });
-    }
-    
-  });
 
-  //console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
-  // INSERT all the items from the itemsToInsert array, gathered from the PBAs
-  return AvatarItems.bulkCreate(itemsToInsert);
-}
-
-function doPostBattleEffects(avatar, foe, outcome){
-  const fAbility = foe.ability;
-  if(fAbility.type === 'postbattle'){
-    switch(fAbility.name){
-      //PLAGUEBRINGER
-      case 'Infect':
-        // Only apply Infect if the hero won or DRAW, otherwise he should just be knocked out
-        if(outcome === 'Avatar Wins' || outcome === 'Draw'){
-          const status = 'Infected';
-          const statusFade = 12;
-
-          return Object.assign({}, avatar, { status, statusFade });
-        }
-        return avatar;
-      default:
-        return;
-    }
-  }
-  return avatar;
-}
-
-module.exports = { determineXpBounty, determinePtBounty, doAllPbas, doPostBattleEffects };
+module.exports = { determineXpBounty, determinePtBounty };
