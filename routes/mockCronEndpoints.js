@@ -15,6 +15,7 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const avCalc = require('../game/upgrades/avCalc');
 const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
+const battleProcess = require('../game/battle/battleProcess');
 const ALLPBAs = require('../game/postBattleActions.json');
 const chance = require('chance')();
 
@@ -276,6 +277,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
     allPbaArrays = [];
     allAvatarPromises = [];
 
+
     shard.forEach((battle) =>{
       console.log('BID - ', battle.id);
       //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
@@ -298,181 +300,15 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
 
       //console.log('AV LENGTH - ', avatars.length);
       //console.log('AVS - ', avatars);
-      avatars.forEach((avatar, i) =>{
-        // BATTLE STEP 1 - PLAYER DECIDES TO GO TO BATTLE (happens earlier when a user clicks 'Battle')
-
-        // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-        avatar = parseAvatarProperties(avatar, true);
-        const foeWithStats  = allFoes[i];
-
-        // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
-        let beginnersLuck = false;
-        const avTXP = avatar.activityXP + avatar.battleXP;
-        if(avTXP < BEGINNERS_LUCK_MAX_XP){
-          beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
-        }
-
-        // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-        let { scenario, sAvatar, sFoe  } = doScenarioAndBonus(cloneObj(avatar), cloneObj(foeWithStats), beginnersLuck);
-        console.log('sFoe1', sFoe);
-        // BATTLE STEP 3 APPLY EFFECTS FROM ITEMS
-        if(allEffects[i] && allEffects[i].length){
-          const preBattleEffects = allEffects[i].filter(effect => effect.type === 'prebattle');
-          // Buff or debuff hero and foe based on item effects
-          // If new item effects are added, they need to be added in this function:
-          const abp = doAvatarBattlePrep(sAvatar, sFoe, preBattleEffects, scenario.id);
-          sAvatar = abp.avatar;
-          sFoe = abp.foe;
-        }
-        
-        // BATTLE STEP 4 - FOE USES prebattle ABILITY
-        if(foeWithStats.ability && foeWithStats.ability.type === 'prebattle'){
-          if(scenario.id !== FOE_NON_ACTION){
-            console.log('sFoe2', sFoe, foeWithStats.ability);
-            const fbp = doFoeBattlePrep(sAvatar, sFoe, foeWithStats.ability);
-            sAvatar = fbp.avatar;
-            sFoe = fbp.foe;
-          }
-        }
-        console.log('sFoe3', sFoe);
-        // Element by Seasonal Element Bonus
-        sAvatar[seasonalBonusElement] *= 1.25;
-        sFoe[seasonalBonusElement] *= 1.25;
-        console.log('sFoe4', sFoe);
-        const BRA = sAvatar;
-        const BRF = sFoe;
-
-        //TEMP CHEAT
-        //BRA.power += 1000;
-        //BRA.health = 10;
-
-        // WHO SWINGS FIRST
-        let goesFirst;
-        if(scenario.id === 0){
-          goesFirst = 'Avatar';
-        }else if(scenario.id === 3){
-          goesFirst = 'Foe';
-        }else{
-          // 75% Chance the Avatar will go first if below level 15
-          if(beginnersLuck){
-            goesFirst = 'Avatar';
-          }else{
-            const randDecider = Math.floor(Math.random() * 2);
-            goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
-          }
-        }
-        console.log('BRF=', BRA, BRF);
-        // BATTLE STEP 5 - EXCHANGE DAMAGE
-        const b = doBattle(BRA, BRF, goesFirst);
-
-        // SAVE DATA
-        let xpGain, ptGain = 0;
-        
-        //console.log('OUTCOME - ', b.outcomeData.outcome);
-        //BRF.bonusXP = 50;
-        //BRF.bonusPT = 50;
-        
-        // POST BATTLE ACTIONS
-        const postBattleActions = allPbaArrays[i] || [];
-        
-        switch(b.outcomeData.outcome){
-          case "Avatar Wins":
-            xpGain = BRF.xpBounty; 
-            ptGain = BRF.ptBounty; 
-            avatar.battleWins = avatar.battleWins + 1;
-            //console.log('XP-bounty', xpGain);
-            //console.log('PT-bounty', ptGain);
-            //console.log('1pbas- ',postBattleActions);
-            avatar.photonTokens += ptGain;
-            //console.log('Avatar id should be 253', avatar.id);
-            if(postBattleActions){
-              allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
-            }
-            // for email tally
-            tally.avatarWins += 1;
-            break;
-          case "Foe Wins":
-            xpGain = BRF.xpBounty * OUTCOME_XP.lossMultiplier;
-            avatar.battleLosses = avatar.battleLosses + 1;
-            // for email tally
-            tally.foeWins += 1;
-            break;
-          case "Draw":
-            xpGain = BRF.xpBounty * OUTCOME_XP.drawMultiplier;
-            avatar.battleDraws = avatar.battleDraws + 1; 
-            // for email tally
-            tally.draw += 1;
-            break;
-          case "Double KO":
-            xpGain = BRF.xpBounty * OUTCOME_XP.dkoMultiplier;
-            avatar.battleDkos = avatar.battleDkos + 1;
-            if(postBattleActions){
-              allPbaPromises.push(doAllPbas(avatar.id, postBattleActions, b.outcomeData.outcome));
-            }
-            // for email tally
-            tally.doubleKO += 1;
-            break;
-          default:
-        }
-
-        // Check for lvl up
-        const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
-        const { leveledUp, qpEarned } = checkLevelUp(xpGain);
-        allBattlePromises.push(Battle.update({
-          scenario : scenario.id,
-          outcome : b.outcomeData.outcome,
-          aStatus : b.outcomeData.avatarStatus,
-          aPhyDamage : b.aPhyDamage,
-          fPhyReduction : b.fPhyReduction,
-          fPhyDamage : b.fPhyDamage,
-          aPhyReduction : b.aPhyReduction,
-          xpGain,
-          ptGain,
-          leveledUp : leveledUp,
-          aHealthRemaining : b.aHealthRemaining,
-          fHealthRemaining : b.fHealthRemaining,
-          foe : Object.assign({}, allFoes[i], foeWithStats),
-          avatar : avatar,
-          bra : BRA,
-          brf : BRF,
-          aElmDamage : b.aElmDamage,
-          fElmReduction : b.fElmReduction,
-          fElmDamage : b.fElmDamage,
-          aElmReduction : b.aElmReduction,
-          roundBreakdown : b.roundBreakdown
-        },
-        { where: { id: allBattleIds[i] }, raw : true }
-        ));
-        
-        const limitedAHealthRemaining = b.aHealthRemaining < 0 ? 0 : b.aHealthRemaining;
-        avatar.status = b.outcomeData.avatarStatus;
-        avatar.battleXP += xpGain;
-        avatar.qp += qpEarned;
-
-        // If Any postbattle abilities exist, use them
-        // Now if i want, new items can do things in this function!
-        avatar = doPostBattleEffects(avatar, foeWithStats, b.outcomeData.outcome);
-        avatarUpdates[avatar.id] = { goToBattle : false, qp : avatar.qp, health : limitedAHealthRemaining, status : avatar.status, statusFade : avatar.statusFade, battleXP : avatar.battleXP, battleWins : avatar.battleWins, battleLosses : avatar.battleLosses, battleDraws :  avatar.battleDraws, battleDkos : avatar.battleDkos, photonTokens : avatar.photonTokens };
+      return avatars.map((avatar, i) =>{
+        const matchingBattle = shard[i];
+        return battleProcess(matchingBattle, avatar);
 
         // End Avatar for each
       });
 
-      return Promise.allSettled([...allBattlePromises, ...allPbaPromises]);
     }).then((data) => {
-      data.forEach((result) => console.log('Battle & PBS Promises:', result.status));
-      //console.log('UPDATED ALL BATTLES AND RAN PBAS');
-      //console.log('data after all battles and pbas settled - ', data);
-      const allUpdateAvatarPromises = [];
-      allAvatarIds.forEach((avatarId, i) =>{
-        // console.log('this will update - ');
-        // console.log('alpaca ID and update - ',avatarId, avatarUpdates[avatarId]);
-
-        allUpdateAvatarPromises.push(Avatar.update(avatarUpdates[avatarId],{ where: { id: avatarId } }));
-      });
-
-      return Promise.allSettled(allUpdateAvatarPromises);
-    }).then((results) =>{
-      results.forEach((result) => console.log('AvatarUpdate Promises', result.status));
+      console.log('DATA', data);
     }).catch((error) =>{
       console.log('ERROR - ', error);
     });
@@ -487,8 +323,8 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
   // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
   }).then((battles) =>{
     console.log('BATTLECOUNT - ', battles.length);
-    // Need to divide records into groups of 15
-    battleShards = arrayChunker(battles, 15);
+    // Need to divide records into groups of 6
+    battleShards = arrayChunker(battles, 6);
     console.log('BattleShard length = ', battleShards.length);
     
     return Promise.allSettled(battleShards.map(async (shard, i) => {

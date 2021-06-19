@@ -22,9 +22,8 @@ const preBattleSetup = function(avatar, foe){
     // Choose scenario then apply bonuses to Avatar & Foe. Return Avatar, Foe, and Scenario
     doScenarioAndBonus : () => {
       scenario = determineScenario(beginnersLuck);
-      const { sAvatar, sFoe } = calcScenarioBonuses(a, f, scenario);
-      a = avatar;
-      f = foe;
+      // assign 'a' variable above the value of sAvatar, same with 'f'
+      ({ sAvatar : a, sFoe : f } = calcScenarioBonuses(a, f, scenario));
     },
     doPreBattleEffects : (effects) => {
       // If there are any effects, find 'prebattle' effects and adjust avatar accordingly
@@ -32,15 +31,11 @@ const preBattleSetup = function(avatar, foe){
         const preBattleEffects = effects.filter(effect => effect.type === 'prebattle');
         // Buff or debuff hero and foe based on item effects
         // If new item effects are added, they need to be added in this function:
-        const { avatar, foe } = doAvatarBattlePrep(a, f, preBattleEffects, scenario.id);
-        a = avatar;
-        f = foe;
+        ({ avatar : a, foe : f } = doAvatarBattlePrep(a, f, preBattleEffects, scenario.id));
       }
     },
     prepareFoe : () => {
-      const { avatar, foe } = doFoeBattlePrep(a, f);
-      a = avatar;
-      f = foe;
+      ({ avatar : a, foe : f } = doFoeBattlePrep(a, f));
     },
     applyElementalBonus : () => {
       // Figure out which season it is, so a 25% bonus can be given to a & f

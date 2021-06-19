@@ -12,8 +12,8 @@ const testSpecificFoe = {
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
     odds : 100,
-    foe : 'Plaguebringer',
-    foeClass : 'Titans'
+    foe : 'Shadow-Self',
+    foeClass : 'Spirits'
   },/*{
     type : 'foeBonusToStats',
     action : "Increase Air",

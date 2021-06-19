@@ -31,7 +31,7 @@ function battleProcess(battle, avatar){
   determineAggressor();
 
   // FOR TESTING PURPOSES - APPLY CHEAT
-  applyCheat(1000, 10)
+  //applyCheat(1000, 10)
 
   // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario } = getPreBattlePackage();
@@ -53,15 +53,18 @@ function battleProcess(battle, avatar){
 
   // POST BATTLE STEP 4 - POST BATTLE ACTIONS - Post battle actions check if any actions were saved to the battle on goToBattle, and runs them now, usually for awarding items
   const itemsToInsert = doAllPbas(battle.postBattleActions);
-
+  console.log('ITEMS TO INSERT', itemsToInsert);
   // DONE! - INSERT all the items from the itemsToInsert array, gathered from the PBAs
   // NESTED TRANSACTION
   return AvatarItems.bulkCreate(itemsToInsert)
   .then(() =>{
     const { postAv, postOutcome, xpGain, ptGain } = getPostBattlePackage();
+    // Only save the relevant avatar changes, all come from postAv
+    const { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;
+    const avatarUpdates = { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens};
 
     // Update Av first, then the battle record
-    return Avatar.update(postAv, { where: { id: avatar.id } })
+    return Avatar.update(avatarUpdates, { where: { id: avatar.id } })
     .then(() =>{
     
       return Battle.update({
