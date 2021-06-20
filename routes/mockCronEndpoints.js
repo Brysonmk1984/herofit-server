@@ -4,18 +4,11 @@ const { authenticateAdminJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { Avatar, AvatarItems, Battle } = require('../config/db');
 const { Op, col } = require("sequelize");
-const { sendBattleReportEmail } = require('../mail');
-const { cloneObj, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
+const { parseAvatarProperties } = require('../lib/helperFunctions');
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, OUTCOME_XP, FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
 const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
-//const doScenarioAndBonus = require('../game/doScenarioAndBonus');
-//const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
-//const doBattle = require('../game/doBattle');
-const xpCalc = require('../game/upgrades/xpCalc');
-const avCalc = require('../game/upgrades/avCalc');
-const { doAllPbas, doPostBattleEffects } = require('../game/runPostBattleActions');
 const { determinePostBattleActions } = require('../game/onGoToBattle');
-const battleProcess = require('../game/battle/battleProcess');
+const runAllBattles = require('../game/battle/runAllBattles');
 const ALLPBAs = require('../game/postBattleActions.json');
 const chance = require('chance')();
 
@@ -242,124 +235,19 @@ router.get('/mock-run-pbas', authenticateAdminJWT, (req, res) => {
 
 // DO ALL BATTLES WHERE BATTLE OUTCOME IS TBD
 router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
-  // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
-  const { determineAstrologySeason } = avCalc();
-  const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
-
-  let allBattleIds = [];
-  let allAvatarIds = [];
-  let allAvatarPromises = [];
-  let allFoes = [];
-  let allPbaPromises = [];
-  let allBattlePromises = [];
-  let avatarUpdates = {};
-  // Breaking battles into groups of 20 so updating doesn't break
-  let battleShards = [];
-
- const tally= {
-    foeWins : 0,
-    avatarWins : 0,
-    draw : 0,
-    doubleKO : 0,
-    total : 0,
-    avWinPercent : 0,
-    avWinPercentOverall : 0,
-    tiePercent : 0
-  };
-
-  function runBattlesOnBatch(shard, shardIndex){
-    //console.log('ShardIndex - ', shardIndex);
-    allBattleIds = [];
-    allAvatarIds = [];
-    allEffects = [];
-    allFoes = [];
-    // array of arrays
-    allPbaArrays = [];
-    allAvatarPromises = [];
-
-
-    shard.forEach((battle) =>{
-      console.log('BID - ', battle.id);
-      //console.log('into arrays - ', battle.id, battle.avatarID, battle.foe);
-      allBattleIds.push(battle.id);
-      allAvatarIds.push(battle.avatarID);
-      allEffects.push(battle.effects);
-      allFoes.push(battle.foe);
-      allPbaArrays.push(battle.postBattleActions);
-      //console.log('BATTLE - ',battle);
-      allAvatarPromises.push(Avatar.findOne(
-        { where : { id: battle.avatarID }, raw : true, attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens'] }
-      ));
-    });
-
-    return Promise.allSettled(allAvatarPromises)
-
-    .then((results) =>{
-      results.forEach((result) => console.log('Find Avatar Promises', result.status));
-      const avatars = results.map((result) => result.value);
-
-      //console.log('AV LENGTH - ', avatars.length);
-      //console.log('AVS - ', avatars);
-      return avatars.map((avatar, i) =>{
-        const matchingBattle = shard[i];
-        return battleProcess(matchingBattle, avatar);
-
-        // End Avatar for each
-      });
-
-    }).then((data) => {
-      console.log('DATA', data);
-    }).catch((error) =>{
-      console.log('ERROR - ', error);
-    });
-  }
-  // END RUN  BATTLES ON BATCH
-
 
   // GET ALL TBD BATTLES
   Battle.findAll({
     where: { outcome : 'TBD' },
     raw : true
-  // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
   }).then((battles) =>{
-    console.log('BATTLECOUNT - ', battles.length);
-    // Need to divide records into groups of 6
-    battleShards = arrayChunker(battles, 6);
-    console.log('BattleShard length = ', battleShards.length);
-    
-    return Promise.allSettled(battleShards.map(async (shard, i) => {
-      console.log('I - ', i);
-      // Update one batch every 8 seconds
-      const timeoutDuration = i * 2000;
-      // RUN BATTLES ON BATCH
-      return await new Promise((resolve) =>{
-        //resolve(runBattlesOnBatch(shard));
-        setTimeout(() => {
-          resolve(runBattlesOnBatch(shard));
-        }, timeoutDuration);
-      });
-    }));
-
-  // TALLY UP THE RESULTS AND SEND EMAIL
-  }).then((results) => {
-      results.forEach((result) => console.log('All battle Promise Results - ', result.status))
-      console.log('ALL AVATARS UPDATED');
-      tally.total = tally.foeWins + tally.avatarWins + tally.draw + tally.doubleKO;
-      tally.avWinPercent = Math.floor(tally.avatarWins / (tally.foeWins + tally.avatarWins)) || 0;
-      tally.avWinPercentOverall = Math.floor(tally.avatarWins / tally.total) || 0;
-      tally.tiePercent = Math.floor((tally.draw + tally.doubleKO) / tally.total) || 0;
-      console.log('tally', tally, 'updates', avatarUpdates);
-
-      return sendBattleReportEmail(tally);
+    return runAllBattles(battles);
   }).then((data) =>{
-    console.log('Result Tally email sent successfully',data);
     res.formatter.ok(data, 'Successfully ran all battles through endpoint - GET /run-all-battles');
   }).catch((error)=>{
-    console.log('error in cronBattleHour', error);
+    console.log('ERROR - GET /run-all-battles', error);
   });
 
-  
 });
-
 
 module.exports = router;

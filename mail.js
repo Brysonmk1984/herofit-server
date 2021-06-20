@@ -224,22 +224,22 @@ const sendBattleReportEmail = function(tally){
       to: `${process.env.INFO_EMAIL}`,
       subject: `HeroFit - Battle Report`, 
       text: `Number of Avatar Battles: ${tally.total}. \n\n Battle Report Tally:\n\n
-      Avatar Wins: ${tally.avatarWins}\n
-      Foe Wins: ${tally.foeWins}\n
-      Draw: ${tally.draw}\n
-      Double KO: ${tally.doubleKO}\n
-      Avatar win%: ${tally.avWinPercent * 100}%\n
-      Avatar win% overall: ${tally.avWinPercentOverall * 100}%\n
-      Tie%: ${tally.tiePercent * 100}%\n
+      Avatar Wins: ${tally['Avatar Wins']}\n
+      Foe Wins: ${tally['Foe Wins']}\n
+      Draw: ${tally['Draw']}\n
+      Double KO: ${tally['Double KO']}\n
+      Avatar win%: ${tally.avWinPercent}\n
+      Avatar win% overall: ${tally.avWinPercentOverall}\n
+      Tie%: ${tally.tiePercent}\n
       `,
       html: `Number of Avatar Battles: ${tally.total}. <br/><br/> Battle Report Tally:\n\n
-      Avatar Wins: ${tally.avatarWins}<br/>
-      Foe Wins: ${tally.foeWins}<br/>
-      Draw: ${tally.draw}<br/>
-      Double KO: ${tally.doubleKO}<br/>
-      Avatar win%: ${tally.avWinPercent * 100}%<br/>
-      Avatar win% overall: ${tally.avWinPercentOverall * 100}%<br/>
-      Tie%: ${tally.tiePercent * 100}%<br/>
+      Avatar Wins: ${tally['Avatar Wins']}<br/>
+      Foe Wins: ${tally['Foe Wins']}<br/>
+      Draw: ${tally['Draw']}<br/>
+      Double KO: ${tally['Double KO']}<br/>
+      Avatar win%: ${tally.avWinPercent}<br/>
+      Avatar win% overall: ${tally.avWinPercentOverall}<br/>
+      Tie%: ${tally.tiePercent}<br/>
       `,
   };
 

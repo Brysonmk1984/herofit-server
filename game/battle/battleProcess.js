@@ -8,7 +8,7 @@ const postBattleProcess = require('./postBattleProcess');
 */
 
 function battleProcess(battle, avatar){
-  console.log('BATTLE', battle, avatar);
+  //console.log('BATTLE', battle, avatar);
   const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
@@ -92,7 +92,11 @@ function battleProcess(battle, avatar){
       },
       { where: { id: battle.id }, raw : true }
       );
-    }).catch((error) =>{
+    })
+    .then(() =>{
+      return postOutcome.outcome;
+    })
+    .catch((error) =>{
       console.log('ERROR SOMEWHERE IN BATTLE PROCESS', error);
       return error;
     });
