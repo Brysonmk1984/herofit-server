@@ -53,7 +53,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
 
         break;
       case "Bad Luck":
-        const badLuckProc = chance.bool({ likelihood: 15 });
+        const badLuckProc = chance.bool({ likelihood: 25 });
         
         // If badluck effect happens, randomly reduce a non-zero foe stat to 50%
         if(badLuckProc){
@@ -73,20 +73,20 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         }
         break;
       case 'Lethal Surprise':
-        const lethalSurpriseProc = chance.bool({ likelihood: 1 });
+        const lethalSurpriseProc = chance.bool({ likelihood: 3 });
         if(lethalSurpriseProc){
           eFoe.health = 1;
         }
         break;
       case 'Eight-Legged Ingenuity':
-        const ingenuityProc = chance.bool({ likelihood: 25 });
+        const ingenuityProc = chance.bool({ likelihood: 33 });
         if(ingenuityProc){
           const possibleStats = ['power','armor','health','water','air','fire','earth'];
           eFoe = { ...scrambleStats(possibleStats, foe) };
         }
         break;
       case 'Frisky Mischief':
-        const friskyProc = chance.bool({ likelihood: 50 });
+        const friskyProc = chance.bool({ likelihood: 66 });
         if(friskyProc){
           const possibleStats = ['power','armor','health','water','air','fire','earth'];
           const mappedToOb = possibleStats.filter(stat => avatar[stat] > 0).map(stat => {
