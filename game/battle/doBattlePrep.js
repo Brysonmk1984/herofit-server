@@ -135,11 +135,11 @@ function doFoeBattlePrep(avatar, foe, scenarioId){
       switch(ability.name){
         case "From the Shadows":
           // Increased Power
-          fFoe.power = Math.floor(foe.power + (foe.power * .2));
+          fFoe.power = Math.floor(foe.power + (foe.power * .3));
           break;
         case "Intimidation":
           // Power Reduction
-          fAvatar.power = Math.floor(avatar.power - (avatar.power * .2));
+          fAvatar.power = Math.floor(avatar.power - (avatar.power * .4));
           break;
         case "Paranormal Pandemonium":
           // Stat Scramble

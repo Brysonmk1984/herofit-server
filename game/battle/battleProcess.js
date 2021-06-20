@@ -61,7 +61,9 @@ function battleProcess(battle, avatar){
     const { postAv, postOutcome, xpGain, ptGain } = getPostBattlePackage();
     // Only save the relevant avatar changes, all come from postAv
     const { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;
-    const avatarUpdates = { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens};
+    // In case of Vampiric Touch, don't heal beyond what Avatar went into battle with
+    const updatedHealth = health > avatar.health ? avatar.health : health;
+    const avatarUpdates = { goToBattle, qp, health : updatedHealth, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens};
 
     // Update Av first, then the battle record
     return Avatar.update(avatarUpdates, { where: { id: avatar.id } })
