@@ -9,7 +9,7 @@ Battle.findAll({
   where: { outcome : 'TBD' },
   raw : true
 }).then((battles) =>{
-  return runAllBattles(battles);
+  return runAllBattles(battles, true);
 }).then((data) =>{
   console.log('cronBattleHour successfully ran');
   process.exit();
