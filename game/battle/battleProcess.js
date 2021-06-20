@@ -7,8 +7,10 @@ const postBattleProcess = require('./postBattleProcess');
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
 */
 
-function battleProcess(battle, avatar){
-  //console.log('BATTLE', battle, avatar);
+function battleProcess(battleInstance, avatarInstance){
+  const battle = Object.assign({}, battleInstance);
+  const avatar = Object.assign({}, avatarInstance);
+  //console.log('BATTLE', battle.id, 'avatar ID', avatar.id);
   const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
@@ -38,7 +40,7 @@ function battleProcess(battle, avatar){
   
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
-  b = doBattle(BRA, BRF, goesFirst);
+  const b = doBattle(BRA, BRF, goesFirst);
 
   const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
 
@@ -53,7 +55,7 @@ function battleProcess(battle, avatar){
 
   // POST BATTLE STEP 4 - POST BATTLE ACTIONS - Post battle actions check if any actions were saved to the battle on goToBattle, and runs them now, usually for awarding items
   const itemsToInsert = doAllPbas(battle.postBattleActions);
-  console.log('ITEMS TO INSERT', itemsToInsert);
+  //console.log('ITEMS TO INSERT', itemsToInsert);
   // DONE! - INSERT all the items from the itemsToInsert array, gathered from the PBAs
   // NESTED TRANSACTION
   return AvatarItems.bulkCreate(itemsToInsert)
@@ -102,6 +104,8 @@ function battleProcess(battle, avatar){
       console.log('ERROR SOMEWHERE IN BATTLE PROCESS', error);
       return error;
     });
+  }).catch((error) =>{
+    console.log('ERROR INSERTING ITEM', error);
   });
 }
 
