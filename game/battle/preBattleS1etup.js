@@ -4,6 +4,7 @@ const { doAvatarBattlePrep, doFoeBattlePrep } = require('./doBattlePrep');
 const avCalc = require('../upgrades/avCalc');
 const chance = require('chance')();
 
+
 const preBattleSetup = function(avatar, foe){
   let a = Object.assign({}, avatar);
   let f = Object.assign({}, foe);
