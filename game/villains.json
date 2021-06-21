@@ -1,6 +1,5 @@
 {
   "Spirits": [{
-      "id": 0,
       "class" : "Spirits",
       "type" : "Shade",
       "foe": [
@@ -24,7 +23,6 @@
       }
     },
     {
-      "id": 1,
       "class" : "Spirits",
       "type": "Apparition",
       "foe": [
@@ -48,7 +46,6 @@
       }
     },
     {
-      "id": 2,
       "class" : "Spirits",
       "type": "Phantasm",
       "foe": [
@@ -72,7 +69,6 @@
       }
     },
     {
-      "id": 3,
       "class" : "Spirits",
       "type" : "Phantom",
       "foe": [
@@ -96,7 +92,6 @@
       }
     },
     {
-      "id": 4,
       "class" : "Spirits",
       "type": "Wraith",
       "foe": [
@@ -120,7 +115,6 @@
       }
     },
     {
-      "id": 5,
       "class" : "Spirits",
       "type": "Poltergeist",
       "foe": [
@@ -144,7 +138,6 @@
       }
     },
     {
-      "id": 6,
       "class" : "Spirits",
       "type" : "Specter",
       "foe": [
@@ -168,7 +161,6 @@
       }
     },
     {
-      "id": 7,
       "class" : "Spirits",
       "type": "Banshee",
       "foe": [
@@ -191,7 +183,6 @@
         "name" : "Banshee Tint"
       }
     },{
-      "id": 8,
       "class" : "Spirits",
       "type": "Shadow-Self",
       "foe": ["Shadow-Self"],
@@ -213,7 +204,6 @@
   ],
   "Titans": [
     {
-      "id": 9,
       "class" : "Titans",
       "type": "Plaguebringer",
       "foe": ["The Plaguebringer"],
@@ -235,7 +225,6 @@
   ],
   "Elementals": [
     {
-      "id": 10,
       "class" : "Elementals",
       "type" : "Gusty Rascal",
       "foe" : [
@@ -258,7 +247,6 @@
         "name" : "Gusty Rascal"
       }
     },{
-      "id": 11,
       "class" : "Elementals",
       "type" : "Rock Skipper",
       "foe" : [

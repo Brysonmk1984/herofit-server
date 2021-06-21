@@ -106,8 +106,10 @@ describe('All NEW item effects should correctly modify stats', ()=>{
     const isHigherDifficulty = sFoe.difficulty >= .07 || sFoe.class === 'titan' || sFoe.type === "Shadow Self";
     
     if(isNegativeScenario && isHigherDifficulty){
+      console.log('RECEIVED ILL OMEN BUFF');
       expect(avatar.health).toBe(sAvatar.health * 1.20);
     }else{
+      console.log('NO ILL OMEN BUFF');
       expect(avatar.health).toBe(sAvatar.health);
     }
 
@@ -123,9 +125,17 @@ describe('All NEW item effects should correctly modify stats', ()=>{
     }];
 
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-  
     // This will only pass when Bad luck DOESN'T proc.... not sure how to handle chance with testing yet.
-    expect(foe).toEqual(expect.objectContaining(sFoe));
+    //expect(foe).toEqual(expect.objectContaining(sFoe));
+    expect(foe).toMatchObject({
+      health: expect.toBeOneOf([sFoe.health, Math.floor((sFoe.health*.5))]),
+      power: expect.toBeOneOf([sFoe.power, Math.floor((sFoe.power*.5))]),
+      armor: expect.toBeOneOf([sFoe.armor, Math.floor((sFoe.armor*.5))]),
+      fire: expect.toBeOneOf([sFoe.fire, Math.floor((sFoe.fire*.5))]),
+      earth: expect.toBeOneOf([sFoe.earth, Math.floor((sFoe.earth*.5))]),
+      water: expect.toBeOneOf([sFoe.water, Math.floor((sFoe.water*.5))]),
+      air: expect.toBeOneOf([sFoe.air, Math.floor((sFoe.air*.5))]),
+    });
   });
 });
 
@@ -150,8 +160,11 @@ describe('Snake effects should correctly modify stats', ()=>{
 
       const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
       expect(avatar.power).toBe(sAvatar.power +10);
-      expect(foe.health).toBe(sFoe.health -10);
-      //expect(foe.health).toBe(1);
+      if(foe.health === 1){
+        console.log('LETHAL SURPRISE PROC', foe.health, sFoe.health);
+      }
+      expect(foe.health).toBeOneOf([sFoe.health, sFoe.health-10]);
+
   });
 });
 
@@ -168,7 +181,7 @@ describe('Octopus effects should correctly modify stats', ()=>{
       "type" : "prebattle",
       "description" : "The Octopus of Cunning has a chance to scramble foe''s stats."
       }];
-
+      
       const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
       expect(avatar.water).toBe(sAvatar.water +5);
 

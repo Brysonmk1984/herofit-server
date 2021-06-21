@@ -49,7 +49,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
           illOmenProc = chance.bool({ likelihood: 75 });
         }
         if(illOmenProc){
-          eAvatar.health = avatar.health * 1.2;
+          eAvatar.health = Math.floor(avatar.health * 1.2);
         }
 
         break;
@@ -171,8 +171,8 @@ function doFoeBattlePrep(avatar, foe, scenarioId){
           const avatarHealth = avatar.health;
           const stolenHealth =  avatarHealth * .125;
 
-          fFoe.health = foe.health + stolenHealth;
-          fAvatar.health = avatar.health - stolenHealth;
+          fFoe.health = Math.floor(foe.health + stolenHealth);
+          fAvatar.health = Math.floor(avatar.health - stolenHealth);
           break ;
           default:
           break;

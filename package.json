@@ -12,7 +12,8 @@
   "jest": {
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
-      "./__tests__/nullOrAny.setup.js"
+      "./__tests__/nullOrAny.setup.js",
+      "jest-extended"
     ],
     "testPathIgnorePatterns": [
       "./__tests__/itemFind",
@@ -29,6 +30,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "jest": "^26.6.1",
+    "jest-extended": "^0.11.5",
     "nodemon": "^2.0.6",
     "supertest": "^3.4.2"
   },

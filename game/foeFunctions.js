@@ -86,8 +86,8 @@ function generateFoeStats(avatar, foe){
   const isMidLevel = (LOW_LEVEL < level && level < HIGH_LEVEL) ? true : false;
 
   let baseQP = Math.floor((level * 5) - 5); 
-  let baseFoeHealth = Math.floor(((level * 5) + 100) * FOE_MOD.HEALTH);
-  let baseFoePower = Math.floor(((level * 5) + 100) * FOE_MOD.POWER);
+  let baseFoeHealth = Math.floor((((level * 5) + 100) * FOE_MOD.HEALTH));
+  let baseFoePower = Math.floor((((level * 5) + 100) * FOE_MOD.POWER));
 
   if(isMidLevel || isHighLevel){
     baseQP =  Math.floor(baseQP * LEVEL_DIFFICULTY_MOD); 
@@ -141,8 +141,8 @@ function generateFoeStats(avatar, foe){
        
         //console.log('BASE QP - ',baseQP, Math.floor(baseQP * FOE_MOD.QP),randomizedQP.stat );
 
-        fws.health = randomizedHealth.stat;
-        fws.power = randomizedPower.stat;
+        fws.health = Math.floor(randomizedHealth.stat);
+        fws.power = Math.floor(randomizedPower.stat);
 
         if(foe.type === 'Phantasm'){
           qpAdjustedStats = ["health","health","armor"];
@@ -159,8 +159,8 @@ function generateFoeStats(avatar, foe){
       randomizedQP = randomizer(Math.floor(baseQP * elementalQp));
       
 
-      fws.health = randomizedHealth.stat;
-      fws.power = randomizedPower.stat;
+      fws.health = Math.floor(randomizedHealth.stat);
+      fws.power = Math.floor(randomizedPower.stat);
 
       //Need to check for for types here for different elements
       switch(foe.type){
@@ -226,8 +226,8 @@ function generateFoeStats(avatar, foe){
       // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
       const powerEighth = Math.floor(randomizedPower.stat / 12);
       
-      fws.health = randomizedHealth.stat;
-      fws.power = randomizedPower.stat;
+      fws.health = Math.floor(randomizedHealth.stat);
+      fws.power = Math.floor(randomizedPower.stat);
       fws.fire = powerEighth;
       fws.earth = powerEighth;
       fws.water = powerEighth;

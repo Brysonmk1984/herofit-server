@@ -214,7 +214,7 @@ router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), aut
         res.formatter.ok({ foe : battle.foe, rewards });
       }
     }else{
-      console.log(`COULDNT FIND BATTLE ${avatarID}`, battle);
+      console.log(`COULDNT FIND BATTLE, maybe it already ran? ${avatarID}`, battle);
 
       const error = new Error("No battles on record");
       res.formatter.serverError(error.toString(), `Couldn't retrieve foe for upcoming battle! No Battle Record listed. USER - ${avatarID}`);
