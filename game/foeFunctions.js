@@ -32,7 +32,7 @@ function selectFoeTemplate(level){
       const req = foe.levelRequirement;
       if(req && req <= level){
         levelRequiredFoes.push(foe);
-      }else{
+      }else if(!req){
         minorFoes.push(foe);
       }
     });
