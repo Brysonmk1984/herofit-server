@@ -1,5 +1,5 @@
 const xpCalc = require('./upgrades/xpCalc');
-const { determineXpBounty, determinePtBounty } = require('./runPostBattleActions');
+const { determineXpBounty, determinePtBounty } = require('./battle/runPostBattleActions');
 const { OUTCOME_XP } = require('./CONSTANTS'); 
 const chance = require('chance')();
 const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
@@ -9,7 +9,7 @@ const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/
 
 // Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level){
-  
+  //console.log('THE LEVEL = ', level);
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if(event){
@@ -33,11 +33,12 @@ function selectFoeTemplate(level){
     // assign foes to two different arrays depending on if there is a level requirement
     villains[fClass].forEach(foe => {
       const req = foe.levelRequirement;
+      //console.log(foe.type, req);
       // If foe is not an item only foe
       if(!foe.itemSummonOnly){
         if(req && req <= level){
           levelRequiredFoes.push(foe);
-        }else{
+        }else if(!req){
           minorFoes.push(foe);
         }
       }
@@ -52,7 +53,10 @@ function selectFoeTemplate(level){
     bossEncounter = chance.bool({ likelihood: 5.5});
   }
   let finalFoeArray =  bossEncounter ? levelRequiredFoes : minorFoes;
+  if(level < 30){
+    //console.log('CHECKIT=', level, finalFoeArray.map(f => f.type));
 
+  }
   // Randomly select from finalFoeArray and return it as the selected foe
   return finalFoeArray[Math.floor(Math.random() * finalFoeArray.length)];
 }
@@ -220,7 +224,7 @@ function generateFoeStats(avatar, foe){
 
       // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
       // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
-      const powerEighth = Math.floor(randomizedPower.stat / 6.6);
+      const powerEighth = Math.floor(randomizedPower.stat / 12);
       
       fws.health = randomizedHealth.stat;
       fws.power = randomizedPower.stat;
@@ -229,7 +233,6 @@ function generateFoeStats(avatar, foe){
       fws.water = powerEighth;
       fws.air = powerEighth;
       qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
-
       break;
 
     default:

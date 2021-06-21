@@ -171,7 +171,5 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
   return foundItemsAndPt;
 }
 
-module.exports = activityItemFind;
-
-// testing
-//module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
+// private functions exported for tests
+module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };

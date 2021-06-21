@@ -1,9 +1,6 @@
-const { AvatarItems } = require('../config/db');
-const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT } = require('./CONSTANTS'); 
-const ALLPBAs = require('./postBattleActions.json');
-const { config } = require('../appConfig');
-const { handleBoostXP, handleBoostPT } = require('./specialEvents/boosterActionHandlers');
-const chance = require('chance')();
+const { FOE_DIFFICULTY_XP_MOD_FACTOR, BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT } = require('../CONSTANTS'); 
+const { config } = require('../../appConfig');
+const { handleBoostXP, handleBoostPT } = require('../specialEvents/boosterActionHandlers');
 
 // XP GAIN FOR DEFEATING FOES
 function determineXpBounty(baseOutcomeXp = 5, difficultyFactor = 0, heroLevel = 1, bonusXp = 0, foeType){
@@ -88,8 +85,6 @@ function determinePtBounty(heroLevel,bonusPt = 0, foeType){
 
   return finalPtGain;
 }
-
-// DO POST BATTLE ACTIONS
 
 
 

@@ -13,7 +13,7 @@ function calcScenarioBonuses(avatar, foe, scenario){
 
   foe.power = fp + (fp * scenario.foePowerMod);
   foe.health = fh + (fh * scenario.foeHealthMod);
-
+  
   return { sAvatar : avatar, sFoe : foe };
 }
 
