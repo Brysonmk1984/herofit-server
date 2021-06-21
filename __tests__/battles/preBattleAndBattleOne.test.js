@@ -67,7 +67,7 @@ describe('Load profiles and generate foes from random Profile', ()=>{
   it('Should Create a foe from the random avatar', ()=>{
     // MATCH PARTIAL
       expect(foeTemplate).toMatchObject(
-     
+        expect.objectContaining(
           {
             ability : expect.any(Object),
             foe : expect.any(Array),
@@ -77,7 +77,7 @@ describe('Load profiles and generate foes from random Profile', ()=>{
             type : expect.any(String),
             level : expect.any(Number)
           }
-      
+        )
       )
 
         
@@ -177,7 +177,6 @@ describe('Do battle setup with random av and generated foe template', ()=>{
 
 
   it('Should run battle with first profile and generated foe', ()=>{
-    console.log('LOOK', BRA, BRF, goesFirst);
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
     

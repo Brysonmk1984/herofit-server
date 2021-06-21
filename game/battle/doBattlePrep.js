@@ -118,7 +118,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
 
         }          
         break;
-      default:
+        default:
         break;
     }
   });

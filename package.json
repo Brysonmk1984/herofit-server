@@ -10,6 +10,7 @@
     "dev": "NODE_ENV=development nodemon start.js"
   },
   "jest": {
+    "watchPathIgnorePatterns" : ["node_modules"],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./__tests__/nullOrAny.setup.js",
@@ -17,7 +18,10 @@
     ],
     "testPathIgnorePatterns": [
       "./__tests__/itemFind",
-      "./__tests__/nullOrAny.setup.js"
+      "./__tests__/nullOrAny.setup.js",
+      "./__tests__/battles/manyBattles.test.js",
+      "./__tests__/battles/preBattleAndBattleOne.test.js",
+      "./__tests__/battles/avatarBattlePrep.test.js"
     ]
   },
   "author": "Bryson Kruk",
