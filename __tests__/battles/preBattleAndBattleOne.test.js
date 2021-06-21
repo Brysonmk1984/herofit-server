@@ -1,8 +1,8 @@
 const avatarProfiles = require('./heroProfiles.json');
 const { selectFoeTemplate, generateFoeStats } = require('../../game/foeFunctions');
-const doScenarioAndBonus = require('../../game/doScenarioAndBonus');
-const { doAvatarBattlePrep, doFoeBattlePrep } = require('../../game/doBattlePrep');
-const doBattle = require('../../game/doBattle');
+const { calcScenarioBonuses, determineScenario } = require('../../game/battle/scenario');
+const { doAvatarBattlePrep, doFoeBattlePrep } = require('../../game/battle/doBattlePrep');
+const doBattle = require('../../game/battle/doBattle');
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../../game/CONSTANTS');
 const avCalc = require('../../game/upgrades/avCalc');
 const chance = require('chance')();
@@ -67,16 +67,17 @@ describe('Load profiles and generate foes from random Profile', ()=>{
   it('Should Create a foe from the random avatar', ()=>{
     // MATCH PARTIAL
       expect(foeTemplate).toMatchObject(
-        expect.objectContaining(
+     
           {
             ability : expect.any(Object),
             foe : expect.any(Array),
             id : expect.any(Number),
             pba : expect.any(Array),
             reward : expect.any(Object),
-            type : expect.any(String)
+            type : expect.any(String),
+            level : expect.any(Number)
           }
-        )
+      
       )
 
         
@@ -123,7 +124,11 @@ describe('Do battle setup with random av and generated foe template', ()=>{
     }
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(randomAv, foeWithStats, beginnersLuck);
+    const scenario = determineScenario(beginnersLuck);
+    const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
+    const sAvatar = scenarioBonuses.sAvatar;
+    const sFoe = scenarioBonuses.sFoe;
+
     //console.log('sFOE - ', sFoe);
     // avatar and foe to be used for battle
     BRA = Object.assign({}, sAvatar);
@@ -172,6 +177,7 @@ describe('Do battle setup with random av and generated foe template', ()=>{
 
 
   it('Should run battle with first profile and generated foe', ()=>{
+    console.log('LOOK', BRA, BRF, goesFirst);
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
     
