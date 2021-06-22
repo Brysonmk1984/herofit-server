@@ -54,30 +54,6 @@
       "name" : ""
     }
   },
-
-  {
-    "class" : "Elementals",
-    "type" : "Cyclonic Siren",
-    "foe" : [
-      "Asherah",
-      "Llyr",
-      "Nereus",
-      "Sarasvati",
-      "Undine",
-      "Yam"
-    ],
-    "ability": {
-      "name" : "Water Proficiency",
-      "effect" : "Major Water Threat",
-      "type" : "prebattle"
-    },
-    "color" : null,
-    "pba" : ["Grant Water Predator"],
-    "reward" : {
-      "type" : "title",
-      "name" : "Water Predator"
-    }
-  },
   {
     "class" : "Elementals",
     "type" : "High Priestess of the Tides",

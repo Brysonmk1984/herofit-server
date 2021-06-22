@@ -29,20 +29,20 @@ const attackOfTheElements = {
     type : 'foeLikelihood',
     action : "Increased Likelyhood Foe",
     odds : 33,
-    foe : 'Burning Jinn',
+    foe : 'Cyclonic Siren',
     foeClass : 'Elementals'
   },{
     type : 'ptBooster',
     action : "Increase PT Reward",
     // BOOSt tHIS TO 3.0 for t3
     bonusPercent : 2.0,
-    requirements : [{ foeType : 'Burning Jinn' }]
+    requirements : [{ foeType : 'Cyclonic Siren' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     // BOOSt tHIS TO 1.5 for t3
     bonusPercent : 1.0,
-    requirements : [{ foeType : 'Burning Jinn' }]
+    requirements : [{ foeType : 'Cyclonic Siren' }]
   }],
 }
 

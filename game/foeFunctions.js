@@ -170,7 +170,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Wheezing Jinn":
-          fws.air = 75;
+          fws.air = 90;
           qpAdjustedStats = ["air", "air", "armor","power","health"]; 
           break; 
         case "Granite Golem":
@@ -182,7 +182,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
-          fws.water = 75;
+          fws.water = 100;
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
