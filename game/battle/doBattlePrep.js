@@ -34,8 +34,11 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
       case "Hero +10 Power":
         eAvatar.power += 10;
         break;
-      case "Hero +5 Armor":
-        eAvatar.armor += 5;
+      case "Hero +15 Power":
+        eAvatar.power += 15;
+        break;
+      case "Hero +10 Armor":
+        eAvatar.armor += 10;
         break;
       case "Hero +25 Water":
         eAvatar.water += 25;
@@ -49,8 +52,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
       case "Hero +25 Fire":
         eAvatar.fire += 25;
         break;
-      case "Hero +20% Fire":
-        eAvatar.fire += Math.floor(eAvatar.fire * .20);
+      case "Hero +33% Fire":
+        eAvatar.fire += Math.floor(eAvatar.fire * .33);
         break;
       case "Hero +5% All Elements":
         eAvatar.fire += Math.floor(eAvatar.fire * .05);

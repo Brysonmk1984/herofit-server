@@ -55,11 +55,11 @@ function postBattleEffects(a, f, outcomeData, effects=[]){
         break;
       // Unicorn
       case 'Heroes Never Die':
-        // If Foe won, 33% chance to destroy foe
+        // If Foe won, 50% chance to revive
         if(outcomeData.outcome === 'Foe Wins' || outcomeData.outcome === 'Double KO'){
           const reviveWorked = chance.bool({ likelihood: 50 });
           if(reviveWorked){
-            avatar = Object.assign({}, a, { health : 1 });
+            avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
           }
         }
         break;

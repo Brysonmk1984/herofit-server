@@ -258,20 +258,20 @@ describe('Llama effects should correctly modify stats', ()=>{
 
 describe('Robot effects should correctly modify stats', ()=>{
   // Robot
-  it('Should give avatar +10 Power, +5 Armor', ()=>{
+  it('Should give avatar +15 Power, +10 Armor', ()=>{
     const effects = [{
-      "name" : "Hero +10 Power",
+      "name" : "Hero +15 Power",
       "type" : "prebattle",
-      "description" : "Hero receives a +10 Power buff before battle."
+      "description" : "Hero receives a +15 Power buff before battle."
       },
       {
-        "name" : "Hero +5 Armor",
+        "name" : "Hero +10 Armor",
         "type" : "prebattle",
-        "description" : "Hero receives a +5 armor buff before battle."
+        "description" : "Hero receives a +10 armor buff before battle."
       }];
       const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.power).toBe(sAvatar.power +10);
-      expect(avatar.armor).toBe(sAvatar.armor +5);
+      expect(avatar.power).toBe(sAvatar.power +15);
+      expect(avatar.armor).toBe(sAvatar.armor +10);
   });
 });
 
@@ -293,14 +293,14 @@ describe('Unicorn effects should correctly modify stats', ()=>{
 
 describe('Dragon Whelp effects should correctly modify stats', ()=>{
   // Dragon Whelp
-  it('Should give avatar +20% Fire', ()=>{
+  it('Should give avatar +33% Fire', ()=>{
     const effects = [{
-      "name" : "Hero +20% Fire",
+      "name" : "Hero +33% Fire",
       "type" : "prebattle",
-      "description" : "Hero receives a +20% Fire buff before battle."
+      "description" : "Hero receives a +33% Fire buff before battle."
       }];
       const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.fire).toBe(sAvatar.fire + Math.floor(sAvatar.fire * .20));
+      expect(avatar.fire).toBe(sAvatar.fire + Math.floor(sAvatar.fire * .33));
   });
 });
 

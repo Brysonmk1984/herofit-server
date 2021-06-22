@@ -33,7 +33,8 @@ function battleProcess(battleInstance, avatarInstance){
   determineAggressor();
 
   // FOR TESTING PURPOSES - APPLY CHEAT
-  //applyCheat(1000, 10)
+  // Avatar Power, Foe Health, Foe Power
+  //applyCheat(1000, 1, 1)
 
   // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario } = getPreBattlePackage();

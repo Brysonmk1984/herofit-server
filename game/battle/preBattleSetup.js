@@ -63,9 +63,10 @@ const preBattleSetup = function(avatar, foe){
         }
       }
     },
-    applyCheat : (powerBoost, healthReduction) =>{
+    applyCheat : (powerBoost, healthReduction, foePowerBoost) =>{
       a.power = powerBoost;
       f.health = healthReduction;
+      f.power = foePowerBoost;
     },
     getPreBattlePackage : () => ({ BRA : a, BRF : f, goesFirst, scenario })
   }
