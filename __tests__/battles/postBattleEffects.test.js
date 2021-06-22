@@ -100,53 +100,83 @@ describe('Do battle setup with random av and generated foe template', ()=>{
     expect(goesFirst).toBeOneOf(['Avatar', 'Foe']);
   });
 
-
-  it('Should run battle, then test Adaptive Camouflage pet ability', () => {
-    BRF.power += 1000;
-    // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name : 'Adaptive Camouflage', type : 'postbattle' }];
-    doPostBattleEffects(effects);
-    const { postAv, postOutcome } = getPostBattlePackage();
-    if(postAv.health === 1){
-      console.log('camo worked = ', postAv.health);
-      expect(postOutcome.outcome).toBe('Draw');
-    }
-    expect(postAv.health).toBeOneOf([1,0, b.aHealthRemaining]);
+  //// Adaptive Camouflage - chameleon
+  // it('Should run battle, then test Adaptive Camouflage pet ability', () => {
+  //   BRF.power += 1000;
+  //   // BATTLE STEP 5 - EXCHANGE DAMAGE
+  //   const b = doBattle(BRA, BRF, goesFirst);
+  //   const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
+  //   const effects = [{ name : 'Adaptive Camouflage', type : 'postbattle' }];
+  //   doPostBattleEffects(effects);
+  //   const { postAv, postOutcome } = getPostBattlePackage();
+  //   if(postAv.health === 1){
+  //     console.log('camo worked = ', postAv.health);
+  //     expect(postOutcome.outcome).toBe('Draw');
+  //   }
+  //   expect(postAv.health).toBeOneOf([1,0, b.aHealthRemaining]);
     
-  });
+  // });
 
-  it('Should run battle, then test Unstable ProtoType pet ability', () => {
-    BRF.power += 1000;
+  // // Unstable Prototype - Robot
+  // it('Should run battle, then test Unstable ProtoType pet ability', () => {
+  //   BRF.power += 1000;
+  //   // BATTLE STEP 5 - EXCHANGE DAMAGE
+  //   const b = doBattle(BRA, BRF, goesFirst);
+  //   const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
+  //   const effects = [{ name : 'Unstable Prototype', type : 'postbattle' }];
+  //   doPostBattleEffects(effects);
+  //   const { postAv, postOutcome } = getPostBattlePackage();
+
+  //   if(postOutcome.outcome === 'Double KO' && b.fHealthRemaining > 0){
+  //     console.log('Self-destruct worked');
+  //     expect(postOutcome.outcome).toBe('Double KO');
+  //   }
+  // });
+
+  // // Heroes Never Die - Unicorn
+  // it('Should run battle, then test Heroes Never Die pet ability', () => {
+  //   BRF.power += 1000;
+  //   // BATTLE STEP 5 - EXCHANGE DAMAGE
+  //   const b = doBattle(BRA, BRF, goesFirst);
+  //   const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
+  //   const effects = [{ name : 'Heroes Never Die', type : 'postbattle' }];
+  //   doPostBattleEffects(effects);
+  //   const { postAv, postOutcome } = getPostBattlePackage();
+
+  //   if((postOutcome.outcome === 'Foe Wins' || postOutcome.outcome === 'Double KO') && postAv.health === 1){
+  //     console.log('Heroes Never Die WORKED');
+  //     expect(postAv.health).toBe(1);
+  //   }
+  // });
+
+  // +15 Damage Afterburn - Dragon Whelp
+  it('Should run battle, then test +25 Damage Afterburn ability', () => {
+    //BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name : 'Unstable Prototype', type : 'postbattle' }];
+    const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const effects = [{ name : '+15 Damage Afterburn', type : 'postbattle' }];
     doPostBattleEffects(effects);
-    const { postAv, postOutcome } = getPostBattlePackage();
+    const { postAv, postOutcome, postFoe } = getPostBattlePackage();
 
-    if(postOutcome.outcome === 'Double KO' && b.fHealthRemaining > 0){
-      console.log('Self-destruct worked');
-      expect(postOutcome.outcome).toBe('Double KO');
+    // IF Afterburn killed opponent after a Loss
+    if((b.outcomeData.outcome === 'Foe Wins')){
+      if(b.fHealthRemaining -25 <= 0){
+        expect(postOutcome.outcome).toBe('Double KO');
+      }
+      console.log('Foe Health before and after Afterburn = ', b.fHealthRemaining, postFoe.health);
+      expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
+    }
+
+    // IF Afterburn killed opponent after a draw
+    if((b.outcomeData.outcome === 'Draw')){
+      if(b.fHealthRemaining -25 <= 0){
+        expect(postOutcome.outcome).toBe('Avatar Wins');
+      }
+      console.log('Foe Health before and after Afterburn = ', b.fHealthRemaining, postFoe.health);
+      expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
     }
   });
-
-  it('Should run battle, then test Heroes Never Die pet ability', () => {
-    BRF.power += 1000;
-    // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name : 'Heroes Never Die', type : 'postbattle' }];
-    doPostBattleEffects(effects);
-    const { postAv, postOutcome } = getPostBattlePackage();
-
-    if((postOutcome.outcome === 'Foe Wins' || postOutcome.outcome === 'Double KO') && postAv.health === 1){
-      console.log('Heroes Never Die WORKED');
-      expect(postAv.health).toBe(1);
-    }
-  });
-
 
 });
 

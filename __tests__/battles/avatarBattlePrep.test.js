@@ -217,13 +217,111 @@ describe('Racoon effects should correctly modify stats', ()=>{
       "type" : "prebattle",
       "description" : "The Feisty Coon has a chance to exchange your lowest stat for the foe''s same stat."
       }];
-
-      const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-
-      
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
       expect(avatar.earth).toBe(sAvatar.earth +5);
-
-
+      // STILL NEED TO TEST FOR FRISKY MISCHIEVOUS
   });
 });
 
+
+describe('Chameleon effects should correctly modify stats', ()=>{
+  // Chameleon
+  it('Should give avatar + 5 earth and +5 air', ()=>{
+    const effects = [{
+      "name" : "Hero +5 Earth",
+      "type" : "prebattle",
+      "description" : "Hero receives a +5 earth buff before battle."
+      },
+      {
+        "name" : "Hero +5 Air",
+        "type" : "prebattle",
+        "description" : "Hero receives a +5 air buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(avatar.earth).toBe(sAvatar.earth +5);
+      expect(avatar.air).toBe(sAvatar.air +5);
+  });
+});
+
+describe('Llama effects should correctly modify stats', ()=>{
+  // Llama
+  it('Should give avatar +25% Health Buff', ()=>{
+    const effects = [{
+      "name" : "Hero +25% Health",
+      "type" : "prebattle",
+      "description" : "Hero receives a +25% health buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(avatar.health).toBe(sAvatar.health + Math.floor(sAvatar.health * .25));
+  });
+});
+
+describe('Robot effects should correctly modify stats', ()=>{
+  // Robot
+  it('Should give avatar +10 Power, +5 Armor', ()=>{
+    const effects = [{
+      "name" : "Hero +10 Power",
+      "type" : "prebattle",
+      "description" : "Hero receives a +10 Power buff before battle."
+      },
+      {
+        "name" : "Hero +5 Armor",
+        "type" : "prebattle",
+        "description" : "Hero receives a +5 armor buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(avatar.power).toBe(sAvatar.power +10);
+      expect(avatar.armor).toBe(sAvatar.armor +5);
+  });
+});
+
+describe('Unicorn effects should correctly modify stats', ()=>{
+  // Unicorn
+  it('Should give avatar +10% All Elms', ()=>{
+    const effects = [{
+      "name" : "Hero +10% All Elements",
+      "type" : "prebattle",
+      "description" : "Hero receives a +10% All Elements buff to All Elements before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(avatar.fire).toBe(sAvatar.fire + Math.floor(sAvatar.fire * .10));
+      expect(avatar.earth).toBe(sAvatar.earth + Math.floor(sAvatar.earth * .10));
+      expect(avatar.water).toBe(sAvatar.water + Math.floor(sAvatar.water * .10));
+      expect(avatar.air).toBe(sAvatar.air + Math.floor(sAvatar.air * .10));
+  });
+});
+
+describe('Dragon Whelp effects should correctly modify stats', ()=>{
+  // Dragon Whelp
+  it('Should give avatar +20% Fire', ()=>{
+    const effects = [{
+      "name" : "Hero +20% Fire",
+      "type" : "prebattle",
+      "description" : "Hero receives a +20% Fire buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(avatar.fire).toBe(sAvatar.fire + Math.floor(sAvatar.fire * .20));
+  });
+});
+
+describe('Orchid Mantis effects should correctly modify stats', ()=>{
+  // Orchid Mantis
+  it('Should give avatar +5% All Elms, Foe -10% Health', ()=>{
+    const effects = [{
+      "name" : "Foe -10% Health",
+      "type" : "prebattle",
+      "description" : "Foe Received a -10% Health debuff before battle."
+      },
+      {
+        "name" : "Hero +5% All Elements",
+        "type" : "prebattle",
+        "description" : "Hero receives a +5% All Elements buff to All Elements before battle."
+      }];
+      const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      expect(foe.health).toBe(sFoe.health - Math.floor(sFoe.health * .1));
+      expect(avatar.fire).toBe(sAvatar.fire + Math.floor(sAvatar.fire * .05));
+      expect(avatar.earth).toBe(sAvatar.earth + Math.floor(sAvatar.earth * .05));
+      expect(avatar.water).toBe(sAvatar.water + Math.floor(sAvatar.water * .05));
+      expect(avatar.air).toBe(sAvatar.air + Math.floor(sAvatar.air * .05));
+  });
+});

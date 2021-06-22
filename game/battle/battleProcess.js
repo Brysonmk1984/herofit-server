@@ -42,7 +42,7 @@ function battleProcess(battleInstance, avatarInstance){
   // BATTLE DETAILS RETURNED
   const b = doBattle(BRA, BRF, goesFirst);
 
-  const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
+  const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } =  postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
 
   // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If Any postbattle abilities or item effects exist, use them. These will often change the avatar status, health, and battle outcomes
   doPostBattleEffects(battle.effects);

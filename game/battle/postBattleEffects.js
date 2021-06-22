@@ -1,8 +1,9 @@
 const chance = require('chance')();
 
-function postBattleEffects(a, f, o, effects=[]){
+function postBattleEffects(a, f, outcomeData, effects=[]){
   let avatar = { ...a };
-  let outcomeStatus = o;
+  let foe = { ...f };
+  let outcomeStatus = outcomeData.outcome;
   const postBattleEffects = effects.filter(effect => effect.type === 'postbattle');
 
   // FOE POSTBATTLE ABILITIES
@@ -28,32 +29,53 @@ function postBattleEffects(a, f, o, effects=[]){
       // Chameleon
       case 'Adaptive Camouflage':
         // If Foe won, 33% chance outcomeStatus will be changed to Draw and set health to 1
-        if(o === 'Foe Wins'){
+        if(outcomeData.outcome === 'Foe Wins'){
           const camoWorked = chance.bool({ likelihood: 33 });
           if(camoWorked){
-            const health = 1;
             outcomeStatus = 'Draw';
-            avatar = Object.assign({}, a, { health, status : 'Recovering' });
+            avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
           }
         }
         break;
       // Robot
       case 'Unstable Prototype':
         // If Foe won, 33% chance to destroy foe
-        if(o === 'Foe Wins'){
+        if(outcomeData.outcome === 'Foe Wins'){
           const selfDestructWorked = chance.bool({ likelihood: 33 });
           if(selfDestructWorked){
             outcomeStatus = 'Double KO';
+          }
+        }else if(outcomeData.outcome === 'Avatar Wins'){
+          const selfDestructWorked = chance.bool({ likelihood: 2 });
+          if(selfDestructWorked){
+            outcomeStatus = 'Double KO';
+            avatar = Object.assign({}, a, { health : 0, status : 'Knocked Out' });
           }
         }
         break;
       // Unicorn
       case 'Heroes Never Die':
         // If Foe won, 33% chance to destroy foe
-        if(o === 'Foe Wins' || o === 'Double KO'){
+        if(outcomeData.outcome === 'Foe Wins' || outcomeData.outcome === 'Double KO'){
           const reviveWorked = chance.bool({ likelihood: 50 });
           if(reviveWorked){
             avatar = Object.assign({}, a, { health : 1 });
+          }
+        }
+        break;
+      // Dragon Whelp
+      case '+25 Damage Afterburn':
+        // If Foe won, or Draw, deal 25 more damage to foe and potentially change outcome
+        if(outcomeData.outcome === 'Foe Wins' || outcomeData.outcome === 'Draw'){
+          foe.health -= 25;
+          if(foe.health <= 0){
+            // If foe won, change to DKO since Afterburn killed foe
+            if(outcomeData.outcome === 'Foe Wins'){
+              outcomeStatus = 'Double KO';
+            // If Draw, change to Avatar Wins since Afterburn killed foe
+            }else if(outcomeData.outcome === 'Draw'){
+              outcomeStatus = 'Avatar Wins';
+            }
           }
         }
         break;
@@ -63,7 +85,7 @@ function postBattleEffects(a, f, o, effects=[]){
   });
 
   return {
-    avatar, outcomeStatus
+    avatar, foe, outcomeStatus
   };
 }
 

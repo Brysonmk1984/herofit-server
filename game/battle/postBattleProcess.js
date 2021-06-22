@@ -3,11 +3,11 @@ const determineItemsToInsert = require('./determineItemsToInsert');
 const xpCalc = require('../upgrades/xpCalc');
 const { OUTCOME_XP } = require('../CONSTANTS'); 
 
-const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining){
+const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining){
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, { goToBattle : false, status : outcomeData.avatarStatus, health : aHealthRemaining < 0 ? 0 : aHealthRemaining });
 
-  let f = Object.assign({}, foe);
+  let f = Object.assign({}, foe, { health : fHealthRemaining });
   let o = outcomeData.outcome;
   let xpGain = 0; 
   let ptGain = 0; 
@@ -15,7 +15,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining){
   return {
     doPostBattleEffects : (effects) => {
       // assign 'a' variable above the value of avatar, same with 'o'
-      ({ avatar : a, outcomeStatus : o } = postBattleEffects(a,f,o, effects));
+      ({ avatar : a, foe : f, outcomeStatus : o } = postBattleEffects(a,f,outcomeData, effects));
     },
     updateAvatarByOutcome : () => {
       switch(o){
@@ -59,7 +59,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining){
     getPostBattlePackage : () => {
       // Outcome status may have changed due to post battle effects, so combine with default outcome object
       const fullOutcome = Object.assign({}, outcomeData, { outcome : o });
-      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain };
+      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain, postFoe : f };
     }
   }
 }

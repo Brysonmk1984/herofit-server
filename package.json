@@ -21,7 +21,7 @@
       "./__tests__/nullOrAny.setup.js",
       "./__tests__/battles/manyBattles.test.js",
       "./__tests__/battles/preBattleAndBattleOne.test.js",
-      "./__tests__/battles/avatarBattlePrep.test.js"
+      "./__tests__/battles/postBattleEffects.test.js"
     ]
   },
   "author": "Bryson Kruk",

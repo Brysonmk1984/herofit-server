@@ -19,14 +19,23 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
       case "Hero +10 Health":
         eAvatar.health += 10;
         break;
+      case "Hero +25% Health":
+        eAvatar.health += Math.floor(eAvatar.health * .25);
+        break;
       case "Foe -10 Health":
         eFoe.health -= 10;
+        break;
+      case "Foe -10% Health":
+        eFoe.health -= Math.floor(eFoe.health * .10);
         break;
       case "Foe -15 Health":
         eFoe.health -= 15;
         break;
       case "Hero +10 Power":
         eAvatar.power += 10;
+        break;
+      case "Hero +5 Armor":
+        eAvatar.armor += 5;
         break;
       case "Hero +25 Water":
         eAvatar.water += 25;
@@ -39,6 +48,21 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         break;
       case "Hero +25 Fire":
         eAvatar.fire += 25;
+        break;
+      case "Hero +20% Fire":
+        eAvatar.fire += Math.floor(eAvatar.fire * .20);
+        break;
+      case "Hero +5% All Elements":
+        eAvatar.fire += Math.floor(eAvatar.fire * .05);
+        eAvatar.earth += Math.floor(eAvatar.earth * .05);
+        eAvatar.water += Math.floor(eAvatar.water * .05);
+        eAvatar.air += Math.floor(eAvatar.air * .05);
+        break;
+      case "Hero +10% All Elements":
+        eAvatar.fire += Math.floor(eAvatar.fire * .10);
+        eAvatar.earth += Math.floor(eAvatar.earth * .10);
+        eAvatar.water += Math.floor(eAvatar.water * .10);
+        eAvatar.air += Math.floor(eAvatar.air * .10);
         break;
       case "Ill Omen":
         const isNegativeScenario = scenario === 1 || scenario === 3 ? true : false;
