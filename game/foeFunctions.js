@@ -266,9 +266,6 @@ function generateFoeStats(avatar, foe){
   return fws;
 }
 
-<<<<<<< HEAD
-module.exports = { generateFoeStats, selectFoeTemplate };
-=======
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar, foeTemplate = null){
   
@@ -317,4 +314,3 @@ function findFoeTemplateByType(foeType){
 };
 
 module.exports = { generateFoeStats, selectFoeTemplate, determineFoeWithStats, findFoeTemplateByType };
->>>>>>> itemFind
