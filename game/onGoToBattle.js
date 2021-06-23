@@ -90,6 +90,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     if(foe.class === 'Elementals'){
       const minorFoes = ['Gusty Rascal', 'Rock Skipper', 'Flame Fiend', 'Splash Artist'];
       const midLevelFoes = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
+      const highLevelFoes = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
       
       if(minorFoes.includes(foe.type)){
         // Check if current foe is last of type of foe
@@ -97,6 +98,9 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
       }else if(midLevelFoes.includes(foe.type)){
         // Check if current foe is last of type of foe
         allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, 'Elementals', foe.name, titleNamesArray));
+      }else if(highLevelFoes.includes(foe.type)){
+        // Check if current foe is last of type of foe
+        allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, 'Elementals', foe.name, skinNamesArray));
       }
     }
 
@@ -220,7 +224,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
 
       // Remove duplicates from foesDefeated
       const fdNoDUpes = [...new Set(foesDefeated)];
-      //console.log('ASDASD-', VILLAINS[foeClass]);
+      //console.log('NO DUPES-', fdNoDUpes);
       // All foes of a certain type
       const allFoes = VILLAINS[foeClass].find(foe => foe.type === foeType).foe.slice().sort();
       //console.log('AF',allFoes);
@@ -241,6 +245,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
         }
       // ANY OTHER FOE
       }else{
+        //console.log('CN = ', currentFoeName);
         // Make an array of all foes of type EXCLUDING the name of the current foe
         const allFoesMinusCurrent = allFoes.filter(foe => foe !== currentFoeName);
         //console.log('AFMC', allFoesMinusCurrent);
@@ -259,7 +264,7 @@ function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentF
           //console.log('action', action, 'MPBA - ', matchingPBA);
           // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin
           const isCriticalWin = !itemTypeNamesArray.includes(matchingPBA.name);
-          
+          //console.log('IS CRITICAL WIN', isCriticalWin);
           // Win is critical if it's unearned
           if(isCriticalWin){
             return action;

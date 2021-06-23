@@ -1,3 +1,6 @@
+const xpCalc = require('./upgrades/xpCalc');
+const { determineXpBounty, determinePtBounty } = require('./battle/runPostBattleActions');
+const { OUTCOME_XP } = require('./CONSTANTS'); 
 const chance = require('chance')();
 const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
 const villains = require('./villains.json');
@@ -6,7 +9,7 @@ const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/
 
 // Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level){
-
+  //console.log('THE LEVEL = ', level);
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if(event){
@@ -30,11 +33,16 @@ function selectFoeTemplate(level){
     // assign foes to two different arrays depending on if there is a level requirement
     villains[fClass].forEach(foe => {
       const req = foe.levelRequirement;
-      if(req && req <= level){
-        levelRequiredFoes.push(foe);
-      }else if(!req){
-        minorFoes.push(foe);
+      //console.log(foe.type, req);
+      // If foe is not an item only foe
+      if(!foe.itemSummonOnly){
+        if(req && req <= level){
+          levelRequiredFoes.push(foe);
+        }else if(!req){
+          minorFoes.push(foe);
+        }
       }
+
     });
   }
   //console.log('FCF-', minorFoes, levelRequiredFoes);
@@ -45,7 +53,10 @@ function selectFoeTemplate(level){
     bossEncounter = chance.bool({ likelihood: 5.5});
   }
   let finalFoeArray =  bossEncounter ? levelRequiredFoes : minorFoes;
+  if(level < 30){
+    //console.log('CHECKIT=', level, finalFoeArray.map(f => f.type));
 
+  }
   // Randomly select from finalFoeArray and return it as the selected foe
   return finalFoeArray[Math.floor(Math.random() * finalFoeArray.length)];
 }
@@ -75,8 +86,8 @@ function generateFoeStats(avatar, foe){
   const isMidLevel = (LOW_LEVEL < level && level < HIGH_LEVEL) ? true : false;
 
   let baseQP = Math.floor((level * 5) - 5); 
-  let baseFoeHealth = Math.floor(((level * 5) + 100) * FOE_MOD.HEALTH);
-  let baseFoePower = Math.floor(((level * 5) + 100) * FOE_MOD.POWER);
+  let baseFoeHealth = Math.floor((((level * 5) + 100) * FOE_MOD.HEALTH));
+  let baseFoePower = Math.floor((((level * 5) + 100) * FOE_MOD.POWER));
 
   if(isMidLevel || isHighLevel){
     baseQP =  Math.floor(baseQP * LEVEL_DIFFICULTY_MOD); 
@@ -130,8 +141,8 @@ function generateFoeStats(avatar, foe){
        
         //console.log('BASE QP - ',baseQP, Math.floor(baseQP * FOE_MOD.QP),randomizedQP.stat );
 
-        fws.health = randomizedHealth.stat;
-        fws.power = randomizedPower.stat;
+        fws.health = Math.floor(randomizedHealth.stat);
+        fws.power = Math.floor(randomizedPower.stat);
 
         if(foe.type === 'Phantasm'){
           qpAdjustedStats = ["health","health","armor"];
@@ -148,8 +159,8 @@ function generateFoeStats(avatar, foe){
       randomizedQP = randomizer(Math.floor(baseQP * elementalQp));
       
 
-      fws.health = randomizedHealth.stat;
-      fws.power = randomizedPower.stat;
+      fws.health = Math.floor(randomizedHealth.stat);
+      fws.power = Math.floor(randomizedPower.stat);
 
       //Need to check for for types here for different elements
       switch(foe.type){
@@ -213,16 +224,15 @@ function generateFoeStats(avatar, foe){
 
       // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
       // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
-      const powerEighth = Math.floor(randomizedPower.stat / 6.6);
+      const powerEighth = Math.floor(randomizedPower.stat / 12);
       
-      fws.health = randomizedHealth.stat;
-      fws.power = randomizedPower.stat;
+      fws.health = Math.floor(randomizedHealth.stat);
+      fws.power = Math.floor(randomizedPower.stat);
       fws.fire = powerEighth;
       fws.earth = powerEighth;
       fws.water = powerEighth;
       fws.air = powerEighth;
       qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
-
       break;
 
     default:
@@ -256,4 +266,55 @@ function generateFoeStats(avatar, foe){
   return fws;
 }
 
+<<<<<<< HEAD
 module.exports = { generateFoeStats, selectFoeTemplate };
+=======
+// Foe param is usually null, unless an item created the battle
+function determineFoeWithStats(avatar, foeTemplate = null){
+  
+  const { currentLevelByInput } = xpCalc();
+  const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+
+  // Use passed in foe template, otherwise randomly pick one
+  foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(currentLevel);
+
+  
+  let foeName;
+  
+  if(foeTemplate.type === 'Shadow-Self'){
+    foeName = `Shadow ${avatar.name}`;
+  }else{
+    // specific foe for testing purposes
+    //foeName = foeTemplate.foe[1];
+    
+    foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
+  }
+  
+  const foe = {
+    id : foeTemplate.id,
+    type : foeTemplate.type,
+    name : foeName,
+    ability : foeTemplate.ability,
+    class : foeTemplate.class
+  }
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
+  
+  
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase, foeWithStats.type);
+  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase, foeWithStats.type);
+  
+  return foeWithStats;
+}
+
+
+function findFoeTemplateByType(foeType){
+  const allFoes = [];
+  for(let foeClass in villains){
+    allFoes.push(...villains[foeClass]);
+  }
+
+  return allFoes.find(foe => foe.type === foeType);
+};
+
+module.exports = { generateFoeStats, selectFoeTemplate, determineFoeWithStats, findFoeTemplateByType };
+>>>>>>> itemFind

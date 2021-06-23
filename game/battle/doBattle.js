@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./CONSTANTS');
+const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('../CONSTANTS');
 const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)
@@ -360,7 +360,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
 }
 
 function doBattle(avatar, foe, goesFirst){
-  console.log('AV IN BATTLE=', avatar, foe);
+  //console.log('AV IN BATTLE=', avatar, foe);
   
   //goesFirst = 'avatar';
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];

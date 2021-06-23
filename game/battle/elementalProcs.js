@@ -1,9 +1,9 @@
 const chance = require('chance')();
-const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD } = require('./CONSTANTS');
+const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD } = require('../CONSTANTS');
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire, d){
-  let critChance = Number((fire*3)/((fire*3)+(FIRE_CRIT_CHANCE_MOD*500))).toFixed(2) * 100;
+  let critChance = Number((fire*3)/((fire*3)+(FIRE_CRIT_CHANCE_MOD))).toFixed(2) * 100;
   if(critChance > 60){
     critChance = 60;
   }
@@ -17,7 +17,7 @@ function determineFireCrit(fire, d){
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
 function determineAirEvade(air, d){
   //console.log('the air params - ',air,d);
-  let evadeChance = Number((air*10)/((air*10)+(AIR_EVASION_CHANCE_MOD*1000))).toFixed(2) * 100;
+  let evadeChance = Number((air*10)/((air*10)+(AIR_EVASION_CHANCE_MOD))).toFixed(2) * 100;
   if(evadeChance > 60){
     evadeChance = 60;
   }
@@ -30,7 +30,7 @@ function determineAirEvade(air, d){
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)
 function determineWaterHeal(water, d){  
-  let healingFactor = Number((water*3)/((water*3)+(WATER_HEAL_MOD))).toFixed(2);
+  let healingFactor = Number((water*5)/((water*5)+(WATER_HEAL_MOD))).toFixed(2);
   if(healingFactor > .45){
     healingFactor = .45;
   }

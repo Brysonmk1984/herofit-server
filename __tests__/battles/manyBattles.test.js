@@ -1,12 +1,12 @@
 const avatarProfiles = require('./heroProfiles.json');
 const avatarPowerSpecProfiles = require('./powerProfiles.json');
-const { selectFoeTemplate, generateFoeStats } = require('../game/foeFunctions');
-const doScenarioAndBonus = require('../game/doScenarioAndBonus');
-const { doAvatarBattlePrep, doFoeBattlePrep } = require('../game/doBattlePrep');
-const doBattle = require('../game/doBattle');
-const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
-const avCalc = require('../game/upgrades/avCalc');
-const xpCalc = require('../game/upgrades/xpCalc');
+const { selectFoeTemplate, generateFoeStats } = require('../../game/foeFunctions');
+const { calcScenarioBonuses, determineScenario } = require('../../game/battle/scenario');
+const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
+const doBattle = require('../../game/battle/doBattle');
+const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../../game/CONSTANTS');
+const avCalc = require('../../game/upgrades/avCalc');
+const xpCalc = require('../../game/upgrades/xpCalc');
 const chance = require('chance')();
 
 
@@ -46,8 +46,11 @@ function generateBrs(avatars, foesWithStats){
     }
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    const { scenario, sAvatar, sFoe  } = doScenarioAndBonus(av, foesWithStats[i], beginnersLuck);
-    //
+    scenario = determineScenario(beginnersLuck);
+    const scenarioBonuses = calcScenarioBonuses(av, foesWithStats[i], scenario);
+    const sAvatar = scenarioBonuses.sAvatar;
+    const sFoe = scenarioBonuses.sFoe;
+
     // avatar and foe to be used for battle
     BRA = Object.assign({}, sAvatar);
     BRF = Object.assign({}, sFoe);
@@ -298,12 +301,12 @@ describe('Battle all generated foes against av profiles', ()=>{
     //console.log('RRR-', totals.lowLevel.wins, totals.count, (totals.lowLevel.wins / totals.count), ((totals.lowLevel.wins / totals.count) > .65));
     // Above min threshold
     
-    expect(lowLevelWinRate).toBeGreaterThanOrEqual(.60);
+    expect(lowLevelWinRate).toBeGreaterThanOrEqual(.74);
     expect(midLevelWinRate).toBeGreaterThanOrEqual(.60);
     expect(highLevelWinRate).toBeGreaterThanOrEqual(.60);
     expect(overallWinRate).toBeGreaterThanOrEqual(.60);
     // Below max threshold
-    expect(lowLevelWinRate).toBeLessThan(.75);
+    expect(lowLevelWinRate).toBeLessThan(.85);
     expect(midLevelWinRate).toBeLessThan(.75);
     expect(highLevelWinRate).toBeLessThan(.75);
     expect(overallWinRate).toBeLessThan(.75);
@@ -335,7 +338,7 @@ describe('Battle all generated foes against av profiles', ()=>{
     expect(winRateVsElementals).toBeGreaterThanOrEqual(.60);
     if(totals.totalsVs.titans > 2){
       expect(winRateVsTitans).toBeGreaterThanOrEqual(.33);
-      expect(winRateVsTitans).toBeLessThan(.66);
+      expect(winRateVsTitans).toBeLessThanOrEqual(.66);
     }
   });
 

@@ -314,6 +314,9 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
   console.log('EFFECTSS', effects);
   itemEffects(effects, avatarID, email)
   .then((data) =>{
+    if(data.error){
+      throw data.error;
+    }
     // If any effect errors out, throw new error
     data.forEach((result, i) =>{
       if(result instanceof Error){
@@ -358,7 +361,9 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
       res.formatter.serverError(error.toString(), `Error destroying item -  DELETE /use-consumable-item`);
     });
   }).catch((error) =>{
-    console.log('USE ITEM OUTER ERROR - ', error);
+    if(error.toString() === 'Error: Hero is already queued for another battle, please try again later.'){
+      res.formatter.badRequest(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+    }
     res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
   });
 });

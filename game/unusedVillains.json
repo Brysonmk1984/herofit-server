@@ -1,27 +1,8 @@
 [
-  
-  {
-    "class" : "Elementals",
-    "type" : "Storming Oni",
-    "foe" : ["Fūjin"],
-    "ability": {
-      "name" : "Air Mastery",
-      "effect" : "Profound Air Threat",
-      "type" : "prebattle"
-    },
-    "color" : null,
-    "bonusXpBase": 50,
-    "bonusPtBase": 100,
-    "pba" : [],
-    "reward" : {
-      "type" : "",
-      "name" : ""
-    }
-  },
   {
     "class" : "Elementals",
     "type" : "Hulking Aggro Crag",
-    "foe" : ["Papa"],
+    "foe" : ["Jötnar"],
     "ability": {
       "name" : "Earth Mastery",
       "effect" : "Profound Earth Threat",
@@ -30,10 +11,10 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Earth Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "skin",
+      "name" : "Earth Tint"
     }
   },
   {
@@ -48,10 +29,10 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Fire Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "skin",
+      "name" : "Fire Tint"
     }
   },
   {
@@ -66,10 +47,10 @@
     "color" : null,
     "bonusXpBase": 50,
     "bonusPtBase": 100,
-    "pba" : [],
+    "pba" : ["Grant Water Tint"],
     "reward" : {
-      "type" : "",
-      "name" : ""
+      "type" : "skin",
+      "name" : "Water Tint"
     }
   }
 ]
