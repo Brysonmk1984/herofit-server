@@ -28,9 +28,9 @@ function instantiateBattle(avatarID, foeType = null){
     const avatar = parseAvatarProperties(results);
     const equippedItemIds = avatar.equipped ? avatar.equipped.map(item => item.itemID) : [];
     const { getCurrentLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
-    avatar.level = getCurrentLevel();  
+    const { total } = getCurrentLevel();  
     // Getting Foe Template
-    const foe = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(avatar.level);
+    const foe = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(total);
     // Adding stats to Foe
     const foeWithStats = determineFoeWithStats(avatar, foe);
 

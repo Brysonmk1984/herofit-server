@@ -21,7 +21,7 @@ function resetHero(avatarID, email){
     });
   }).then(({ health, activityXP, battleXP, character, createdAt }) =>{
     const { getCurrentLevel } = xpCalc(activityXP, battleXP);
-    const heroLevel = getCurrentLevel();
+    const { total : heroLevel } = getCurrentLevel();
 
     // CALCULATE ATTRIBUTES BASED ON (what should be) the updated XP curve.
     const { updatePower, updateHealth, updateElements } = avCalc(userTotals);  

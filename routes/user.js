@@ -240,7 +240,9 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     battles = battles.value;
     const { currentLevelByInput } = xpCalc();
     avatar = avatar.value;
-    avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+    const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+    avatar.level = level;
+    avatar.albedo = albedo;
 
     res.formatter.ok({userTotals, activities, avatar, battles, itemInstances });
   }).catch((error)=>{

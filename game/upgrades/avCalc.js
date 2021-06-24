@@ -1,4 +1,4 @@
-const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS');
+const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } = require('../CONSTANTS');
 const moment = require('moment');
 const { cloneObj, adjustActivityMinutes } = require('../../lib/helperFunctions');
 const avatarList = require('../../heroList.json');
@@ -11,6 +11,13 @@ function avCalc(userTotals){
       // 5 Power per level, plus base, plus how much QP has been spent
       const totalPower = ((level-1) * 5) + qpPower + BASE_POWER;
       return totalPower;
+    },
+    updateAether : function(totalLevel, qpAether){
+      const albedoLevel = totalLevel - MAX_LEVEL;
+      // 5 Aether per level per Albedo level, plus how much QP has been spent
+      // Don't need to -1 here since we're not starting at zero, but continuing on after 100
+      const totalAether = ((albedoLevel) * 5) + qpAether;
+      return totalAether;
     },
     updateHealth : function(level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp){
       let updatedHealth = oldHealth;

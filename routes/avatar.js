@@ -7,10 +7,9 @@ const { Avatar, AvatarItems, User, UserTotal, Items } = require('../config/db');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
 const { literal, Op } = require("sequelize");
 const { parseAvatarProperties, paginate } = require('../lib/helperFunctions');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES } = require('../game/CONSTANTS');
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
-const passport = require('passport');
 const  { activityItemFind } = require('../game/activityItemFind');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
@@ -93,7 +92,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       // Get Avatar to buff as well as all possible items that can drop from activities
       return Promise.all([
         Avatar.findOne({ 
-          where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
+          where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'aether', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qpAether', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
         }), 
         Items.findAll({ 
           where: { dropRate: { [Op.ne]: null }, disabled : false }, attributes : ['name', 'dropRate', 'levelRestriction', 'activityRestriction', 'disabled'], raw : true, transaction: t, 
@@ -101,33 +100,39 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     }).then((result) =>{console.log('RESSS', result);
       const avatar = result[0];
       const possibleItemDrops = result[1];
-      avStatSnapshot = Object.assign({}, {activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air});
+      avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether });
       
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
-      const { updatePower, updateHealth, updateElements, updateStatus } = avCalc(ut);  
-      
+      const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
+      console.log('snap', avStatSnapshot);
       // Updated aXP
       const aXP = calcNewActivityXPFromUt(ut);
       aXPDiff = aXP - avStatSnapshot.activityXP;
+      console.log('AXP DIFF', aXPDiff);
       const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
+      console.log(leveledUp, endingLevel, qpEarned);
       lvlUp = leveledUp;
-      lvlAfterBuff = endingLevel;
+      // endingLevel starts over after MAX_LEVEL(100)
+      lvlAfterBuff = endingLevel > MAX_LEVEL ? (endingLevel - MAX_LEVEL) : endingLevel;
       qpe = qpEarned;
 
       const updatedPower = updatePower(endingLevel, avatar.qpPower);
+      const updatedAether = updateAether(endingLevel, avatar.qpAether);
       const { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
       const updatedStatus = updateStatus(avatar.status, lvlUp);
       const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
 
+      console.log('!!!', updatedAether, avStatSnapshot.aether);
 
       // Calc gains here to be displayed on frontend
       improvements = {
-        power : avatar.power - avStatSnapshot.power,
+        power : updatedPower - avStatSnapshot.power,
         health : avatar.maxHealth - avStatSnapshot.maxHealth,
         air : Number((air - avStatSnapshot.air).toFixed(2)),
         water : Number((water - avStatSnapshot.water).toFixed(2)),
         fire : Number((fire - avStatSnapshot.fire).toFixed(2)),
         earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
+        aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
       };
 
       // Needed for activity-specific items
@@ -150,7 +155,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
       // Now we need to add any items acquired from activities to a user's inventory
       // And also update the avatar's PT
-      const updatedAvatar = Object.assign({}, avatar, { photonTokens : avatar.photonTokens += pt, activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : updatedHealth, maxHealth : updatedMaxHealth, fire, earth, water, air, hasBeenUpgraded : true, status : updatedStatus });
+      const updatedAvatar = Object.assign({}, avatar, { photonTokens : avatar.photonTokens += pt, activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : updatedHealth, aether : updatedAether, maxHealth : updatedMaxHealth, fire, earth, water, air, hasBeenUpgraded : true, status : updatedStatus });
 
       // Finally, Update Avatar in DB
       return Avatar.update(
@@ -162,7 +167,9 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
       
       avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-      avatar.level = getCurrentLevel();
+      const { level, albedo } = getCurrentLevel();
+      avatar.level = level;
+      avatar.albedo = albedo;
       avatar.nextLevelStartXp = getNextLevel();
       avatar.thisLevelStartXp = getNextLevel(-1);
       avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
@@ -240,7 +247,9 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0]);
     const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
-    avatar.level = getCurrentLevel();
+    const { level, albedo } = getCurrentLevel();
+    avatar.level = level;
+    avatar.albedo = albedo;
     avatar.nextLevelStartXp = getNextLevel();
     avatar.thisLevelStartXp = getNextLevel(-1);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
@@ -294,7 +303,7 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
   const searchInput = req.body.searchInput;
 
   const expression = { 
-    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'aether', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
     include : [
       { model: User, attributes: ['username'] },
       { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
@@ -327,7 +336,9 @@ router.post('/fetch-avatars-by-page', body('page').isNumeric(), body('searchInpu
     // Sequelize requires us to loop over the returned data when 'raw : false'
     const avatars = actualRows.map((result, i) => {
       avatar = parseAvatarProperties(result);
-      avatar.level = currentLevelByInput(avatar.totalXP);
+      const { level, albedo } = currentLevelByInput(avatar.totalXP);
+      avatar.level = level;
+      avatar.albedo = albedo;
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
@@ -386,7 +397,7 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
     });
 
     const expression = {
-      attributes : ['id','owner','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+      attributes : ['id','owner','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'aether', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
       include : [
         { model: User, attributes: ['username'] },
         { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
@@ -416,7 +427,9 @@ router.post('/fetch-avatars-by-page-and-ranking-type', body('rankingType').isIn(
       
       const avatarsWithRank = avatarsOrderedByActivityDuration.map((result, i) => {
         avatar = parseAvatarProperties(result);
-        avatar.level = currentLevelByInput(avatar.totalXP);
+        const { level, albedo } = currentLevelByInput(avatar.totalXP);
+        avatar.level = level;
+        avatar.albedo = albedo;
         avatar.user = avatar.user ? avatar.user  : { username : '' };
         // Determine rank based on page and position within page
         avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);
@@ -459,7 +472,7 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 
 
   const expression = { 
-    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
+    attributes : ['id','name','character','power', 'maxHealth', 'recovery', 'armor', 'fire', 'water', 'earth', 'air', 'aether', 'activityXP', 'battleXP', 'battleWins', 'battleLosses', 'battleDraws', 'battleDkos', 'userId', [literal('COALESCE("activityXP", 0) + COALESCE("battleXP", 0)'),'totalXP']],
     include : [
       { model: User, attributes: ['username'] },
       { model: AvatarItems, as : 'equipped', attributes: ['equipped', 'itemID'], 
@@ -492,7 +505,9 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
     // Sequelize requires us to loop over the returned data when 'raw : false'
     const avatars = actualRows.map((result, i) => {
       avatar = parseAvatarProperties(result);
-      avatar.level = currentLevelByInput(avatar.totalXP);
+      const { level, albedo } = currentLevelByInput(avatar.totalXP);
+      avatar.level = level;
+      avatar.albedo = albedo;
       avatar.user = avatar.user ? avatar.user  : { username : '' };
       // Determine rank based on page and position within page
       avatar.rank = page === 0 ? i + 1 : (page * AVATAR_COUNT_PER_PAGE) + (i + 1);

@@ -2,10 +2,12 @@ const xpCalc = require('./upgrades/xpCalc');
 const { determineXpBounty, determinePtBounty } = require('./battle/runPostBattleActions');
 const { OUTCOME_XP } = require('./CONSTANTS'); 
 const chance = require('chance')();
-const { FOE_MOD, XP_BASE_LEVEL, LEVEL_CURVE, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
+const { FOE_MOD,  LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
 const villains = require('./villains.json');
 const { config } = require('../appConfig');
 const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
+
+const { currentLevelByInput } = xpCalc();
 
 // Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level){
@@ -53,24 +55,13 @@ function selectFoeTemplate(level){
     bossEncounter = chance.bool({ likelihood: 5.5});
   }
   let finalFoeArray =  bossEncounter ? levelRequiredFoes : minorFoes;
-  if(level < 30){
-    //console.log('CHECKIT=', level, finalFoeArray.map(f => f.type));
 
-  }
   // Randomly select from finalFoeArray and return it as the selected foe
   return finalFoeArray[Math.floor(Math.random() * finalFoeArray.length)];
 }
 
 function generateFoeStats(avatar, foe){
-  // GIVES CURRENT LEVEL based on XP input
-  function currentLevel(xp){
-    const exponent = LEVEL_CURVE;
-    const baseXP = XP_BASE_LEVEL;
-    const currentLevel = Math.pow((xp/baseXP),(1 / exponent));
-
-    return Math.floor(currentLevel) + 1;
-  }
-
+  const { total : totalLevel } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
 
   // Random modifier within -15% of base stat
@@ -80,14 +71,12 @@ function generateFoeStats(avatar, foe){
     return { stat : Math.floor(modifiedStat), modifier : randomModifierDecimal };
   }
 
+  const isHighLevel = totalLevel >= HIGH_LEVEL ? true : false;
+  const isMidLevel = (LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL) ? true : false;
 
-  const level = currentLevel(avatar.activityXP + avatar.battleXP);
-  const isHighLevel = level >= HIGH_LEVEL ? true : false;
-  const isMidLevel = (LOW_LEVEL < level && level < HIGH_LEVEL) ? true : false;
-
-  let baseQP = Math.floor((level * 5) - 5); 
-  let baseFoeHealth = Math.floor((((level * 5) + 100) * FOE_MOD.HEALTH));
-  let baseFoePower = Math.floor((((level * 5) + 100) * FOE_MOD.POWER));
+  let baseQP = Math.floor((totalLevel * 5) - 5); 
+  let baseFoeHealth = Math.floor((((totalLevel * 5) + 100) * FOE_MOD.HEALTH));
+  let baseFoePower = Math.floor((((totalLevel * 5) + 100) * FOE_MOD.POWER));
 
   if(isMidLevel || isHighLevel){
     baseQP =  Math.floor(baseQP * LEVEL_DIFFICULTY_MOD); 
@@ -268,12 +257,10 @@ function generateFoeStats(avatar, foe){
 
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar, foeTemplate = null){
-  
-  const { currentLevelByInput } = xpCalc();
-  const currentLevel = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+  const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
   // Use passed in foe template, otherwise randomly pick one
-  foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(currentLevel);
+  foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(level);
 
   
   let foeName;
@@ -297,8 +284,8 @@ function determineFoeWithStats(avatar, foeTemplate = null){
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
   
   
-  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, currentLevel, foeTemplate.bonusXpBase, foeWithStats.type);
-  foeWithStats.ptBounty = determinePtBounty(currentLevel, foeTemplate.bonusPtBase, foeWithStats.type);
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, level, foeTemplate.bonusXpBase, foeWithStats.type);
+  foeWithStats.ptBounty = determinePtBounty(level, foeTemplate.bonusPtBase, foeWithStats.type);
   
   return foeWithStats;
 }

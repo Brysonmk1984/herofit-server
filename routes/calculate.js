@@ -30,10 +30,10 @@ router.post('/fetch-current-level-by-input', body('xp').isNumeric(), authenticat
 
   const xp = req.body.xp;
   const { currentLevelByInput } = xpCalc();
-  const currentLevel = currentLevelByInput(xp);
+  const levelObj = currentLevelByInput(xp);
 
-  if(currentLevel){
-    res.formatter.ok({ currentLevel });
+  if(levelObj){
+    res.formatter.ok(levelObj);
   }else{
     res.formatter.serverError('Current level is falsy');
   }

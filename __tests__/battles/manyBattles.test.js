@@ -4,7 +4,7 @@ const { selectFoeTemplate, generateFoeStats } = require('../../game/foeFunctions
 const { calcScenarioBonuses, determineScenario } = require('../../game/battle/scenario');
 const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
 const doBattle = require('../../game/battle/doBattle');
-const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../../game/CONSTANTS');
+const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../../game/CONSTANTS');
 const avCalc = require('../../game/upgrades/avCalc');
 const xpCalc = require('../../game/upgrades/xpCalc');
 const chance = require('chance')();
@@ -96,7 +96,7 @@ describe('Battle all generated foes against av profiles', ()=>{
 
   let avatars = avatarProfiles.map((av) => {
     const { getCurrentLevel } = xpCalc(av.activityXP, av.battleXP);
-    return Object.assign({}, av, { level : getCurrentLevel() });
+    return Object.assign({}, av, { level : getCurrentLevel().total });
   });
   let multipliedAvatars = [];
   // Multiplies the instances of avatar profiles to create more battles
@@ -382,7 +382,7 @@ describe('Battle all generated foes against av profiles', ()=>{
 
 //   let avatars = avatarPowerSpecProfiles.map((av) => {
 //     const { getCurrentLevel } = xpCalc(av.activityXP, av.battleXP);
-//     return Object.assign({}, av, { level : getCurrentLevel() });
+//     return Object.assign({}, av, { level : getCurrentLevel().total });
 //   });
 //   let multipliedAvatars = [];
 //   // Multiplies the instances of avatar profiles to create more battles
