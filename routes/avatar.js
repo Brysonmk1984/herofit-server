@@ -6,11 +6,12 @@ const db = require('../config/db').db;
 const { Avatar, AvatarItems, User, UserTotal, Items } = require('../config/db');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
 const { literal, Op } = require("sequelize");
-const { parseAvatarProperties, paginate } = require('../lib/helperFunctions');
+const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const  { activityItemFind } = require('../game/activityItemFind');
+const activityRewards = require('../game/activities/activityRewards');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 // Create Avatar in DB after Signup
@@ -24,7 +25,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
   if(avatar.status === 'New Recruit'){
     avatar.status = 'Rested';
   }
-  console.log('FINDORCREATE-', email, userId, avatar );
+
   Avatar.findOrCreate({
     where: { owner : email },
     // set the default properties if it doesn't exist
@@ -77,9 +78,13 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
   }
   const { email } = req.body;
   delete req.body.restedEnough;
+  let avatar;
   let ut, avStatSnapshot, aXPDiff, lvlUp, lvlAfterBuff, qpe;
   let foundItems;
   let returnPackage;
+  let startingUpgradeLevel;
+  let endingUpgradeLevel;
+  
 
   return db.transaction(t => {
     let improvements;
@@ -92,25 +97,26 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       // Get Avatar to buff as well as all possible items that can drop from activities
       return Promise.all([
         Avatar.findOne({ 
-          where: { owner: email }, attributes : ['character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'aether', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qpAether', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
+          where: { owner: email }, attributes : ['id','character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'aether', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qpAether', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
         }), 
         Items.findAll({ 
           where: { dropRate: { [Op.ne]: null }, disabled : false }, attributes : ['name', 'dropRate', 'levelRestriction', 'activityRestriction', 'disabled'], raw : true, transaction: t, 
         })])
-    }).then((result) =>{console.log('RESSS', result);
-      const avatar = result[0];
+    }).then((result) =>{
+      avatar = result[0];
       const possibleItemDrops = result[1];
       avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether });
       
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
-      console.log('snap', avStatSnapshot);
+    
       // Updated aXP
       const aXP = calcNewActivityXPFromUt(ut);
       aXPDiff = aXP - avStatSnapshot.activityXP;
-      console.log('AXP DIFF', aXPDiff);
-      const { leveledUp, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
-      console.log(leveledUp, endingLevel, qpEarned);
+   
+      const { leveledUp, levels, startingLevel, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
+      startingUpgradeLevel = startingLevel;
+      endingUpgradeLevel = endingLevel;
       lvlUp = leveledUp;
       // endingLevel starts over after MAX_LEVEL(100)
       lvlAfterBuff = endingLevel > MAX_LEVEL ? (endingLevel - MAX_LEVEL) : endingLevel;
@@ -122,7 +128,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       const updatedStatus = updateStatus(avatar.status, lvlUp);
       const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
 
-      console.log('!!!', updatedAether, avStatSnapshot.aether);
+   
 
       // Calc gains here to be displayed on frontend
       improvements = {
@@ -144,12 +150,14 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         earth : (improvements.earth / totalElmImprove) * 100,
       } 
 
-      console.log('POSSIBLE DROPS', possibleItemDrops);
+      //console.log('POSSIBLE DROPS', possibleItemDrops);
+
+
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS
       // the last param is an array of possible items drops
       // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
       const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms, null, null, possibleItemDrops);
-    
+      // Items & PT found during activity
       foundItems = items;
       improvements["Photon Tokens"] = pt;
 
@@ -198,15 +206,39 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         transaction : t
       }).then((matchingItems) =>{
         const itemsToInsert = []
-        // for each item earned, find it's matching item template and push a new item instance into the DB
+        //for each item earned, find it's matching item template and push a new item instance into the DB
         returnPackage.items.forEach((item) => {
           const matchingItem = matchingItems.find(itemTemplate => itemTemplate.name === item)
           itemsToInsert.push({ avatarID : returnPackage.avatar.id, itemID : matchingItem.id });
         });
-        return AvatarItems.bulkCreate(itemsToInsert, { where: { owner : email }, transaction : t })
+
+        const allItemPromises = []
+        
+        
+        // Items Found
+        allItemPromises.push(AvatarItems.bulkCreate(itemsToInsert, { where: { owner : email }, transaction : t }));
+        
+        if(endingUpgradeLevel > startingUpgradeLevel){
+          const levelsToCheck = range(startingUpgradeLevel, endingUpgradeLevel);
+          // Rewards for reaching levels, etc...
+          allItemPromises.push(
+            activityRewards(avatar.id, levelsToCheck, t)
+            .then((rewards) =>{
+              if(rewards){
+                console.log('REWARDS!', rewards);
+                returnPackage.rewards = rewards;
+              }
+            }).catch((error) => {
+              console.log('ERROR in activityRewards', error);
+            })
+          );
+        }
+
+
+
+        return Promise.all(allItemPromises)
+
       });
-
-
     }).then((result) =>{
       // Transaction has been committed
       // result is whatever the result of the promise chain returned to the transaction callback

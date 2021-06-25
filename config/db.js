@@ -10,8 +10,8 @@ let db;
 let dbUrl;
 let sequelizeSettings;
 
-// PRODUCTION or Locally running backend through PROXY
 if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
+  // PRODUCTION or Locally running backend through PROXY
   sequelizeSettings = {
     dialect: 'postgres',
     dialectOptions: {
@@ -31,8 +31,8 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
   }
   dbUrl = process.env.DATABASE_URL;
 
-  // DEVELOPMENTS
 }else{
+  // DEVELOPMENT
   sequelizeSettings = {
     host: 'localhost',
     dialect: 'postgres',
@@ -46,11 +46,9 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
     },
     query:{raw:true}
   }
+  
   dbUrl = process.env.DATABASE_URL_LOCAL;
-
 }
-
-
 
 db = new Sequelize(dbUrl, sequelizeSettings);
 db.authenticate();

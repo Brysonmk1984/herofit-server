@@ -55,7 +55,7 @@ function xpCalc(activityXP, battleXP){
       const qpEarned = (levelsGained * QP_PER_LEVEL);
 
       //console.log('XPSTUFF - ', xpGained, startingLevel, endingLevel, levelsGained, leveledUp, qpEarned);
-      return { leveledUp, levels : levelsGained, endingLevel, qpEarned };
+      return { leveledUp, levels : levelsGained, endingLevel, qpEarned, startingLevel };
     },
 
     // GIVEN NEW XP FROM ACTIVITIES OR BATTLES, CALCULATE NEW TOTAL XPs

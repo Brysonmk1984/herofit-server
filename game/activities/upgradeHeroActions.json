@@ -1,0 +1,16 @@
+[
+  {
+    "action" : "Grant Ascended-Self",
+    "name" : "Ascended Self",
+    "itemCategory": "skins",
+    "type" : "levelReward",
+    "requiredLevel" : 100
+  },
+  {
+    "action" : "Grant Ascended",
+    "name" : "Ascended",
+    "itemCategory": "titles",
+    "type" : "levelReward",
+    "requiredLevel" : 100
+  }
+]
