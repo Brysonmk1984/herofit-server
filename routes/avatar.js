@@ -211,9 +211,8 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
           const matchingItem = matchingItems.find(itemTemplate => itemTemplate.name === item)
           itemsToInsert.push({ avatarID : returnPackage.avatar.id, itemID : matchingItem.id });
         });
-
-        const allItemPromises = []
         
+        const allItemPromises = []
         
         // Items Found
         allItemPromises.push(AvatarItems.bulkCreate(itemsToInsert, { where: { owner : email }, transaction : t }));
@@ -234,10 +233,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
           );
         }
 
-
-
         return Promise.all(allItemPromises)
-
       });
     }).then((result) =>{
       // Transaction has been committed
