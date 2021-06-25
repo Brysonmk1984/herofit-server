@@ -134,7 +134,7 @@ const PTFIND_BASE_AMOUNT = 15;
 const PTFIND_EFFECTIVENESS_MOD = 45;
 
 // MAX LEVEL
-const MAX_LEVEL = 68;
+const MAX_LEVEL = 100;
 
 module.exports = { 
   LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, 
