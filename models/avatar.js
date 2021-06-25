@@ -109,6 +109,13 @@ const AvatarModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: 0,
       },
+      aether: {
+        type: DataTypes.NUMERIC,
+        precision : 7,
+        scale : 2,
+        allowNull: false,
+        defaultValue: 0,
+        },
       qpFire: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -145,6 +152,11 @@ const AvatarModel = function(db, DataTypes){
         defaultValue: 0,
       },
       qpHealth: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      qpAether: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
