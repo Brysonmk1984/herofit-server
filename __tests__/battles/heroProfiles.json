@@ -1027,5 +1027,23 @@
     "name": "recoveryElmBalance",
     "description":"very high Level, focused RECOVERY + balance elms",
     "level": 75
+  },
+  {
+    "activityXP": 24282,
+    "battleXP": 2292,
+    "air": 208,
+    "earth": 208,
+    "fire": 208,
+    "water": 208,
+    "power": 820,
+    "health": 470,
+    "armor": 6,
+    "recovery": 5,
+    "character": "Compost Creature",
+    "equipped": [],
+    "name": "powerElmBalance",
+    "description":"very high Level, focused POWER + balance elms",
+    "level": 75,
+    "aether": 100
   }
 ]

@@ -50,4 +50,18 @@ function determineEarthThorns(earth, d){
   return { thornsFactor, thornsDamageToAttacker };
 }
 
-module.exports = { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns};
+// Aether - late game offensive trait - takes in attacker's aether amount and calculates a chance for taking an extra battle turn
+function determineIDS(aether, goesFirst){
+  let idsChance = Number((aether*3)/((aether*3)+(FIRE_CRIT_CHANCE_MOD))).toFixed(2) * 100;
+  if(idsChance > 60){
+    idsChance = 60;
+  }
+  const isIDS = chance.bool({ likelihood: idsChance });
+  if(isIDS){
+    const gf = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
+    return { ids : true, gf };
+  }
+  return { ids : false, gf : goesFirst };
+}
+
+module.exports = { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineIDS };
