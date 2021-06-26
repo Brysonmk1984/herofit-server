@@ -22,9 +22,8 @@
       "./__tests__/itemFind",
       "./__tests__/itemRewards",
       "./__tests__/battles/manyBattles.test.js",
-      
-      "./__tests__/battles/postBattleEffects.test.js"
-
+      "./__tests__/battles/postBattleEffects.test.js",
+      "./__tests__/battles"
     ]
   },
   "author": "Bryson Kruk",

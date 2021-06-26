@@ -12,6 +12,7 @@ const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const  { activityItemFind } = require('../game/activityItemFind');
 const activityRewards = require('../game/activities/activityRewards');
+const activityHeal = require('../game/activities/activityHeal');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 // Create Avatar in DB after Signup
@@ -105,7 +106,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     }).then((result) =>{
       avatar = result[0];
       const possibleItemDrops = result[1];
-      avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether });
+      avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
       
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
@@ -124,11 +125,12 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
 
       const updatedPower = updatePower(endingLevel, avatar.qpPower);
       const updatedAether = updateAether(endingLevel, avatar.qpAether);
-      const { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
+      let { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
       const updatedStatus = updateStatus(avatar.status, lvlUp);
       const { fire, earth, water, air } = updateElements(avatar.character, { qpFire : avatar.qpFire, qpEarth : avatar.qpEarth, qpWater : avatar.qpWater, qpAir : avatar.qpAir }, avatar.createdAt);
 
-   
+      // For users with Aether, heal a portion of health based on activity time and aether
+      updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
 
       // Calc gains here to be displayed on frontend
       improvements = {
@@ -139,6 +141,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         fire : Number((fire - avStatSnapshot.fire).toFixed(2)),
         earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
         aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
+        health : updatedHealth - avStatSnapshot.health
       };
 
       // Needed for activity-specific items
@@ -149,8 +152,6 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         fire : (improvements.fire / totalElmImprove) * 100,
         earth : (improvements.earth / totalElmImprove) * 100,
       } 
-
-      //console.log('POSSIBLE DROPS', possibleItemDrops);
 
 
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS

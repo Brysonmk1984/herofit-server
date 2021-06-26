@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD } = require('../CONSTANTS');
+const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD, AETHER_IDS_CHANCE_MOD } = require('../CONSTANTS');
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire, d){
@@ -52,7 +52,7 @@ function determineEarthThorns(earth, d){
 
 // Aether - late game offensive trait - takes in attacker's aether amount and calculates a chance for taking an extra battle turn
 function determineIDS(aether, goesFirst){
-  let idsChance = Number((aether*3)/((aether*3)+(FIRE_CRIT_CHANCE_MOD))).toFixed(2) * 100;
+  let idsChance = Number((aether*3)/((aether*3)+(AETHER_IDS_CHANCE_MOD))).toFixed(2) * 100;
   if(idsChance > 60){
     idsChance = 60;
   }
