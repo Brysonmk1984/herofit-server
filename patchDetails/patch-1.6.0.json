@@ -1,0 +1,47 @@
+{
+  "version": "1.6.0",
+  "headline": "Instant Battles, Activity Item Find, New Pets! - version 1.6.0",
+  "openingRemarks": "The biggest update yet, both in content & infrastructure",
+  "newFeatures": [
+    {
+      "title": "Instant Battles - triggered by using items",
+      "description": "The level 3 Elementals can only be engaged by using specific items found during activities - Wave-swept Battle Conch (water), Smoldering Skull Torch (fire), Petrified Power Totem (earth), Storm Crow Bone Chimes (air). Once these items are used, you will immediately be able to battle the powerful boss elemental."
+    },
+    {
+      "title": "Activity Item Find",
+      "description": "You can now find items and photon tokens depending on how long you workout, and what activities you do. In addition to the four items already mentioned above, you can also find Health & Antidote Potions, a risky Dubious Decoy robot that self-destructs, a powerful Fire Breathing Dragon Whelp from doing fire activities, a very powerful Mystical Unicorn, and more to be added at a later date."
+    },
+    {
+      "title": "MORE Pets!",
+      "description": "As mentioned above, the robot, whelp, and unicorn can be found from activities, but 3 others have been added to the store. The Covert Chameleon, Orchid Mantis, and the Hearty Llama of Wellbeing are all available for purchase with Photon Tokens."
+    },
+    {
+      "title": "Late Game Content",
+      "description": "After reaching Level 100, Heroes become 'Ascended' and start leveling on 'Albedo' levels. Each Albedo level grants 5 'Aether' in addition to the 5 power & health. Aether has two effects - 1. Recover % of max health during activities. 2. Chance to repeat attacking turn in battle. Quantum Points can also be spent on aether."
+    },
+    {
+      "title": "Item Rewards at certain levels",
+      "description": "The infrastructure has been added to dole out rewards for reaching levels. Currently, the only reward for this is the new 'Ascended' costume and title for reaching 100."
+    },
+    {
+      "title": "Final 4 Bosses released and available for battles",
+      "description": "Since the elemental bosses are only engaged via item finds, it made sense to release them all at once. This first week, the Storm Crow Bone Chimes will have an enhanced drop rate and defeating the Storming Oni will grant bonus XP & PT. Next week will be the Hulking Aggro Crag Earth Boss, and so forth."
+    }
+  ],
+  "bugFixes": [
+    "Fixed bug where new users were not receiving their initial 5 recovery points",
+    "Fixed bug where navigating to the ranking page would cause a blank screen",
+    "Fixed bug where low level heroes were getting matched up against bosses",
+    "Fixed bug where 'Buy More Items' link wouldn't load items"
+  ],
+  "balanceChanges": [
+    "Elemental trait changes: Thorns Damage & Vampiric Touch have been nerfed. They now max out at 45% and the effectiveness curve has been adjusted accordingly",
+    "Boosted pet special ability chance for Black Cat, Octopus of Cunning, Feisty Coon, & Arizona Rattlesnake",
+    "Shade and Apparition are now a bit more difficult"
+  ],
+  "miscDetails": [
+    "Added Earth, Fire, Water, Air costume tints for defeating elemental bosses",
+    "Completely refactored code for instantiating and running battles. This is an under-the-hood change that greatly improves the maintainability of the code and allows for bulk and single battles to be ran."
+  ],
+  "closingRemarks": "This is such a loaded update, but there's one more thing... HeroFit turns 1 on the 4th of July! Compost Creature has baked us a cake to celebrate and a slice has been added to your inventory! Enjoy :)"
+} 

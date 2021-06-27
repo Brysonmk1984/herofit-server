@@ -106,6 +106,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
     }).then((result) =>{
       avatar = result[0];
       const possibleItemDrops = result[1];
+      //console.log(possibleItemDrops);
       avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
       
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
@@ -157,11 +158,11 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       // RUN FUNCTION TO CHECK FOR FOUND ITEMS
       // the last param is an array of possible items drops
       // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
-      const { items, pt } = activityItemFind(aXPDiff, lvlAfterBuff, weightedElms, null, null, possibleItemDrops);
+      const { items, pt } = activityItemFind(aXPDiff, endingUpgradeLevel, weightedElms, null, null, possibleItemDrops);
       // Items & PT found during activity
       foundItems = items;
       improvements["Photon Tokens"] = pt;
-
+      //console.log('FOUND!', foundItems);
       // Now we need to add any items acquired from activities to a user's inventory
       // And also update the avatar's PT
       const updatedAvatar = Object.assign({}, avatar, { photonTokens : avatar.photonTokens += pt, activityXP : aXP, qp: (avatar.qp + qpEarned), power : updatedPower, health : updatedHealth, aether : updatedAether, maxHealth : updatedMaxHealth, fire, earth, water, air, hasBeenUpgraded : true, status : updatedStatus });

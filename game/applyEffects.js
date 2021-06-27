@@ -136,7 +136,7 @@ function itemEffects(effects, avatarID, email){
         case 'Summon Scorching Archfiend': 
           effectPromises.push(instantiateBattle(avatarID, 'Scorching Archfiend'));  
           break;
-        case 'High Priestess of the Tides':
+        case 'Summon High Priestess of the Tides':
           effectPromises.push(instantiateBattle(avatarID, 'High Priestess of the Tides')); 
           break;
         default:

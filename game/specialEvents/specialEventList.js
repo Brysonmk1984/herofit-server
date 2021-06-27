@@ -39,8 +39,8 @@ const attackOfTheElements = {
   {
     type : 'itemFind',
     action : "Increased Likelihood Item",
-    bonusPercent : 2.0,
-    items : ['Petrified Power Totem' /*,'Wave-Swept Battle Conch', 'Smoldering Skull Torch', 'Storm Crow Bone Chimes'*/],
+    bonusPercent : 3.0,
+    items : [/*'Petrified Power Totem','Wave-Swept Battle Conch', 'Smoldering Skull Torch',*/ 'Storm Crow Bone Chimes'],
   }
 ],
 }

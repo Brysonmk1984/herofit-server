@@ -178,7 +178,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = 100;
+          fws.fire = 150;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
@@ -194,7 +194,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
-          fws.fire = 250;
+          fws.fire = 500;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
