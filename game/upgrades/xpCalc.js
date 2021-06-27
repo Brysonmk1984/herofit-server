@@ -1,4 +1,4 @@
-let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD } = require('../CONSTANTS.js');
+let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD, MAX_LEVEL } = require('../CONSTANTS.js');
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP){
@@ -12,17 +12,30 @@ function xpCalc(activityXP, battleXP){
     getNextLevel : function (levelsAway = 0){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
-      const currentLevel = xpReturn.getCurrentLevel()
-      return Math.floor(baseXP * (Math.pow(currentLevel + levelsAway, exponent))) + 1;
+      const { total } = xpReturn.getCurrentLevel();
+
+      return Math.floor(baseXP * (Math.pow(total + levelsAway, exponent))) + 1;
     },
 
-    // GIVES CURRENT LEVEL BASED ON DB VALUES
+    // GIVES CURRENT LEVEL BASED ON DB VALUES, and POSSIBLY LATE GAME LEVELS if user is over 100
     getCurrentLevel : function (){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
 
-      const currentLevel = Math.pow((tXP/baseXP),(1 / exponent));
-      return Math.floor(currentLevel) + 1;
+      const overallLevel = Math.floor(Math.pow((tXP/baseXP),(1 / exponent))+ 1);
+      let currentLevel = overallLevel;
+      let albedoLevel = 0;
+      if(overallLevel > MAX_LEVEL){
+        albedoLevel = overallLevel - MAX_LEVEL;
+        currentLevel = MAX_LEVEL;
+      }
+
+      const levelObj = { level : currentLevel, total : (currentLevel + albedoLevel) }
+      if(albedoLevel > 0){
+        levelObj.albedo = albedoLevel;
+      }
+
+      return levelObj;
     },
 
     // RETURNS THE TOTALXP, ACTIVITYXP, AND BATTLEXP OF AVATAR, from DB VALUES
@@ -34,14 +47,15 @@ function xpCalc(activityXP, battleXP){
     // as well as the xp gained from either new activites or a battle.
     checkLevelUp : function (xpGained = 0){
       //console.log('TXP at check - ', tXP, 'plus gain - ', tXP + xpGained);
-      const startingLevel = xpReturn.getCurrentLevel();
-      const endingLevel = xpReturn.currentLevelByInput(tXP + xpGained);
+      const { total : startingLevel, } = xpReturn.getCurrentLevel();
+      let { total : endingLevel } = xpReturn.currentLevelByInput(tXP + xpGained);
       //console.log('SL - ', startingLevel, 'EL - ', endingLevel);
-      const levelsGained = (endingLevel - startingLevel);console.log(levelsGained);
+      const levelsGained = (endingLevel - startingLevel);
       const leveledUp = levelsGained > 0;
       const qpEarned = (levelsGained * QP_PER_LEVEL);
+
       //console.log('XPSTUFF - ', xpGained, startingLevel, endingLevel, levelsGained, leveledUp, qpEarned);
-      return { leveledUp, levels : levelsGained, endingLevel, qpEarned };
+      return { leveledUp, levels : levelsGained, endingLevel, qpEarned, startingLevel };
     },
 
     // GIVEN NEW XP FROM ACTIVITIES OR BATTLES, CALCULATE NEW TOTAL XPs
@@ -94,13 +108,6 @@ function xpCalc(activityXP, battleXP){
       return adjRegenRate;
     },
 
-    /**** 
-     * 
-     The Methods below are MOSTLY for testing purposes, but not always. 'checkLevelUpByInput' is used on avatars.js route. The upgrade algorithim uses only the functions above,
-     which use the players XP directly from the DB as input, which is passed to 'xpCalc' directly as a parameter.
-     * 
-     ****/ 
-
     // GIVES XP REQUIRED FOR NEXT LEVEL, based on level input
     nextLevelByInput : function (level){
       const exponent = LEVEL_CURVE;
@@ -109,22 +116,33 @@ function xpCalc(activityXP, battleXP){
       return Math.floor(baseXP * (Math.pow(level, exponent))) + 1;
     },
 
-    // GIVES CURRENT LEVEL based on XP input
+    // GIVES CURRENT LEVEL based on XP input, and POSSIBLY LATE GAME LEVELS if user is over 100
     currentLevelByInput : function (xp){
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
 
       // Need to add 1 because I'm starting on level one rather than zero
-      const currentLevel = Math.pow((xp/baseXP),(1 / exponent)) + 1;
-    
-      return Math.floor(currentLevel);
+      const overallLevel = Math.floor(Math.pow((xp/baseXP),(1 / exponent)) + 1);
+      let currentLevel = overallLevel;
+      let albedoLevel = 0;
+      if(overallLevel > MAX_LEVEL){
+        albedoLevel = overallLevel - MAX_LEVEL;
+        currentLevel = MAX_LEVEL;
+      }
+
+      const levelObj = { level : currentLevel, total : (currentLevel + albedoLevel) }
+      if(albedoLevel > 0){
+        levelObj.albedo = albedoLevel;
+      }
+      
+      return levelObj;
     },
 
     // Calculate whether a user leveled up, and how many times based on XP input
     checkLevelUpByInput : function (startingXP, endingXP){
-      const level = xpReturn.currentLevelByInput(startingXP);
-      const endingLevel = xpReturn.currentLevelByInput(endingXP);
-      const levelsGained = (endingLevel - level);
+      const startingLevel = xpReturn.currentLevelByInput(startingXP).total;
+      const endingLevel = xpReturn.currentLevelByInput(endingXP).total;
+      const levelsGained = (endingLevel - startingLevel);
       const leveledUp = levelsGained > 0;
     
       return { leveledUp, levels : levelsGained };

@@ -223,9 +223,9 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     const allPromises = [];
 
     allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe', 'kayaking'], raw : true }));
-    allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true, attributes : ['id', 'activity', 'activityDate']}));
+    allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true,  limit : 10, order: [['activityDate', 'DESC']], attributes : ['id', 'activity', 'activityDate']}));
     allPromises.push(Avatar.findOne({ where: { owner: data.email }, raw : true }));
-    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true, order: [['createdAt', 'ASC']] }));
+    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true,  limit : 50, order: [['createdAt', 'DESC']] }));
     
     return Promise.allSettled(allPromises);
   }).then(([ut, act, av, bat]) =>{
@@ -240,7 +240,9 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     battles = battles.value;
     const { currentLevelByInput } = xpCalc();
     avatar = avatar.value;
-    avatar.level = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+    const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
+    avatar.level = level;
+    avatar.albedo = albedo;
 
     res.formatter.ok({userTotals, activities, avatar, battles, itemInstances });
   }).catch((error)=>{

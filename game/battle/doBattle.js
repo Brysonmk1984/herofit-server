@@ -1,6 +1,6 @@
 const chance = require('chance')();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('./CONSTANTS');
-const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns } = require('./elementalProcs');
+const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require('../CONSTANTS');
+const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineIDS } = require('./elementalProcs');
 
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage){
@@ -359,12 +359,40 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
 
 }
 
+function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound){
+  // IDS round is a bonus round for the Avatar based on Aether value
+  if(idsRound){
+    return { aggressorString : 'Avatar', aggressor : avatar, defenderString : 'Foe', defender : foe, goesFirst : 'Avatar' }
+  }
+
+  const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
+  console.log('in here1', turnIsOdd ? goesSecond : goesFirst);
+  // If the turn is odd, the second player attacks, otherwise it's the first player
+  const aggressorString = turnIsOdd ? goesSecond : goesFirst;
+  console.log('in here2',aggressorString);
+  let aggressor = aggressorString === 'Avatar' ? avatar : foe;
+  // If the turn is odd, the first player attacks, otherwise it's the second player
+  const defenderString = turnIsOdd ? goesFirst : goesSecond;
+  let defender = defenderString === 'Avatar' ? avatar : foe;
+  
+  return { aggressorString, aggressor, defenderString, defender }
+}
+
+// Interdimentional strike has a chance to repeat rounds by Avatar
+function _testForIDStrike(aggressorString, aether, nextRoundIDS, goesFirst){
+  // Round must be avatar as aggressor, av must have aether, and round must not already be an IDS round
+  if(aggressorString === 'Avatar' && aether && !nextRoundIDS){
+    return determineIDS(aether, goesFirst);
+  }
+  return { ids : false, gf : goesFirst };
+}
+
 function doBattle(avatar, foe, goesFirst){
-  console.log('AV IN BATTLE=', avatar, foe);
+  console.log('AV IN BATTLE=', avatar, 'GF=', goesFirst);
   
   //goesFirst = 'avatar';
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
-  const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
+  
   const foeIsElemental = _checkIfElemental(foe);
   const roundBreakdown = [];
 
@@ -382,6 +410,7 @@ function doBattle(avatar, foe, goesFirst){
   };
   let winnerString = null;
   let i;
+  let nextRoundIDS = false;
   
   for(i = 0; i<battleTurns.length; i++){
  
@@ -390,13 +419,11 @@ function doBattle(avatar, foe, goesFirst){
     
     // because zero-based, if the turn is odd, goesFirst actually doesn't attack, but the other player
     const turnIsOdd = battleTurns[i] % 2 === 0 ? false : true;
-    // If the turn is odd, the second player attacks, otherwise it's the first player
-    const aggressorString = turnIsOdd ? goesSecond : goesFirst;
-    const aggressor = aggressorString === 'Avatar' ? avatar : foe;
+    const { aggressorString, aggressor, defenderString, defender } = _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, nextRoundIDS);
+    
+    // LATE GAME ELEMENTAL TRAIT - Determine if IDS round, if so, set variable to flag it for next round and change whoGoes first in order to reverse the turn order
+    ({ ids : nextRoundIDS, gf : goesFirst } = _testForIDStrike(aggressorString, avatar.aether, nextRoundIDS, goesFirst));
 
-    // If the turn is odd, the first player attacks, otherwise it's the second player
-    const defenderString = turnIsOdd ? goesFirst : goesSecond;
-    const defender = defenderString === 'Avatar' ? avatar : foe;
 
     // Compute battle turn and add results to total
     const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt,  physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
@@ -449,7 +476,7 @@ function doBattle(avatar, foe, goesFirst){
   // }));
 
   const outcomeData = _determineOutcome(winnerString); 
-
+  //console.log('RB=', roundBreakdown, outcomeData);
   const results = {
     aElmDamage : grandTotals.aElmDamage,
     fElmReduction : grandTotals.fElmReduction,

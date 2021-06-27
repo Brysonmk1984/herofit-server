@@ -25,10 +25,10 @@ const RESTED_THRESHOLD = 1;
 const BATTLE_SCENARIOS = [{
   id : 0,
   description : "Avatar attacked unprepared foe",
-  avatarPowerMod : .075,
+  avatarPowerMod : .05,
   avatarHealthMod : 0,
   foePowerMod : 0,
-  foeHealthMod : -.075,
+  foeHealthMod : -.05,
 },{
   id : 1,
   description : "Avatar attacked defending foe",
@@ -47,8 +47,8 @@ const BATTLE_SCENARIOS = [{
   id : 3,
   description : "Foe attacked unprepared avatar",
   avatarPowerMod : 0,
-  avatarHealthMod : -.075,
-  foePowerMod : .075,
+  avatarHealthMod : -.05,
+  foePowerMod : .05,
   foeHealthMod : 0,
 },{
   id : 4,
@@ -70,9 +70,9 @@ const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  HEALTH : .80,
+  HEALTH : .85,
   QP : 1,
-  POWER : .80
+  POWER : .85
 };
 
 
@@ -115,20 +115,27 @@ const FIRE_CRIT_CHANCE_MOD = 1650;
 const WATER_HEAL_MOD = 5040;
 const AIR_EVASION_CHANCE_MOD = 6000;
 const EARTH_THORNS_MOD = 5500;
+const AETHER_IDS_CHANCE_MOD = 1650;
 
 // MUST MAKE GAME EASIER FOR BEGINNERS AND MORE DIFFICULT FOR VETERANS
 const BEGINNERS_LUCK_MAX_XP = 2587; // Level 15
-const BEGINNERS_LUCK_LIKELIHOOD = 75;
+const BEGINNERS_LUCK_LIKELIHOOD = 66;
 const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 
 // Applies to mid level +
 const LEVEL_DIFFICULTY_MOD = 1.29;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.25;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.35;
 
-// ITEM FIND DURING ACTIVITIES
-const ELM_LEVEL_3_REQ = 30;
+// Photon Token find
+const PTFIND_BASE_DROP_RATE = 33;
+const PTFIND_BASE_AMOUNT = 15;
+// higher is more effective
+const PTFIND_EFFECTIVENESS_MOD = 45;
+
+// MAX LEVEL
+const MAX_LEVEL = 100;
 
 module.exports = { 
   LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, 
@@ -138,7 +145,7 @@ module.exports = {
   FOE_NON_ACTION, AVATAR_NON_ACTION,
   FOE_MOD, OUTCOME_XP, FOE_DIFFICULTY_XP_MOD_FACTOR,BXP_LEVEL_CURVE, BONUS_XP_EXPONENT, PT_EXPONENT,
   REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD,
-  ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE, FIRE_CRIT_CHANCE_MOD, AIR_EVASION_CHANCE_MOD, WATER_HEAL_MOD, EARTH_THORNS_MOD,
+  ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE, FIRE_CRIT_CHANCE_MOD, AIR_EVASION_CHANCE_MOD, WATER_HEAL_MOD, EARTH_THORNS_MOD, AETHER_IDS_CHANCE_MOD,
   BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD,
-  ELM_LEVEL_3_REQ
+  PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD, MAX_LEVEL
 };

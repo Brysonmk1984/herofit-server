@@ -115,7 +115,7 @@ const AvatarModel = function(db, DataTypes){
         scale : 2,
         allowNull: false,
         defaultValue: 0,
-        },
+      },
       qpFire: {
         type: DataTypes.INTEGER,
         allowNull: false,

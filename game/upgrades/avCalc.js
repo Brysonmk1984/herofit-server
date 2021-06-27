@@ -1,4 +1,4 @@
-const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES } = require('../CONSTANTS');
+const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } = require('../CONSTANTS');
 const moment = require('moment');
 const { cloneObj, adjustActivityMinutes } = require('../../lib/helperFunctions');
 const avatarList = require('../../heroList.json');
@@ -12,10 +12,40 @@ function avCalc(userTotals){
       const totalPower = ((level-1) * 5) + qpPower + BASE_POWER;
       return totalPower;
     },
-    updateHealth : function(level, qpHealth){
-      // 5 Power per level, plus base, plus how much QP has been spent
-      const totalHealth = ((level-1) * 5) + qpHealth + BASE_HEALTH;
-      return totalHealth;
+    updateAether : function(totalLevel, qpAether){
+      const albedoLevel = totalLevel - MAX_LEVEL;
+      // 5 Aether per level per Albedo level, plus how much QP has been spent
+      // Don't need to -1 here since we're not starting at zero, but continuing on after 100
+      const totalAether = ((albedoLevel) * 5) + qpAether;
+      return totalAether;
+    },
+    updateHealth : function(level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp){
+      let updatedHealth = oldHealth;
+      let updatedMaxHealth = oldMaxHealth;
+
+      if(lvlUp){
+        // 5 Power per level, plus base, plus how much QP has been spent
+        updatedMaxHealth = ((level-1) * 5) + qpHealth + BASE_HEALTH;
+
+        switch(oldStatus){
+          case 'Knocked Out':
+            updatedHealth = 1;
+            break;
+          case 'Infected':
+            updatedHealth = oldHealth;
+            break;
+          case 'Recovering':
+            updatedHealth = updatedMaxHealth;
+            break;
+          default:
+            break;
+        }
+      }
+
+      return {
+        updatedHealth,
+        updatedMaxHealth
+      };
     },
     updateElements : function(character, qpSpent, dateOfCreation){
 
@@ -81,6 +111,22 @@ function avCalc(userTotals){
       }
       //console.log('combined, updated elms - ', updatedElms);
       return updatedElms;
+    },
+    updateStatus : function(oldStatus, lvlUp){
+      if(lvlUp){
+        switch(oldStatus){
+          case 'Knocked Out':
+            return 'Recovering';
+          case 'Infected':
+            return 'Recovering';
+          case 'Recovering':
+            return 'Rested';
+          default:
+            return oldStatus;
+        }
+      }
+      
+      return oldStatus;
     },
     
     // ADDS 5 TO WHICHEVER ELEMENT OF THE SIGN OF THE SEASON WHEN ACCOUNT WAS CREATED

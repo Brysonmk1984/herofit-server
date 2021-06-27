@@ -36,7 +36,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
     const isValid = validatePassword(password, user.hash, user.salt);
     if(isValid){
       const tokenObject = issueJWT(user);
-      console.log(tokenObject);
+      //console.log(tokenObject);
       return res.formatter.ok({ user, tokenObject });
     }else{
       return res.formatter.unauthorized(`Incorrect password, please try again.`);
@@ -59,12 +59,14 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
-  const { email, username, password, firstName, lastName } = req.body;
+  let { email, username, password, firstName, lastName } = req.body;
+  fistName = firstName || null;
+  lastName = lastName || null;
 
   const saltHash = genPassword(password);
   const { salt, hash } = saltHash;
   const emailCode =  randomEmailString();
-  console.log(emailCode);
+  //console.log(emailCode);
   const newUser = { 
     email,
     username,
@@ -88,7 +90,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     }
     sendVerificationEmail(email, emailCode)
     .then((data) =>{
-      console.log(data);
+      //console.log(data);
       if(data.error){
         return res.formatter.serverError(error.toString());
       }
@@ -121,12 +123,12 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), (req, res)
 
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
   .then((result) =>{
-    console.log('DB email result = ', result);
+    //console.log('DB email result = ', result);
     if(result){
       const token = usePasswordHashToMakeToken(result);
       sendResetPasswordEmail(email, token)
       .then((result) =>{
-        console.log(result);
+        //console.log(result);
         return res.formatter.ok({ result });
       }).catch((error) =>{
         console.log('Error', error);
@@ -197,15 +199,13 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
   }
   
   const { email, emailCode } = req.body;
-  console.log(email, emailCode);
+  //console.log(email, emailCode);
   sendVerificationEmail(email, emailCode)
   .then((data) => {
-    console.log(data);
     if(data.error){
       return res.formatter.serverError(error.toString());
     }
 
-    console.log('sending OK RESPONSE');
     return res.formatter.ok({});
   }).catch((error) => {
     console.log('THE ERROR', error);
@@ -246,7 +246,6 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
     return res.formatter.badRequest(errors.array(), "Validation Error - for /strava-credentials");
   }
 
-  console.log('!!! headers sent to strava-credentials', req.headers, req.headers.authorization);
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
   User.findOne({ where: { email } })
   .then((user) =>{
