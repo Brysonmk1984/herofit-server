@@ -136,13 +136,13 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       // Calc gains here to be displayed on frontend
       improvements = {
         power : updatedPower - avStatSnapshot.power,
-        health : avatar.maxHealth - avStatSnapshot.maxHealth,
+        "max health" : updatedMaxHealth - avStatSnapshot.maxHealth,
+        health : updatedHealth - avStatSnapshot.health,
         air : Number((air - avStatSnapshot.air).toFixed(2)),
         water : Number((water - avStatSnapshot.water).toFixed(2)),
         fire : Number((fire - avStatSnapshot.fire).toFixed(2)),
         earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
         aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
-        health : updatedHealth - avStatSnapshot.health
       };
 
       // Needed for activity-specific items

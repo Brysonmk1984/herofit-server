@@ -423,7 +423,8 @@
       "reward" : {
         "type" : "skin",
         "name" : "Air Tint"
-      }
+      },
+      "itemSummon" : "Storm Crow Bone Chimes"
     },
     {
       "class" : "Elementals",
@@ -441,7 +442,8 @@
       "reward" : {
         "type" : "skin",
         "name" : "Earth Tint"
-      }
+      },
+      "itemSummon" : "Petrified Power Totem"
     },
     {
       "class" : "Elementals",
@@ -459,7 +461,8 @@
       "reward" : {
         "type" : "skin",
         "name" : "Fire Tint"
-      }
+      },
+      "itemSummon" : "Smoldering Skull Torch"
     },
     {
       "class" : "Elementals",
@@ -477,7 +480,8 @@
       "reward" : {
         "type" : "skin",
         "name" : "Water Tint"
-      }
+      },
+      "itemSummon" : "Wave-Swept Battle Conch"
     }
   ]
 }
