@@ -69,7 +69,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         break;
       case "Ill Omen":
         const isNegativeScenario = scenario === 1 || scenario === 3 ? true : false;
-        const isHigherDifficulty = foe.difficulty >= .07 || foe.class === 'titan' || foe.type === "Shadow Self";
+        const isHigherDifficulty = foe.difficulty >= .07 || foe.class === 'titan' || foe.type === "Shadow Self" || foe.type === "High Priestess of the Tides" || foe.type === "Scorching Archfiend" || foe.type === "Hulking Aggro Crag" || foe.type === "Storming Oni";
 
         let illOmenProc = false;
         if(isNegativeScenario && isHigherDifficulty){
