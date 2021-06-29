@@ -12,5 +12,37 @@
     "itemCategory": "titles",
     "type" : "levelReward",
     "requiredLevel" : 100
+  },
+  {
+    "action" : "Grant Fire Brand",
+    "name" : "Fire Brand",
+    "itemCategory": "skins",
+    "type" : "statAward",
+    "stat" : "fire",
+    "requiredAmount" : 500
+  },
+  {
+    "action" : "Grant Earth Shaker",
+    "name" : "Earth Shaker",
+    "itemCategory": "skins",
+    "type" : "statAward",
+    "stat" : "earth",
+    "requiredAmount" : 500
+  },
+  {
+    "action" : "Grant Tide Caller",
+    "name" : "Tide Caller",
+    "itemCategory": "skins",
+    "type" : "statAward",
+    "stat" : "water",
+    "requiredAmount" : 500
+  },
+  {
+    "action" : "Grant Gale Force",
+    "name" : "Gale Force",
+    "itemCategory": "skins",
+    "type" : "statAward",
+    "stat" : "air",
+    "requiredAmount" : 500
   }
 ]

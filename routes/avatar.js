@@ -11,7 +11,7 @@ const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const  { activityItemFind } = require('../game/activityItemFind');
-const activityRewards = require('../game/activities/activityRewards');
+const { activityStatRewards, activityLevelRewards } = require('../game/activities/activityRewards');
 const activityHeal = require('../game/activities/activityHeal');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
@@ -144,7 +144,6 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
         aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
       };
-      console.log('AVHEALTH', avStatSnapshot.health, updatedHealth);
       // Needed for activity-specific items
       const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
       const weightedElms = {
@@ -223,7 +222,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
           const levelsToCheck = range(startingUpgradeLevel, endingUpgradeLevel);
           // Rewards for reaching levels, etc...
           allItemPromises.push(
-            activityRewards(avatar.id, levelsToCheck, t)
+            activityLevelRewards(avatar.id, levelsToCheck, t)
             .then((rewards) =>{
               if(rewards){
                 console.log('REWARDS!', rewards);
@@ -234,6 +233,25 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
             })
           );
         }
+
+        // if(endingUpgradeLevel > startingUpgradeLevel){
+        //   const statObj = { fire : avatar.fire, air : avatar.air, water : avatar.water, earth : avatar.earth };
+        //   avStatSnapshot
+        //   // Rewards for reaching levels, etc...
+        //   allItemPromises.push(
+        //     activityStatRewards(avatar.id, statObj, t)
+        //     .then((rewards) =>{
+        //       if(rewards){
+        //         console.log('REWARDS!', rewards);
+        //         returnPackage.rewards = rewards;
+        //       }
+        //     }).catch((error) => {
+        //       console.log('ERROR in activityRewards', error);
+        //     })
+        //   );
+        // }
+
+
 
         return Promise.all(allItemPromises)
       });
