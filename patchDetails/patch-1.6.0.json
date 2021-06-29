@@ -20,8 +20,8 @@
       "description": "After reaching Level 100, Heroes become 'Ascended' and start leveling on 'Albedo' levels. Each Albedo level grants 5 'Aether' in addition to the 5 power & health. Aether has two effects - 1. Recover % of max health during activities. 2. Chance to repeat attacking turn in battle. Quantum Points can also be spent on aether."
     },
     {
-      "title": "Item Rewards at certain levels",
-      "description": "The infrastructure has been added to dole out rewards for reaching levels. Currently, the only reward for this is the new 'Ascended' costume and title for reaching 100."
+      "title": "Item Rewards on Level Up",
+      "description": "Aside from finding items during workouts, the infrastructure has been added to dole out rewards for reaching levels or other milemarkers. Currently, the new awards are the 'Ascended' costume and title for reaching 100, and the epic elemental costumes for reaching 500 in each element."
     },
     {
       "title": "Final 4 Bosses released and available for battles",

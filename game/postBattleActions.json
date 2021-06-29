@@ -215,6 +215,15 @@
       "type" : "Award Title",
       "itemCategory": "titles",
       "outcome" : ["Avatar Wins"]
+    },
+    {
+      "itemID" : 97,
+      "requirement" : 50,
+      "action" : "Grant Win Streak 50",
+      "name" : "The Mythical",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : ["Avatar Wins"]
     }
   ],
 
