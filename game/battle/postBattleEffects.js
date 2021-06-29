@@ -1,10 +1,13 @@
 const chance = require('chance')();
 
-function postBattleEffects(a, f, outcomeData, effects=[]){
+function postBattleEffects(a, f, outcomeData, effects){
   let avatar = { ...a };
   let foe = { ...f };
   let outcomeStatus = outcomeData.outcome;
-  const postBattleEffects = effects.filter(effect => effect.type === 'postbattle');
+  let postBattleEffects = [];
+  if(effects && effects.length){
+    postBattleEffects = effects.filter(effect => effect.type === 'postbattle');
+  }
 
   // FOE POSTBATTLE ABILITIES
   if(f.ability.type === 'postbattle'){
