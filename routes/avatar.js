@@ -144,7 +144,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
         earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
         aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
       };
-
+      console.log('AVHEALTH', avStatSnapshot.health, updatedHealth);
       // Needed for activity-specific items
       const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
       const weightedElms = {

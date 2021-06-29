@@ -8,7 +8,6 @@ function activityHeal(health, maxHealth, aether, xpGain){
   const activityHealSessions = xpGain / 60;
   const modifiedHealPercent = (healPercent * activityHealSessions) * .01;
   let adjustedHealth = health + (maxHealth * modifiedHealPercent); 
-
   if(adjustedHealth > maxHealth){
     adjustedHealth = maxHealth;
   }

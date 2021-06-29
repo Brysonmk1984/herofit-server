@@ -121,7 +121,7 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-user-activities Endpoint");
   }
   const { email, activities } = req.body;
-  console.log('ALL PASSED ACTS - ', activities);
+  //console.log('ALL PASSED ACTS - ', activities);
 
   // In case the activities are invalid... this should eventually be moved to the validation middleware.
   if(!activities[0].id){
@@ -153,10 +153,24 @@ router.post('/insert-user-activities', body('email').isEmail(), body('activities
       return entry.activityId
     });
     // Front end is determining which activities are new, so everything passed here can be added to db.
-    //UserActivity.bulkCreate(entries, { ignoreDuplicates: true })
-    UserActivity.bulkCreate(entries)
+    UserActivity.bulkCreate(entries, { ignoreDuplicates: true, returning : true })
+    //UserActivity.bulkCreate(entries)
     .then((result) =>{
-      res.formatter.ok({ activities : activities });
+      // Fetch all recent activities again because I'm not sure how to return activities from a bulk insert where some don't insert
+      return UserActivity.findAll({ where: { user: email }, raw: true, limit : 30, order:[["activityDate", 'DESC']],
+        attributes : ['id', 'activity', 'activityDate']
+      });
+    }).then((results) =>{
+      //console.log('THE RESULTS!', results.length);
+      if(results.length){
+        const activities = results.map((result, i) =>{
+          return result.activity;
+        });
+
+        res.formatter.ok({ activities });
+      }else{
+        res.formatter.serverError("Something went wrong with retrieving activities after bulkInsert");
+      }
     }).catch((error)=>{
       const actIdMap = entries.map((entry) =>{
         return entry.activityId

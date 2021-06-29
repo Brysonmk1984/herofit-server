@@ -13,6 +13,9 @@ function avCalc(userTotals){
       return totalPower;
     },
     updateAether : function(totalLevel, qpAether){
+      if(totalLevel <= MAX_LEVEL){
+        return 0;
+      }
       const albedoLevel = totalLevel - MAX_LEVEL;
       // 5 Aether per level per Albedo level, plus how much QP has been spent
       // Don't need to -1 here since we're not starting at zero, but continuing on after 100
