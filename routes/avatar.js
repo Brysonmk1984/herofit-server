@@ -11,7 +11,7 @@ const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const  { activityItemFind } = require('../game/activityItemFind');
-const { activityStatRewards, activityLevelRewards } = require('../game/activities/activityRewards');
+const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
 const activityHeal = require('../game/activities/activityHeal');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
@@ -107,8 +107,8 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
       avatar = result[0];
       const possibleItemDrops = result[1];
       //console.log(possibleItemDrops);
-      avStatSnapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
-      
+      const snapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
+      avStatSnapshot = parseAvatarProperties(snapshot);
       const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
     
@@ -234,28 +234,28 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
           );
         }
 
-        // if(endingUpgradeLevel > startingUpgradeLevel){
-        //   const statObj = { fire : avatar.fire, air : avatar.air, water : avatar.water, earth : avatar.earth };
-        //   avStatSnapshot
-        //   // Rewards for reaching levels, etc...
-        //   allItemPromises.push(
-        //     activityStatRewards(avatar.id, statObj, t)
-        //     .then((rewards) =>{
-        //       if(rewards){
-        //         console.log('REWARDS!', rewards);
-        //         returnPackage.rewards = rewards;
-        //       }
-        //     }).catch((error) => {
-        //       console.log('ERROR in activityRewards', error);
-        //     })
-        //   );
-        // }
+        const statObjForUpgrade = determineStatImprovements(improvements, avStatSnapshot)
 
+        // Rewards for reaching levels, etc...
+        allItemPromises.push(
+          activityStatRewards(avatar.id, statObjForUpgrade, t)
+          .then((rewards) =>{
+            if(rewards){
+              returnPackage.rewards = rewards;
+            }
+          }).catch((error) => {
+            console.log('ERROR in activityRewards');
+            throw error;
+          })
+        );
 
-
-        return Promise.all(allItemPromises)
+        return Promise.all(allItemPromises, t)
+      }).catch((error) =>{
+        console.log('all promise error with items');
+        throw error;
       });
     }).then((result) =>{
+      console.log('FINAL RES', result, returnPackage);
       // Transaction has been committed
       // result is whatever the result of the promise chain returned to the transaction callback
       return res.formatter.ok(returnPackage);

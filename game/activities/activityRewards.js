@@ -1,7 +1,9 @@
 //const { Avatar, AvatarItems, User, UserTotal, Items } = require('../../config/db');
 const { Op } = require("sequelize");
 const { Items, AvatarItems } = require('../../config/db');
+const { range } = require('../../lib/helperFunctions');
 const upgradeActions = require('./upgradeHeroActions.json');
+
 
 function _insertLevelRewards(avatarID, levelsEarned, t){
   // Filter all possible rewards down to just the ones that match the type 'levelReward' AND are of one of the levels passed in the levelsEarned array 
@@ -29,7 +31,7 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
         });
       });
       
-      console.log('AWARDS TO DISPLAY:', rewards);
+      //console.log('AWARDS TO DISPLAY:', rewards);
       return rewards.length ? rewards : null;
     }).catch((error) => {
       console.log('ERROR WITH CREATING AVATARITEMS', error);
@@ -44,15 +46,19 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
 }
 
 function _insertStatRewards(avatarID, statObj, t){
+
   const levelRewardNames = [];
   for(let stat in statObj){
-    const matchingStatInUpgradeActions = upgradeActions.filter(action => action.stat === stat);
-    const matchingToValue = matchingStatInUpgradeActions.filter(action => action.requiredAmount === statObj[stat]);
-    const rewardNames = matchingToValue.map(reward => reward.name);
-    levelRewardNames.push(rewardNames);
+    // For each stat, find the matching Upgrade Actions for each point the hero achieved
+    const matchingActions = statObj[stat].map(statPoint => {
+      return upgradeActions.filter(action => action.stat === stat).find(action => action.requiredAmount === statPoint)
+    }).filter(Boolean);
+    const rewardNames = matchingActions.map(reward => reward.name);
+    levelRewardNames.push(...rewardNames);
   }
-  console.log('LRN = ', levelRewardNames);
+
   
+
   return Items.findAll({
     attributes : { id : avatarID },
     where : { name : {[Op.in] : levelRewardNames} },
@@ -73,8 +79,7 @@ function _insertStatRewards(avatarID, statObj, t){
           description : item.description
         });
       });
-      
-      console.log('AWARDS TO DISPLAY:', rewards);
+
       return rewards.length ? rewards : null;
     }).catch((error) => {
       console.log('ERROR WITH CREATING AVATARITEMS', error);
@@ -86,6 +91,19 @@ function _insertStatRewards(avatarID, statObj, t){
   });
 
 
+}
+
+function determineStatImprovements(improvements, snapshot){
+  const statObj = { fire : [], earth : [], water : [], air : [] };
+  const statsToCheck = ['fire', 'earth', 'water', 'air'];
+
+  for(stat in improvements){
+    if(statsToCheck.includes(stat) && improvements[stat] > 0){
+      statObj[stat] = range(Math.floor(snapshot[stat] + 1), Math.floor(snapshot[stat] + improvements[stat]));
+    }
+  }
+
+  return statObj;
 }
 
 function activityLevelRewards(avatarID, levelsEarned, t){
@@ -108,4 +126,4 @@ function activityStatRewards(avatarID, statObj, t){
   });
 };
 
-module.exports = { activityLevelRewards, activityStatRewards};
+module.exports = { activityLevelRewards, activityStatRewards, determineStatImprovements };
