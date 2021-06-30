@@ -424,6 +424,7 @@
         "type" : "skin",
         "name" : "Air Tint"
       },
+      "itemSummonOnly" : true,
       "itemSummon" : "Storm Crow Bone Chimes"
     },
     {
@@ -443,6 +444,7 @@
         "type" : "skin",
         "name" : "Earth Tint"
       },
+      "itemSummonOnly" : true,
       "itemSummon" : "Petrified Power Totem"
     },
     {
@@ -462,6 +464,7 @@
         "type" : "skin",
         "name" : "Fire Tint"
       },
+      "itemSummonOnly" : true,
       "itemSummon" : "Smoldering Skull Torch"
     },
     {
@@ -481,6 +484,7 @@
         "type" : "skin",
         "name" : "Water Tint"
       },
+      "itemSummonOnly" : true,
       "itemSummon" : "Wave-Swept Battle Conch"
     }
   ]
