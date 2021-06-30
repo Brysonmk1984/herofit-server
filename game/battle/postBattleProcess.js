@@ -47,10 +47,10 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
     updateAvatarByLevelUp : () => {
       // Use initial avatar values
       const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
-      // Check if level up from xp gain, adjust qp
+      // Check if level up from xp gain, adjust qp, maxHealth, power
       const leveledUpResults = checkLevelUp(xpGain);
       leveledUp = leveledUpResults.leveledUp;
-      a = Object.assign({}, a, { qp : avatar.qp + leveledUpResults.qpEarned });
+      a = Object.assign({}, a, { qp : avatar.qp + leveledUpResults.qpEarned, maxHealth : avatar.maxHealth += 5, power : avatar.power += 5 });
     },
     doAllPbas : (postBattleActions) => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);
