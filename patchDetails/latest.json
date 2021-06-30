@@ -44,7 +44,8 @@
     "Completely refactored code for instantiating and running battles. This is an under-the-hood change that greatly improves the maintainability of the code and allows for bulk and single battles to be ran.",
     "Updated the Shadow-Self costumes do be more distinct and interesting!",
     "New Item Wiki Page accessible through the sidebar menu",
-    "Added 50 Win Streak Title to the game"
+    "Added 50 Win Streak Title to the game",
+    "Battle Time moved 2 hours later (2AM MST, 10AM CET) to better accommodate our European friends."
   ],
   "closingRemarks": "This is such a loaded update, but there's one more thing... HeroFit turns 1 on the 4th of July! Compost Creature has baked us a cake to celebrate and a slice has been added to your inventory! Enjoy :)"
 } 
