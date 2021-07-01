@@ -19,10 +19,7 @@
     "testPathIgnorePatterns": [
       "./__tests__/databaseForTests.setup.js",
       "./__tests__/nullOrAny.setup.js",
-      "./__tests__/itemFind",
-      "./__tests__/battles/manyBattles.test.js",
-      "./__tests__/battles/postBattleEffects.test.js",
-      "./__tests__/battles"
+      "./__tests__/itemFind"
     ]
   },
   "author": "Bryson Kruk",

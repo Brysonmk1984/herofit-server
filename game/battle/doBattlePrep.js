@@ -114,8 +114,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         }
         break;
       case 'Frisky Mischief':
-        const friskyProc = chance.bool({ likelihood: 66 });
-        if(friskyProc){
+        //const friskyProc = chance.bool({ likelihood: 75 });
+        //if(friskyProc){
           const possibleStats = ['power','armor','health','water','air','fire','earth'];
           const mappedToOb = possibleStats.filter(stat => avatar[stat] > 0).map(stat => {
             return { [stat] : avatar[stat] || 0 }
@@ -125,25 +125,32 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
           const lowestAvVal = mappedToOb.reduce((m, k)=> {
             return Math.min(m,avatar[Object.keys(k)[0]]);
           }, Infinity);
-
+          
           // Finds the property of that value
-          const avStatObj = mappedToOb.find(obj => {
+          let avStatObj = mappedToOb.find(obj => {
+            console.log('look', Object.keys(obj), Object.keys(obj)[0]);
             const currentKey = Object.keys(obj)[0];
             if(obj[currentKey] === lowestAvVal){
+              console.log('in lowest match', lowestAvVal);
               return Object.keys(lowestAvVal);
             }
           });
-
+          
+          // Can't figure out why 
+          if(!avStatObj){
+            console.log('avStatObj is undefined or null for some reason', avStatObj);
+            break;
+          }
+          // THIS IS WHERE IT FAILED (BELOW)
           const avStat = Object.keys(avStatObj)[0];
           const avStatValue = Object.values(avStatObj)[0];
           const foeStatVal = foe[avStat];
-
           if(foeStatVal > avStatValue){
             eAvatar[avStat] = foeStatVal;
             eFoe[avStat] = lowestAvVal;
           }
 
-        }          
+        //}          
         break;
         default:
         break;
