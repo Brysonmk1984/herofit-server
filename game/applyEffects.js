@@ -8,7 +8,6 @@ const instantiateBattle = require('./instantiateBattle');
 // Retrocausal Capsule
 function resetHero(avatarID, email){
   let userTotals;
-  
   // GET USER TOTALS
   return UserTotal.findOne(
     { where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true }
@@ -16,10 +15,10 @@ function resetHero(avatarID, email){
     userTotals = ut;
     // GET AVATAR
     return Avatar.findOne({
-      attributes : ['health','activityXP', 'battleXP', 'character', 'createdAt', 'owner'],
+      attributes : ['health', 'maxHealth', 'activityXP', 'battleXP', 'character', 'createdAt', 'owner'],
       where : { id : avatarID }
     });
-  }).then(({ health, activityXP, battleXP, character, createdAt }) =>{
+  }).then(({ health, maxHealth, activityXP, battleXP, character, createdAt }) =>{
     const { getCurrentLevel } = xpCalc(activityXP, battleXP);
     const { total : heroLevel } = getCurrentLevel();
 
@@ -27,13 +26,12 @@ function resetHero(avatarID, email){
     const { updatePower, updateHealth, updateElements } = avCalc(userTotals);  
     const { fire, earth, water, air } = updateElements(character, { qpFire : 0, qpEarth : 0, qpWater : 0, qpAir : 0 }, createdAt);
     const power = updatePower(heroLevel, 0);
-    const maxHealth = updateHealth(heroLevel, 0);
+    const { updatedMaxHealth, updatedHealth} = updateHealth(heroLevel, 0, health, maxHealth, 'rested', false, true);
 
-    return { power, health, maxHealth,  fire, earth, water, air, heroLevel };
+    return { power, health : updatedHealth, maxHealth : updatedMaxHealth,  fire, earth, water, air, heroLevel };
   }).then(({ power, health, maxHealth,  fire, earth, water, air, heroLevel }) =>{
     const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
-
-    
+    console.log('THE GS', theGoods);
     const updatedAttributes = {
       /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */
       /* +5 Signup bonus, +5 Strava Bonus */

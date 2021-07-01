@@ -22,7 +22,7 @@ function avCalc(userTotals){
       const totalAether = ((albedoLevel) * 5) + qpAether;
       return totalAether;
     },
-    updateHealth : function(level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp){
+    updateHealth : function(level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp, reset){
       let updatedHealth = oldHealth;
       let updatedMaxHealth = oldMaxHealth;
 
@@ -43,6 +43,10 @@ function avCalc(userTotals){
           default:
             break;
         }
+      }else if(reset){
+        // Qp health will always be zero on reset
+        updatedMaxHealth = ((level-1) * 5) + BASE_HEALTH;
+        updatedHealth = updatedMaxHealth;
       }
 
       return {

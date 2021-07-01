@@ -311,7 +311,6 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
   }
 
   const { id, email, avatarID, effects } = req.body;
-  console.log('EFFECTSS', effects);
   itemEffects(effects, avatarID, email)
   .then((data) =>{
     if(data.error){
