@@ -9,7 +9,8 @@ const postBattleProcess = require('./postBattleProcess');
 
 function battleProcess(battleInstance, avatarInstance){
   const battle = Object.assign({}, battleInstance);
-  const avatar = Object.assign({}, avatarInstance);
+  let avatar = Object.assign({}, avatarInstance);
+
   //console.log('BATTLE', battle.id, 'avatar ID', avatar.id);
   const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 

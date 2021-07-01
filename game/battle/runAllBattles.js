@@ -1,6 +1,6 @@
 const { Avatar } = require('../../config/db');
 const { Op } = require("sequelize");
-const { arrayChunker, roundNumber } = require('../../lib/helperFunctions');
+const { arrayChunker, roundNumber, parseAvatarProperties } = require('../../lib/helperFunctions');
 const battleProcess = require('./battleProcess');
 const { sendBattleReportEmail } = require('../../mail');
 
@@ -20,7 +20,7 @@ function _runBattlesOnBatch(shard, shardIndex){
 
     let battlePromises = []
     for(let i=0; i< shard.length; i++){
-      battlePromises.push(battleProcess(shard[i], avatars[i]));
+      battlePromises.push(battleProcess(shard[i], parseAvatarProperties(avatars[i])));
     }
     return Promise.allSettled(battlePromises);
   }).catch((error) =>{

@@ -366,10 +366,8 @@ function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound
   }
 
   const goesSecond = goesFirst === 'Avatar' ? 'Foe' : 'Avatar';
-  console.log('in here1', turnIsOdd ? goesSecond : goesFirst);
   // If the turn is odd, the second player attacks, otherwise it's the first player
   const aggressorString = turnIsOdd ? goesSecond : goesFirst;
-  console.log('in here2',aggressorString);
   let aggressor = aggressorString === 'Avatar' ? avatar : foe;
   // If the turn is odd, the first player attacks, otherwise it's the second player
   const defenderString = turnIsOdd ? goesFirst : goesSecond;
@@ -388,7 +386,7 @@ function _testForIDStrike(aggressorString, aether, nextRoundIDS, goesFirst){
 }
 
 function doBattle(avatar, foe, goesFirst){
-  console.log('AV IN BATTLE=', avatar, 'GF=', goesFirst);
+  console.log('AV IN BATTLE=', avatar.name, 'GF=', goesFirst);
   
   //goesFirst = 'avatar';
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
