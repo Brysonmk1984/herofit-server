@@ -19,6 +19,8 @@ function insertBattle(avatar, foe){
         avatarID: avatar.id,
         avatarName: avatar.name,
         foe,
+        foeType: foe.type,
+        avatar,
         outcome: "TBD",
         seenReport : false,
     };

@@ -1,6 +1,6 @@
 {
   "name": "stravat-cognito",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
@@ -19,7 +19,10 @@
     "testPathIgnorePatterns": [
       "./__tests__/databaseForTests.setup.js",
       "./__tests__/nullOrAny.setup.js",
-      "./__tests__/itemFind"
+      "./__tests__/itemFind",
+      "./__tests__/itemRewards",
+      "./__tests__/battles/postBattleEffects.test.js"
+
     ]
   },
   "author": "Bryson Kruk",

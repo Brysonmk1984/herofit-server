@@ -65,6 +65,10 @@ const BattleModel = function(db, DataTypes){
       type : DataTypes.JSONB,
       allowNull: true
     },
+    foeType : {
+      type : DataTypes.STRING,
+      allowNull: true
+    },
     bra : {
       type : DataTypes.JSONB,
       allowNull: true

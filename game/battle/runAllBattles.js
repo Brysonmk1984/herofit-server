@@ -6,27 +6,19 @@ const { sendBattleReportEmail } = require('../../mail');
 
 // Takes a group of bandles and runs them through the universal battleProcess
 function _runBattlesOnBatch(shard, shardIndex){
-  const allAvatarIds = shard.map(battle => battle.avatarID);
- 
-  return Avatar.findAll({
-    where : { id : { [Op.in] : allAvatarIds }},
-    raw : true,
-    attributes: ['id','name','character', 'qp', 'health','power','armor','fire','air','water','earth','status', 'activityXP', 'battleXP', 'battleWins','battleLosses','battleDraws', 'battleDkos', 'photonTokens']
-  }).then((avatars) =>{
-    // Reorder of avatars is the same as the shard's order
-    avatars.sort((a, b) => {  
-      return allAvatarIds.indexOf(a.id) - allAvatarIds.indexOf(b.id);
-    });
+  const allAvatars = shard.map(battle => battle.avatar);
+  console.log('THE BATTLES', shard);
 
-    let battlePromises = []
-    for(let i=0; i< shard.length; i++){
-      battlePromises.push(battleProcess(shard[i], parseAvatarProperties(avatars[i])));
-    }
-    return Promise.allSettled(battlePromises);
-  }).catch((error) =>{
-    console.log('ERROR RUNNING battlePromises', error);
-    return error;
-  });
+  // Reorder of avatars is the same as the shard's order
+  // avatars.sort((a, b) => {  
+  //   return allAvatarIds.indexOf(a.id) - allAvatarIds.indexOf(b.id);
+  // });
+
+  let battlePromises = []
+  for(let i=0; i< shard.length; i++){
+    battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
+  }
+  return Promise.allSettled(battlePromises);
 
 }
 

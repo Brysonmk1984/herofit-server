@@ -265,25 +265,26 @@ router.post('/fetch-battles-won-or-dko', body('avatarID').isNumeric(), authentic
   });
 });
 
-// Runs one specific battle... currently only used if a battle fails and debug purposes
-// Soon will be used when users earn an item that starts a battle
-router.post('/run-specific-battle', body('avatar').isObject(), authenticateJWT, (req, res) => {
+// Runs one specific battle... currently only used if a battle fails
+router.post('/run-specific-battle', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /run-specific-battle");
   }
 
-  let { avatar } = req.body;
+  let { avatarID } = req.body;
 
-  Battle.findOne({ where: { outcome : 'TBD', avatarID : avatar.id }, raw : true })
+  Battle.findOne({ where: { outcome : 'TBD', avatarID }, raw : true })
   .then((battle) =>{
-    return battleProcess(battle, avatar);
+    return battleProcess(battle, battle.avatar);
   }).then((data) =>{
     console.log('MADE IT OUT THE OTHER SIDE', data);
     res.formatter.ok(data);
   }).catch((error) =>{console.log('ERROR', error);
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for /run-specific-battle');
   });
+
+
 
 });
 
