@@ -31,7 +31,7 @@ function resetHero(avatarID, email){
     return { power, health : updatedHealth, maxHealth : updatedMaxHealth,  fire, earth, water, air, heroLevel };
   }).then(({ power, health, maxHealth,  fire, earth, water, air, heroLevel }) =>{
     const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
-    console.log('THE GS', theGoods);
+    //console.log('THE GS', theGoods);
     const updatedAttributes = {
       /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */
       /* +5 Signup bonus, +5 Strava Bonus */

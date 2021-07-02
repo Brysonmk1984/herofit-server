@@ -49,8 +49,8 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
   });
 });
 
-// Update Avatar without full buff sequence. Used when spending QP points and initial avatar update after Strava connection
-router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail(), authenticateJWT, (req, res) => {
+// Update Avatar without full buff sequence. Used when spending QP points
+router.post('/update-avatar-stats', body('avatar').isObject(), body('email').isEmail(), authenticateJWT, (req, res) => {
 
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -64,7 +64,25 @@ router.post('/update-avatar', body('avatar').isObject(), body('email').isEmail()
     {...avatar},
     { where: { owner: email }, raw : true }
   ).then((result) => {
-    res.formatter.ok();
+    const statObjForUpgrade = {
+      fire : [Math.floor(avatar.fire)],
+      earth : [Math.floor(avatar.earth)],
+      water : [Math.floor(avatar.water)],
+      air : [Math.floor(avatar.air)]
+    };
+    
+    // if player hits a certain award based on stat level, award them the item
+    activityStatRewards(avatar.id, statObjForUpgrade)
+    .then((rewards) =>{
+      if(rewards){
+        return res.formatter.ok(rewards);
+      }
+      res.formatter.ok();
+    }).catch((error) => {
+      console.log('ERROR in activityRewards');
+      throw error;
+    });
+
   }).catch((error) =>{
     console.log(`Error updating avatar for user ${email}, DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for POST /update-avatar Endpoint`);

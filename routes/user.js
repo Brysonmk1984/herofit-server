@@ -284,7 +284,7 @@ router.post('/get-matching-users', body('searchInput').isString(), (req, res) =>
   }));
 
   Promise.allSettled(allPromises)
-  .then((data) =>{console.log('DATA', data);
+  .then((data) =>{
     const userList = [data[0].value, data[1].value];
     res.formatter.ok({ userList });
   }).catch((error) =>{

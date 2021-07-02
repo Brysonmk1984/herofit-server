@@ -46,22 +46,21 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
 }
 
 function _insertStatRewards(avatarID, statObj, t){
-
-  const levelRewardNames = [];
+  const statRewardNames = [];
   for(let stat in statObj){
     // For each stat, find the matching Upgrade Actions for each point the hero achieved
     const matchingActions = statObj[stat].map(statPoint => {
-      return upgradeActions.filter(action => action.stat === stat).find(action => action.requiredAmount === statPoint)
+      return upgradeActions.filter(action => action.stat === stat).find(action => action.requiredAmount === statPoint);
     }).filter(Boolean);
     const rewardNames = matchingActions.map(reward => reward.name);
-    levelRewardNames.push(...rewardNames);
+    statRewardNames.push(...rewardNames);
   }
 
   
 
   return Items.findAll({
     attributes : { id : avatarID },
-    where : { name : {[Op.in] : levelRewardNames} },
+    where : { name : {[Op.in] : statRewardNames} },
     raw : true
   }).then((items) => {
     const avItems = items.map(item => {
