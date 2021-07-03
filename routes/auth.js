@@ -252,7 +252,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
   if(dataSrcId){
     updateObj.dataSrcId = dataSrcId;
   }
-  
+
   User.findOne({ where: { email } })
   .then((user) =>{
     // Check if record exists in db
@@ -268,7 +268,15 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
       })
       .catch((error)=>{
         console.log(`Couldn't update Strava tokens for user ${email}, DEBUG: ${error}`);
-        res.formatter.serverError(error.toString(), `Couldn't update Strava tokens for user ${email}`);
+
+        const errorString = error.toString();
+        console.log('ERR STR = ', errorString)
+        // If dataSrcId is already in use, send bad request
+        if(errorString === 'SequelizeUniqueConstraintError: Validation error'){
+          res.formatter.badRequest(errorString, `That Strava Account is Already in use! You can unlink a Strava Account from the Account Page of the other HeroFit account.`);
+        }else{
+          res.formatter.serverError(errorString, `Couldn't update Strava tokens for user ${email}`);
+        }
       });
     } else {
       console.log('User not found!');
