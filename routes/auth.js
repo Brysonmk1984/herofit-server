@@ -240,19 +240,25 @@ router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
   });
 });
 
-router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessToken').isString(), body('stravaAccessTokenExpiration').isNumeric(), body('stravaRefreshToken').isString(), authenticateJWT, (req, res) =>{
+router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessToken').isString(), body('stravaAccessTokenExpiration').isNumeric(), body('stravaRefreshToken').isString(), body('dataSrcId').exists().optional(), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for /strava-credentials");
   }
-
-  const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken } = req.body;
+ 
+  const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken, dataSrcId } = req.body;
+  console.log('here with new token', stravaAccessToken, dataSrcId);
+  const updateObj = { stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken };
+  if(dataSrcId){
+    updateObj.dataSrcId = dataSrcId;
+  }
+  
   User.findOne({ where: { email } })
   .then((user) =>{
     // Check if record exists in db
     if (user) {
       User.update(
-        { stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken },
+        updateObj,
         { where: { email },
         returning : true, plain : true })
       .then((data) => {
@@ -288,7 +294,7 @@ router.get('/fetch-latest-patch-details', authenticateJWT, (req, res) =>{
   res.formatter.ok(latestPatchDetails);
 });
 
-router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT, (req, res) =>{
+router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for /update-seen-latest-patch");

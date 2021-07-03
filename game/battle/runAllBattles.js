@@ -7,7 +7,7 @@ const { sendBattleReportEmail } = require('../../mail');
 // Takes a group of bandles and runs them through the universal battleProcess
 function _runBattlesOnBatch(shard, shardIndex){
   const allAvatars = shard.map(battle => battle.avatar);
-  console.log('THE BATTLES', shard);
+  //console.log('THE BATTLES', shard);
 
   // Reorder of avatars is the same as the shard's order
   // avatars.sort((a, b) => {  
@@ -62,7 +62,7 @@ function runAllBattles(battles, sendReport){
   // TALLY UP THE RESULTS AND SEND EMAIL
   .then((results) => {
     console.log('tally', results);
-    if(sendReport){
+    if(sendReport && results.total > 0){
       return sendBattleReportEmail(results)
       .then((data) =>{
         console.log('Result Tally email sent successfully',data);

@@ -78,6 +78,11 @@ const UserModel = function(db, DataTypes){
         type : DataTypes.STRING,
         allowNull: true,
     },
+    dataSrcId: {
+        type: DataTypes.STRING,
+        length : 50,
+        allowNull: true
+    },
   });
 
       
