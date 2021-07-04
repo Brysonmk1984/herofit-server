@@ -161,7 +161,7 @@ function _calcElementDamage(attacker, receiver){
     THIS IS WHERE WE NEED TO INSERT ELEMENTAL SPECIALTIES
   */
   // First value is total fire of attacker, second is the 'd' factor, which is all elemental power added together adjusted down for rounds, and then averaged together in the fireProc function
-  const fireProc = determineFireCrit(attacker.fire, (attackerElms.fire + attackerElms.earth + attackerElms.water + attackerElms.air));
+  const fireProc = determineFireCrit(attacker.fire, (attackerElms.fire + (attackerElms.earth || attackerElms.fire) + (attackerElms.water || attackerElms.fire) + (attackerElms.air  || attackerElms.fire)));
   attackerElms.fire = fireProc.netDamage;
   //console.log('fireProc - ', fireProc);
   turnElmDamageDone.fire += fireProc.critDamage;

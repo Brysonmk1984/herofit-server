@@ -194,7 +194,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
-          fws.fire = 400;
+          fws.fire = 200;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
