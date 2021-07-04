@@ -606,21 +606,21 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 */
 
 // Write code to reset all avatars that hasResetStats = false
-router.get('/reset-migration', (req, res) => {
-  Avatar.findAll({where:{ hasResetStats : false }, raw : true})
-  .then((results)=> {
-    const allPromises = [];
-    for(let i = 0; i< results.length; i++){
-      allPromises.push(itemEffects([{ name : 'Reset Hero' }], results[i].id, results[i].owner ));
-    }
-    return Promise.allSettled(allPromises);
-  }).then((results) =>{
-    AvatarItems.destroy({ where : { itemID : 31 } })
-  }).then(() =>{
-    res.formatter.ok('Success!');
-  }).catch((error) =>{
-    res.formatter.serverError(error.toString());
-  });
-});
+// router.get('/reset-migration', (req, res) => {
+//   Avatar.findAll({where:{ hasResetStats : false }, raw : true})
+//   .then((results)=> {
+//     const allPromises = [];
+//     for(let i = 0; i< results.length; i++){
+//       allPromises.push(itemEffects([{ name : 'Reset Hero' }], results[i].id, results[i].owner ));
+//     }
+//     return Promise.allSettled(allPromises);
+//   }).then((results) =>{
+//     AvatarItems.destroy({ where : { itemID : 31 } })
+//   }).then(() =>{
+//     res.formatter.ok('Success!');
+//   }).catch((error) =>{
+//     res.formatter.serverError(error.toString());
+//   });
+// });
 
 module.exports = router;

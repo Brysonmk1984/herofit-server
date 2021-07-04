@@ -88,7 +88,6 @@ it('Should Insert Fire Skin for Grabbler', () => {
     userId: 288,
     photonTokens: 2303,
     statusFade: 0,
-    hasResetStats: true,
     aether: 0,
     qpAether: 0,
     restedEnough: false,
