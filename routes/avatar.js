@@ -14,6 +14,7 @@ const  { activityItemFind } = require('../game/activityItemFind');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
 const activityHeal = require('../game/activities/activityHeal');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
+const { itemEffects } = require('../game/applyEffects');
 
 // Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
@@ -605,8 +606,21 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 */
 
 // Write code to reset all avatars that hasResetStats = false
-// router.post('/reset-migration', body('email').isEmail(), (req, res) => {
-
-// });
+router.get('/reset-migration', (req, res) => {
+  Avatar.findAll({where:{ hasResetStats : false }, raw : true})
+  .then((results)=> {
+    const allPromises = [];
+    for(let i = 0; i< results.length; i++){
+      allPromises.push(itemEffects([{ name : 'Reset Hero' }], results[i].id, results[i].owner ));
+    }
+    return Promise.allSettled(allPromises);
+  }).then((results) =>{
+    AvatarItems.destroy({ where : { itemID : 31 } })
+  }).then(() =>{
+    res.formatter.ok('Success!');
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString());
+  });
+});
 
 module.exports = router;
