@@ -196,12 +196,12 @@ router.post('/fetch-upcoming-foe-and-rewards', body('avatarID').isNumeric(), aut
             }
           } 
 
-          return matchingPBA.itemID;
+          return matchingPBA.name;
         });
         if(rewards.length){
           Items.findAll({
             attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
-            where : { id : { [Op.in] : rewards }}
+            where : { name : { [Op.in] : rewards }}
           }).then((matchingItems) =>{
             return res.formatter.ok({ foe : battle.foe, rewards : matchingItems });
           }).catch((error) =>{

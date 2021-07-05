@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateAdminJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const { Avatar, AvatarItems, Battle } = require('../config/db');
+const { Avatar, AvatarItems, Items, Battle } = require('../config/db');
 const { Op, col } = require("sequelize");
 const { parseAvatarProperties } = require('../lib/helperFunctions');
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD, RESTED_THRESHOLD, OUTCOME_XP, FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../game/CONSTANTS');
@@ -195,7 +195,7 @@ router.get('/mock-run-pbas', authenticateAdminJWT, (req, res) => {
   }).then(({ avatarID, postBattleActions }) =>{
     _avatarID = avatarID;
     _postBattleActions = postBattleActions;
-    const itemsToInsert = [];
+    const itemNames = [];
     
     // ALL PBAs FROM BATTLE
     postBattleActions.forEach(( ACTION )=>{
@@ -214,21 +214,24 @@ router.get('/mock-run-pbas', authenticateAdminJWT, (req, res) => {
       // There should always be a matchingPBA here, if not, I forgot to add one to the postBattleActions.json
       if(matchingPBA){
         // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
-        itemsToInsert.push({ avatarID, itemID : matchingPBA.itemID });
+        itemNames.push(matchingPBA.name);
       }
       
     });
+    return Items.findAll({ where : { name : { [Op.in] : itemNames } }, raw : true });
+  }).then((results) =>{
+    const itemsToInsert = results.map(item => {
+      return { avatarID : _avatarID, itemID : item.id }
+    });
 
-    console.log('BULK CREATE - INSERT ITEMS -', itemsToInsert);
-    // INSERT all the items from the itemsToInsert array, gathered from the PBAs
-    return AvatarItems.bulkCreate(itemsToInsert);
-
+    return AvatarItems.bulkCreate(itemsToInsert)
   }).then(() =>{
     res.formatter.ok({
       avatarID : _avatarID,
       postBattleActions : _postBattleActions
     });
   }).catch((error) =>{
+    console.log(error);
     res.formatter.serverError(error.toString(), "Database or Server code error for POST /mock-run-pbas endpoint");
   });
 });

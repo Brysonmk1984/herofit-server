@@ -73,7 +73,7 @@ function insertBattle(avatar, foe){
           }
         } 
   
-        return matchingPBA.itemID;
+        return matchingPBA.name;
       });
     }
 
@@ -81,7 +81,7 @@ function insertBattle(avatar, foe){
       if(rewards){
         return Items.findAll({
           attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
-          where : { id : { [Op.in] : rewards }}
+          where : { name : { [Op.in] : rewards }}
         }).then((matchingItems) =>{
           resolve({
             goToBattle : true,

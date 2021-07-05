@@ -1,7 +1,8 @@
-const { Avatar, AvatarItems, Battle} = require('../../config/db');
+const { Avatar, AvatarItems, Items, Battle} = require('../../config/db');
 const doBattle = require('./doBattle');
 const preBattleSetup = require('./preBattleSetup');
 const postBattleProcess = require('./postBattleProcess');
+const { Op } = require("sequelize");
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
@@ -56,12 +57,16 @@ function battleProcess(battleInstance, avatarInstance){
   updateAvatarByLevelUp();
 
   // POST BATTLE STEP 4 - POST BATTLE ACTIONS - Post battle actions check if any actions were saved to the battle on goToBattle, and runs them now, usually for awarding items
-  const itemsToInsert = doAllPbas(battle.postBattleActions);
-  //console.log('ITEMS TO INSERT', itemsToInsert);
-  // DONE! - INSERT all the items from the itemsToInsert array, gathered from the PBAs
-  // NESTED TRANSACTION
-  return AvatarItems.bulkCreate(itemsToInsert)
-  .then(() =>{
+  // DONE! - INSERT all the items from the itemNames array, gathered from the PBAs
+  const itemNames = doAllPbas(battle.postBattleActions);
+  return Items.findAll({
+    where : { name : { [Op.in] : itemNames } }, raw : true
+  }).then((results) =>{
+    const itemsToInsert = results.map(item => {
+      return { avatarID : avatar.id, itemID : item.id }
+    })
+    return AvatarItems.bulkCreate(itemsToInsert)
+  }).then(() =>{
     const { postAv, postOutcome, xpGain, ptGain } = getPostBattlePackage();
     // Only save the relevant avatar changes, all come from postAv
     const { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;

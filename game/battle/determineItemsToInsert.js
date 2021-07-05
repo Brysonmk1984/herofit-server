@@ -1,6 +1,6 @@
 const ALLPBAs = require('../postBattleActions.json');
 
-function determineItemsToInsert(avatarID, postBattleActions, battleOutcome){  
+function determineItemsToInsert(postBattleActions, battleOutcome){  
   if(postBattleActions === null){
     return [];
   } 
@@ -30,7 +30,7 @@ function determineItemsToInsert(avatarID, postBattleActions, battleOutcome){
     // There should always be a matchingPBA here, if not, I forgot to add one to the postBattleActions.json
     if(matchingPBA){
       // Push the ITEM that matches a PBA that matches the ACTION, along with the avatarID, into an array
-      return { avatarID, itemID : matchingPBA.itemID };
+      return matchingPBA.name;
     }
     
   });

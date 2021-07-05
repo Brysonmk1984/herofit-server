@@ -54,7 +54,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
     },
     doAllPbas : (postBattleActions) => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);
-      return determineItemsToInsert(a.id, postBattleActions, o);
+      return determineItemsToInsert(postBattleActions, o);
     },
     getPostBattlePackage : () => {
       // Outcome status may have changed due to post battle effects, so combine with default outcome object
