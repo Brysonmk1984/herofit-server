@@ -1,10 +1,10 @@
-const db = require('../config/db').db;
+const db = require('../../config/db').db;
 const { Op } = require("sequelize");
-const { Items } = require('../config/db');
-const xpCalc = require('./upgrades/xpCalc');
+const { Items } = require('../../config/db');
+const xpCalc = require('../upgrades/xpCalc');
 const insertBattle = require('./insertBattle');
 const { findFoeTemplateByType, selectFoeTemplate, determineFoeWithStats } = require('./foeFunctions');
-const { parseAvatarProperties } = require('../lib/helperFunctions');
+const { parseAvatarProperties } = require('../../lib/helperFunctions');
 
 // Used to insert a battle into the DB for both random midnight battles or item-instantiated battles
 // FoeType is null unless an item created the battle

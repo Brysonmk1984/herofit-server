@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 const { Items, AvatarItems } = require('../../config/db');
 const { range } = require('../../lib/helperFunctions');
 const upgradeActions = require('./upgradeHeroActions.json');
+const preventDuplicateItems = require('../items/preventDuplicateItems');
 
 
 function _insertLevelRewards(avatarID, levelsEarned, t){

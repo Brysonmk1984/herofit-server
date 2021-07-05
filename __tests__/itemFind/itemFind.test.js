@@ -1,5 +1,5 @@
 const chance = require('chance')();
-const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require('../../game/activityItemFind');
+const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require('../../game/activities/activityItemFind');
 const mockItemDrops = require('./mockItemDrops.json');
 
 let weightedElms;

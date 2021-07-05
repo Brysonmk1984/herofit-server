@@ -1,11 +1,11 @@
-const xpCalc = require('./upgrades/xpCalc');
-const { determineXpBounty, determinePtBounty } = require('./battle/runPostBattleActions');
-const { OUTCOME_XP } = require('./CONSTANTS'); 
+const xpCalc = require('../upgrades/xpCalc');
+const { determineXpBounty, determinePtBounty } = require('../battle/determineBounties');
+const { OUTCOME_XP } = require('../CONSTANTS'); 
 const chance = require('chance')();
-const { FOE_MOD,  LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('./CONSTANTS'); 
-const villains = require('./villains.json');
-const { config } = require('../appConfig');
-const { handleFoeLikelihood, handleFoeBonusToStats } = require('./specialEvents/foeActionHandlers');
+const { FOE_MOD,  LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require('../CONSTANTS'); 
+const villains = require('../villains.json');
+const { config } = require('../../appConfig');
+const { handleFoeLikelihood, handleFoeBonusToStats } = require('../specialEvents/foeActionHandlers');
 
 const { currentLevelByInput } = xpCalc();
 

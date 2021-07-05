@@ -58,9 +58,12 @@ function battleProcess(battleInstance, avatarInstance){
 
   // POST BATTLE STEP 4 - POST BATTLE ACTIONS - Post battle actions check if any actions were saved to the battle on goToBattle, and runs them now, usually for awarding items
   // DONE! - INSERT all the items from the itemNames array, gathered from the PBAs
-  const itemNames = doAllPbas(battle.postBattleActions);
-  return Items.findAll({
-    where : { name : { [Op.in] : itemNames } }, raw : true
+  return doAllPbas(battle.postBattleActions)
+  .then((itemNames) =>{
+    console.log('INSERTING = ', itemNames);
+    return Items.findAll({
+      where : { name : { [Op.in] : itemNames } }, raw : true
+    });
   }).then((results) =>{
     const itemsToInsert = results.map(item => {
       return { avatarID : avatar.id, itemID : item.id }

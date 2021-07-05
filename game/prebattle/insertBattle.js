@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
-const { Avatar, Battle, Items } = require('../config/db');
-const { determineItemEffects, determinePostBattleActions } = require('../game/onGoToBattle');
-const ALLPBAs = require('../game/postBattleActions.json');
+const { Avatar, Battle, Items } = require('../../config/db');
+const { determineItemEffects, determinePostBattleActions } = require('./onGoToBattle');
+const ALLPBAs = require('../postBattleActions.json');
 
 // Used for inserting a battle for an individual user
 function insertBattle(avatar, foe){

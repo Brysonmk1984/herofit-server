@@ -1,5 +1,6 @@
 const postBattleEffects = require('./postBattleEffects');
 const determineItemsToInsert = require('./determineItemsToInsert');
+const preventDuplicateItems = require('../items/preventDuplicateItems');
 const xpCalc = require('../upgrades/xpCalc');
 const { OUTCOME_XP } = require('../CONSTANTS'); 
 
@@ -54,7 +55,10 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
     },
     doAllPbas : (postBattleActions) => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);
-      return determineItemsToInsert(postBattleActions, o);
+      const items = determineItemsToInsert(postBattleActions, o)
+      //console.log('ATTEMPTING DUP CHECK', items);
+      // Prevents duplicate items being added to a players inventory for non-consumables
+      return preventDuplicateItems(items, a.id);
     },
     getPostBattlePackage : () => {
       // Outcome status may have changed due to post battle effects, so combine with default outcome object

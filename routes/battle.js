@@ -8,7 +8,7 @@ const villains = require('../game/villains.json');
 const avCalc = require('../game/upgrades/avCalc');
 const moment = require('moment');
 const ALLPBAs = require('../game/postBattleActions.json');
-const instantiateBattle = require('../game/instantiateBattle');
+const instantiateBattle = require('../game/prebattle/instantiateBattle');
 const battleProcess = require('../game/battle/battleProcess');
 
 // USER CLICKED 'GO TO BATTLE'

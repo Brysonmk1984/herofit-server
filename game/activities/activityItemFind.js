@@ -1,7 +1,7 @@
 const chance = require('chance')();
-const { specialEvent } = require('../appConfig').config;
-const { roundNumber, cloneObj } = require('../lib/helperFunctions');
-const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require('./CONSTANTS');
+const { specialEvent } = require('../../appConfig').config;
+const { roundNumber, cloneObj } = require('../../lib/helperFunctions');
+const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require('../CONSTANTS');
 
  //ptFindStatBoost
  function _calcPtBoost(ptFind){

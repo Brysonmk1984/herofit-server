@@ -1,9 +1,9 @@
 const { col, literal } = require("sequelize");
-const { Avatar, UserTotal } = require('../config/db');
-const xpCalc = require('./upgrades/xpCalc');
-const avCalc = require('./upgrades/avCalc');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('./CONSTANTS');
-const instantiateBattle = require('./instantiateBattle');
+const { Avatar, UserTotal } = require('../../config/db');
+const xpCalc = require('../upgrades/xpCalc');
+const avCalc = require('../upgrades/avCalc');
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require('../CONSTANTS');
+const instantiateBattle = require('../prebattle/instantiateBattle');
 
 // Retrocausal Capsule
 function resetHero(avatarID, email){
@@ -95,6 +95,7 @@ function removeInfected(avatarID){
   });
 }
 
+// Birthday Cake
 function setToHalfHealth(avatarID){
   return Avatar.update(
     { health : literal(`"maxHealth" / 2`), status : 'Recovering' } , { where : { id : avatarID }, returning : true }

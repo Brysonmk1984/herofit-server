@@ -10,11 +10,10 @@ const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctio
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../game/CONSTANTS');
 const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
-const  { activityItemFind } = require('../game/activityItemFind');
+const  { activityItemFind } = require('../game/activities/activityItemFind');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
 const activityHeal = require('../game/activities/activityHeal');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
-const { itemEffects } = require('../game/applyEffects');
 
 // Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
