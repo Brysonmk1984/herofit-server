@@ -2,6 +2,7 @@ const chance = require('chance')();
 const { specialEvent } = require('../../appConfig').config;
 const { roundNumber, cloneObj } = require('../../lib/helperFunctions');
 const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require('../CONSTANTS');
+const preventDuplicateItems = require('../items/preventDuplicateItems');
 
  //ptFindStatBoost
  function _calcPtBoost(ptFind){
@@ -119,7 +120,9 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
     }
   });
   
-  const foundItems = _chanceItemFind(generalItemTuple, remainderPercent);
+  let foundItems = _chanceItemFind(generalItemTuple, remainderPercent);
+  
+  
   // Figures out the heroes adjusted pt drop rate and amount based on their ptFind stat
   const { ptDropRate, ptDropAmount } = _calcPtBoost(ptFindStatBoost);
   const ptFind =  _chancePTFind(remainderPercent, ptDropRate, ptDropAmount);
@@ -171,5 +174,42 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
   return foundItemsAndPt;
 }
 
+function insertItemsFromItemFind(avatarID, itemsToInsert){
+
+  return Items.findAll({
+    attributes : { id : avatarID },
+    where : { name : {[Op.in] : itemsToInsert} },
+    raw : true
+  }).then((items) => {
+
+    const avItems = items.map(item => {
+      return { avatarID, itemID : item.id }
+    });
+
+    // Insert all items earned from item find
+    return AvatarItems.bulkCreate(avItems, { transaction: t })
+    .then(() =>{
+      // Used for displaying rewards to user after level up only
+      const rewards = [];
+      items.forEach((item) =>{
+        rewards.push({
+          type : item.type,
+          name : item.name,
+          description : item.description
+        });
+      });
+      
+      //console.log('AWARDS TO DISPLAY:', rewards);
+      return rewards.length ? rewards : null;
+    }).catch((error) => {
+      console.log('ERROR WITH CREATING AVATAR ITEMS', error);
+      throw error;
+    });
+  }).catch((error) =>{
+    console.log('ERROR FINDING ITEMS', error);
+    throw error;
+  });
+}
+
 // private functions exported for tests
-module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind };
+module.exports = {  _callXTimes, _itemFind, _chancePTFind, activityItemFind, insertItemsFromItemFind };

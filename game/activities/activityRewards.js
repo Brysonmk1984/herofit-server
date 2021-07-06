@@ -33,7 +33,7 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
       });
       
       //console.log('AWARDS TO DISPLAY:', rewards);
-      return rewards.length ? rewards : null;
+      return rewards;
     }).catch((error) => {
       console.log('ERROR WITH CREATING AVATARITEMS', error);
       throw error;
@@ -80,7 +80,7 @@ function _insertStatRewards(avatarID, statObj, t){
         });
       });
 
-      return rewards.length ? rewards : null;
+      return rewards;
     }).catch((error) => {
       console.log('ERROR WITH CREATING AVATARITEMS', error);
       throw error;

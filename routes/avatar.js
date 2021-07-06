@@ -2,18 +2,16 @@ const express = require('express');
 const router = express.Router(); 
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
-const db = require('../config/db').db;
-const { Avatar, AvatarItems, User, UserTotal, Items } = require('../config/db');
+const { Avatar, AvatarItems, User, UserTotal } = require('../config/db');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
 const { literal, Op } = require("sequelize");
 const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctions');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../game/CONSTANTS');
-const avCalc = require('../game/upgrades/avCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
-const  { activityItemFind } = require('../game/activities/activityItemFind');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
-const activityHeal = require('../game/activities/activityHeal');
+
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
+
+const upgradeProcess = require('../game/activities/upgradeProcess');
 
 // Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
@@ -95,7 +93,24 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /buff-and-update-avatar Endpoint");
   }
+
   const { email } = req.body;
+  
+  // Runs entire upgrade sequence, returns {updatedAvatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
+  upgradeProcess(email)
+  .then((returnPackage) =>{
+    console.log('return package!', returnPackage);
+    // Transaction has been committed
+    // result is whatever the result of the promise chain returned to the transaction callback
+    return res.formatter.ok(returnPackage);
+  }).catch((error) =>{
+    // Transaction has been rolled back
+    console.log('INSIDE transaction', error);
+    return res.formatter.serverError(error.toString(), `Transaction error for ${email} for POST /buff-and-update-avatar Endpoint`);
+  });
+  
+  
+  /*
   delete req.body.restedEnough;
   let avatar;
   let ut, avStatSnapshot, aXPDiff, lvlUp, lvlAfterBuff, qpe;
@@ -329,6 +344,7 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
   }
 
+  */
 });
 
 // Check if Avatar name is available
