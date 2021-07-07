@@ -12,6 +12,10 @@ const { config } = require('../appConfig');
 
 // If an email is passed, get that user, otherwise get user based on JWT
 router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), body('initMessage').isBoolean().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+  if(config.mode === 'maintenance'){
+    return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
+  }
+  
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     console.log(errors);
@@ -301,9 +305,7 @@ router.post('/get-user-by-email', body('email').isEmail(), (req, res) => {
   }
   const { email } = req.body;
   
-  if(config.mode === 'maintenance'){
-    return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
-  }
+
   User.findOne({ where: { email }, attributes : ['username'], raw : true })
   .then((data) =>{
     res.formatter.ok({ username : data.username });
