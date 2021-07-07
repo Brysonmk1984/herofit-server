@@ -300,7 +300,10 @@ router.post('/get-user-by-email', body('email').isEmail(), (req, res) => {
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-user-by-email Endpoint");
   }
   const { email } = req.body;
-
+  
+  if(config.mode === 'maintenance'){
+    return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
+  }
   User.findOne({ where: { email }, attributes : ['username'], raw : true })
   .then((data) =>{
     res.formatter.ok({ username : data.username });
