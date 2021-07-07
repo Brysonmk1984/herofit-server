@@ -1,3 +1,5 @@
+const { Items, AvatarItems } = require('../../config/db');
+const { Op } = require("sequelize");
 const chance = require('chance')();
 const { specialEvent } = require('../../appConfig').config;
 const { roundNumber, cloneObj } = require('../../lib/helperFunctions');
@@ -164,7 +166,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
   }
 }
 
-function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
+function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops, t){
   const activityItemSessions = xpGain / 60;
   const integer = Math.floor(activityItemSessions);
   const remainder =  activityItemSessions % 1;
@@ -174,39 +176,45 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
   return foundItemsAndPt;
 }
 
-function insertItemsFromItemFind(avatarID, itemsToInsert){
+function insertItemsFromItemFind(avatarID, itemsToInsert, t){
+  return preventDuplicateItems(itemsToInsert, avatarID)
+  .then((dedupedItemFinds) =>{
+  
+      return Items.findAll({
+      attributes : { id : avatarID },
+      where : { name : {[Op.in] : dedupedItemFinds} },
+      raw : true
+    }).then((items) => {
 
-  return Items.findAll({
-    attributes : { id : avatarID },
-    where : { name : {[Op.in] : itemsToInsert} },
-    raw : true
-  }).then((items) => {
-
-    const avItems = items.map(item => {
-      return { avatarID, itemID : item.id }
-    });
-
-    // Insert all items earned from item find
-    return AvatarItems.bulkCreate(avItems, { transaction: t })
-    .then(() =>{
-      // Used for displaying rewards to user after level up only
-      const rewards = [];
-      items.forEach((item) =>{
-        rewards.push({
-          type : item.type,
-          name : item.name,
-          description : item.description
-        });
+      const avItems = items.map(item => {
+        return { avatarID, itemID : item.id }
       });
-      
-      //console.log('AWARDS TO DISPLAY:', rewards);
-      return rewards.length ? rewards : null;
-    }).catch((error) => {
-      console.log('ERROR WITH CREATING AVATAR ITEMS', error);
+
+      // Insert all items earned from item find
+      return AvatarItems.bulkCreate(avItems, { transaction: t })
+      .then(() =>{
+        // Used for displaying rewards to user after level up only
+        const foundItems = [];
+        items.forEach((item) =>{
+          foundItems.push({
+            type : item.type,
+            name : item.name,
+            description : item.description
+          });
+        });
+        
+        //console.log('AWARDS TO DISPLAY:', foundItems);
+        return foundItems.map(item => item.name);
+      }).catch((error) => {
+        console.log('ERROR WITH CREATING AVATAR ITEMS', error);
+        throw error;
+      });
+    }).catch((error) =>{
+      console.log('ERROR FINDING ITEMS', error);
       throw error;
-    });
+    })
   }).catch((error) =>{
-    console.log('ERROR FINDING ITEMS', error);
+    console.log('ERROR PREVENTING DUPES', error);
     throw error;
   });
 }

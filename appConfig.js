@@ -6,9 +6,9 @@ const config = {
   specialEvent : attackOfTheElements,
 
 
-  // globalMessage : [
-  //   { type : 'info', /*link : '/elemental-event#percentTable',*/ persist : false, message : "HeroFit is turning 1! Enjoy a piece of cake in your inventory to celebrate!" }
-  // ],
+  globalMessage : [
+    { type : 'info', link : 'https://old.reddit.com/r/herofit/comments/ofmont/housekeeping_minor_update/', persist : false, message : "New minor updates including connecting/disconnecting Strava account. Click here for details." }
+  ],
 
   // RANKING PAGE
   AVATAR_COUNT_PER_PAGE : 20

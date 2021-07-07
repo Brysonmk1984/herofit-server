@@ -11,38 +11,43 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
   const levelRewards = upgradeActions.filter(action => action.type === 'levelReward').filter((action) => levelsEarned.find(lvl => lvl === action.requiredLevel));
   const levelRewardNames = levelRewards.map(reward => reward.name);
 
-  return Items.findAll({
-    attributes : { id : avatarID },
-    where : { name : {[Op.in] : levelRewardNames} },
-    raw : true
-  }).then((items) => {
-    const avItems = items.map(item => {
-      return { avatarID, itemID : item.id }
-    });
-
-    return AvatarItems.bulkCreate(avItems, { transaction: t })
-    .then(() =>{
-      // Used for displaying rewards to user after level up only
-      const rewards = [];
-      items.forEach((item) =>{
-        rewards.push({
-          type : item.type,
-          name : item.name,
-          description : item.description
-        });
+  return preventDuplicateItems(levelRewardNames, avatarID)
+  .then((dedupedRewards) =>{
+    return Items.findAll({
+      attributes : { id : avatarID },
+      where : { name : {[Op.in] : dedupedRewards} },
+      raw : true
+    }).then((items) => {
+      const avItems = items.map(item => {
+        return { avatarID, itemID : item.id }
       });
-      
-      //console.log('AWARDS TO DISPLAY:', rewards);
-      return rewards;
-    }).catch((error) => {
-      console.log('ERROR WITH CREATING AVATARITEMS', error);
+
+      return AvatarItems.bulkCreate(avItems, { transaction: t })
+      .then(() =>{
+        // Used for displaying rewards to user after level up only
+        const rewards = [];
+        items.forEach((item) =>{
+          rewards.push({
+            type : item.type,
+            name : item.name,
+            description : item.description
+          });
+        });
+        
+        //console.log('AWARDS TO DISPLAY:', rewards);
+        return rewards;
+      }).catch((error) => {
+        console.log('ERROR WITH CREATING AVATARITEMS', error);
+        throw error;
+      });
+    }).catch((error) =>{
+      console.log('ERROR FINDING ITEMS', error);
       throw error;
     });
   }).catch((error) =>{
-    console.log('ERROR FINDING ITEMS', error);
+    console.log('ERROR PREVENTING DUPES', error);
     throw error;
   });
-
 
 }
 
@@ -57,39 +62,42 @@ function _insertStatRewards(avatarID, statObj, t){
     statRewardNames.push(...rewardNames);
   }
 
-  
-
-  return Items.findAll({
-    attributes : { id : avatarID },
-    where : { name : {[Op.in] : statRewardNames} },
-    raw : true
-  }).then((items) => {
-    const avItems = items.map(item => {
-      return { avatarID, itemID : item.id }
-    });
-
-    return AvatarItems.bulkCreate(avItems, { transaction: t })
-    .then(() =>{
-      // Used for displaying rewards to user after level up only
-      const rewards = [];
-      items.forEach((item) =>{
-        rewards.push({
-          type : item.type,
-          name : item.name,
-          description : item.description
-        });
+  return preventDuplicateItems(statRewardNames, avatarID)
+  .then((dedupedStatRewards) =>{
+    return Items.findAll({
+      attributes : { id : avatarID },
+      where : { name : { [Op.in] : dedupedStatRewards } },
+      raw : true
+    }).then((items) => {
+      const avItems = items.map(item => {
+        return { avatarID, itemID : item.id }
       });
 
-      return rewards;
-    }).catch((error) => {
-      console.log('ERROR WITH CREATING AVATARITEMS', error);
+      return AvatarItems.bulkCreate(avItems, { transaction: t })
+      .then(() =>{
+        // Used for displaying rewards to user after level up only
+        const rewards = [];
+        items.forEach((item) =>{
+          rewards.push({
+            type : item.type,
+            name : item.name,
+            description : item.description
+          });
+        });
+
+        return rewards;
+      }).catch((error) => {
+        console.log('ERROR WITH CREATING AVATARITEMS', error);
+        throw error;
+      });
+    }).catch((error) =>{
+      console.log('ERROR FINDING ITEMS', error);
       throw error;
     });
   }).catch((error) =>{
-    console.log('ERROR FINDING ITEMS', error);
+    console.log('ERROR PREVENTING DUPES', error);
     throw error;
   });
-
 
 }
 

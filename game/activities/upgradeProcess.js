@@ -1,7 +1,7 @@
-const { UserTotal, Avatar, AvatarItems, Items } = require('../../config/db');
+const { UserTotal, Avatar, Items } = require('../../config/db');
 const db = require('../../config/db').db;
 const { Op } = require("sequelize");
-const { parseAvatarProperties} = require('../../lib/helperFunctions');
+const { parseAvatarProperties, range } = require('../../lib/helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../CONSTANTS');
 const avCalc = require('../upgrades/avCalc');
 const xpCalc = require('../upgrades/xpCalc');
@@ -17,7 +17,7 @@ let startingUpgradeLevel, endingUpgradeLevel;
 let improvements, foundItems;
 let updatedAvatar;
 
-// First, retrieve userTotals AND avatar from DB
+// RETRIEVE USERTOTALS AND AVATAR FROM DB
 function _getExistingData(email, t){
   return Promise.all([
     UserTotal.findOne({
@@ -31,19 +31,22 @@ function _getExistingData(email, t){
   })])
 }
 
+// CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
 function _calcAvatarImprovements(){
+  const { power, maxHealth, health, air, water, fire, earth, aether } = updatedAvatar;
   return improvements = {
-    power : updatedPower - avStatSnapshot.power,
-    "max health" : updatedMaxHealth - avStatSnapshot.maxHealth,
-    health : updatedHealth - avStatSnapshot.health,
+    power : power - avStatSnapshot.power,
+    "max health" : maxHealth - avStatSnapshot.maxHealth,
+    health : health - avStatSnapshot.health,
     air : Number((air - avStatSnapshot.air).toFixed(2)),
     water : Number((water - avStatSnapshot.water).toFixed(2)),
     fire : Number((fire - avStatSnapshot.fire).toFixed(2)),
     earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
-    aether : Number((updatedAether - avStatSnapshot.aether).toFixed(2)),
+    aether : Number((aether - avStatSnapshot.aether).toFixed(2)),
   };
 }
 
+// DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
 function _calcWeightedElms(){
     // Needed for activity-specific items
     const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
@@ -55,6 +58,7 @@ function _calcWeightedElms(){
     } 
 }
 
+// CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
 function _calcProgress(){
   const snapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
   avStatSnapshot = parseAvatarProperties(snapshot);
@@ -96,8 +100,8 @@ function _calcProgress(){
 
 }
 
+// RUN FUNCTION TO CHECK FOR FOUND ITEMS
 function _handleActivityItemFind(weightedElms){
-  // RUN FUNCTION TO CHECK FOR FOUND ITEMS
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
   const { items, pt } = activityItemFind(aXPDiff, endingUpgradeLevel, weightedElms, null, null, possibleItemDrops);
@@ -108,12 +112,14 @@ function _handleActivityItemFind(weightedElms){
   //console.log('FOUND!', foundItems);
 }
 
-function _updateAvatar(t){
+// UPDATE HERO IN DB
+function _updateAvatar(email, t){
   return Avatar.update({...updatedAvatar},
     { where: { owner: email }, transaction: t }
   );
 }
 
+// APPEND ALL EXTRA INFO NEEDED FOR HERO ON FRONTEND
 function _appendLevelInfo(){
   const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(updatedAvatar.activityXP, updatedAvatar.battleXP);
   const { level, albedo } = getCurrentLevel();
@@ -127,28 +133,30 @@ function _appendLevelInfo(){
   
 }
 
+// RUN FUNCTIONS FOR ITEM FIND & REWARDS
 function _handleAllItemAwarding(t){
   
   const statObjForUpgrade = determineStatImprovements(improvements, avStatSnapshot)
   const allItemPromises = [
     // ITEMS FROM ITEM FIND
-    insertItemsFromItemFind(avatarID, foundItems, t),
+    insertItemsFromItemFind(avatar.id, foundItems, t),
     // ITEMS FROM STAT REWARDS
-    activityStatRewards(avatarID, statObjForUpgrade, t)
+    activityStatRewards(avatar.id, statObjForUpgrade, t)
   ];
 
   // ITEMS FROM LEVELING
   if(endingUpgradeLevel > startingUpgradeLevel){
     const levelsToCheck = range(startingUpgradeLevel, endingUpgradeLevel);
-    allItemPromises.push(activityLevelRewards(avatarID, levelsToCheck, t));
+    allItemPromises.push(activityLevelRewards(avatar.id, levelsToCheck, t));
   }
   
   return Promise.allSettled(allItemPromises);
 }
 
+// ROOT FUNCTION FOR UPGRADING HERO
 function upgradeProcess(email){
   return db.transaction(t => {
-    _getExistingData(email, t).then((result) =>{
+    return _getExistingData(email, t).then((result) =>{
       ut = result[0];
       avatar = result[1];
       possibleItemDrops = result[2];
@@ -165,32 +173,29 @@ function upgradeProcess(email){
       // Run activity find module to see if any items were found from latest upgrade
       _handleActivityItemFind(weightedElms);
 
-      
       // Save new Av to DB
-      return _updateAvatar(t);
+      return _updateAvatar(email, t);
 
     }).then(() =>{
       // assign adjusted level-related properties to avatar
       _appendLevelInfo();
-
       return _handleAllItemAwarding(t);
     }).then((promiseResults) =>{  
       // RETURNS ALL promise results from itemFind, activityStatRewards, activityLevelRewards 
-      console.log(promiseResults);
-      const itemsFromItemFind = promiseResults[0];
-      const rewards = [...promiseResults[1], ...promiseResults[2]];
+      const itemsFromItemFind = promiseResults[0].value;
+      const rewards = [...promiseResults[1].value, ...promiseResults[2].value];
       
-      console.log(itemsFromItemFind, rewards);
+      //console.log(itemsFromItemFind, rewards);
 
       // Return package to be used on the frontend
       return {
-        updatedAvatar,
-        improvements,
+        avatar : updatedAvatar,
+        improvements : parseAvatarProperties(improvements, true),
         reachedLevel : lvlUp ? lvlAfterBuff : null,
         qpEarned : qpe,
         xpGain : aXPDiff,
         items : itemsFromItemFind,
-        rewards
+        rewards : rewards
       }
 
     }).catch((error) =>{

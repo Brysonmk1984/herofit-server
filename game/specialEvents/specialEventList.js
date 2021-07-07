@@ -29,18 +29,18 @@ const attackOfTheElements = {
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 3.0,
-    requirements : [{ foeType : 'Storming Oni' }]
+    requirements : [{ foeType : 'Hulking Aggro Crag' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : 3.0,
-    requirements : [{ foeType : 'Storming Oni' }]
+    requirements : [{ foeType : 'Hulking Aggro Crag' }]
   },
   {
     type : 'itemFind',
     action : "Increased Likelihood Item",
     bonusPercent : 3.0,
-    items : [/*'Petrified Power Totem','Wave-Swept Battle Conch', 'Smoldering Skull Torch',*/ 'Storm Crow Bone Chimes'],
+    items : ['Petrified Power Totem'/*,'Wave-Swept Battle Conch', 'Smoldering Skull Torch',*/],
   }
 ],
 }
