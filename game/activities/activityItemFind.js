@@ -40,6 +40,7 @@ function _chanceItemFind(itemTuples, remainderPercent){
     if(remainderPercent){
       likelihood = roundNumber(likelihood * (remainderPercent * .01), 4);
     }
+    console.log('likelihood', likelihood);
     const foundThisItem = chance.bool({ likelihood });
     if(foundThisItem){
       foundItems.push(itemTuples[0][i]);
