@@ -186,11 +186,11 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
-          fws.air = 175;
+          fws.air = 200;
           qpAdjustedStats = ["air", "air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
-          fws.earth = 150;
+          fws.earth = 200;
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
@@ -198,7 +198,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
-          fws.water = 175;
+          fws.water = 200;
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         default :
