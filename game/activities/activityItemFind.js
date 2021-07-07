@@ -40,7 +40,10 @@ function _chanceItemFind(itemTuples, remainderPercent){
     if(remainderPercent){
       likelihood = roundNumber(likelihood * (remainderPercent * .01), 4);
     }
-    console.log('likelihood', likelihood);
+    if(likelihood > 100 || likelihood < 0){
+      console.log('SUMTING WONG with likelihood', likelihood);
+      throw new Error('Likelihood is inaccurate');
+    }
     const foundThisItem = chance.bool({ likelihood });
     if(foundThisItem){
       foundItems.push(itemTuples[0][i]);
@@ -131,7 +134,7 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
   const ptFind =  _chancePTFind(remainderPercent, ptDropRate, ptDropAmount);
   
   return {
-    items : foundItems.length ? foundItems : null,
+    items : foundItems,
     pt : ptFind
   }
 }
@@ -162,7 +165,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
     }
   }
   return {
-    items : acquiredItems.length ? acquiredItems : null,
+    items : acquiredItems,
     pt : ptFound
   }
 }

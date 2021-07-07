@@ -52,6 +52,7 @@ function _insertLevelRewards(avatarID, levelsEarned, t){
 }
 
 function _insertStatRewards(avatarID, statObj, t){
+
   const statRewardNames = [];
   for(let stat in statObj){
     // For each stat, find the matching Upgrade Actions for each point the hero achieved

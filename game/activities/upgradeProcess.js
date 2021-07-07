@@ -76,7 +76,7 @@ function _calcProgress(){
   // endingLevel starts over after MAX_LEVEL(100)
   lvlAfterBuff = endingLevel > MAX_LEVEL ? (endingLevel - MAX_LEVEL) : endingLevel;
   qpe = qpEarned;
-  const updatedQP = qpe += avatar.qp;
+  const updatedQP = qpe + avatar.qp;
 
   const updatedPower = updatePower(endingLevel, avatar.qpPower);
   const updatedAether = updateAether(endingLevel, avatar.qpAether);
@@ -109,7 +109,6 @@ function _handleActivityItemFind(weightedElms){
   foundItems = items;
   improvements["Photon Tokens"] = pt;
   updatedAvatar.photonTokens += improvements["Photon Tokens"];
-  //console.log('FOUND!', foundItems);
 }
 
 // UPDATE HERO IN DB
@@ -183,7 +182,11 @@ function upgradeProcess(email){
     }).then((promiseResults) =>{  
       // RETURNS ALL promise results from itemFind, activityStatRewards, activityLevelRewards 
       const itemsFromItemFind = promiseResults[0].value;
-      const rewards = [...promiseResults[1].value, ...promiseResults[2].value];
+      const rewards = [...promiseResults[1].value];
+      if(promiseResults[2]){
+        rewards.push(...promiseResults[2].value);
+      }
+      
       
       //console.log(itemsFromItemFind, rewards);
 

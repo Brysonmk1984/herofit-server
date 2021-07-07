@@ -3,9 +3,11 @@ const { Op } = require('sequelize');
 
 // Check if a particular avatar already has items passed in itemsToCheck array (of item names)
 function preventDuplicateItems(itemsToCheck, avatarId){
+  // if(!itemsToCheck.length){
+  //   return [];
+  // }
   // Should end up with [{ name : 'Black Belt', id : 28, false }, undefined, undefined, etc]
   let allItemMatches = [];
-
   return Items.findAll({ 
     attributes : ['name', 'id'],
     where : { name : { [Op.in] : itemsToCheck }, exhaustible : false }, raw : true
