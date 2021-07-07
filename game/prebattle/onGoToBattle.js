@@ -289,7 +289,7 @@ function _checkWinStreak(avatarId, titleNamesArray){
   return Battle.findAll({
     attributes : ["outcome"],
     where : {  avatarID : avatarId, outcome : { [Op.ne] : "TBD" } },
-    limit : 35,
+    limit : 50,
     order : [['createdAt','DESC']],
     raw : true 
   }).then((results) =>{
