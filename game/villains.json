@@ -417,8 +417,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
       "pba" : ["Grant Air Tint"],
       "reward" : {
         "type" : "skin",
@@ -437,8 +437,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
       "pba" : ["Grant Earth Tint"],
       "reward" : {
         "type" : "skin",
@@ -457,8 +457,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
       "pba" : ["Grant Fire Tint"],
       "reward" : {
         "type" : "skin",
@@ -477,8 +477,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 100,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
       "pba" : ["Grant Water Tint"],
       "reward" : {
         "type" : "skin",
