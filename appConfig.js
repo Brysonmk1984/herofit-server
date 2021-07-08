@@ -7,7 +7,7 @@ const config = {
 
 
   globalMessage : [
-    { type : 'info', link : 'https://old.reddit.com/r/herofit/comments/ofmont/housekeeping_minor_update/', persist : false, message : "New minor updates including connecting/disconnecting Strava account. Click here for details." }
+    { type : 'info', link : 'http://localhost:3000/elemental-event#segmentHeaderWrap', persist : false, message : "Until Wednesday, bonus odds and rewards for beating the Hulking Aggro Crag (from earth activities)" }
   ],
 
   // RANKING PAGE
