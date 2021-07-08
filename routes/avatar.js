@@ -4,7 +4,6 @@ const db = require('../config/db').db;
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const { Avatar, AvatarItems, User, UserTotal } = require('../config/db');
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../game/CONSTANTS');
 const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
 const { literal, Op } = require("sequelize");
 const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctions');
@@ -90,16 +89,21 @@ router.post('/update-avatar-stats', body('avatar').isObject(), body('email').isE
 });
 
 // When a user applies their latest Strava activities, adjust avatar
-router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT, (req, res) => {
+router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isArray(), body('activities').custom((activities) =>{
+    const invalidActivities = activities.find(act => !act.id);
+    // In case the activities are invalid... this should eventually be moved to the validation middleware.
+    return invalidActivities ? res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /upgrade-sequence Endpoint, One or more activities are invalid: ACT - ${invalidActivities}`) : true;
+}), body('accountDate').isString(), body('hasBeenUpgraded').isBoolean(), authenticateJWT, (req, res) => {
+ 
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /buff-and-update-avatar Endpoint");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /upgrade-sequence Endpoint");
   }
 
-  const { email } = req.body;
+  const { email, activities, accountDate, hasBeenUpgraded } = req.body;
   
-  // Runs entire upgrade sequence, returns {updatedAvatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
-  upgradeProcess(email)
+  // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
+  upgradeProcess(email, activities, accountDate, hasBeenUpgraded)
   .then((returnPackage) =>{
     console.log('return package!', returnPackage);
     // Transaction has been committed
@@ -108,7 +112,7 @@ router.post('/buff-and-update-avatar', body('email').isEmail(), authenticateJWT,
   }).catch((error) =>{
     // Transaction has been rolled back
     console.log('INSIDE transaction', error);
-    return res.formatter.serverError(error.toString(), `Transaction error for ${email} for POST /buff-and-update-avatar Endpoint`);
+    return res.formatter.serverError(error.toString(), `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
   });
   
 

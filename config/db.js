@@ -62,14 +62,14 @@ const AvatarItems = AvatarItemsModel(db, Sequelize);
 const Items = ItemsModel(db, Sequelize);
 // User - Avatar JOIN
 User.hasOne(Avatar, {foreignKey: 'userId'});
-Avatar.belongsTo(User, {foreignKey: 'userId'});
+Avatar.belongsTo(User, {foreignKey: 'userId', onDelete: 'CASCADE'});
 
 // Avatar-AvatarItems
 Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID', as: 'equipped'});
-AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID'});
+AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID', onDelete: 'CASCADE'});
 
 // Items - AvatarItems
 Items.hasMany(AvatarItems, {foreignKey: 'itemID', as: 'items'});
-AvatarItems.belongsTo(Items, {foreignKey: 'itemID'});
+AvatarItems.belongsTo(Items, {foreignKey: 'itemID', onDelete: 'CASCADE'});
 
 module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarItems, Items, db }

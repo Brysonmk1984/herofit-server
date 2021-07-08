@@ -1,13 +1,14 @@
-const { UserTotal, Avatar, Items } = require('../../config/db');
+const { User, UserActivity, UserTotal, Avatar, Items } = require('../../config/db');
 const db = require('../../config/db').db;
 const { Op } = require("sequelize");
+const moment = require('moment');
 const { parseAvatarProperties, range } = require('../../lib/helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../CONSTANTS');
+const utCalc = require('../upgrades/utCalc');
 const avCalc = require('../upgrades/avCalc');
 const xpCalc = require('../upgrades/xpCalc');
 const { activityItemFind, insertItemsFromItemFind } = require('./activityItemFind');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('./activityRewards');
-const preventDuplicateItems = require('../items/preventDuplicateItems');
 const activityHeal = require('./activityHeal');
 
 let avatar;
@@ -15,14 +16,52 @@ let possibleItemDrops;
 let ut, avStatSnapshot, aXPDiff, lvlUp, lvlAfterBuff, qpe;
 let startingUpgradeLevel, endingUpgradeLevel;
 let improvements, foundItems;
-let updatedAvatar;
+let updatedAvatar, updatedActivities;
 
-// RETRIEVE USERTOTALS AND AVATAR FROM DB
-function _getExistingData(email, t){
+// UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
+function _insertActivityData(email, activities, t){
+    // Need latest Activity to be added to user's account
+    let latestActivityUpdate;
+    const activityEntries = activities.map((activity) =>{
+      const activityDate = moment.utc(activity.start_date);
+      const activityId = activity.id;
+      
+      // Check for latest activity (doesn't include DB activities)
+      if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
+        latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
+      }
+      return { user : email,  activity, activityDate : latestActivityUpdate, activityId };
+    });
+
+    const allPromises = [
+      // Update latestActivity Date on USER
+      User.update({ latestActivityUpdate },{ where: { email }, transaction: t }),
+      // Insert All activities
+      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: true, returning : true, transaction: t }),
+      // Find matching User Totals
+      UserTotal.findOne({ attributes : [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], where: { user: email }, raw : true, transaction: t })
+    ];
+
+   return Promise.allSettled(allPromises)
+}
+
+// UPDATE USER TOTALS
+function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t){
+  if(!userTotals){
+    throw new Error(`No User Totals for user ${email}`);
+  }
+  // Then Update userTotals
+  const { update, initialUpdate } = utCalc(userTotals);
+
+  // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
+  ut = hasBeenUpgraded ? update(updatedActivities) : initialUpdate(updatedActivities, accountDate);
+  // Finally, save to DB
+  return UserTotal.update(ut, { where: { user: email }, transaction : t });
+}
+
+// RETRIEVE AVATAR AND ITEMS FROM DB
+function _getAvatarAndItems(email, t){
   return Promise.all([
-    UserTotal.findOne({
-      where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw : true, transaction: t 
-    }),
     Avatar.findOne({ 
       where: { owner: email }, attributes : ['id','character', 'createdAt','activityXP', 'battleXP', 'power', 'health', 'maxHealth', 'fire', 'earth', 'water', 'air', 'aether', 'qpFire', 'qpEarth', 'qpWater', 'qpAir', 'qpPower', 'qpHealth', 'qpAether', 'qp', 'photonTokens', 'status'], raw : true, transaction: t, 
     }), 
@@ -63,6 +102,7 @@ function _calcProgress(){
   const snapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
   avStatSnapshot = parseAvatarProperties(snapshot);
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
+
   const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
 
   // Updated aXP
@@ -153,12 +193,19 @@ function _handleAllItemAwarding(t){
 }
 
 // ROOT FUNCTION FOR UPGRADING HERO
-function upgradeProcess(email){
+function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
   return db.transaction(t => {
-    return _getExistingData(email, t).then((result) =>{
-      ut = result[0];
-      avatar = result[1];
-      possibleItemDrops = result[2];
+    return _insertActivityData(email, activities, t)
+    .then((promiseResults) =>{
+      updatedActivities = promiseResults[1].value.map(actResult => actResult.dataValues.activity);
+      const userTotals = promiseResults[2].value;
+      return _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
+
+    }).then(() =>{    
+      return _getAvatarAndItems(email, t)
+    }).then((result) =>{
+      avatar = result[0];
+      possibleItemDrops = result[1];
 
       // Determine all progress made with XP, levels, etc.
       _calcProgress();
@@ -186,12 +233,10 @@ function upgradeProcess(email){
       if(promiseResults[2]){
         rewards.push(...promiseResults[2].value);
       }
-      
-      
-      //console.log(itemsFromItemFind, rewards);
 
       // Return package to be used on the frontend
       return {
+        activities,
         avatar : updatedAvatar,
         improvements : parseAvatarProperties(improvements, true),
         reachedLevel : lvlUp ? lvlAfterBuff : null,

@@ -4,10 +4,8 @@ const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require('../config/db');
 const moment = require('moment');
-const utCalc = require('../game/upgrades/utCalc');
 const xpCalc = require('../game/upgrades/xpCalc');
 const { Op } = require('sequelize');
-const passport = require('passport');
 const { config } = require('../appConfig');
 
 // If an email is passed, get that user, otherwise get user based on JWT
@@ -81,110 +79,6 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
   }).catch((error) =>{
     console.log(`Error Instantiating user total for ${email}, DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Error Instantiating user total for ${email} - POST /instantiate-user-totals Endpoint`);
-  });
-});
-
-// Update existing user's totals, happens FIRST in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
-router.post('/update-user-totals', body('email').isEmail(), body('activities').isArray(), body('hasBeenUpgraded').isBoolean(), body('accountDate').isString(), authenticateJWT, (req, res) => {
-  const errors = validationResult(req);
-  if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /update-user-totals Endpoint");
-  }
-  const { email, activities, hasBeenUpgraded, accountDate } = req.body;
-
-
-  // First, retrieve userTotals from DB
-  UserTotal.findOne(
-    { where: { user: email }, raw : true }
-  ).then((utData) => {
-    if(!utData){
-      throw new Error(`No User Totals for user ${email}`);
-    }
-    // Then Update userTotals
-    const { update, initialUpdate } = utCalc(utData);
-    // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
-    const updatedUT = hasBeenUpgraded ? update(activities) : initialUpdate(activities, accountDate);
-    // Finally, save to DB
-    return UserTotal.update(
-      updatedUT,
-      { where: { user: email } }
-    );
-  
-  }).then((result) =>{
-    res.formatter.ok({ totalsUpdated : true, result });
-  }).catch((error) =>{
-    console.log('Error - ', error);
-    res.formatter.serverError(error.toString(), `Error updating user total for ${email} - POST /update-user-totals Endpoint`);
-  });
-});
-
-// Insert user activities, happends SECOND in upgrade sequence - UPDATE USER TOTALS, UPDATE ACTIVITIES, UPGRADE HERO
-router.post('/insert-user-activities', body('email').isEmail(), body('activities').isArray(), authenticateJWT, (req, res) => {
-  const errors = validationResult(req);
-  if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-user-activities Endpoint");
-  }
-  const { email, activities } = req.body;
-  //console.log('ALL PASSED ACTS - ', activities);
-
-  // In case the activities are invalid... this should eventually be moved to the validation middleware.
-  if(!activities[0].id){
-    return res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint, ACT 0 - ${activities[0]}`);
-  }
-
-  // Need latest Activity to be added to user's account
-  let latestActivityUpdate = null;
-  const entries = activities.map((activity) =>{
-    activityId = activity.id;
-    //console.log('ACT in question - ', activity, activityId);
-    const activityDate = moment.utc(activity.start_date);
-    // Check for latest activity (doesn't include DB activities)
-    if(latestActivityUpdate === null){
-      latestActivityUpdate = activity.start_date;
-    }else if( activityDate.isAfter(moment.utc(latestActivityUpdate)) ){
-      latestActivityUpdate = activity.start_date;
-    }
-    return { user : email,  activity, activityDate : activity.start_date, activityId };
-  });
-
-  // Add latestActivityUpdate to DB for user
-  User.update(
-    {latestActivityUpdate : moment.utc(latestActivityUpdate).format('YYYY-MM-DD HH:mm:ss')},
-    { where: { email } }
-  ).then(() => {
-    const actIdMap = entries.map((entry) =>{
-      //console.log(entry.activityId);
-      return entry.activityId
-    });
-    // Front end is determining which activities are new, so everything passed here can be added to db.
-    UserActivity.bulkCreate(entries, { ignoreDuplicates: true, returning : true })
-    //UserActivity.bulkCreate(entries)
-    .then((result) =>{
-      // Fetch all recent activities again because I'm not sure how to return activities from a bulk insert where some don't insert
-      return UserActivity.findAll({ where: { user: email }, raw: true, limit : 30, order:[["activityDate", 'DESC']],
-        attributes : ['id', 'activity', 'activityDate']
-      });
-    }).then((results) =>{
-      //console.log('THE RESULTS!', results.length);
-      if(results.length){
-        const activities = results.map((result, i) =>{
-          return result.activity;
-        });
-
-        res.formatter.ok({ activities });
-      }else{
-        res.formatter.serverError("Something went wrong with retrieving activities after bulkInsert");
-      }
-    }).catch((error)=>{
-      const actIdMap = entries.map((entry) =>{
-        return entry.activityId
-      });
-      console.log(`Error bulk inserting user activities for ${email} DEBUG: ACTID-${actIdMap.join()} ${error}`);
-      res.formatter.serverError(error.toString(), `Error bulk inserting user activities for ${email} ACTIDs-${actIdMap.join()} - POST /insert-user-activitiesEndpoint`);
-    });
-  }).catch((error)=>{
-    console.log(`Error updating latest activity to user table for user ${email} DEBUG: ${error}`);
-    res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /insert-user-activities Endpoint`);
   });
 });
 

@@ -50,15 +50,17 @@ router.post('/update-owner-username', body('owner').isEmail(), body('newUsername
 });
 
 // DELETE ACCOUNT
-router.delete('/:username', authenticateJWT, (req, res) => {
+router.delete('/:username', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
   }
 
   const { id, email } = req.user;
+  const { avatarID } = req.body;
+
   const promises = [];
-  promises.push(AvatarItems.destroy({ where : { owner : email }}));
+  promises.push(AvatarItems.destroy({ where : { avatarID }}));
   promises.push(Battle.destroy({ where : { owner : email }}));
 
   Promise.allSettled(promises)
