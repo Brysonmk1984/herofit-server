@@ -124,7 +124,7 @@ const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 
 // Applies to mid level +
-const LEVEL_DIFFICULTY_MOD = 1.20;
+const LEVEL_DIFFICULTY_MOD = 1.23;
 // Applies to high level (on top of mid level difficulty mod)
 const HIGH_LEVEL_DIFFICULTY_MOD = 1.30;
 
