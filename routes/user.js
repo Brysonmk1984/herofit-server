@@ -118,40 +118,40 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
 
 // PROFILE PAGE
 // Initial page load of profile page, uses username as a parameter
-router.post('/get-info-by-username', body('username').isString(), (req, res) => {
+router.post('/get-profile-info-by-email', body('heroName').isString(), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-info-by-username Endpoint");
   }
-  const { username } = req.body;
+  const { heroName } = req.body;
 
-  let userTotals, activities, avatar, battles;
+  let email, userTotals, activities, avatar, battles;
   // First, exchange the username for the email
-  User.findOne({ where: { username }, attributes : ['email'], raw : true })
-  .then((data) =>{
-    if(!data){
+
+  const allPromises = [];
+  Avatar.findOne({ where: { name: heroName }, raw : true }).then((av) =>{
+    if(!av){
       return res.formatter.ok({ noUser : true });
     }
-    const allPromises = [];
 
-    allPromises.push(UserTotal.findOne({ where: { user: data.email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe', 'kayaking'], raw : true }));
-    allPromises.push(UserActivity.findAll({ where: { user: data.email }, raw: true,  limit : 10, order: [['activityDate', 'DESC']], attributes : ['id', 'activity', 'activityDate']}));
-    allPromises.push(Avatar.findOne({ where: { owner: data.email }, raw : true }));
-    allPromises.push(Battle.findAll({ where: { owner: data.email }, raw : true,  limit : 50, order: [['createdAt', 'DESC']] }));
-    
-    return Promise.allSettled(allPromises);
-  }).then(([ut, act, av, bat]) =>{
+    email = av.owner;
+    avatar = av;
+    allPromises.push(UserTotal.findOne({ where: { user: email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe', 'kayaking'], raw : true }));
+    allPromises.push(UserActivity.findAll({ where: { user: email }, raw: true,  limit : 10, order: [['activityDate', 'DESC']], attributes : ['id', 'activity', 'activityDate']}));
+    allPromises.push(Battle.findAll({ where: { owner: email }, raw : true,  limit : 50, order: [['createdAt', 'DESC']] }));
+    allPromises.push(User.findOne({ where: { email }, attributes : ['username'], raw : true }));  
+    return Promise.allSettled(allPromises)
+  }).then(([ut, act, bat, user]) =>{
     userTotals = ut;
     activities = act;
-    avatar = av;
     battles = bat;
-    return AvatarItems.findAll({ where: { avatarID : avatar.value.id }, raw : true })
+    avatar.ownerUserName = user.value.username;
+    return AvatarItems.findAll({ where: { avatarID : avatar.id }, raw : true })
   }).then((itemInstances) =>{
     userTotals = userTotals.value;
     activities = activities.value.map((act) =>act.activity);
     battles = battles.value;
     const { currentLevelByInput } = xpCalc();
-    avatar = avatar.value;
     const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
     avatar.level = level;
     avatar.albedo = albedo;
@@ -159,7 +159,7 @@ router.post('/get-info-by-username', body('username').isString(), (req, res) => 
     res.formatter.ok({userTotals, activities, avatar, battles, itemInstances });
   }).catch((error)=>{
     console.log('Error - ', error);
-    res.formatter.serverError(error.toString(), `Error retrieving data for ${username} - POST /get-info-by-username Endpoint`);
+    res.formatter.serverError(error.toString(), `Error retrieving data for ${email} - POST /get-profile-info-by-email Endpoint`);
   });
 
 });
@@ -192,20 +192,20 @@ router.post('/get-matching-users', body('searchInput').isString(), (req, res) =>
 });
 
 // After a user searches for a user, they click an email from the list. Load selected user
-router.post('/get-user-by-email', body('email').isEmail(), (req, res) => {
+router.post('/get-hero-name-by-username', body('username').isString(), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-user-by-email Endpoint");
+    return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-hero-name-by-username Endpoint");
   }
-  const { email } = req.body;
-  
-
-  User.findOne({ where: { email }, attributes : ['username'], raw : true })
-  .then((data) =>{
-    res.formatter.ok({ username : data.username });
+  const { username } = req.body;
+  User.findOne({ where: { username }, attributes : ['email'], raw : true })
+  .then((user) =>{
+    return Avatar.findOne({ where: { owner : user.email }, attributes : ['name'], raw : true })
+  }).then((data) =>{
+    res.formatter.ok({ name : data.name });
   }).catch((error) =>{
     console.log('Error - ', error);
-    res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-user-by-email Endpoint`);
+    res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-hero-name-by-username Endpoint`);
   });
 });
 
