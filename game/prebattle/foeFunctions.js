@@ -158,11 +158,11 @@ function generateFoeStats(avatar, foe){
       //Need to check for for types here for different elements
       switch(foe.type){
         case "Gusty Rascal":
-          fws.air = 25;
+          fws.air = 50;
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Rock Skipper":
-          fws.earth = 25;
+          fws.earth = 50;
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Flame Fiend":
@@ -170,23 +170,23 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Splash Artist":
-          fws.water = 25;
+          fws.water = 50;
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Wheezing Jinn":
-          fws.air = 75;
+          fws.air = 125;
           qpAdjustedStats = ["air", "air", "armor","power","health"]; 
           break; 
         case "Granite Golem":
-          fws.earth = 80;
+          fws.earth = 125;
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = 100;
+          fws.fire = 125;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
-          fws.water = 90;
+          fws.water = 125;
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
