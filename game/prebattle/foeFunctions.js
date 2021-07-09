@@ -141,16 +141,26 @@ function generateFoeStats(avatar, foe){
         break;
       }
     case 'Elementals':
-      let elementalQp = FOE_MOD.QP * 1.3;
+      let elementalQp = FOE_MOD.QP
+      let baseHealth = baseFoeHealth;
+      let basePower = baseFoePower;
       const bosses = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
+      const adepts = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
       if(bosses.includes(foe.type)){
+        elementalQp *= 1.5;
+        baseHealth *= 1.2;
+        basePower *= 1.1;
+      }else if(adepts.includes(foe.type)){
         elementalQp *= 1.3;
+        baseHealth *= 1.1;
+      }else{
+        elementalQp *= 1.2;
       }
 
-      randomizedHealth = randomizer(baseFoeHealth);
-      randomizedPower = randomizer(baseFoePower);
+ 
+      randomizedHealth = randomizer(baseHealth);
+      randomizedPower = randomizer(basePower);
       randomizedQP = randomizer(Math.floor(baseQP * elementalQp));
-      
 
       fws.health = Math.floor(randomizedHealth.stat);
       fws.power = Math.floor(randomizedPower.stat);
@@ -175,35 +185,35 @@ function generateFoeStats(avatar, foe){
           break; 
         case "Wheezing Jinn":
           fws.air = 125;
-          qpAdjustedStats = ["air", "air", "armor","power","health"]; 
+          qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Granite Golem":
           fws.earth = 125;
-          qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
+          qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
           fws.fire = 125;
-          qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
+          qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
           fws.water = 125;
-          qpAdjustedStats = ["water", "water", "armor","power","health"]; 
+          qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
           fws.air = 250;
-          qpAdjustedStats = ["air", "air", "armor","power","health"]; 
+          qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
           fws.earth = 250;
-          qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
+          qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
           fws.fire = 250;
-          qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
+          qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
           fws.water = 250;
-          qpAdjustedStats = ["water", "water", "armor","power","health"]; 
+          qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         default :
           qpAdjustedStats = ["health","power","armor","fire","earth","water","air"]; 
