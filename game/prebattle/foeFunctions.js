@@ -141,7 +141,11 @@ function generateFoeStats(avatar, foe){
         break;
       }
     case 'Elementals':
-      const elementalQp = FOE_MOD.QP * 1.3;
+      let elementalQp = FOE_MOD.QP * 1.3;
+      const bosses = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
+      if(bosses.includes(foe.type)){
+        elementalQp *= 1.3;
+      }
 
       randomizedHealth = randomizer(baseFoeHealth);
       randomizedPower = randomizer(baseFoePower);
@@ -178,7 +182,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = 150;
+          fws.fire = 100;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
@@ -186,23 +190,19 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
-          randomizedQP *= 1.2;
-          fws.air = 200;
+          fws.air = 250;
           qpAdjustedStats = ["air", "air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
-          randomizedQP *= 1.2;
-          fws.earth = 200;
+          fws.earth = 250;
           qpAdjustedStats = ["earth", "earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
-          randomizedQP *= 1.2;
-          fws.fire = 200;
+          fws.fire = 250;
           qpAdjustedStats = ["fire", "fire", "armor","power","health"]; 
           break; 
         case "High Priestess of the Tides":
-          randomizedQP *= 1.2;
-          fws.water = 200;
+          fws.water = 250;
           qpAdjustedStats = ["water", "water", "armor","power","health"]; 
           break; 
         default :
