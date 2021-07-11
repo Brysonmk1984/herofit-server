@@ -105,7 +105,7 @@ router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isA
   // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
   upgradeProcess(email, activities, accountDate, hasBeenUpgraded)
   .then((returnPackage) =>{
-    console.log('return package!', returnPackage);
+    //console.log('return package!', returnPackage);
     // Transaction has been committed
     // result is whatever the result of the promise chain returned to the transaction callback
     return res.formatter.ok(returnPackage);

@@ -11,13 +11,6 @@ const { activityItemFind, insertItemsFromItemFind } = require('./activityItemFin
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('./activityRewards');
 const activityHeal = require('./activityHeal');
 
-let avatar;
-let possibleItemDrops;
-let ut, avStatSnapshot, aXPDiff, lvlUp, lvlAfterBuff, qpe;
-let startingUpgradeLevel, endingUpgradeLevel;
-let improvements, foundItems;
-let updatedAvatar, updatedActivities;
-
 // UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
 function _insertActivityData(email, activities, t){
     // Need latest Activity to be added to user's account
@@ -46,7 +39,7 @@ function _insertActivityData(email, activities, t){
 }
 
 // UPDATE USER TOTALS
-function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t){
+async function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t){
   if(!userTotals){
     throw new Error(`No User Totals for user ${email}`);
   }
@@ -54,9 +47,10 @@ function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, acco
   const { update, initialUpdate } = utCalc(userTotals);
 
   // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
-  ut = hasBeenUpgraded ? update(updatedActivities) : initialUpdate(updatedActivities, accountDate);
+  const ut = hasBeenUpgraded ? update(updatedActivities) : initialUpdate(updatedActivities, accountDate);
   // Finally, save to DB
-  return UserTotal.update(ut, { where: { user: email }, transaction : t });
+  await UserTotal.update(ut, { where: { user: email }, transaction : t });
+  return ut;
 }
 
 // RETRIEVE AVATAR AND ITEMS FROM DB
@@ -71,9 +65,9 @@ function _getAvatarAndItems(email, t){
 }
 
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(){
-  const { power, maxHealth, health, air, water, fire, earth, aether } = updatedAvatar;
-  return improvements = {
+function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }){
+
+  return {
     power : power - avStatSnapshot.power,
     "max health" : maxHealth - avStatSnapshot.maxHealth,
     health : health - avStatSnapshot.health,
@@ -86,38 +80,35 @@ function _calcAvatarImprovements(){
 }
 
 // DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
-function _calcWeightedElms(){
+function _calcWeightedElms({ air, water, fire, earth }){
     // Needed for activity-specific items
-    const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
+    const totalElmImprove = air + water + fire + earth;
     return {
-      air : (improvements.air / totalElmImprove) * 100,
-      water : (improvements.water / totalElmImprove) * 100,
-      fire : (improvements.fire / totalElmImprove) * 100,
-      earth : (improvements.earth / totalElmImprove) * 100,
+      air : (air / totalElmImprove) * 100,
+      water : (water / totalElmImprove) * 100,
+      fire : (fire / totalElmImprove) * 100,
+      earth : (earth / totalElmImprove) * 100,
     } 
 }
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
-function _calcProgress(){
-  const snapshot = Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health });
-  avStatSnapshot = parseAvatarProperties(snapshot);
+function _calcProgress(avatar, ut){
+  const avStatSnapshot = parseAvatarProperties(Object.assign({}, { activityXP : avatar.activityXP, power : avatar.power, maxHealth : avatar.maxHealth, fire : avatar.fire, earth : avatar.earth, water : avatar.water, air : avatar.air, aether : avatar.aether, health : avatar.health }));
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
   const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);  
 
   // Updated aXP
   const updatedAXP = calcNewActivityXPFromUt(ut);
-  aXPDiff = (updatedAXP - avStatSnapshot.activityXP);
+  const aXPDiff = (updatedAXP - avStatSnapshot.activityXP);
 
   const { leveledUp, startingLevel, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
-  startingUpgradeLevel = startingLevel;
-  endingUpgradeLevel = endingLevel;
-  lvlUp = leveledUp;
+  const lvlUp = leveledUp;
   // endingLevel starts over after MAX_LEVEL(100)
-  lvlAfterBuff = endingLevel > MAX_LEVEL ? (endingLevel - MAX_LEVEL) : endingLevel;
-  qpe = qpEarned;
-  const updatedQP = qpe + avatar.qp;
-
+  const lvlAfterBuff = endingLevel > MAX_LEVEL ? (endingLevel - MAX_LEVEL) : endingLevel;
+  const levelInfo = { startingLevel, endingLevel, lvlUp, lvlAfterBuff, qpEarned, aXPDiff };
+  
+  const updatedQP = qpEarned + avatar.qp;
   const updatedPower = updatePower(endingLevel, avatar.qpPower);
   const updatedAether = updateAether(endingLevel, avatar.qpAether);
   let { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
@@ -126,67 +117,79 @@ function _calcProgress(){
   // For users with Aether, heal a portion of health based on activity time and aether
   updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
 
-  updatedAvatar = Object.assign({}, avatar, {
-    power : updatedPower,
-    aether : updatedAether,
-    health : updatedHealth,
-    maxHealth : updatedMaxHealth,
-    status : updatedStatus,
-    fire, earth, water, air,
-    activityXP : updatedAXP,
-    qp : updatedQP,
-    hasBeenUpgraded : true
-  });
+  return {
+    avStatSnapshot,
+    levelInfo,
+    updatedAvatar : Object.assign({}, avatar, {
+      power : updatedPower,
+      aether : updatedAether,
+      health : updatedHealth,
+      maxHealth : updatedMaxHealth,
+      status : updatedStatus,
+      fire, earth, water, air,
+      activityXP : updatedAXP,
+      qp : updatedQP,
+      hasBeenUpgraded : true
+    })
+  };
 
 }
 
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-function _handleActivityItemFind(weightedElms){
+function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops){
+
+  const { aXPDiff, endingLevel } = levelInfo;
+
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
-  const { items, pt } = activityItemFind(aXPDiff, endingUpgradeLevel, weightedElms, null, null, possibleItemDrops);
   // Items & PT found during activity
-  foundItems = items;
-  improvements["Photon Tokens"] = pt;
-  updatedAvatar.photonTokens += improvements["Photon Tokens"];
+  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, null, null, possibleItemDrops);
+
+  return {
+    foundItems : items, 
+    improvements : Object.assign(improvements, { "Photon Tokens" : pt }),
+    updatedAvatar : Object.assign(updatedAvatar, { photonTokens : updatedAvatar.photonTokens + improvements["Photon Tokens"] })
+  }
 }
 
 // UPDATE HERO IN DB
-function _updateAvatar(email, t){
+function _updateAvatar(email, updatedAvatar, t){
   return Avatar.update({...updatedAvatar},
     { where: { owner: email }, transaction: t }
   );
 }
 
 // APPEND ALL EXTRA INFO NEEDED FOR HERO ON FRONTEND
-function _appendLevelInfo(){
-  const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(updatedAvatar.activityXP, updatedAvatar.battleXP);
+function _appendLevelInfo(updatedAvatar){
+  const { activityXP, battleXP, recovery, health, maxHealth} = updatedAvatar;
+  const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(activityXP, battleXP);
   const { level, albedo } = getCurrentLevel();
 
-  updatedAvatar.level = level;
-  updatedAvatar.albedo = albedo;
-  updatedAvatar.nextLevelStartXp = getNextLevel();
-  updatedAvatar.thisLevelStartXp = getNextLevel(-1);
-  updatedAvatar.healthRegenRate = determineRecoveryPerHour(updatedAvatar.recovery);
-  updatedAvatar.restedEnough = updatedAvatar.maxHealth * .8 <= updatedAvatar.health;
-  
+  return Object.assign({}, updatedAvatar, {
+    level,
+    albedo,
+    nextLevelStartXp : getNextLevel(),
+    thisLevelStartXp : getNextLevel(-1),
+    healthRegenRate : determineRecoveryPerHour(recovery),
+    restedEnough : maxHealth * .8 <= health
+  });
 }
 
 // RUN FUNCTIONS FOR ITEM FIND & REWARDS
-function _handleAllItemAwarding(t){
-  
+function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInfo, foundItems, t){
+  const { startingLevel, endingLevel } = levelInfo;
   const statObjForUpgrade = determineStatImprovements(improvements, avStatSnapshot)
   const allItemPromises = [
     // ITEMS FROM ITEM FIND
-    insertItemsFromItemFind(avatar.id, foundItems, t),
+    insertItemsFromItemFind(avatarID, foundItems, t),
     // ITEMS FROM STAT REWARDS
-    activityStatRewards(avatar.id, statObjForUpgrade, t)
+    activityStatRewards(avatarID, statObjForUpgrade, t)
   ];
 
   // ITEMS FROM LEVELING
-  if(endingUpgradeLevel > startingUpgradeLevel){
-    const levelsToCheck = range(startingUpgradeLevel, endingUpgradeLevel);
-    allItemPromises.push(activityLevelRewards(avatar.id, levelsToCheck, t));
+  if(endingLevel > startingLevel){
+    const levelsToCheck = range(startingLevel, endingLevel);
+    allItemPromises.push(activityLevelRewards(avatarID, levelsToCheck, t));
   }
   
   return Promise.allSettled(allItemPromises);
@@ -197,33 +200,34 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
   return db.transaction(async t => {
     try{
       const activityPromiseResults = await _insertActivityData(email, activities, t)
-      updatedActivities = activityPromiseResults[1].value.map(actResult => actResult.dataValues.activity);
-      const userTotals = activityPromiseResults[2].value;
+      const updatedActivities = activityPromiseResults[1].value.map(actResult => actResult.dataValues.activity);
+      let userTotals = activityPromiseResults[2].value;
 
-      await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
-      [ avatar, possibleItemDrops ] = await _getAvatarAndItems(email, t);
+      userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
+      const [ avatar, possibleItemDrops ] = await _getAvatarAndItems(email, t);
 
       // Determine all progress made with XP, levels, etc.
-      _calcProgress();
+      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
-      _calcAvatarImprovements();
+      let improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
-      const weightedElms = _calcWeightedElms();
-
+      const weightedElms = _calcWeightedElms(improvements);
+      
+      let foundItems;
       // Run activity find module to see if any items were found from latest upgrade
-      _handleActivityItemFind(weightedElms);
+      ({ foundItems, improvements, updatedAvatar } = _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops));
 
       // Save new Av to DB
-      await _updateAvatar(email, t);
+      await _updateAvatar(email, updatedAvatar, t);
 
       // assign adjusted level-related properties to avatar
-      _appendLevelInfo();
+      updatedAvatar = _appendLevelInfo(updatedAvatar);
 
       // Returns all promise results from itemFind, activityStatRewards, activityLevelRewards 
       // Destructures into itemsFromItemFind, rewards, and a possible levelReward (will be undefined unless a user earned a level up)
-      [{value : itemsFromItemFind}, {value : rewards}, levelRewards] = await _handleAllItemAwarding(t);
+      [{value : itemsFromItemFind}, {value : rewards}, levelRewards] = await _handleAllItemAwarding(avatar.id, improvements, avStatSnapshot, levelInfo, foundItems, t);
 
       if(levelRewards){
         rewards.push(...levelRewards.value);
@@ -234,9 +238,9 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
         activities,
         avatar : updatedAvatar,
         improvements : parseAvatarProperties(improvements, true),
-        reachedLevel : lvlUp ? lvlAfterBuff : null,
-        qpEarned : qpe,
-        xpGain : aXPDiff,
+        reachedLevel : levelInfo.lvlUp ? levelInfo.lvlAfterBuff : null,
+        qpEarned : levelInfo.qpEarned,
+        xpGain : levelInfo.aXPDiff,
         items : itemsFromItemFind,
         rewards
       }
