@@ -194,18 +194,14 @@ function _handleAllItemAwarding(t){
 
 // ROOT FUNCTION FOR UPGRADING HERO
 function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
-  return db.transaction(t => {
-    return _insertActivityData(email, activities, t)
-    .then((promiseResults) =>{
-      updatedActivities = promiseResults[1].value.map(actResult => actResult.dataValues.activity);
-      const userTotals = promiseResults[2].value;
-      return _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
+  return db.transaction(async t => {
+    try{
+      const activityPromiseResults = await _insertActivityData(email, activities, t)
+      updatedActivities = activityPromiseResults[1].value.map(actResult => actResult.dataValues.activity);
+      const userTotals = activityPromiseResults[2].value;
 
-    }).then(() =>{    
-      return _getAvatarAndItems(email, t)
-    }).then((result) =>{
-      avatar = result[0];
-      possibleItemDrops = result[1];
+      await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
+      [ avatar, possibleItemDrops ] = await _getAvatarAndItems(email, t);
 
       // Determine all progress made with XP, levels, etc.
       _calcProgress();
@@ -220,18 +216,17 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
       _handleActivityItemFind(weightedElms);
 
       // Save new Av to DB
-      return _updateAvatar(email, t);
+      await _updateAvatar(email, t);
 
-    }).then(() =>{
       // assign adjusted level-related properties to avatar
       _appendLevelInfo();
-      return _handleAllItemAwarding(t);
-    }).then((promiseResults) =>{  
-      // RETURNS ALL promise results from itemFind, activityStatRewards, activityLevelRewards 
-      const itemsFromItemFind = promiseResults[0].value;
-      const rewards = [...promiseResults[1].value];
-      if(promiseResults[2]){
-        rewards.push(...promiseResults[2].value);
+
+      // Returns all promise results from itemFind, activityStatRewards, activityLevelRewards 
+      // Destructures into itemsFromItemFind, rewards, and a possible levelReward (will be undefined unless a user earned a level up)
+      [{value : itemsFromItemFind}, {value : rewards}, levelRewards] = await _handleAllItemAwarding(t);
+
+      if(levelRewards){
+        rewards.push(...levelRewards.value);
       }
 
       // Return package to be used on the frontend
@@ -243,12 +238,12 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
         qpEarned : qpe,
         xpGain : aXPDiff,
         items : itemsFromItemFind,
-        rewards : rewards
+        rewards
       }
-
-    }).catch((error) =>{
+    }catch(error){
       console.log('ERROR UPGRADING HERO', error);
-    });
+      throw error;
+    }
   });
 }
 
