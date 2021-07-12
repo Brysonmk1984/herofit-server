@@ -1,10 +1,10 @@
 const postBattleEffects = require('./postBattleEffects');
 const determineItemsToInsert = require('./determineItemsToInsert');
 const preventDuplicateItems = require('../items/preventDuplicateItems');
-const xpCalc = require('../upgrades/xpCalc');
 const { OUTCOME_XP } = require('../CONSTANTS'); 
 
 const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining){
+  console.log('AVATAR', avatar);
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, { goToBattle : false, status : outcomeData.avatarStatus, health : aHealthRemaining < 0 ? 0 : aHealthRemaining });
 
@@ -44,14 +44,6 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
           break;
         default:
       }
-    },
-    updateAvatarByLevelUp : () => {
-      // Use initial avatar values
-      const { checkLevelUp } = xpCalc(avatar.activityXP, avatar.battleXP);
-      // Check if level up from xp gain, adjust qp, maxHealth, power
-      const leveledUpResults = checkLevelUp(xpGain);
-      leveledUp = leveledUpResults.leveledUp;
-      a = Object.assign({}, a, { qp : avatar.qp + leveledUpResults.qpEarned, maxHealth : avatar.maxHealth += 5, power : avatar.power += 5 });
     },
     doAllPbas : (postBattleActions) => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);

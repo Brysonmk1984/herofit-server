@@ -3,6 +3,7 @@ const doBattle = require('./doBattle');
 const preBattleSetup = require('./preBattleSetup');
 const postBattleProcess = require('./postBattleProcess');
 const { Op } = require("sequelize");
+const xpCalc = require('../upgrades/xpCalc');
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
@@ -53,9 +54,6 @@ function battleProcess(battleInstance, avatarInstance){
   // POST BATTLE STEP 2
   updateAvatarByOutcome();
 
-  // POST BATTLE STEP 3 - adjust avatar xp & qp based on level up from battle
-  updateAvatarByLevelUp();
-
   // POST BATTLE STEP 4 - POST BATTLE ACTIONS - Post battle actions check if any actions were saved to the battle on goToBattle, and runs them now, usually for awarding items
   // DONE! - INSERT all the items from the itemNames array, gathered from the PBAs
   return doAllPbas(battle.postBattleActions)
@@ -72,47 +70,59 @@ function battleProcess(battleInstance, avatarInstance){
   }).then(() =>{
     const { postAv, postOutcome, xpGain, ptGain } = getPostBattlePackage();
     // Only save the relevant avatar changes, all come from postAv
-    const { goToBattle, qp, health, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;
+    const { goToBattle, qp, health, maxHealth, power, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;
     // In case of Vampiric Touch, don't heal beyond what Avatar went into battle with
     const updatedHealth = health > avatar.health ? avatar.health : health;
-    const avatarUpdates = { goToBattle, qp, health : updatedHealth, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens};
+    const avatarBattleUpdates = { goToBattle, health : updatedHealth, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens };
 
-    // Update Av first, then the battle record
-    return Avatar.update(avatarUpdates, { where: { id: avatar.id } })
-    .then(() =>{
-    
-      return Battle.update({
-        scenario : scenario.id,
-        outcome : postOutcome.outcome,
-        aStatus : postOutcome.avatarStatus,
-        aPhyDamage : b.aPhyDamage,
-        fPhyReduction : b.fPhyReduction,
-        fPhyDamage : b.fPhyDamage,
-        aPhyReduction : b.aPhyReduction,
-        xpGain,
-        ptGain,
-        leveledUp : leveledUp,
-        aHealthRemaining : b.aHealthRemaining,
-        fHealthRemaining : b.fHealthRemaining,
-        foe : battle.foe,
-        avatar,
-        bra : BRA,
-        brf : BRF,
-        aElmDamage : b.aElmDamage,
-        fElmReduction : b.fElmReduction,
-        fElmDamage : b.fElmDamage,
-        aElmReduction : b.aElmReduction,
-        roundBreakdown : b.roundBreakdown
-      },
-      { where: { id: battle.id }, raw : true }
-      );
-    })
-    .then(() =>{
-      return postOutcome.outcome;
-    })
-    .catch((error) =>{
-      console.log('ERROR SOMEWHERE IN BATTLE PROCESS', error);
-      return error;
+    return Avatar.findOne({ where: { id: avatar.id }, raw : true})
+    .then((latestSavedAv) =>{
+      const { checkLevelUp } = xpCalc(latestSavedAv.activityXP, latestSavedAv.battleXP);
+      // Check if level up from xp gain, adjust qp, maxHealth, power
+      const { leveledUp, qpEarned, maxHealthEarned, powerEarned } = checkLevelUp(xpGain);
+
+      // Combine latest saved av with the updates from the latest battle. If avatar earned level up during battle, those values will be saved
+      const combinedAv = leveledUp ? 
+      Object.assign({}, latestSavedAv, avatarBattleUpdates, { qp : (latestSavedAv.qp + qpEarned), power : (latestSavedAv.power + powerEarned), maxHealth : (latestSavedAv.maxHealth + maxHealthEarned), health: (latestSavedAv.maxHealth + maxHealthEarned) })
+      : Object.assign({}, latestSavedAv, avatarBattleUpdates);
+      
+      // Update Av first, then the battle record
+      return Avatar.update(combinedAv, { where: { id: avatar.id } })
+      .then(() =>{
+      
+        return Battle.update({
+          scenario : scenario.id,
+          outcome : postOutcome.outcome,
+          aStatus : postOutcome.avatarStatus,
+          aPhyDamage : b.aPhyDamage,
+          fPhyReduction : b.fPhyReduction,
+          fPhyDamage : b.fPhyDamage,
+          aPhyReduction : b.aPhyReduction,
+          xpGain,
+          ptGain,
+          leveledUp : leveledUp,
+          aHealthRemaining : b.aHealthRemaining,
+          fHealthRemaining : b.fHealthRemaining,
+          foe : battle.foe,
+          avatar,
+          bra : BRA,
+          brf : BRF,
+          aElmDamage : b.aElmDamage,
+          fElmReduction : b.fElmReduction,
+          fElmDamage : b.fElmDamage,
+          aElmReduction : b.aElmReduction,
+          roundBreakdown : b.roundBreakdown
+        },
+        { where: { id: battle.id }, raw : true }
+        );
+      })
+      .then(() =>{
+        return postOutcome.outcome;
+      })
+      .catch((error) =>{
+        console.log('ERROR SOMEWHERE IN BATTLE PROCESS', error);
+        return error;
+      });
     });
   }).catch((error) =>{
     console.log('ERROR INSERTING ITEM', error);
