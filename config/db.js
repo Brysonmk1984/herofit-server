@@ -65,7 +65,7 @@ User.hasOne(Avatar, {foreignKey: 'userId'});
 Avatar.belongsTo(User, {foreignKey: 'userId', onDelete: 'CASCADE'});
 
 // Avatar-AvatarItems
-Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID', as: 'equipped'});
+Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID', as: 'equipped', onDelete: 'CASCADE'});
 AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID', onDelete: 'CASCADE'});
 
 // Items - AvatarItems
