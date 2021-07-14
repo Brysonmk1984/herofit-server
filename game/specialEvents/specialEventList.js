@@ -29,18 +29,18 @@ const attackOfTheElements = {
     type : 'ptBooster',
     action : "Increase PT Reward",
     bonusPercent : 3.0,
-    requirements : [{ foeType : 'Hulking Aggro Crag' }]
+    requirements : [{ foeType : 'Scorching Archfiend' }]
   },{
     type : 'xpBooster',
     action : "Increase XP Reward",
     bonusPercent : 3.0,
-    requirements : [{ foeType : 'Hulking Aggro Crag' }]
+    requirements : [{ foeType : 'Scorching Archfiend' }]
   },
   {
     type : 'itemFind',
     action : "Increased Likelihood Item",
     bonusPercent : 3.0,
-    items : ['Petrified Power Totem'/*,'Wave-Swept Battle Conch', 'Smoldering Skull Torch',*/],
+    items : [/*,'Wave-Swept Battle Conch',*/ 'Smoldering Skull Torch'],
   }
 ],
 }
