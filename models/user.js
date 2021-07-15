@@ -83,6 +83,11 @@ const UserModel = function(db, DataTypes){
         length : 50,
         allowNull: true
     },
+    emailMarketingOptIn : {
+        type : DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    },
   });
 
       
