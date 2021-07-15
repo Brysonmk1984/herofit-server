@@ -273,15 +273,21 @@ router.post('/run-specific-battle', body('avatarID').isNumeric(), authenticateJW
   }
 
   let { avatarID } = req.body;
-  console.log('AVID', avatarID);
-  Battle.findOne({ where: { outcome : 'TBD', avatarID }, raw : true })
+  return Battle.findOne({ where: { outcome : 'TBD', avatarID }, raw : true })
   .then((battle) =>{
-    console.log('BAT', battle);
-    return battleProcess(battle, battle.avatar);
+    if(!battle){
+      throw new Error('No Battle')
+    }else{
+      return battleProcess(battle, battle.avatar);
+    }
+
   }).then((data) =>{
-    console.log('MADE IT OUT THE OTHER SIDE', data);
+    console.log('ran single battle - ', data);
     res.formatter.ok(data);
-  }).catch((error) =>{console.log('ERROR', error);
+  }).catch((error) =>{
+    if(error.toString() === 'Error: No Battle'){
+      return res.formatter.badRequest(errors.array(), `No TBD battle matching avatarID ${avatarID} - POST /run-specific-battle`);
+    }
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for /run-specific-battle');
   });
 
