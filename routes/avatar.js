@@ -20,7 +20,10 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
   }
+  
   let { avatar, userId, email } = req.body;
+  console.log('IN!', avatar, userId, email);
+
   // This is to allow the user to Go To Battle after signup.
   if(avatar.status === 'New Recruit'){
     avatar.status = 'Rested';

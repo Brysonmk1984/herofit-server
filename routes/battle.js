@@ -273,9 +273,10 @@ router.post('/run-specific-battle', body('avatarID').isNumeric(), authenticateJW
   }
 
   let { avatarID } = req.body;
-
+  console.log('AVID', avatarID);
   Battle.findOne({ where: { outcome : 'TBD', avatarID }, raw : true })
   .then((battle) =>{
+    console.log('BAT', battle);
     return battleProcess(battle, battle.avatar);
   }).then((data) =>{
     console.log('MADE IT OUT THE OTHER SIDE', data);
