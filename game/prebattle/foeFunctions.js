@@ -184,35 +184,39 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Wheezing Jinn":
-          fws.air = 125;
+          fws.air = (100 + (totalLevel));
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Granite Golem":
-          fws.earth = 125;
+          fws.earth = (100 + (totalLevel));
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = 125;
+          fws.fire = (100 + (totalLevel));
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
-          fws.water = 125;
+          fws.water = (100 + (totalLevel));
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
-          fws.air = 250;
+          fws.air = (150 + (3 * totalLevel));
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
-          fws.earth = 250;
+          fws.earth = (150 + (3 * totalLevel));
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Scorching Archfiend":
-          fws.fire = 250;
+          // Scorching Archfiend Still needs more difficulty;
+          randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP * 1.3));
+
+          fws.fire = (150 + (3 * totalLevel));
           qpAdjustedStats = ["fire", "armor","power","health"]; 
+          
           break; 
         case "High Priestess of the Tides":
-          fws.water = 250;
+          fws.water = (150 + (3 * totalLevel));
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         default :
