@@ -59,10 +59,9 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
-  let { email, username, password, firstName, lastName } = req.body;
+  let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
   fistName = firstName || null;
   lastName = lastName || null;
-
   const saltHash = genPassword(password);
   const { salt, hash } = saltHash;
   const emailCode =  randomEmailString();
@@ -74,7 +73,8 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     lastName,
     hash,
     salt,
-    emailCode
+    emailCode,
+    emailMarketingOptIn
   };
 
   User.create(newUser)
