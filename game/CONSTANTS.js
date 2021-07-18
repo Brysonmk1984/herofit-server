@@ -100,7 +100,7 @@ const RECOVERY_EFFECTIVENESS_MOD = 45;
 // DO BATTLE
 
 // lower is more effective
-const ARMOR_DRF = 3.3;
+const ARMOR_DRF = .7;
 
 // variation on the power each attack (one per turn)
 const DAMAGE_PERCENT_PER_TURN = .15;
