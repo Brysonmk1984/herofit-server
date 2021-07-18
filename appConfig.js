@@ -6,9 +6,9 @@ const config = {
   specialEvent : attackOfTheElements,
 
 
-  // globalMessage : [
-  //   { type : 'info', link : '/elemental-event#segmentHeaderWrap', persist : false, message : "Until next wednesday, bonus odds and rewards for beating the Scorching Archfiend (from fire activities)" }
-  // ],
+  globalMessage : [
+    { type : 'info', /*link : '/elemental-event#segmentHeaderWrap',*/ persist : false, message : "A BIG congratulations to Bicycle Berserker for being the first to reach level 100!!!" }
+  ],
 
   // RANKING PAGE
   AVATAR_COUNT_PER_PAGE : 20

@@ -37,6 +37,9 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
     if(isValid){
       const tokenObject = issueJWT(user);
       //console.log(tokenObject);
+      if(!user.active){
+        return res.formatter.ok({ user : { active : false }, tokenObject });
+      }
       return res.formatter.ok({ user, tokenObject });
     }else{
       return res.formatter.unauthorized(`Incorrect password, please try again.`);
