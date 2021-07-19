@@ -209,7 +209,7 @@ function generateFoeStats(avatar, foe){
           break; 
         case "Scorching Archfiend":
           // Scorching Archfiend Still needs more difficulty;
-          randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP * 1.3));
+          randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP * 1.5));
 
           fws.fire = (175 + (3 * totalLevel));
           qpAdjustedStats = ["fire", "armor","power","health"]; 
