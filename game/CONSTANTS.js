@@ -103,8 +103,8 @@ const RECOVERY_EFFECTIVENESS_MOD = 45;
 const ARMOR_DRF = .7;
 
 // variation on the power each attack (one per turn)
-const DAMAGE_PERCENT_PER_TURN = .15;
-const DAMAGE_VARIANCE_PER_TURN = .025;
+const DAMAGE_PERCENT_PER_TURN = .18;
+const DAMAGE_VARIANCE_PER_TURN = .05;
 const DAMAGE_VARIANCE_RANGE = [DAMAGE_PERCENT_PER_TURN - DAMAGE_VARIANCE_PER_TURN, DAMAGE_PERCENT_PER_TURN + DAMAGE_VARIANCE_PER_TURN];
 
 // ELEMENTAL variation on the elemental power each attack (turns 2,3,6,7,10,11)
@@ -119,14 +119,14 @@ const AIR_EVASION_CHANCE_MOD = 6000;
 const EARTH_THORNS_MOD = 5500;
 const AETHER_IDS_CHANCE_MOD = 1650;
 
-// MUST MAKE GAME EASIER FOR BEGINNERS AND MORE DIFFICULT FOR VETERANS
+// MAKES GAME EASIER FOR BEGINNERS AND MORE DIFFICULT FOR VETERANS
 const BEGINNERS_LUCK_MAX_XP = 2587; // Level 15
 const BEGINNERS_LUCK_LIKELIHOOD = 66;
 const LOW_LEVEL = 15;
 const HIGH_LEVEL = 60;
 
 // Applies to mid level +
-const LEVEL_DIFFICULTY_MOD = 1.23;
+const LEVEL_DIFFICULTY_MOD = 1.26;
 // Applies to high level (on top of mid level difficulty mod)
 const HIGH_LEVEL_DIFFICULTY_MOD = 1.30;
 
@@ -136,7 +136,7 @@ const PTFIND_BASE_AMOUNT = 15;
 // higher is more effective
 const PTFIND_EFFECTIVENESS_MOD = 45;
 
-// MAX LEVEL
+// MAX LEVEL, ALBEDO LEVELS FOLLOW
 const MAX_LEVEL = 100;
 
 module.exports = { 
