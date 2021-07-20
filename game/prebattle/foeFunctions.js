@@ -147,12 +147,12 @@ function generateFoeStats(avatar, foe){
       const bosses = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
       const adepts = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
       if(bosses.includes(foe.type)){
-        elementalQp *= 1.7;
-        baseHealth *= 1.3;
+        elementalQp *= 1.6;
+        baseHealth *= 1.25;
         basePower *= 1.2;
       }else if(adepts.includes(foe.type)){
-        elementalQp *= 1.5;
-        baseHealth *= 1.2;
+        elementalQp *= 1.4;
+        baseHealth *= 1.15;
       }else{
         elementalQp *= 1.3;
       }
