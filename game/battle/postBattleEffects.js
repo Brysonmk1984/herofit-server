@@ -82,6 +82,15 @@ function postBattleEffects(a, f, outcomeData, effects){
           }
         }
         break;
+      // Plagueling
+      case 'Bolstered Immune System':
+        // Only apply if Hero is infected
+        if(a.status === 'Infected'){
+          const status = 'Recovering';
+          const statusFade = 0;
+          avatar = Object.assign({}, a, { status, statusFade });
+        }
+        break;
       default:
         break;
     }

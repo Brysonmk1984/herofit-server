@@ -7,65 +7,80 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
   let eFoe = { ...foe };
   effects.forEach((effect) =>{
     switch(effect.name){
-      case "Hero +5 Water":
+      case "Hero +5,+10% Water":
         eAvatar.water += 5;
+        eAvatar.water += Math.floor(eAvatar.water * .05);
         break;
-      case "Hero +5 Air":
+      case "Hero +5,+10% Air":
         eAvatar.air += 5;
+        eAvatar.air += Math.floor(eAvatar.air * .05);
         break;
-      case "Hero +5 Earth":
+      case "Hero +5,+10% Earth":
         eAvatar.earth += 5;
+        eAvatar.earth += Math.floor(eAvatar.earth * .05);
         break;
       case "Hero +10 Health":
         eAvatar.health += 10;
         break;
-      case "Hero +25% Health":
-        eAvatar.health += Math.floor(eAvatar.health * .25);
-        break;
-      case "Foe -10 Health":
-        eFoe.health -= 10;
-        break;
-      case "Foe -10% Health":
-        eFoe.health -= Math.floor(eFoe.health * .10);
-        break;
-      case "Foe -15 Health":
-        eFoe.health -= 15;
-        break;
-      case "Hero +10 Power":
+      case "Hero +10,+15% Power":
         eAvatar.power += 10;
-        break;
-      case "Hero +15 Power":
-        eAvatar.power += 15;
+        eAvatar.power += Math.floor(eAvatar.power * .15);
         break;
       case "Hero +10 Armor":
         eAvatar.armor += 10;
         break;
-      case "Hero +25 Water":
-        eAvatar.water += 25;
+      case "Hero +15 Power":
+        eAvatar.power += 15;
         break;
-      case "Hero +25 Air":
-        eAvatar.air += 25;
+      case "Hero +15 Aether":
+        eAvatar.aether += 15;
         break;
-      case "Hero +25 Earth":
-        eAvatar.earth += 25;
-        break;
-      case "Hero +25 Fire":
-        eAvatar.fire += 25;
+      case "Hero +25% Health":
+        eAvatar.health += Math.floor(eAvatar.health * .25);
         break;
       case "Hero +33% Fire":
         eAvatar.fire += Math.floor(eAvatar.fire * .33);
+        break;
+      case "Hero +25,+25% Air":
+        eAvatar.air += 25;
+        eAvatar.air += Math.floor(eAvatar.air * .25);
+        break;
+      case "Hero +25,+25% Earth":
+        eAvatar.earth += 25;
+        eAvatar.earth += Math.floor(eAvatar.earth * .25);
+        break;
+      case "Hero +25,+25% Fire":
+        eAvatar.fire += 25;
+        eAvatar.fire += Math.floor(eAvatar.fire * .25);
+        break;
+      case "Hero +25,+25% Water":
+        eAvatar.water += 25;
+        eAvatar.water += Math.floor(eAvatar.water * .25);
         break;
       case "Hero +5% All Elements":
         eAvatar.fire += Math.floor(eAvatar.fire * .05);
         eAvatar.earth += Math.floor(eAvatar.earth * .05);
         eAvatar.water += Math.floor(eAvatar.water * .05);
         eAvatar.air += Math.floor(eAvatar.air * .05);
+        eAvatar.aether += Math.floor(eAvatar.aether * .05);
         break;
       case "Hero +10% All Elements":
         eAvatar.fire += Math.floor(eAvatar.fire * .10);
         eAvatar.earth += Math.floor(eAvatar.earth * .10);
         eAvatar.water += Math.floor(eAvatar.water * .10);
         eAvatar.air += Math.floor(eAvatar.air * .10);
+        eAvatar.aether += Math.floor(eAvatar.aether * .10);
+        break;
+      case "Foe -10|-3% Health":
+        const threePercentHealth = Math.floor(eFoe.health * .03);
+        eFoe.health -= threePercentHealth > 10 ? threePercentHealth : 10;
+        break;
+      case "Foe -35|-5% Health":
+        const fivePercentHealth = Math.floor(eFoe.health * .05);
+        eFoe.health -= fivePercentHealth > 35 ? fivePercentHealth : 35;
+        break;
+      case "Foe -10% Health":
+        eFoe.health -= Math.floor(eFoe.health * .10);
         break;
       case "Ill Omen":
         const isNegativeScenario = scenario === 1 || scenario === 3 ? true : false;
@@ -203,7 +218,7 @@ function doFoeBattlePrep(avatar, foe, scenarioId){
         case "Sadistic Siphon":
           // Health Steal
           const avatarHealth = avatar.health;
-          const stolenHealth =  avatarHealth * .125;
+          const stolenHealth =  avatarHealth * .133;
 
           fFoe.health = Math.floor(foe.health + stolenHealth);
           fAvatar.health = Math.floor(avatar.health - stolenHealth);

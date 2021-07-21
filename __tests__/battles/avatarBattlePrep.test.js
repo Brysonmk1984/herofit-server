@@ -47,7 +47,7 @@ describe('All EXISTING item effects should correctly modify stats', ()=>{
 
   it('Should return an avatar with +5 water', () => {
     const effects = [{
-      "name" : "Hero +5 Water",
+      "name" : "Hero +5,+10% Water",
       "type" : "prebattle",
       "description" : "Hero receives a +5 Water buff before battle."
     }];
@@ -73,12 +73,12 @@ describe('All NEW item effects should correctly modify stats', ()=>{
   // HAWK
   it('Should return an avatar with +10 health & +5 Air', () => {
     const effects =   [{
-      "name" : "Hero +5 Air",
+      "name" : "Hero +5,+10% Air",
       "type" : "prebattle",
       "description" : "Hero receives a +5 air buff before battle."
     },
     {
-      "name" : "Hero +10 Power",
+      "name" : "Hero +10,+15% Power",
       "type" : "prebattle",
       "description" : "Hero receives a +10 power buff before battle."
     }];
@@ -90,7 +90,7 @@ describe('All NEW item effects should correctly modify stats', ()=>{
   // RAVEN
   it('Should return an avatar with +5 Air & run Ill Omen buff if necessary', () => {
     const effects =   [{
-      "name" : "Hero +5 Air",
+      "name" : "Hero +5,+10% Air",
       "type" : "prebattle",
       "description" : "Hero receives a +5 air buff before battle."
     },
@@ -143,12 +143,12 @@ describe('Snake effects should correctly modify stats', ()=>{
   // SNAKE
   it('Should give avatar + 10 power and lower foes health by 10', ()=>{
     const effects = [{
-      "name" : "Hero +10 Power",
+      "name" : "Hero +10,+15% Power",
       "type" : "prebattle",
       "description" : "Hero receives a +10 power buff before battle."
       },
       {
-      "name" : "Foe -10 Health",
+      "name" : "Foe -10|3% Health",
       "type" : "prebattle",
       "description" : "Foe receives a -10 health debuff before battle."
       },
@@ -172,7 +172,7 @@ describe('Octopus effects should correctly modify stats', ()=>{
   // OCTOPUS
   it('Should give avatar + 5 water & possibly run Eight-Legged Ingenuity', ()=>{
     const effects = [{
-      "name" : "Hero +5 Water",
+      "name" : "Hero +5,+10% Water",
       "type" : "prebattle",
       "description" : "Hero receives a +5 water buff before battle."
       },
@@ -208,9 +208,9 @@ describe('Racoon effects should correctly modify stats', ()=>{
   // Racoon
   it('Should give avatar + 5 earth & possibly run Frisky Mischief', ()=>{
     const effects = [{
-      "name" : "Hero +5 Earth",
+      "name" : "Hero +5,+10% Earth",
       "type" : "prebattle",
-      "description" : "Hero receives a +5 water buff before battle."
+      "description" : "Hero receives a +5 earth buff before battle."
       },
       {
       "name" : "Frisky Mischief",
@@ -228,12 +228,12 @@ describe('Chameleon effects should correctly modify stats', ()=>{
   // Chameleon
   it('Should give avatar + 5 earth and +5 air', ()=>{
     const effects = [{
-      "name" : "Hero +5 Earth",
+      "name" : "Hero +5,+10% Earth",
       "type" : "prebattle",
       "description" : "Hero receives a +5 earth buff before battle."
       },
       {
-        "name" : "Hero +5 Air",
+        "name" : "Hero +5,+10% Air",
         "type" : "prebattle",
         "description" : "Hero receives a +5 air buff before battle."
       }];
