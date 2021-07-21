@@ -9,15 +9,15 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
     switch(effect.name){
       case "Hero +5,+10% Water":
         eAvatar.water += 5;
-        eAvatar.water += Math.floor(eAvatar.water * .05);
+        eAvatar.water += Math.floor(eAvatar.water * .10);
         break;
       case "Hero +5,+10% Air":
         eAvatar.air += 5;
-        eAvatar.air += Math.floor(eAvatar.air * .05);
+        eAvatar.air += Math.floor(eAvatar.air * .10);
         break;
       case "Hero +5,+10% Earth":
         eAvatar.earth += 5;
-        eAvatar.earth += Math.floor(eAvatar.earth * .05);
+        eAvatar.earth += Math.floor(eAvatar.earth * .10);
         break;
       case "Hero +10 Health":
         eAvatar.health += 10;

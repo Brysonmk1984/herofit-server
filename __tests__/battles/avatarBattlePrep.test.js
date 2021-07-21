@@ -52,19 +52,23 @@ describe('All EXISTING item effects should correctly modify stats', ()=>{
       "description" : "Hero receives a +5 Water buff before battle."
     }];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-    expect(avatar.water).toBe(sAvatar.water + 5);
+    const adjustedBase = sAvatar.water + 5;
+    const adjustedTotal = adjustedBase + Math.floor(adjustedBase * .1);
+    expect(avatar.water).toBe(adjustedTotal);
   });
 
 
-  it('Should return an foe with -15 health', () => {
-    const effects = [{
-      "name" : "Foe -15 Health",
-      "type" : "prebattle",
-      "description" : "Hero receives a -15 health debuff before battle."
-    }];
+  it('Should return an foe with -35 or -5% health', () => {
+    const effects = [ {
+      "name": "Foe -35|-5% Health",
+      "type": "prebattle",
+      "description": "Foe receives a -35 or -5% health debuff (whichever is greater) before battle."
+  }];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-
-    expect(foe.health).toBe(sFoe.health - 15);
+    const fixed = 35;
+    const percentage = Math.floor(sFoe.health * .05)
+    const adjustedTotalHealth = fixed > percentage ? (sFoe.health - fixed) : (sFoe.health - percentage);
+    expect(foe.health).toBe(adjustedTotalHealth);
   });
 });
 
@@ -83,8 +87,12 @@ describe('All NEW item effects should correctly modify stats', ()=>{
       "description" : "Hero receives a +10 power buff before battle."
     }];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-    expect(avatar.power).toBe(sAvatar.power + 10);
-    expect(avatar.air).toBe(sAvatar.air + 5);
+    const adjustedBasePower = sAvatar.power + 10;
+    const adjustedTotalPower = adjustedBasePower + Math.floor(adjustedBasePower * .15);
+    expect(avatar.power).toBe(adjustedTotalPower);
+    const adjustedBaseAir = sAvatar.air + 5;
+    const adjustedTotalAir = adjustedBaseAir + Math.floor(adjustedBaseAir * .1);
+    expect(avatar.air).toBe(adjustedTotalAir);
   });
 
   // RAVEN
@@ -100,7 +108,9 @@ describe('All NEW item effects should correctly modify stats', ()=>{
       "description" : "If there''s an unfavorable battle ahead, the Raven of Omens has a high chance to give a 20% health buff."
     }];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-    expect(avatar.air).toBe(sAvatar.air + 5);
+    const adjustedBase = sAvatar.air + 5;
+    const adjustedTotal = adjustedBase + Math.floor(adjustedBase * .1);
+    expect(avatar.air).toBe(adjustedTotal);
 
     const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
     const isHigherDifficulty = sFoe.difficulty >= .07 || sFoe.class === 'titan' || sFoe.type === "Shadow Self";
@@ -159,7 +169,9 @@ describe('Snake effects should correctly modify stats', ()=>{
       }];
 
       const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.power).toBe(sAvatar.power +10);
+      const adjustedBasePower = sAvatar.power + 10;
+      const adjustedTotalPower = adjustedBasePower + Math.floor(adjustedBasePower * .15);
+      expect(avatar.power).toBe(adjustedTotalPower);
       if(foe.health === 1){
         console.log('LETHAL SURPRISE PROC', foe.health, sFoe.health);
       }
@@ -183,7 +195,9 @@ describe('Octopus effects should correctly modify stats', ()=>{
       }];
 
       const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.water).toBe(sAvatar.water +5);
+      const adjustedBaseWater = sAvatar.water + 5;
+      const adjustedTotalWater = adjustedBaseWater + Math.floor(adjustedBaseWater * .1);
+      expect(avatar.water).toBe(adjustedTotalWater);
 
       const possibleNonZeroStats = ['health','power', 'earth', 'water', 'fire', 'air', 'armor'];
       const nonZero = possibleNonZeroStats.map((stat) => foe[stat]).filter(Boolean);
@@ -218,7 +232,9 @@ describe('Racoon effects should correctly modify stats', ()=>{
       "description" : "The Feisty Coon has a chance to exchange your lowest stat for the foe''s same stat."
       }];
       const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.earth).toBe(sAvatar.earth +5);
+      const adjustedBase = sAvatar.earth + 5;
+      const adjustedTotal = adjustedBase + Math.floor(adjustedBase * .1);
+      expect(avatar.earth).toBe(adjustedTotal);
       // STILL NEED TO TEST FOR FRISKY MISCHIEVOUS
   });
 });
@@ -238,8 +254,13 @@ describe('Chameleon effects should correctly modify stats', ()=>{
         "description" : "Hero receives a +5 air buff before battle."
       }];
       const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-      expect(avatar.earth).toBe(sAvatar.earth +5);
-      expect(avatar.air).toBe(sAvatar.air +5);
+      const adjustedBaseEarth = sAvatar.earth + 5;
+      const adjustedTotalEarth = adjustedBaseEarth + Math.floor(adjustedBaseEarth * .1);
+      expect(avatar.earth).toBe(adjustedTotalEarth);
+      
+      const adjustedBaseAir = sAvatar.air + 5;
+      const adjustedTotalAir = adjustedBaseAir + Math.floor(adjustedBaseAir * .1);
+      expect(avatar.air).toBe(adjustedTotalAir);
   });
 });
 
@@ -323,5 +344,60 @@ describe('Orchid Mantis effects should correctly modify stats', ()=>{
       expect(avatar.earth).toBe(sAvatar.earth + Math.floor(sAvatar.earth * .05));
       expect(avatar.water).toBe(sAvatar.water + Math.floor(sAvatar.water * .05));
       expect(avatar.air).toBe(sAvatar.air + Math.floor(sAvatar.air * .05));
+  });
+});
+
+
+describe('Elemental pets should correctly modify stats', ()=>{
+  // Splash Artist
+  it('Should give avatar +25,+25% Water Buff', ()=>{
+    const effects = [{
+          "name": "Hero +25,+25% Water",
+          "type": "prebattle",
+          "description": "Hero receives a +25 and a +25% water buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      const adjustedBaseWater = sAvatar.water + 25;
+      const adjustedTotalWater = adjustedBaseWater + Math.floor(adjustedBaseWater * .25);
+      expect(avatar.water).toBe(adjustedTotalWater);
+  });
+
+  // Flame Fiend
+  it('Should give avatar +25,+25% Fire Buff', ()=>{
+    const effects = [{
+          "name": "Hero +25,+25% Fire",
+          "type": "prebattle",
+          "description": "Hero receives a +25 and a +25% water buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      const adjustedBaseFire = sAvatar.fire + 25;
+      const adjustedTotalFire = adjustedBaseFire + Math.floor(adjustedBaseFire * .25);
+      expect(avatar.fire).toBe(adjustedTotalFire);
+  });
+
+  // Rock Skipper
+  it('Should give avatar +25,+25% Earth Buff', ()=>{
+    const effects = [{
+          "name": "Hero +25,+25% Earth",
+          "type": "prebattle",
+          "description": "Hero receives a +25 and a +25% earth buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      const adjustedBaseEarth = sAvatar.earth + 25;
+      const adjustedTotalEarth = adjustedBaseEarth + Math.floor(adjustedBaseEarth * .25);
+      expect(avatar.earth).toBe(adjustedTotalEarth);
+  });
+
+  // Gusty Rascal
+  it('Should give avatar +25,+25% Air Buff', ()=>{
+    const effects = [{
+          "name": "Hero +25,+25% Air",
+          "type": "prebattle",
+          "description": "Hero receives a +25 and a +25% air buff before battle."
+      }];
+      const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      const adjustedBaseAir = sAvatar.air + 25;
+      const adjustedTotalAir = adjustedBaseAir + Math.floor(adjustedBaseAir * .25);
+      expect(avatar.air).toBe(adjustedTotalAir);
   });
 });
