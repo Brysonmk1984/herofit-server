@@ -100,11 +100,11 @@ const RECOVERY_EFFECTIVENESS_MOD = 45;
 // DO BATTLE
 
 // lower is more effective
-const ARMOR_DRF = .7;
+const ARMOR_DRF = 1.7;
 
 // variation on the power each attack (one per turn)
-const DAMAGE_PERCENT_PER_TURN = .18;
-const DAMAGE_VARIANCE_PER_TURN = .05;
+const DAMAGE_PERCENT_PER_TURN = .2;
+const DAMAGE_VARIANCE_PER_TURN = .07;
 const DAMAGE_VARIANCE_RANGE = [DAMAGE_PERCENT_PER_TURN - DAMAGE_VARIANCE_PER_TURN, DAMAGE_PERCENT_PER_TURN + DAMAGE_VARIANCE_PER_TURN];
 
 // ELEMENTAL variation on the elemental power each attack (turns 2,3,6,7,10,11)
