@@ -44,10 +44,13 @@ router.post('/fetch-avatar-inventory', body('avatarID').isNumeric(), authenticat
       pets : [],
       skins : [],
       titles : [],
-      consumables : []
+      consumables : [],
+      codices : []
     };
     inventory.forEach((thing) =>{
-      if(inventoryObj[thing.type +'s']){
+      if(thing.type === 'codex'){
+        inventoryObj.codices.push(thing);
+      }else if(inventoryObj[thing.type +'s']){
         inventoryObj[thing.type +'s'].push(thing);
       }
     });
