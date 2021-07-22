@@ -136,6 +136,12 @@ function itemEffects(effects, avatarID, email){
         case 'Summon High Priestess of the Tides':
           effectPromises.push(instantiateBattle(avatarID, 'High Priestess of the Tides')); 
           break;
+        case 'Summon Plaguebringer':
+          effectPromises.push(instantiateBattle(avatarID, 'Plaguebringer')); 
+          break;
+        case 'Summon Shadow-Self':
+          effectPromises.push(instantiateBattle(avatarID, 'Shadow-Self')); 
+          break;
         default:
           break;
       }
