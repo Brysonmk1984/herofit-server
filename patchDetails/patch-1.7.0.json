@@ -1,0 +1,37 @@
+{
+  "version": "1.7.0",
+  "headline": "New Codex Item Type, More Instant Battles & Pet Effect Changes - version 1.7.0",
+  "openingRemarks": "Time to start sprinkling in story line to the game!",
+  "newFeatures": [
+    {
+      "title": "Codex Items",
+      "description": "A new item type has been added to the game and will appear in it's own category in your inventory. Codex items are brief stories added for background to the story of HeroFit. Like other items, they have a small chance to drop from activities."
+    },
+    {
+      "title": "Plaguebringer & Shadow-Self Instant Battles",
+      "description": "The Plague Token & the Obsidian Mirror have been added to the game to instantiate battles with Plaguebringer and the Shadow-Self."
+    },
+    {
+      "title": "Many Pet Effects Improved",
+      "description": "See reddit post for details."
+    }
+  ],
+  "bugFixes": [
+    "Fixed UI bug where users couldn't click the footer links",
+    "Fixed a new bug with deleting accounts"
+  ],
+  "balanceChanges": [
+    "Fire Trait - Critical Strike damage has been buffed significantly",
+    "Armor effectiveness increased",
+    "Power effectiveness increased, as well as variance in randomly generated value",
+    "Tweaked foe difficulty across the board",
+    "Slight buff to Banshees",
+    "Elemental Boss difficulty increased"
+  ],
+  "miscDetails": [
+    "First Codex item added to the game - The Timber Terror Origin Story!",
+    "Changed Profile page to search by Hero Name primarily rather than user name",
+    "More improvements to the Upgrade algorithm, greatly reducing potential for errors when upgrading hero"
+  ],
+  "closingRemarks": "While most dev time has gone to the upcoming mobile app, I wanted to sneak in some easy but exciting updates!"
+} 
