@@ -386,7 +386,7 @@ function _testForIDStrike(aggressorString, aether, nextRoundIDS, goesFirst){
 }
 
 function doBattle(avatar, foe, goesFirst){
-  console.log('AV IN BATTLE=', avatar.name, 'GF=', goesFirst);
+  //console.log('AV IN BATTLE=', avatar.name, 'GF=', goesFirst);
   
   //goesFirst = 'avatar';
   const battleTurns = [0,1,2,3,4,5,6,7,8,9,10,11,12];
