@@ -9,7 +9,6 @@ const passport = require('passport');
 const authenticateJWT = (req, res, next) => {
    //console.log('REQHEADER', req.headers);
    passport.authenticate('jwt', { session : false }, (error, user, info)=>{
-      console.log('THE USER', user);
       if(error){
          console.log('AUTHENTICATION ERROR = ', error);
          return res.formatter.serverError(error);

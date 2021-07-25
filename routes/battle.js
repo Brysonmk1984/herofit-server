@@ -1,5 +1,5 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, oneOf } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
 const { Op } = require("sequelize");
@@ -43,23 +43,25 @@ router.post('/insert-battle', body('email').isEmail(), body('avatar').isObject()
 });
 
 // USER Logs in after a battle, or clicks button to retrieve report
-router.post('/fetch-battle-report', body('avatarID').isNumeric(), authenticateJWT, (req, res) =>{
-
+router.post('/fetch-battle-report', oneOf([body('avatarID').isNumeric().optional({nullable: true, checkFalsy: true}), body('owner').isEmail().optional({nullable: true, checkFalsy: true})]), authenticateJWT, (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - POST /fetch-battle-report");
   }
 
+  // Can now get latest BR by either avatarID or email(owner)
+  const { avatarID, owner } = req.body;
+  const column = avatarID ? "avatarID" : "owner";
+
   Battle.findAll({
     limit: 1,
     where: { 
-      avatarID: req.body.avatarID,
+      [column]: req.body[column],
       [Op.not]: { outcome: "TBD" }
     },
     order: [ [ 'createdAt', 'DESC' ]],
     raw : true
   }).then((result) =>{
-
     if(result.length && !result[0].seenReport){
       
       adjResult = result[0];

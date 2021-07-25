@@ -10,6 +10,7 @@ function issueJWT(user){
   const expiresIn = '14d';
   const payload = {
     sub : user.id,
+    email : user.email,
     iat : Date.now()
   };
   const signedToken = jsonwebtoken.sign(payload, PRIV_KEY, { expiresIn, algorithm : 'RS256' })

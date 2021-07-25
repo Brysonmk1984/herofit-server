@@ -3,12 +3,11 @@ const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const issueJWT = require('../jwt/issueJWT');
-const { User, Avatar } = require('../config/db');
+const { User } = require('../config/db');
 const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
-const passport = require('passport');
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
 // mobile app only
 const heroList = require('../heroList.json');

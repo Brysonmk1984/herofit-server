@@ -123,12 +123,12 @@ const AETHER_IDS_CHANCE_MOD = 1650;
 const BEGINNERS_LUCK_MAX_XP = 2587; // Level 15
 const BEGINNERS_LUCK_LIKELIHOOD = 66;
 const LOW_LEVEL = 15;
-const HIGH_LEVEL = 60;
+const HIGH_LEVEL = 70;
 
 // Applies to mid level +
 const LEVEL_DIFFICULTY_MOD = 1.28;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.32;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.28;
 
 // Photon Token find
 const PTFIND_BASE_DROP_RATE = 33;
