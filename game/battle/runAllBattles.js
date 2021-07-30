@@ -24,30 +24,44 @@ function _runBattlesOnBatch(shard, shardIndex){
 
 
 // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
-function runAllBattles(battles, sendReport){
+async function runAllBattles(battles, sendReport){
+  
   // Need to divide records into groups of 9
-  battleShards = arrayChunker(battles, 9);
+  battleShards = arrayChunker(battles, 1);
 
   const allBattleShardPromises = [];
-  //RUN BATTLES ON BATCH
-  for(let i = 0; i < battleShards.length; i++){
-    allBattleShardPromises.push( _runBattlesOnBatch(battleShards[i], i));
+  let i = 0;                  
+
+  // Delay each shard by 6 seconds
+  // Currently needed to work around the connection limit error on Heroku Postgres
+  function staggerBattleBatches(resolve) {
+    setTimeout(() => {
+      allBattleShardPromises.push(_runBattlesOnBatch(battleShards[i], i));
+      i++;
+      if(i < battleShards.length) {
+        return staggerBattleBatches(resolve);     
+      }         
+      resolve(Promise.allSettled(allBattleShardPromises));     
+    }, 3000);
   }
-  return Promise.allSettled(allBattleShardPromises)
-  .then((result)=>{
+
+  try{
+    const result = await new Promise((resolve) => staggerBattleBatches(resolve));
+    console.log('RESULT!', result);
+
     // If there's an error in the battle processing, throw error before trying to calculate totals
     if(result.length && result[0].value instanceof Error){
       throw result[0].value;
     }
     const allOutcomes = result.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value))
     const outcomeList = [].concat.apply([], allOutcomes);
-
+    console.log('ALL DONE!!!!');
     const tally= { 'Avatar Wins' : 0, 'Foe Wins' : 0, 'Draw' : 0, 'Double KO' : 0, total : 0, avWinPercent : 0, avWinPercentOverall : 0, tiePercent : 0 };
-
+  
     outcomeList.forEach((outcome, i) =>{
       tally[outcome] += 1;
       tally.total +=1;
-
+  
       // If last outcome, compute totals
       if(i + 1 === outcomeList.length){
         tally.avWinPercent = `${roundNumber((tally['Avatar Wins'] / (tally['Avatar Wins'] + tally['Foe Wins'])), 2) * 100}%`;
@@ -57,26 +71,29 @@ function runAllBattles(battles, sendReport){
       }
     });
     // Return battle results tally to be emailed
-    return tally;
-  })
+  
+  
   // TALLY UP THE RESULTS AND SEND EMAIL
-  .then((results) => {
-    console.log('tally', results);
-    if(sendReport && results.total > 0){
-      return sendBattleReportEmail(results)
-      .then((data) =>{
+  
+    console.log('tally', tally);
+    if(sendReport && tally.total > 0){
+      try{
+        const data = await sendBattleReportEmail(tally);
         console.log('Result Tally email sent successfully',data);
         return data;
-      }).catch((error) =>{
+      }catch(error){
         console.log('ERROR Sending Battle Report email', error);
-        return error;
-      });
+        throw error;
+      }
+  
     }
-    return results;
-  }).catch((error) =>{
+    return tally;
+  }catch(error){
     console.log('ERROR RUNNING ALL BATTLES', error);
-    return error;
-  });
+    throw error;
+  }
+
+
 }
 
 module.exports = runAllBattles;
