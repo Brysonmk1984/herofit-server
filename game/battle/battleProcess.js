@@ -84,7 +84,8 @@ function battleProcess(battleInstance, avatarInstance){
       //console.log(leveledUp, qpEarned,);
       // Combine latest saved av with the updates from the latest battle. If avatar earned level up during battle, those values will be saved
       const combinedAv = leveledUp ? 
-      Object.assign({}, latestSavedAv, avatarBattleUpdates, { qp : (latestSavedAv.qp + qpEarned), power : (latestSavedAv.power + powerEarned), maxHealth : (latestSavedAv.maxHealth + maxHealthEarned), health: (latestSavedAv.maxHealth + maxHealthEarned) })
+      // If leveled up, check if hero was infected, if so, health shouldn't be set to full.
+      Object.assign({}, latestSavedAv, avatarBattleUpdates, { qp : (latestSavedAv.qp + qpEarned), power : (latestSavedAv.power + powerEarned), maxHealth : (latestSavedAv.maxHealth + maxHealthEarned)}, { health: avatarBattleUpdates.status === 'Infected' ? avatarBattleUpdates.health : (latestSavedAv.maxHealth + maxHealthEarned) })
       : Object.assign({}, latestSavedAv, avatarBattleUpdates);
         //console.log('updatedAv', combinedAv);
       // Update Av first, then the battle record

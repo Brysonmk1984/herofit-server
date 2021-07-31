@@ -18,6 +18,7 @@ function postBattleEffects(a, f, outcomeData, effects){
         if(outcomeStatus === 'Avatar Wins' || outcomeStatus === 'Draw'){
           const status = 'Infected';
           const statusFade = 12;
+          console.log('AAAA HEALTH - ', a);
           avatar = Object.assign({}, a, { status, statusFade });
         }
         break;

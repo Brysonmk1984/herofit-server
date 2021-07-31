@@ -231,9 +231,9 @@ function generateFoeStats(avatar, foe){
 
       // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
       // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
-      const powerEighth = Math.floor(randomizedPower.stat / 12);
+      const powerEighth = Math.floor(randomizedPower.stat / 8);
       
-      fws.health = Math.floor(randomizedHealth.stat);
+      fws.health = randomizedHealth < 200 ? 200 : Math.floor(randomizedHealth.stat);
       fws.power = Math.floor(randomizedPower.stat);
       fws.fire = powerEighth;
       fws.earth = powerEighth;

@@ -274,16 +274,9 @@ router.post('/set-avatar-health-and-status', body('id').isNumeric(), body('healt
 
     return Avatar.update(
       { health : req.body.health, status : req.body.status },
-      { where: { id: req.body.id }, returning : true, raw : true }
-    ).then((avatar) =>{
-      // Shouldn't ever happen
-      if(!avatar){
-        throw new Error(`No Avatar to set health and status for Avatar ID: ${req.body.id}`);
-      }else if(!avatar[1] || !avatar[1][0]){
-        throw new Error('Error with Sequelize return formatting.');
-      }
-
-      res.formatter.ok({ avatar : parseAvatarProperties(avatar[1][0]) });
+      { where: { id: req.body.id }, raw : true }
+    ).then(() =>{
+      res.formatter.ok({ message : 'Update Successful' });
     }).catch((error) =>{
       res.formatter.notFound(error.toString(), 'Retrieved Data Error for set-avatar-health-and-status endpoint');
     });
