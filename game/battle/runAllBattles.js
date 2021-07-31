@@ -1,61 +1,55 @@
-const { Avatar } = require('../../config/db');
-const { Op } = require("sequelize");
 const { arrayChunker, roundNumber, parseAvatarProperties } = require('../../lib/helperFunctions');
 const battleProcess = require('./battleProcess');
 const { sendBattleReportEmail } = require('../../mail');
 
-// Takes a group of bandles and runs them through the universal battleProcess
-function _runBattlesOnBatch(shard, shardIndex){
-  const allAvatars = shard.map(battle => battle.avatar);
-  //console.log('THE BATTLES', shard);
+const BATCH_CHUNK = 9;
+const BATCH_TIMEOUT = 3000;
 
-  // Reorder of avatars is the same as the shard's order
-  // avatars.sort((a, b) => {  
-  //   return allAvatarIds.indexOf(a.id) - allAvatarIds.indexOf(b.id);
-  // });
+// TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
+function _runBattlesOnBatch(shard){
+  const allAvatars = shard.map(battle => battle.avatar);
 
   let battlePromises = []
   for(let i=0; i< shard.length; i++){
     battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
   }
   return Promise.allSettled(battlePromises);
-
 }
 
 
 // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
 async function runAllBattles(battles, sendReport){
-  
-  // Need to divide records into groups of 9
-  battleShards = arrayChunker(battles, 1);
-
   const allBattleShardPromises = [];
-  let i = 0;                  
+  let i = 0;   
+
+  // Need to divide records into groups of 9
+  battleShards = arrayChunker(battles, BATCH_CHUNK);
+
+               
 
   // Delay each shard by 6 seconds
   // Currently needed to work around the connection limit error on Heroku Postgres
   function staggerBattleBatches(resolve) {
     setTimeout(() => {
-      allBattleShardPromises.push(_runBattlesOnBatch(battleShards[i], i));
+      allBattleShardPromises.push(_runBattlesOnBatch(battleShards[i]));
       i++;
       if(i < battleShards.length) {
         return staggerBattleBatches(resolve);     
       }         
       resolve(Promise.allSettled(allBattleShardPromises));     
-    }, 3000);
+    }, BATCH_TIMEOUT);
   }
 
   try{
-    const result = await new Promise((resolve) => staggerBattleBatches(resolve));
-    console.log('RESULT!', result);
+    const battlesResults = await new Promise((resolve) => staggerBattleBatches(resolve));
+    console.log('BATTLES RAN!', battlesResults);
 
     // If there's an error in the battle processing, throw error before trying to calculate totals
-    if(result.length && result[0].value instanceof Error){
-      throw result[0].value;
+    if(battlesResults.length && battlesResults[0].value instanceof Error){
+      throw battlesResults[0].value;
     }
-    const allOutcomes = result.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value))
+    const allOutcomes = battlesResults.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value))
     const outcomeList = [].concat.apply([], allOutcomes);
-    console.log('ALL DONE!!!!');
     const tally= { 'Avatar Wins' : 0, 'Foe Wins' : 0, 'Draw' : 0, 'Double KO' : 0, total : 0, avWinPercent : 0, avWinPercentOverall : 0, tiePercent : 0 };
   
     outcomeList.forEach((outcome, i) =>{
@@ -70,6 +64,7 @@ async function runAllBattles(battles, sendReport){
         tally.tiePercent = `${roundNumber((ties / tally.total), 2) * 100}%`;
       }
     });
+    tally.failedToRun = tally.total - (tally['Avatar Wins'] + tally['Foe Wins'] + tally['Draw'] + tally['Double KO']);
     // Return battle results tally to be emailed
   
   

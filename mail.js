@@ -231,6 +231,7 @@ const sendBattleReportEmail = function(tally){
       Avatar win%: ${tally.avWinPercent}\n
       Avatar win% overall: ${tally.avWinPercentOverall}\n
       Tie%: ${tally.tiePercent}\n
+      FAILED TO RUN: ${tally.failedToRun}\n
       `,
       html: `Number of Avatar Battles: ${tally.total}. <br/><br/> Battle Report Tally:\n\n
       Avatar Wins: ${tally['Avatar Wins']}<br/>
@@ -240,6 +241,7 @@ const sendBattleReportEmail = function(tally){
       Avatar win%: ${tally.avWinPercent}<br/>
       Avatar win% overall: ${tally.avWinPercentOverall}<br/>
       Tie%: ${tally.tiePercent}<br/>
+      FAILED TO RUN: ${tally.failedToRun}<br/>
       `,
   };
 
