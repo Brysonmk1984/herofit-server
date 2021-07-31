@@ -200,7 +200,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
-          fws.air = (150 + (3 * totalLevel));
+          fws.air = (200 + (3 * totalLevel));
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
