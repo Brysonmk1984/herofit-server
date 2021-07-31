@@ -38,6 +38,7 @@ function battleProcess(battleInstance, avatarInstance){
   // FOR TESTING PURPOSES - APPLY CHEAT
   // Avatar Power, Foe Power, Avatar Health, Foe Health, Avatar Earth, Foe Earth
   //applyCheat(1,1,1,1,10000,10000)
+  //applyCheat(1000,50, 448,1)
 
   // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario } = getPreBattlePackage();
@@ -81,13 +82,14 @@ function battleProcess(battleInstance, avatarInstance){
       const { checkLevelUp } = xpCalc(latestSavedAv.activityXP, latestSavedAv.battleXP);
       // Check if level up from xp gain, adjust qp, maxHealth, power
       const { leveledUp, qpEarned, maxHealthEarned, powerEarned } = checkLevelUp(xpGain);
-      //console.log(leveledUp, qpEarned,);
+
       // Combine latest saved av with the updates from the latest battle. If avatar earned level up during battle, those values will be saved
       const combinedAv = leveledUp ? 
       // If leveled up, check if hero was infected, if so, health shouldn't be set to full.
       Object.assign({}, latestSavedAv, avatarBattleUpdates, { qp : (latestSavedAv.qp + qpEarned), power : (latestSavedAv.power + powerEarned), maxHealth : (latestSavedAv.maxHealth + maxHealthEarned)}, { health: avatarBattleUpdates.status === 'Infected' ? avatarBattleUpdates.health : (latestSavedAv.maxHealth + maxHealthEarned) })
       : Object.assign({}, latestSavedAv, avatarBattleUpdates);
-        //console.log('updatedAv', combinedAv);
+
+
       // Update Av first, then the battle record
       return Avatar.update(combinedAv, { where: { id: avatar.id } })
       .then(() =>{

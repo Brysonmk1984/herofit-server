@@ -63,7 +63,7 @@ const preBattleSetup = function(avatar, foe){
         }
       }
     },
-    applyCheat : (avPowerBoost, foePowerBoost, avHealthBoost, foeHealthBoost, avatarEarthBoost, foeEarthBoost) =>{
+    applyCheat : (avPowerBoost = 1, foePowerBoost = 1, avHealthBoost = 1, foeHealthBoost = 1, avatarEarthBoost = 1, foeEarthBoost = 1) =>{
       a.power = avPowerBoost;
       f.power = foePowerBoost;
       a.health = avHealthBoost;

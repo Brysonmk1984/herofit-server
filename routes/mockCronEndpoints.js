@@ -21,26 +21,27 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
   
   //Get all avatars who aren't at full health
   return Avatar.findAll({ 
-    where: { health : { [Op.lt] : col('maxHealth') } },
+    //where: { health : { [Op.lt] : col('maxHealth') } },
+    where: { status : { [Op.or] : ['Infected', 'Recovering', 'Rested'] } },
     raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] 
   }).then((results) => {
     const allPromises = []
-    
-      // Loop over each avatar and either regen health if recovering or other status effects
-      results.forEach((avatar) =>{
-        avatar = parseAvatarProperties(avatar);
-
-        let avatarHealth = avatar.health;
-        const maxHealth = avatar.maxHealth;
-        const recovery = avatar.recovery;
-        const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
-        const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
-        let avatarStatus = avatar.status;
-        let avatarStatusFade = avatar.statusFade;
-
-            // Check avatar status and run appropriate action
+    // Loop over each avatar and either regen health if recovering or other status effects
+    results.forEach((avatar) =>{
+      avatar = parseAvatarProperties(avatar);
+      console.log('AVV', avatar);
+      let avatarHealth = avatar.health;
+      const maxHealth = avatar.maxHealth;
+      const recovery = avatar.recovery;
+      const recoveryRetarder = recovery/(recovery+RECOVERY_EFFECTIVENESS_MOD); 
+      const adjRegenRate = recovery - Math.round( recovery * recoveryRetarder);
+      let avatarStatus = avatar.status;
+      let avatarStatusFade = avatar.statusFade;
+  
+      // Check avatar status and run appropriate action
       switch(avatarStatus){
         case 'Infected':
+          console.log('ASASD');
           const infectAmount = Math.floor(adjRegenRate / 2);
           // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
           if((avatarHealth - infectAmount) <= 0){
@@ -59,7 +60,7 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
             break;
           }
         case 'Recovering':
-          // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
+        // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
         case 'Rested':
           // If one tick of health recovery is over maxHealth, just assign maxHealth
           if((avatarHealth + adjRegenRate) > maxHealth){
@@ -78,7 +79,7 @@ router.get('/regenerate-health', authenticateAdminJWT, (req, res) =>{
         default: 
           break;
       }
-
+  
       allPromises.push(Avatar.update(
         {health : avatarHealth, status : avatarStatus, statusFade : avatarStatusFade},
         { where: { owner: avatar.owner },

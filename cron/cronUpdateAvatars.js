@@ -7,7 +7,8 @@ console.log('*** RUNNING CRON HEALTH UPDATE AVATARS ***');
 
 //Get all avatars who aren't at full health
 Avatar.findAll({ 
-  where: { health : { [Op.lt] : col('maxHealth') } },
+  //where: { health : { [Op.lt] : col('maxHealth') } },
+  where: { status : { [Op.or] : ['Infected', 'Recovering', 'Rested'] } },
   raw: true, attributes: ['health','maxHealth','recovery','status', 'owner', 'statusFade'] 
 }).then((results) => {
   
@@ -15,7 +16,6 @@ Avatar.findAll({
   // Loop over each avatar and either regen health if recovering or other status effects
   results.forEach((avatar) =>{
     avatar = parseAvatarProperties(avatar);
-
     let avatarHealth = avatar.health;
     const maxHealth = avatar.maxHealth;
     const recovery = avatar.recovery;
