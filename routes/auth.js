@@ -348,7 +348,7 @@ router.get('/hero-list', (req, res) =>{
     return res.formatter.serverError(error.toString());
   }
   const heroListForApp = heroList.map(heroData => {
-    return { character : heroData.character, alias : heroData.alias, description : heroData.description, history : heroData.history,
+    return { character : heroData.character, alias : heroData.alias, description : heroData.description, history : heroData.history, image : heroData.image,
       fire : heroData.elms.fire, earth : heroData.elms.earth, water  : heroData.elms.water, air : heroData.elms.air
     }
   })

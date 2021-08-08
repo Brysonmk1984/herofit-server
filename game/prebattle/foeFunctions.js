@@ -147,12 +147,12 @@ function generateFoeStats(avatar, foe){
       const bosses = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
       const adepts = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
       if(bosses.includes(foe.type)){
-        elementalQp *= 1.5;
+        elementalQp *= 1.4;
         baseHealth *= 1.2;
         basePower *= 1.1;
       }else if(adepts.includes(foe.type)){
-        elementalQp *= 1.5;
-        baseHealth *= 1.2;
+        elementalQp *= 1.4;
+        baseHealth *= 1.1;
       }else{
         elementalQp *= 1.3;
       }
@@ -230,8 +230,8 @@ function generateFoeStats(avatar, foe){
       randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP), -1);
 
       // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
-      // Going with 1/8 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
-      const powerEighth = Math.floor(randomizedPower.stat / 8);
+      // Going with 1/6 power for elements... otherwise too difficult. Also, setting a baseline 200 for health on PB
+      const powerEighth = Math.floor(randomizedPower.stat / 6);
       
       fws.health = randomizedHealth < 200 ? 200 : Math.floor(randomizedHealth.stat);
       fws.power = Math.floor(randomizedPower.stat);

@@ -5,7 +5,7 @@
   "elms" : {"fire":0,"water":0,"air":10,"earth":0},
   "skills" : ["Time Freeze", "Quantum Teleportation", "Cognitive Flash Forward", "Entropy Ray", "Slow Speed Field"],
   "ultimate" : "Timeline Shift",
-  "image" : "chrono_guy.webp",
+  "image" : "../../../assets/images/heroes/chrono_guy/chrono_guy.webp",
   "description" : "Time Traveling Renegade",
   "history" : "This enigmatic time traveler has been appearing with increasing frequency as the world has descended into chaos. While he has explained publicly that he's from two thousand years in the future and here to 'maintain the timeline of order', it's unclear what his exact motives are, who he works for and what the implications are of his very existence."
 },
@@ -16,7 +16,7 @@
   "elms" : {"fire":2,"water":2,"air":2,"earth":4},
   "skills" : ["Unsatisfactory Olfactory","Mulch Munch","Regenerative Recess","Coons & Creepy Crawlers","Decomposing Breath"],
   "ultimate" : "Purge, Plant & Propagate",
-  "image" : "compost_creature.webp",
+  "image" : "../../../assets/images/heroes/compost_creature/compost_creature.webp",
   "description" : "Animated Biodecay",
   "history" : "A bioengineering experiment gone wrong, the Compost Creature managed to escape its existence as a test subject under government control. While it appears quite terrifying and has a scent that can literally cause nerve damage, it seems to maintain a strong moral conviction for preserving the environment and maintaining the ecosystem. Interestingly, it becomes incredibly hostile around plastics."
 },
@@ -27,7 +27,7 @@
   "elms" : {"fire":0,"water":5,"air":5,"earth":0},
   "skills" : ["Alkalize & Purify", "Corrosive Toxicity", "Hot Air Hot Head", "pH Paralysis", "Problematic Plumbing"],
   "ultimate" : "Reverse Osmosis Psychosis",
-  "image" : "filtron_five.webp",
+  "image" : "../../../assets/images/heroes/filtron_five/filtron_five.webp",
   "description" : "Pathogen Punishing Automaton",
   "history" : "The humanitarian possibilities will change the world, they speculated... The engineers at Dynamo Labs perfected an autonomous A.I. filtration robot, ready to be deployed anywhere in the world. The A.I. unexpectedly became corrupted by the collective negativity resulting in severe stress, bad luck, and a nasty disposition. The AI bot has since gone rogue, attempting to purify his outer world, in hopes of finding a state of equilibrium."
 },
@@ -38,7 +38,7 @@
   "elms" : {"fire":0,"water":10,"air":0,"earth":0},
   "skills" : ["Intuitive Teamwork","Toroidal Force Field","Reflect Inner Demons","Hold the Space", "Funnel of Forgiveness"],
   "ultimate" : "Gift of Divine Love",
-  "image" : "the_empath.webp",
+  "image" : "../../../assets/images/heroes/the_empath/the_empath.webp",
   "description" : "Clairsentient Enchantress",
   "history" : "The empath had a traumatic childhood, yet always seemed to have room in her heart for others. She took their burdens and emotionally made them her own. While noble, this left her in a state of being utterly drained of energy. Over the years, she has learned how to be fully present in any experience while discerning her emotions from the emotions of those around her. She's not a healer, she shows others how to heal themselves."
 },
@@ -49,7 +49,7 @@
   "elms" : {"fire":0,"water":0,"air":0,"earth":10},
   "skills" : ["Seismic Slam","Rubble Rouser","Party Hardy","Sentiment of the Sediment", "Muddy Slippery Slide"],
   "ultimate" : "The Aggro Crag",
-  "image" : "boulder_bro.webp",
+  "image" : "../../../assets/images/heroes/boulder_bro/boulder_bro.webp",
   "description" : "The Party Rock",
   "history" : "After a drunken tumbled down a quarry, this former man-child emerged days later with a new perspective on life and a new physique to boot! If he's not smashing and bashing, this rock elemental works on his new career as a rock role model for other weak men looking to turn their lives around."
 },
@@ -60,7 +60,7 @@
   "elms" : {"fire":4,"water":2,"air":2,"earth":2},
   "skills" : ["Bamboo Blade","Hemp Hogtie","Sneak in Solidarity","All Natural Nunchaku","Obsidian Shuriken"],
   "ultimate" : "Fermentation Frenzy",
-  "image" : "natural_ninja.webp",
+  "image" : "../../../assets/images/heroes/natural_ninja/natural_ninja.webp",
   "description" : "Sentinal of Sustainability",
   "history" : "The Natural Ninja is shrouded in mystery, first appearing in a Tokyo street market in an act of vigilante environmentalism. Dashing in and out of alleyways, all plastic shopping bags, drinking straws, and takeout containers were snatched in the blink of an eye. Only a note remained, hanging from a throwing star: 'Sustainability or the sword, choose wisely!'."
 },
@@ -71,7 +71,7 @@
   "elms" : {"fire":5,"water":0,"air":5,"earth":0},
   "skills" : ["Scrapyard Scavenge","Reduce, Reuse, Recycle Foe","Law-Binding Lasso","Muffler Mortar","Uncanny Decoy"],
   "ultimate" : "Mini RePete Multiplicity",
-  "image" : "repete.webp",
+  "image" : "../../../assets/images/heroes/repete/repete.webp",
   "description" : "Reduce, Reuse, Recycle",
   "history" : "The Scavenger bot is the product of a genius kid inventor, already a senior in college at age 12. He says the concept and blueprints randomly come to him in his dreams from a past life. The robot is completely autonomous and will actively scavenge for parts to improve its form. If it doesn’t need the trash for an upgrade, the remaining waste is used as ammo for the powerful Muffler Mortar."
 },
@@ -82,7 +82,7 @@
   "elms" : {"fire":2,"water":3,"air":3,"earth":2},
   "skills" : ["Surprise Saprolings", "Ten Ton Stomp","Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
   "ultimate" : "Purify by Chlorophyll",
-  "image" : "timber_terror.webp",
+  "image" : "../../../assets/images/heroes/timber_terror/timber_terror.webp",
   "description" : "Indomitable Forest Strider",
   "history" : "This indobidable elemental awakened after the great western wildfires of 2020; energy of the forest coalescing & manifesting as a massive treant. Systematically, the wooded walker is taking revenge for the destruction of its homeland by targeting all those guilty of deforestation and careless fires."
 },
@@ -93,7 +93,7 @@
   "elms" : {"fire":10,"water":0,"air":0,"earth":0},
   "skills" : ["Million-Degree Beam","Core-Forged Aegis","Speed of Light Strike","Photon Flashbang","Solar Flare EMP"],
   "ultimate" : "Avatar of the Sun",
-  "image" : "solar_celeste.webp",
+  "image" : "../../../assets/images/heroes/solar_celeste/solar_celeste.webp",
   "description" : "Extra Terrestrial Spirit",
   "history" : "The Solar Warrior is a higher-dimensional life form inhabiting our sun and baffling the scientific communities on Earth. Capable of taking both the forms of a warrior woman and a ball of pure light, she is enabling unlimited free solar energy to communities most in in need."
 },
@@ -104,7 +104,7 @@
   "elms" : {"fire":3,"water":3,"air":2,"earth":2},
   "skills" : ["Collude with the Crows","Wolf Pack Attack","Beastly Behavior","Off-the-Grid Offense","Axecution"],
   "ultimate" : "Every Beast Stampede",
-  "image" : "wilhelm_the_wild.webp",
+  "image" : "../../../assets/images/heroes/wilhelm_the_wild/wilhelm_the_wild.webp",
   "description" : "Barbaric Beastmaster",
   "history" : "This survivalist never really fit in with society, often favoring the solitude of nature and his kinship with animals. Frustrated with the misguided priorities and growing insanity of the collective, he renounced his citizenship and began living off the land and in isolation. Over the years, he developed the remarkable ability to communicate with animals to fight on his side."
 }]
