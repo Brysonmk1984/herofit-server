@@ -1,6 +1,6 @@
 {
   "name": "stravat-cognito",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {

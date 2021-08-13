@@ -342,7 +342,7 @@ router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT
 
 // Mobile app only
 router.get('/hero-list', (req, res) =>{
-  console.log('END POINT');
+
   if(!heroList){
     const error = new Error("Couldn't retrieve hero list!")
     return res.formatter.serverError(error.toString());
@@ -352,7 +352,7 @@ router.get('/hero-list', (req, res) =>{
       fire : heroData.elms.fire, earth : heroData.elms.earth, water  : heroData.elms.water, air : heroData.elms.air
     }
   })
-
+  
   res.formatter.ok(heroListForApp);
 });
 
