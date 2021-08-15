@@ -160,7 +160,7 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     return res.formatter.ok( avatar );
 
   }catch(error){
-    console.log(`Couldn't get Avatar for user ${email} DEBUG: ${error}`);
+    console.log(`Could not get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
   }
 
