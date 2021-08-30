@@ -51,7 +51,8 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 
 });
 
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('lastName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
+// Last name is now optional since App isn't collecting it
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('lastName').isString().optional(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -349,9 +350,10 @@ router.get('/hero-list', (req, res) =>{
   }
   const heroListForApp = heroList.map(heroData => {
     return { character : heroData.character, alias : heroData.alias, description : heroData.description, history : heroData.history, image : heroData.image,
-      fire : heroData.elms.fire, earth : heroData.elms.earth, water  : heroData.elms.water, air : heroData.elms.air
+      elms : heroData.elms, colors : heroData.colors
     }
   })
+  
   
   res.formatter.ok(heroListForApp);
 });
