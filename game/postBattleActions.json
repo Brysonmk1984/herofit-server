@@ -176,7 +176,7 @@
     {
       "requirement" : 15,
       "action" : "Grant Win Streak 15",
-      "name" : "The Dominator",
+      "name" : "The Valorous",
       "type" : "Award Title",
       "itemCategory": "titles",
       "outcome" : ["Avatar Wins"]
