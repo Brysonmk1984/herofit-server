@@ -37,11 +37,12 @@ function _chanceItemFind(itemTuples, remainderPercent){
   // run chance function on each percentage in second part of tuple
   itemTuples[1].forEach((likelihood, i) =>{
     // If it's a remainder iteration, reduce likelihood by the remainderPercent * likelihood
+    //console.log('ASD', likelihood, remainderPercent);
     if(remainderPercent){
       likelihood = roundNumber(likelihood * (remainderPercent * .01), 4);
     }
     if(likelihood > 100 || likelihood < 0){
-      console.log('SUMTING WONG with likelihood', likelihood);
+      //console.log('SUMTING WONG with likelihood', likelihood);
       throw new Error('Likelihood is inaccurate');
     }
     const foundThisItem = chance.bool({ likelihood });
@@ -125,7 +126,7 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
       }
     }
   });
-  
+  //console.log('ITUPLE=', generalItemTuple);
   let foundItems = _chanceItemFind(generalItemTuple, remainderPercent);
   
   
@@ -153,7 +154,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
       ptFound += result.pt;
     }
   }
-
+  //console.log('INSIDEE', remainderPercent);
   // Check partial hour
   if(remainderPercent){
     const result = func(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
@@ -175,6 +176,7 @@ function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFind
   const integer = Math.floor(activityItemSessions);
   const remainder =  activityItemSessions % 1;
   const remainderPercent = remainder * 100;
+  //console.log('Earlyy', integer, remainderPercent);
   const foundItemsAndPt =  _callXTimes(_itemFind, integer, remainderPercent, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
   //console.log('DONE', foundItemsAndPt);
   return foundItemsAndPt;
