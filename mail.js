@@ -32,8 +32,8 @@ const sendContactEmail = function(formData, resolve, reject){
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${formData.email} submitted a form message.`, 
-      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.message} \n \n ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
-      html: `<div>${formData.message}</div><br /> ACCOUNT DATA: <br />${accountInfo.username} (${accountInfo.email}) <br /> First Name: ${accountInfo.firstName}<br />`
+      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.feedbackType}: \n\n ${formData.message} \n \n ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      html: `<div><strong>${formData.feedbackType}:</strong></div><div>${formData.message}</div><br /> ACCOUNT DATA: <br />${accountInfo.username} (${accountInfo.email}) <br /> First Name: ${accountInfo.firstName}<br />`
   };
 
   // send mail with defined transport object

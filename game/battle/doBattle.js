@@ -162,11 +162,11 @@ function _calcElementDamage(attacker, receiver){
   */
   // First value is total fire of attacker, second is the 'd' factor, which is all elemental power added together adjusted down for rounds, and then averaged together in the fireProc function
   const fireProc = determineFireCrit(attacker.fire, (attackerElms.fire + (attackerElms.earth || attackerElms.fire) + (attackerElms.water || attackerElms.fire) + (attackerElms.air  || attackerElms.fire)));
-  attackerElms.fire = fireProc.netDamage;
-  //console.log('fireProc - ', fireProc);
   turnElmDamageDone.fire += fireProc.critDamage;
-  //console.log('total fire done - ', turnElmDamageDone.fire);
+  turnElmDamageDone.total += fireProc.critDamage;
   
+
+  //   return { critChance, critDamage };
   const airProc = determineAirEvade(receiver.air, turnElmDamageDone.total);
   //console.log(airProc);
   if(airProc.evaded){
@@ -254,10 +254,6 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     }
 
     const elementalProcs = {
-      //water : 0,
-      // air : 0,
-      // earth : 0,
-      // fire : 0,
       fire : fireProc,
       air : airProc,
       earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + totals.aPhyDamage)),
@@ -334,10 +330,6 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       }
 
       elementalProcs = {
-        //fire : 0,
-        //water : 0,
-        // air : 0,
-        // earth : 0,
         fire : fireProc,
         air : airProc,
         earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + physicalDamage)),

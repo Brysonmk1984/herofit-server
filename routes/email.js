@@ -61,14 +61,15 @@ router.post('/survey-data', body('email').isEmail(), body('username').isString()
   });
 });
 
-router.post('/contact-form', body('email').isEmail(), body('message').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
+// feedbackType is optional - Only the native app is sending this property, not the web app
+router.post('/contact-form', body('email').isEmail(), body('feedbackType').isString().optional({ checkFalsy: true }), body('message').isString(), body('accountInfo').isObject().optional({ checkFalsy: true }), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for /contact-form'");
   }
-  const { email, message, accountInfo } = req.body;
+  const { email, message, feedbackType, accountInfo } = req.body;
   new Promise((resolve, reject) => {
-    sendContactEmail({ email, message, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
+    sendContactEmail({ email, message, feedbackType, accountInfo : accountInfo || 'User not logged in.' }, resolve, reject);
   }).then((data) =>{
     res.formatter.ok(data);
   }).catch((error) =>{
