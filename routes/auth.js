@@ -11,7 +11,7 @@ const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwo
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
 // mobile app only
 const heroList = require('../heroList.json');
-
+const crypto = require('crypto');
 
 router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
@@ -250,7 +250,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
   }
  
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken, dataSrcId } = req.body;
-  console.log('here with new token', stravaAccessToken, dataSrcId);
+
   const updateObj = { stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken };
   if(dataSrcId){
     updateObj.dataSrcId = dataSrcId;
@@ -353,9 +353,52 @@ router.get('/hero-list', (req, res) =>{
       elms : heroData.elms, colors : heroData.colors
     }
   })
-  
-  
   res.formatter.ok(heroListForApp);
+});
+
+// If a user opts to do 'manual mode' instead of strava, use this endpoint to generate a dataSrcId
+router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /non-strava-credentials");
+  }
+ 
+  const { email } = req.body;
+
+  User.findOne({ where: { email } })
+  .then((user) =>{
+    // Check if record exists in db
+    if (user) {
+      User.update(
+        {  dataSrcId : `hf-${crypto.randomBytes(64).toString('hex')}` },
+        { where: { email },
+        returning : true, plain : true })
+      .then((data) => {
+        res.formatter.ok({
+          user : data[1]
+        });
+      })
+      .catch((error)=>{
+        console.log(`Couldn't update dataSrcId for user ${email}, DEBUG: ${error}`);
+
+        const errorString = error.toString();
+        console.log('ERR STR = ', errorString)
+        // If dataSrcId is already in use, send bad request
+        if(errorString === 'SequelizeUniqueConstraintError: Validation error'){
+          res.formatter.badRequest(errorString, `That dataSrcId is already in use!`);
+        }else{
+          res.formatter.serverError(errorString, `Couldn't update dataSrcId for user ${email}`);
+        }
+      });
+    } else {
+      console.log('User not found!');
+      const error = new Error('User not found!');
+      res.formatter.serverError(error.toString());
+    }
+  }).catch((error)=>{
+    console.log(`Couldn't find user ${email} to update their Strava, DEBUG: ${error}`);
+    res.formatter.serverError(error.toString(), `Couldn't find user ${email}`);
+  });
 });
 
 module.exports = router;

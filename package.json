@@ -10,7 +10,9 @@
     "dev": "NODE_ENV=development nodemon start.js"
   },
   "jest": {
-    "watchPathIgnorePatterns" : ["node_modules"],
+    "watchPathIgnorePatterns": [
+      "node_modules"
+    ],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./__tests__/nullOrAny.setup.js",
@@ -21,7 +23,6 @@
       "./__tests__/nullOrAny.setup.js",
       "./__tests__/itemFind",
       "./__tests__/battles/postBattleEffects.test.js"
-
     ]
   },
   "author": "Bryson Kruk",

@@ -9,7 +9,7 @@ const { Op } = require('sequelize');
 const { config } = require('../appConfig');
 
 // If an email is passed, get that user, otherwise get user based on JWT
-router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), body('initMessage').isBoolean().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
+router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
   if(config.mode === 'maintenance'){
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
@@ -19,7 +19,7 @@ router.post('/user-details', body('email').isEmail().optional({ nullable: true, 
     console.log(errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
   }
-  const { email, initMessage } = req.body;
+  const { email } = req.body;
   const user = req.user;
 
   User.findOne({ where : email ? { email } : { id : user.id }, raw : true })
