@@ -52,7 +52,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 });
 
 // Last name is now optional since App isn't collecting it
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('lastName').isString().optional(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -370,7 +370,7 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
     // Check if record exists in db
     if (user) {
       User.update(
-        {  dataSrcId : `hf-${crypto.randomBytes(64).toString('hex')}` },
+        {  dataSrcId : `hf-${crypto.randomBytes(4).toString('hex')}` },
         { where: { email },
         returning : true, plain : true })
       .then((data) => {
@@ -380,7 +380,6 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
       })
       .catch((error)=>{
         console.log(`Couldn't update dataSrcId for user ${email}, DEBUG: ${error}`);
-
         const errorString = error.toString();
         console.log('ERR STR = ', errorString)
         // If dataSrcId is already in use, send bad request
