@@ -50,13 +50,14 @@ router.post('/update-owner-username', body('owner').isEmail(), body('newUsername
 });
 
 // DELETE ACCOUNT
-router.delete('/:username', body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
+router.delete('/:username', body('deleteFromAdminPanel').isBoolean().optional({nullable: true, checkFalsy: true}), body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
   }
-
-  const { id, email } = req.user;
+  console.log('SHOULDBETRUE', req.body.deleteFromAdminPanel);
+  // If deleting from the admin panel, use data from the body, otherwise from the passed in user token
+  const { id, email } =  req.body.deleteFromAdminPanel ? req.body : req.user;
   const { avatarID } = req.body;
 
   const promises = [];
@@ -76,5 +77,35 @@ router.delete('/:username', body('avatarID').isNumeric(), authenticateJWT, (req,
   });
 
 });
+
+// DELETE ACCOUNT
+router.delete('/:email', body('deleteFromAdminPanel').isBoolean().optional({nullable: true, checkFalsy: true}), body('id').isNumeric().optional({nullable: true, checkFalsy: true}),  body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
+  }
+
+  // If deleting from the admin panel, use data from the body, otherwise from the passed in user token
+  const { id, email } =  req.body.deleteFromAdminPanel ? req.body : req.user;
+  const { avatarID } = req.body;
+
+  const promises = [];
+  promises.push(AvatarItems.destroy({ where : { avatarID }}));
+  promises.push(Battle.destroy({ where : { owner : email }}));
+
+  Promise.allSettled(promises)
+  .then(() =>{
+    return Avatar.destroy({ where : { owner : email } });
+  }).then(() =>{
+    return User.destroy({ where : { id }});
+  }).then(() =>{
+    return res.formatter.ok({ message : 'Successfully deleted account!' });
+  }).catch((error)=>{
+    console.log(error);
+    return res.formatter.serverError(error.toString(), `Unable to delete account for user ${email}, - DELETE /:username endpoint`);
+  });
+
+});
+
 
 module.exports = router;
