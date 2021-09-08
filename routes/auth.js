@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const issueJWT = require('../jwt/issueJWT');
 const { User } = require('../config/db');
@@ -9,6 +10,7 @@ const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
+
 // mobile app only
 const heroList = require('../heroList.json');
 const crypto = require('crypto');
@@ -63,6 +65,17 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   }
 
   console.log('CAPTCHA VALUE', req.body.captchaValue);
+
+(async() =>{
+  try{
+    //const val = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${googleCaptchaSecret}&response=${req.body.captchaValue}`)
+    const val = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, { secret: process.env.GOOGLE_CAPTCHA_SECRET, response : req.body.captchaValue })
+    console.log('GRESPONSE', val);
+    return res.formatter.badReqåuest([], `GOOD RESPONSE, captcha value = ${val}`);
+  }catch(error){
+    return res.formatter.badRequest([], `ERROR WITH GOOGLE REQUEST, = ${error}`);
+  }
+})()
   
   return res.formatter.badRequest([], `TEST, captcha value = ${req.body.captchaValue}`);
 
