@@ -76,7 +76,7 @@ Avatar.findAll({
   return Promise.allSettled(allPromises);
 
 }).then((results) => {
-  results.forEach((result) => console.log('All Regenerate Results - ', result.status));
+  //results.forEach((result) => console.log('All Regenerate Results - ', result.status));
   return process.exit();
 }).catch((error) =>{
     console.log('ERROR DOING BULK HEALTH UPDATE', error);
