@@ -51,8 +51,8 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 
 });
 
-// Last name is now optional since App isn't collecting it
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), (req, res)=>{
+// captchaValue is optional since App isn't using it
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -61,6 +61,10 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   if(config.mode === 'maintenance'){
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
+
+  console.log('CAPTCHA VALUE', req.body.captchaValue);
+  
+  return res.formatter.badRequest([], `TEST, captcha value = ${req.body.captchaValue}`);
 
   let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
   fistName = firstName || null;
