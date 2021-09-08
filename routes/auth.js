@@ -66,9 +66,10 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
   console.log('CAPTCHA VALUE', req.body.captchaValue, process.env.GOOGLE_CAPTCHA_SECRET);
 
-
-  const successfulRecaptcha =  verifyRecaptcha(req.body.captchaValue);
+  // Skip Recaptcha if development mode
+  const successfulRecaptcha =  process.env.NODE_ENV === 'development' ? true : verifyRecaptcha(req.body.captchaValue);
   if(!successfulRecaptcha){
+    console.log('FAILED CAPTACH');
     return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
 
@@ -118,7 +119,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   }).catch((error)=>{
     console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
     const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
-    if(error.toString() === uniqueConstraint){
+    if(error.toString() === uniqueConstraint){console.log('YEP, UNIQUE EMAIL VIOLATION');
       const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
       return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
     }
