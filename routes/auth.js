@@ -206,13 +206,24 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
 
 
 
-router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString(), (req, res) => {
+router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional({nullable: true, checkFalsy: true}), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
   }
   
-  const { email, emailCode } = req.body;
+  let { email, emailCode } = req.body;
+
+  async function updatedCodeInDb(){
+    return await User.update({ emailCode }, { where : { email }});
+  }
+
+  // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
+  if(!emailCode){
+    emailCode = randomEmailString();
+    updatedCodeInDb(emailCode);
+  }
+
   //console.log(email, emailCode);
   sendVerificationEmail(email, emailCode)
   .then((data) => {
@@ -235,9 +246,10 @@ router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
   }
 
   const { emailCode } = req.body;
-
+  console.log('EMAILCODE', emailCode);
   User.update({ active : true }, { where : { emailCode }, returning : true, plain : true })
   .then((data) => {
+    console.log('IM IN', data[1]);
     return res.formatter.ok({ user : data[1] });
   }).catch((error) => {
     console.log(error);
