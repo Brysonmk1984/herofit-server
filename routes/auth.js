@@ -68,7 +68,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 (async() =>{
   try{
-    const val = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_CAPTCHA_SECRET}&response=${req.body.captchaValue}`{}, { headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" }, })
+    const val = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_CAPTCHA_SECRET}&response=${req.body.captchaValue}`, {}, { headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" }})
     //const val = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, { secret: process.env.GOOGLE_CAPTCHA_SECRET, response : req.body.captchaValue })
     console.log('GRESPONSE', val);
     return res.formatter.badReqåuest([], `GOOD RESPONSE, captcha value = ${val}`);
