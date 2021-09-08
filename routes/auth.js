@@ -73,64 +73,65 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     console.log('GRESPONSE', val);
     return res.formatter.badReqåuest([], `GOOD RESPONSE, captcha value = ${val}`);
   }catch(error){
+    console.log('GERROR', val);
     return res.formatter.badRequest([], `ERROR WITH GOOGLE REQUEST, = ${error}`);
   }
 })()
   
-  return res.formatter.badRequest([], `TEST, captcha value = ${req.body.captchaValue}`);
-
-  let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
-  fistName = firstName || null;
-  lastName = lastName || null;
-  const saltHash = genPassword(password);
-  const { salt, hash } = saltHash;
-  const emailCode =  randomEmailString();
-  //console.log(emailCode);
-  const newUser = { 
-    email,
-    username,
-    firstName,
-    lastName,
-    hash,
-    salt,
-    emailCode,
-    emailMarketingOptIn
-  };
-
-  User.create(newUser)
-  .then((result) => {
-    // Not sure why sequelize can't do raw : true, so we need this:
-    const user = result.get({ plain : true });
-
-    const tokenObject = issueJWT(user);
-    const response = { user, tokenObject };
-
-    if(config.globalMessage && config.globalMessage.length){
-      response.globalMessage = config.globalMessage;
-    }
-    sendVerificationEmail(email, emailCode)
-    .then((data) =>{
-      //console.log(data);
-      if(data.error){
-        return res.formatter.serverError(error.toString());
-      }
-
-      console.log('sending OK RESPONSE');
-      return res.formatter.ok(response);
-    }).catch((error) =>{
-      console.log('THE ERROR', error);
-    });
 
 
-  }).catch((error)=>{
-    console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
-    const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
-    if(error.toString() === uniqueConstraint){
-      const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
-      return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
-    }
-    res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
-  });
+  // let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
+  // fistName = firstName || null;
+  // lastName = lastName || null;
+  // const saltHash = genPassword(password);
+  // const { salt, hash } = saltHash;
+  // const emailCode =  randomEmailString();
+  // //console.log(emailCode);
+  // const newUser = { 
+  //   email,
+  //   username,
+  //   firstName,
+  //   lastName,
+  //   hash,
+  //   salt,
+  //   emailCode,
+  //   emailMarketingOptIn
+  // };
+
+  // User.create(newUser)
+  // .then((result) => {
+  //   // Not sure why sequelize can't do raw : true, so we need this:
+  //   const user = result.get({ plain : true });
+
+  //   const tokenObject = issueJWT(user);
+  //   const response = { user, tokenObject };
+
+  //   if(config.globalMessage && config.globalMessage.length){
+  //     response.globalMessage = config.globalMessage;
+  //   }
+  //   sendVerificationEmail(email, emailCode)
+  //   .then((data) =>{
+  //     //console.log(data);
+  //     if(data.error){
+  //       return res.formatter.serverError(error.toString());
+  //     }
+
+  //     console.log('sending OK RESPONSE');
+  //     return res.formatter.ok(response);
+  //   }).catch((error) =>{
+  //     console.log('THE ERROR', error);
+  //   });
+
+
+  // }).catch((error)=>{
+  //   console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
+  //   const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
+  //   if(error.toString() === uniqueConstraint){
+  //     const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
+  //     return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
+  //   }
+  //   res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
+  // });
 
 });
 
