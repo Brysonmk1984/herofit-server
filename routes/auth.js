@@ -214,14 +214,12 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
   
   let { email, emailCode } = req.body;
 
-  async function updatedCodeInDb(){
-    return await User.update({ emailCode }, { where : { email }});
-  }
+
 
   // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
   if(!emailCode){
     emailCode = randomEmailString();
-    updatedCodeInDb(emailCode);
+    User.update({ emailCode }, { where : { email }});
   }
 
   //console.log(email, emailCode);
