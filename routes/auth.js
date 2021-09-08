@@ -67,7 +67,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   console.log('CAPTCHA VALUE', req.body.captchaValue, process.env.GOOGLE_CAPTCHA_SECRET);
 
 
-  const successfulRecaptcha =  await verifyRecaptcha(req.body.captchaValue);
+  const successfulRecaptcha =  verifyRecaptcha(req.body.captchaValue);
   if(!successfulRecaptcha){
     return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
