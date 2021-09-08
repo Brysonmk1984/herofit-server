@@ -64,7 +64,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
-  console.log('CAPTCHA VALUE', req.body.captchaValue);
+  console.log('CAPTCHA VALUE', req.body.captchaValue, process.env.GOOGLE_CAPTCHA_SECRET);
 
 (async() =>{
   try{
