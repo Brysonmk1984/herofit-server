@@ -69,7 +69,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
   const successfulRecaptcha =  await verifyRecaptcha(req.body.captchaValue);
   if(!successfulRecaptcha){
-    res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
+    return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
 
   let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
