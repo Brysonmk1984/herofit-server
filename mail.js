@@ -257,7 +257,7 @@ const sendBattleReportEmail = function(tally){
 };
 
 // VERIFICATION EMAIL For Verifying Account
-const sendVerificationEmail = function(email, code){
+const sendVerificationEmail = function(email, code, isMobileApp){
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_PROVIDER,
     port: 465,
@@ -271,13 +271,14 @@ const sendVerificationEmail = function(email, code){
   const baseUrl = process.env.NODE_ENV === 'development' ? process.env.EMAIL_REDIRECT_DEV 
   : process.env.NODE_ENV === 'production' ? process.env.EMAIL_REDIRECT_PROD : process.env.EMAIL_REDIRECT_STAGING;
 
-  const url = `${baseUrl}/welcome?verify=${code}`;
+  const url = isMobileApp ? `${process.env.EMAIL_REDIRECT_APP}?verify=${code}` : `${baseUrl}/welcome?verify=${code}`;
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: email,
     subject: `HeroFit - Account Verification`, 
     text: "Click on the link below to verify your account\n\n" + url,
+    //html: `<div>Click on the link below to verify your account</div><br /><div><a href="${url}">${url}</a></div>`
   }
   return new Promise((resolve, reject) =>{
     transporter.sendMail(mailOptions, (error, info) => {

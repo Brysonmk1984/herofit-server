@@ -54,7 +54,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 });
 
 // captchaValue is optional since App isn't using it
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), (req, res)=>{
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -64,16 +64,14 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
-  console.log('CAPTCHA VALUE', req.body.captchaValue, process.env.GOOGLE_CAPTCHA_SECRET);
 
   // Skip Recaptcha if development mode
   const successfulRecaptcha =  process.env.NODE_ENV === 'development' ? true : verifyRecaptcha(req.body.captchaValue);
   if(!successfulRecaptcha){
-    console.log('FAILED CAPTACH');
     return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
 
-  let { email, username, password, firstName, lastName, emailMarketingOptIn } = req.body;
+  let { email, username, password, firstName, lastName, emailMarketingOptIn, isMobileApp } = req.body;
   fistName = firstName || null;
   lastName = lastName || null;
   const saltHash = genPassword(password);
@@ -102,7 +100,9 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;
     }
-    sendVerificationEmail(email, emailCode)
+
+
+    sendVerificationEmail(email, emailCode, isMobileApp)
     .then((data) =>{
       //console.log(data);
       if(data.error){
@@ -206,13 +206,13 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
 
 
 
-router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional({nullable: true, checkFalsy: true}), (req, res) => {
+router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
   }
   
-  let { email, emailCode } = req.body;
+  let { email, emailCode, isMobileApp } = req.body;
 
 
 
@@ -223,7 +223,7 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
   }
 
   //console.log(email, emailCode);
-  sendVerificationEmail(email, emailCode)
+  sendVerificationEmail(email, emailCode, isMobileApp)
   .then((data) => {
     if(data.error){
       return res.formatter.serverError(error.toString());
