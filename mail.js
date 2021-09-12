@@ -1,6 +1,26 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken')
 
+function determineVerificationUrl(env, isApp){
+  console.log(process.env.NODE_ENV, isApp);
+  let environment = isApp && env === 'development' ? 'app-development' : isApp && env === 'production' ? 'app-production' : env;
+  switch(environment){
+    case 'production':
+      return process.env.EMAIL_REDIRECT_PROD;
+    case 'staging':
+      return process.env.EMAIL_REDIRECT_STAGING;
+    case 'development':
+      return process.env.EMAIL_REDIRECT_DEV;
+    case 'app-production':
+      return process.env.EMAIL_REDIRECT_APP;
+    case 'app-development':console.log('YES');
+      return process.env.EMAIL_REDIRECT_APP_DEV;
+    default: console.log('NO!');
+      return process.env.EMAIL_REDIRECT_PROD;
+  }
+}
+
+
 // create reusable transporter object using the default SMTP transport
 let transporter = (process.env.NODE_ENV === 'development') ? 
   nodemailer.createTransport({
@@ -268,10 +288,10 @@ const sendVerificationEmail = function(email, code, isMobileApp){
     }
   });
 
-  const baseUrl = process.env.NODE_ENV === 'development' ? process.env.EMAIL_REDIRECT_DEV 
-  : process.env.NODE_ENV === 'production' ? process.env.EMAIL_REDIRECT_PROD : process.env.EMAIL_REDIRECT_STAGING;
 
-  const url = isMobileApp ? `${process.env.EMAIL_REDIRECT_APP}?verify=${code}` : `${baseUrl}/welcome?verify=${code}`;
+  const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
+
+  const url = `${baseUrl}?verify=${code}`;
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
@@ -295,7 +315,7 @@ const sendVerificationEmail = function(email, code, isMobileApp){
 };
 
 // RESET PASSWORD email verification
-const sendResetPasswordEmail = function(email, code){
+const sendResetPasswordEmail = function(email, code, isMobileApp){
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_PROVIDER,
     port: 465,
@@ -306,9 +326,7 @@ const sendResetPasswordEmail = function(email, code){
     }
   });
 
-  const baseUrl = process.env.NODE_ENV === 'development' ? process.env.EMAIL_REDIRECT_DEV 
-  : process.env.NODE_ENV === 'production' ? process.env.EMAIL_REDIRECT_PROD : process.env.EMAIL_REDIRECT_STAGING;
-
+  const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
   const url = `${baseUrl}/welcome?verifyPassword=${code}`;
 
   const mailOptions = {

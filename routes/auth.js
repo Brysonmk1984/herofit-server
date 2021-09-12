@@ -257,6 +257,7 @@ router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
 });
 
 router.get('/strava-client-credentials', authenticateJWT, (req, res) =>{
+ 
   res.formatter.ok({
     clientId: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
