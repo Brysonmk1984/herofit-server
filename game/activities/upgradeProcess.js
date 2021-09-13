@@ -211,7 +211,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
       let improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
-
+        console.log('SNAPSHOT, UPAV, IMPROV - ',avStatSnapshot,updatedAvatar,improvements);
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
       const weightedElms = _calcWeightedElms(improvements);
       

@@ -73,7 +73,7 @@ function _chancePTFind(remainderPercent = null, ptDropRate, ptDropAmount){
 // Run ALL functions that check for various items
   // weightedElms is an object of the elements with full percents of total workout
 function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
-
+  console.log('WEIGHTED ELMS', weightedElms);
   // If Special Event is live, run code to attempt any special item find event
   let eventItemFindBonusArray = [];
   if(specialEvent){
