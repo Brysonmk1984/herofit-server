@@ -67,15 +67,20 @@ function _getAvatarAndItems(email, t){
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
 function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }){
 
+  function minZero(val){
+    return val < 0 ? 0 : val;
+  }
+
+
   return {
-    power : power - avStatSnapshot.power,
-    "max health" : maxHealth - avStatSnapshot.maxHealth,
-    health : health - avStatSnapshot.health,
-    air : Number((air - avStatSnapshot.air).toFixed(2)),
-    water : Number((water - avStatSnapshot.water).toFixed(2)),
-    fire : Number((fire - avStatSnapshot.fire).toFixed(2)),
-    earth : Number((earth - avStatSnapshot.earth).toFixed(2)),
-    aether : Number((aether - avStatSnapshot.aether).toFixed(2)),
+    power : minZero(power - avStatSnapshot.power),
+    "max health" : minZero(maxHealth - avStatSnapshot.maxHealth),
+    health : minZero(health - avStatSnapshot.health),
+    air : minZero(Number((air - avStatSnapshot.air).toFixed(2))),
+    water : minZero(Number((water - avStatSnapshot.water).toFixed(2))),
+    fire : minZero(Number((fire - avStatSnapshot.fire).toFixed(2))),
+    earth : minZero(Number((earth - avStatSnapshot.earth).toFixed(2))),
+    aether : minZero(Number((aether - avStatSnapshot.aether).toFixed(2))),
   };
 }
 

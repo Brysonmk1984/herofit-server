@@ -32,7 +32,7 @@ function _chanceItemFind(itemTuples, remainderPercent){
 
   // itemTuples LOOKS SOMETHING LIKE: [['Health Potion', 'Antidote Potion'],[75,25]];
   //itemTuple gives exact percent chance for drop
-  console.log('ITEM TUPLES',itemTuples, 'REMAINDERPERCENT', remainderPercent);
+  //console.log('ITEM TUPLES',itemTuples, 'REMAINDERPERCENT', remainderPercent);
   const foundItems = [];
   // run chance function on each percentage in second part of tuple
   itemTuples[1].forEach((likelihood, i) =>{
@@ -40,9 +40,9 @@ function _chanceItemFind(itemTuples, remainderPercent){
   
     if(remainderPercent){
       likelihood = roundNumber(likelihood * (remainderPercent * .01), 4);
-      console.log("likelihood in a remainder", likelihood);
+      //console.log("likelihood in a remainder", likelihood);
     }else{
-      console.log("likelihood outside of a remainder", likelihood);
+      //console.log("likelihood outside of a remainder", likelihood);
     }
     if(likelihood > 100 || likelihood < 0){
       //console.log('SUMTING WONG with likelihood', likelihood);
@@ -73,7 +73,7 @@ function _chancePTFind(remainderPercent = null, ptDropRate, ptDropAmount){
 // Run ALL functions that check for various items
   // weightedElms is an object of the elements with full percents of total workout
 function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops){
-  console.log('WEIGHTED ELMS', weightedElms);
+  //console.log('WEIGHTED ELMS', weightedElms);
   // If Special Event is live, run code to attempt any special item find event
   let eventItemFindBonusArray = [];
   if(specialEvent){
@@ -120,10 +120,10 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
           // Total the possible chance from each element multiplied by item chance
           chanceToFind += ((weightedElms[elm] * .01) * item.dropRate);
         });
-        console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
+        //console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
         generalItemTuple[1].push(roundNumber(chanceToFind, 4));
       }else{
-        console.log('NOT ACT RESTRICTED ', item.name, item.dropRate);
+        //console.log('NOT ACT RESTRICTED ', item.name, item.dropRate);
         // NOT ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE ONLY
         generalItemTuple[1].push(item.dropRate);
       }
