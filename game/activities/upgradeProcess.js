@@ -66,11 +66,12 @@ function _getAvatarAndItems(email, t){
 
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
 function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }){
-
+  // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot 
+  // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
+  // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
   function minZero(val){
     return val < 0 ? 0 : val;
   }
-
 
   return {
     power : minZero(power - avStatSnapshot.power),
