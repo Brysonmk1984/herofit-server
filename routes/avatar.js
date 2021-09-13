@@ -9,7 +9,7 @@ const { literal, Op } = require("sequelize");
 const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctions');
 const xpCalc = require('../game/upgrades/xpCalc');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
-
+const { sendBackendOnlyEmail }= require('../mail');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 
 const upgradeProcess = require('../game/activities/upgradeProcess');

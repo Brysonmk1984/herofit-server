@@ -5,6 +5,7 @@ const { specialEvent } = require('../../appConfig').config;
 const { roundNumber, cloneObj } = require('../../lib/helperFunctions');
 const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require('../CONSTANTS');
 const preventDuplicateItems = require('../items/preventDuplicateItems');
+const { sendBackendOnlyEmail }= require('../../mail');
 
  //ptFindStatBoost
  function _calcPtBoost(ptFind){
@@ -46,7 +47,9 @@ function _chanceItemFind(itemTuples, remainderPercent){
     }
     if(likelihood > 100 || likelihood < 0){
       //console.log('SUMTING WONG with likelihood', likelihood);
-      throw new Error('Likelihood is inaccurate');
+      const error =  new Error('Likelihood is inaccurate');
+      sendBackendOnlyEmail(`Likelihood for itemFind exceeds boundaries - ${likelihood}`, error);
+      throw error;
     }
     const foundThisItem = chance.bool({ likelihood });
     if(foundThisItem){

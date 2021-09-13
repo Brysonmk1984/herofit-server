@@ -276,6 +276,33 @@ const sendBattleReportEmail = function(tally){
 
 };
 
+// BACKEND ONLY ERRORS
+const sendBackendOnlyEmail = function(message, error){
+  return new Promise((resolve, reject) =>{
+    // setup email data with unicode symbols
+    let mailOptions = { 
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HeroFit - Backend Error`, 
+      text: `
+        Backend Error:\n
+        Message: ${message}\n,
+        ERROR: ${error}
+      `
+  };
+
+  // send mail with defined transport object
+  return transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(nodemailer.getTestMessageUrl(info));
+  });
+  });
+
+};
+
+
 // VERIFICATION EMAIL For Verifying Account
 const sendVerificationEmail = function(email, code, isMobileApp){
   const transporter = nodemailer.createTransport({
@@ -351,4 +378,4 @@ const sendResetPasswordEmail = function(email, code, isMobileApp){
 };
 
 
-module.exports = { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendVerificationEmail, sendResetPasswordEmail };
+module.exports = { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendBackendOnlyEmail, sendVerificationEmail, sendResetPasswordEmail };
