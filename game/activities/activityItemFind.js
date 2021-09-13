@@ -120,10 +120,10 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
           // Total the possible chance from each element multiplied by item chance
           chanceToFind += ((weightedElms[elm] * .01) * item.dropRate);
         });
-        //console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
+        console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
         generalItemTuple[1].push(roundNumber(chanceToFind, 4));
       }else{
-        //console.log('NOT ACT RESTRICTED ', item.name, item.dropRate);
+        console.log('NOT ACT RESTRICTED ', item.name, item.dropRate);
         // NOT ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE ONLY
         generalItemTuple[1].push(item.dropRate);
       }
