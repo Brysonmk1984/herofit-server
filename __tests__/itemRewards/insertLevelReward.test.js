@@ -1,4 +1,4 @@
-const { loadDb, closeDb } = require('../databaseForTests.setup.js');
+const { loadDb, closeDb } = require('../setup/databaseForTests.setup.js');
 const { activityLevelRewards, activityStatRewards, determineStatImprovements } = require('../../game/activities/activityRewards');
 const { range } = require('../../lib/helperFunctions');
 const preventDuplicateItems = require('../../game/items/preventDuplicateItems');

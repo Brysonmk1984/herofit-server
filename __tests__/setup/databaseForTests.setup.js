@@ -1,5 +1,6 @@
-const Sequelize = require('sequelize');
 require('dotenv').load();
+const Sequelize = require('sequelize');
+
 
 let db;
 

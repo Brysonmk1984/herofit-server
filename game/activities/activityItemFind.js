@@ -32,14 +32,17 @@ function _chanceItemFind(itemTuples, remainderPercent){
 
   // itemTuples LOOKS SOMETHING LIKE: [['Health Potion', 'Antidote Potion'],[75,25]];
   //itemTuple gives exact percent chance for drop
-  //console.log(itemTuples);
+  console.log('ITEM TUPLES',itemTuples, 'REMAINDERPERCENT', remainderPercent);
   const foundItems = [];
   // run chance function on each percentage in second part of tuple
   itemTuples[1].forEach((likelihood, i) =>{
     // If it's a remainder iteration, reduce likelihood by the remainderPercent * likelihood
-    //console.log('ASD', likelihood, remainderPercent);
+  
     if(remainderPercent){
       likelihood = roundNumber(likelihood * (remainderPercent * .01), 4);
+      console.log("likelihood in a remainder", likelihood);
+    }else{
+      console.log("likelihood outside of a remainder", likelihood);
     }
     if(likelihood > 100 || likelihood < 0){
       //console.log('SUMTING WONG with likelihood', likelihood);

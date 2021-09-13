@@ -4,8 +4,8 @@
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
-    "test": "jest --verbose",
-    "test:watch": "jest --watch --verbose",
+    "test": "jest --verbose ",
+    "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js"
   },
@@ -15,14 +15,14 @@
     ],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
-      "./__tests__/nullOrAny.setup.js",
+      "./__tests__/setup/nullOrAny.setup.js",
       "jest-extended"
     ],
     "testPathIgnorePatterns": [
-      "./__tests__/databaseForTests.setup.js",
-      "./__tests__/nullOrAny.setup.js",
-      "./__tests__/itemFind",
-      "./__tests__/battles/postBattleEffects.test.js"
+      "./__tests__/setup",
+      "./__tests__/battles",
+      "./__tests__/activityTraits",
+      "./__tests__/itemRewards"
     ]
   },
   "author": "Bryson Kruk",

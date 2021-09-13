@@ -1,9 +1,11 @@
+require('dotenv').load();
+const { loadDb, closeDb } = require('../setup/databaseForTests.setup.js');
 const chance = require('chance')();
 const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require('../../game/activities/activityItemFind');
 const mockItemDrops = require('./mockItemDrops.json');
 
 let weightedElms;
-beforeAll(() =>{
+beforeAll(() =>{ 
   const improvements = { air : 0, water : 0, fire : .2, earth : .8 };
   const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
   weightedElms = {
