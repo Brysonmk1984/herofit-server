@@ -4,7 +4,7 @@
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
-    "test": "jest --verbose ",
+    "test": "jest --verbose --detectOpenHandles",
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js"

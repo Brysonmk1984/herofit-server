@@ -3,9 +3,9 @@ const { activityLevelRewards, activityStatRewards, determineStatImprovements } =
 const { range } = require('../../lib/helperFunctions');
 const preventDuplicateItems = require('../../game/items/preventDuplicateItems');
 
-beforeAll(async () => {
-  await loadDb();
-});
+// beforeAll(async () => {
+//   await loadDb();
+// });
 
 
 // it('Should Insert the 2 items earned from reaching level 100', () => {
@@ -120,6 +120,6 @@ it('Should return a false value for red belt, and a true value for black belt', 
 
 
 
-afterAll(async () => {
-  await closeDb();
-});
+// afterAll(async () => {
+//   await closeDb();
+// });

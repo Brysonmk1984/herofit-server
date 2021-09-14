@@ -422,5 +422,11 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
   });
 });
 
+router.get('/strava-client-credentials-app', authenticateJWT, (req, res) =>{
+  res.formatter.ok({
+    clientId: process.env.STRAVA_CLIENT_ID_APP,
+    redirectUri : process.env.STRAVA_REDIRECT_APP
+  });
+});
 module.exports = router;
 
