@@ -272,7 +272,7 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
   }
  
   const { email, stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken, dataSrcId } = req.body;
-
+  
   const updateObj = { stravaAccessToken, stravaAccessTokenExpiration, stravaRefreshToken };
   if(dataSrcId){
     updateObj.dataSrcId = dataSrcId;
@@ -425,7 +425,8 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
 router.get('/strava-client-credentials-app', authenticateJWT, (req, res) =>{
   res.formatter.ok({
     clientId: process.env.STRAVA_CLIENT_ID_APP,
-    redirectUri : process.env.STRAVA_REDIRECT_APP
+    redirectUri : process.env.STRAVA_REDIRECT_APP,
+    clientSecret: process.env.STRAVA_CLIENT_SECRET_APP,
   });
 });
 module.exports = router;
