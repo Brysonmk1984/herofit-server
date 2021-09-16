@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken')
 
 function determineVerificationUrl(env, isApp){
   console.log(process.env.NODE_ENV, isApp);
@@ -13,9 +12,9 @@ function determineVerificationUrl(env, isApp){
       return process.env.EMAIL_REDIRECT_DEV;
     case 'app-production':
       return process.env.EMAIL_REDIRECT_APP;
-    case 'app-development':console.log('YES');
+    case 'app-development':
       return process.env.EMAIL_REDIRECT_APP_DEV;
-    default: console.log('NO!');
+    default: 
       return process.env.EMAIL_REDIRECT_PROD;
   }
 }

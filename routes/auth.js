@@ -128,7 +128,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 });
 
-router.post('/reset-password-confirm-email', body('email').isEmail(), (req, res)=>{
+router.post('/reset-password-confirm-email', body('email').isEmail(), body('isApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
@@ -140,7 +140,7 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), (req, res)
     //console.log('DB email result = ', result);
     if(result){
       const token = usePasswordHashToMakeToken(result);
-      sendResetPasswordEmail(email, token)
+      sendResetPasswordEmail(email, token, true)
       .then((result) =>{
         //console.log(result);
         return res.formatter.ok({ result });
@@ -206,7 +206,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
 
 
 
-router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res) => {
+router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional(), body('isMobileApp').isBoolean().optional(), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
