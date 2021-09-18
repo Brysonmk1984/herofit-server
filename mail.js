@@ -235,13 +235,13 @@ const sendAppErrorEmail = function(formData, resolve, reject){
 };
 
 const sendBattleReportEmail = function(tally){
-  
+  let dateString = new Date().toLocaleDateString();
   return new Promise((resolve, reject) =>{
     // setup email data with unicode symbols
     let mailOptions = { 
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
-      subject: `HeroFit - Battle Report`, 
+      subject: `BattleReport for ${dateString} - HeroFit`, 
       text: `Number of Avatar Battles: ${tally.total}. \n\n Battle Report Tally:\n\n
       Avatar Wins: ${tally['Avatar Wins']}\n
       Foe Wins: ${tally['Foe Wins']}\n
