@@ -11,6 +11,7 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('../game/activities/activityRewards');
 const { sendBackendOnlyEmail }= require('../mail');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
+const heroList = require("../heroList.json");
 
 const upgradeProcess = require('../game/activities/upgradeProcess');
 
@@ -156,7 +157,7 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
     avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
-
+    avatar.alias = heroList.find(av => av.character === avatar.character).alias;
     return res.formatter.ok( avatar );
 
   }catch(error){
