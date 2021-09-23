@@ -244,13 +244,11 @@ router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
   }
 
   const { emailCode } = req.body;
-  console.log('EMAILCODE', emailCode);
   User.update({ active : true }, { where : { emailCode }, returning : true, plain : true })
   .then((data) => {
-    console.log('IM IN', data[1]);
     return res.formatter.ok({ user : data[1] });
   }).catch((error) => {
-    console.log(error);
+    console.log('ERROR WITH EMAIL CODE', error);
     return res.formatter.serverError(error.toString(), "SERVER Error - for POST /validated-email");
   });
 
@@ -323,7 +321,6 @@ router.post('/disconnect-strava', body('email').isEmail(), authenticateJWT, (req
 
   User.update({ stravaAccessToken : null, stravaAccessTokenExpiration : null, stravaRefreshToken : null, dataSrcId : null }, { where : { email }})
   .then((result) =>{
-    console.log(result);
     return res.formatter.ok();
   }).catch((error) =>{
     console.log(`Couldn't Disconnect Strava for account email ${email}`);

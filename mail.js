@@ -316,8 +316,8 @@ const sendVerificationEmail = function(email, code, isMobileApp){
 
 
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
-
-  const url = `${baseUrl}?verify=${code}`;
+  const route = isMobileApp ? "" : "/welcome";
+  const url = `${baseUrl}${route}?verify=${code}`;
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
@@ -353,7 +353,8 @@ const sendResetPasswordEmail = function(email, code, isMobileApp){
   });
 
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
-  const url = `${baseUrl}/welcome?verifyPassword=${code}`;
+  const route = isMobileApp ? "" : "/welcome";
+  const url = `${baseUrl}${route}?verify=${code}`;
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
