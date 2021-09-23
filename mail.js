@@ -270,9 +270,9 @@ const sendBattleReportEmail = function(tally){
           console.log("ERROR SENDING BR EMAIL:", error);
           reject(error);
         }
-        const m = nodemailer.getTestMessageUrl(info);
-        console.log("SUCCESS SENDING BR EMAIL:", m);
-        resolve(m);
+        //const m = nodemailer.getTestMessageUrl(info);
+        console.log("SUCCESS SENDING BR EMAIL");
+        resolve(true);
     });
   });
 
