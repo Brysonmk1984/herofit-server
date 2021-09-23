@@ -245,7 +245,7 @@ router.get('/run-all-battles', authenticateAdminJWT, (req, res) => {
     where: { outcome : 'TBD' },
     raw : true
   }).then((battles) =>{
-    return runAllBattles(battles);
+    return runAllBattles(battles, true);
   }).then((data) =>{
     res.formatter.ok(data, 'Successfully ran all battles through endpoint - GET /run-all-battles');
   }).catch((error)=>{
