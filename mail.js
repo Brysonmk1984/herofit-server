@@ -267,9 +267,12 @@ const sendBattleReportEmail = function(tally){
   // send mail with defined transport object
   return transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log("ERROR SENDING BR EMAIL:", error);
         reject(error);
       }
-      resolve(nodemailer.getTestMessageUrl(info));
+      const m = nodemailer.getTestMessageUrl(info);
+      console.log("SUCCESS SENDING BR EMAIL:", m);
+      resolve(m);
   });
   });
 
