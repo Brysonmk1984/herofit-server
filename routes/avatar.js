@@ -147,7 +147,8 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     }
   
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    const avatar = parseAvatarProperties(results[0]);
+    const avatar = parseAvatarProperties(results[0], true);
+    
     const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { level, albedo } = getCurrentLevel();
     avatar.level = level;
@@ -158,6 +159,8 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
     avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
     avatar.alias = heroList.find(av => av.character === avatar.character).alias;
+
+    
     return res.formatter.ok( avatar );
 
   }catch(error){
