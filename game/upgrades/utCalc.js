@@ -30,7 +30,7 @@ const utCalc = function(userTotals){
         // All activities track instance count, duration, and average heart rate
         ut[a] = {
           instance : ++ut[a].instance,
-          duration : ut[a].duration + activity.moving_time,
+          duration : ut[a].duration + activity.duration,
         }
 
       });

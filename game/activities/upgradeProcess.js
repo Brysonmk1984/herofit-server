@@ -23,7 +23,17 @@ function _insertActivityData(email, activities, t){
       if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
         latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
       }
-      return { user : email,  activity, activityDate : latestActivityUpdate, activityId };
+      return { user : email, 
+        type : activity.type,
+        averageSpeed: activity.averageSpeed,
+        maxSpeed: activity.maxSpeed,
+        distance: activity.distance,
+        duration: activity.duration,
+        elevationGain: activity.elevationGain,
+        source: activity.source,
+        activityDate : latestActivityUpdate,
+        activityId 
+      };
     });
 
     const allPromises = [
@@ -205,8 +215,15 @@ function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInf
 function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
   return db.transaction(async t => {
     try{
-      const activityPromiseResults = await _insertActivityData(email, activities, t)
-      const updatedActivities = activityPromiseResults[1].value.map(actResult => actResult.dataValues.activity);
+      const activityPromiseResults = await _insertActivityData(email, activities, t);
+
+      console.log('WAAT4', activityPromiseResults);
+      const updatedActivities = activityPromiseResults[1].value.map(actResult => {
+        return {
+          type : actResult.type,
+          duration : actResult.duration
+        }
+      });
       let userTotals = activityPromiseResults[2].value;
 
       userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);

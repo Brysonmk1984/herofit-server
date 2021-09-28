@@ -9,7 +9,7 @@ const UserActivityModel = function(db, DataTypes){
       },
       activity: {
           type: DataTypes.JSONB,
-          allowNull: false
+          allowNull: true
       },
       activityDate: {
         type: DataTypes.TIME,
@@ -27,7 +27,35 @@ const UserActivityModel = function(db, DataTypes){
       activityId: {
         type: DataTypes.STRING(10),
         allowNull: false
+     }, 
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
+    duration: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    distance: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    averageSpeed: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    maxSpeed: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    elevationGain: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   });
 
       

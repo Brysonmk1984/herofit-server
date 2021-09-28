@@ -5,8 +5,9 @@ const router = express.Router();
 const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require('../config/db');
 const moment = require('moment');
 const xpCalc = require('../game/upgrades/xpCalc');
-const { Op } = require('sequelize');
+const { Op, col, literal } = require('sequelize');
 const { config } = require('../appConfig');
+const { parseActivityData } = require('../lib/helperFunctions');
 
 // If an email is passed, get that user, otherwise get user based on JWT
 router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
@@ -91,7 +92,7 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
   const { email } = req.body;
 
   UserActivity.findAll({ where: { user: email }, raw: true, limit : 250, order:[["activityDate", 'DESC']],
-    attributes : ['id', 'activity', 'activityDate']
+    attributes : ['id', 'type', 'duration', 'source', 'averageSpeed', 'maxSpeed', 'elevationGain',  'activityDate']
   }).then((results) =>{
     if(results.length){
       const datesArray = results.map((result, i) =>{
@@ -102,11 +103,9 @@ router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (r
       //maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
       maxDate = moment.utc(moment.max(moments), 'YYYY-MM-DD HH:mm:ss');
 
-      const activities = results.map((result, i) =>{
-        return result.activity;
-      });
+      console.log('RESULTS', results);
       console.log('LATEST _SAVED - ',maxDate);
-      res.formatter.ok({ activities, latestActivityDate : maxDate });
+      res.formatter.ok({ activities : results, latestActivityDate : maxDate });
     }else{
       res.formatter.ok({ activities : null });
     }
@@ -137,25 +136,32 @@ router.post('/get-profile-info-by-email', body('heroName').isString(), (req, res
     email = av.owner;
     avatar = av;
     allPromises.push(UserTotal.findOne({ where: { user: email }, attributes : ['run', 'hike', 'walk', 'ride', 'weightTraining', 'yoga', 'stairStepper', 'elliptical', 'swim', 'rowing', 'crossfit', 'standUpPaddling', 'workout', 'ski', 'snowboard', 'snowshoe', 'kayaking'], raw : true }));
-    allPromises.push(UserActivity.findAll({ where: { user: email }, raw: true,  limit : 10, order: [['activityDate', 'DESC']], attributes : ['id', 'activity', 'activityDate']}));
+    allPromises.push(UserActivity.findAll({ where: { user: email }, raw: true,  limit : 10, order: [['activityDate', 'DESC']], attributes : ['id', 'type', 'duration', 'source', 'distance', 'averageSpeed', 'maxSpeed', 'elevationGain', 'activityDate']}));
     allPromises.push(Battle.findAll({ where: { owner: email }, raw : true,  limit : 50, order: [['createdAt', 'DESC']] }));
     allPromises.push(User.findOne({ where: { email }, attributes : ['username'], raw : true }));  
     return Promise.allSettled(allPromises)
   }).then(([ut, act, bat, user]) =>{
     userTotals = ut;
-    activities = act;
+    console.log('AACT',act.value);
+
+
+
+    activities = act.value.map((a) =>{
+      
+      return parseActivityData(a);
+    });
+    console.log('done with acts!~', activities);
     battles = bat;
     avatar.ownerUserName = user.value.username;
     return AvatarItems.findAll({ where: { avatarID : avatar.id }, raw : true })
   }).then((itemInstances) =>{
     userTotals = userTotals.value;
-    activities = activities.value.map((act) =>act.activity);
     battles = battles.value;
     const { currentLevelByInput } = xpCalc();
     const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
     avatar.level = level;
     avatar.albedo = albedo;
-
+    console.log('ACTIVITIES', activities);
     res.formatter.ok({userTotals, activities, avatar, battles, itemInstances });
   }).catch((error)=>{
     console.log('Error - ', error);
@@ -208,6 +214,39 @@ router.post('/get-hero-name-by-username', body('username').isString(), (req, res
     res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-hero-name-by-username Endpoint`);
   });
 });
+
+
+
+router.post('/set-new-activity-fields', (req, res) =>{
+
+  UserActivity.update({ 
+    type: literal(`activity ->> 'type'`),
+    duration: literal(`activity ->> 'moving_time'`),
+    distance: literal(`activity ->> 'distance'`),
+    averageSpeed: literal(`activity ->> 'average_speed'`),
+    maxSpeed: literal(`activity ->> 'max_speed'`),
+    elevationGain: literal(`activity ->> 'total_elevation_gain'`),
+    source: "strava"
+  }, {
+    where : { 
+      elevationGain: null
+    } 
+  }).then((data) =>{
+    console.log(data);
+    res.formatter.ok();
+  }).catch((error) =>{
+    console.log('Error - ', error);
+    res.formatter.serverError(error.toString(), `Error Setting new activty fields - ${error}`);
+  })
+  
+});
+
+
+
+
+
+
+
 
 // ONE TIME USE FIX
 // Loop over all activities of a user and recalculate user totals.
