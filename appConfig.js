@@ -2,7 +2,7 @@ const { testSpecificFoe, attackOfTheElements } = require('./game/specialEvents/s
 
 const appState = ['live','maintenance'];
 const config = {
-  mode : appState[0],
+  mode : appState[1],
   //specialEvent : testSpecificFoe,
 
 
