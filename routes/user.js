@@ -65,8 +65,6 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
     const created = result[1];
     const results = result[0].dataValues;
 
-    console.log('RESS!!', created, results);
-
     // New user_total Created
     if(created){
       res.formatter.ok({ results });
@@ -84,28 +82,29 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
 });
 
 // Get all user activities by email - used only for the logged in user
-router.post('/get-user-activities', body('email').isEmail(), authenticateJWT, (req, res) => {
+// Count is used in the App to only fetch latest 10. Might make this the standard in web version too in the future instead of getting 250
+router.post('/get-user-activities', body('email').isEmail(), body('count').isNumeric().optional(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-user-activities Endpoint");
   }
-  const { email } = req.body;
-
-  UserActivity.findAll({ where: { user: email }, raw: true, limit : 250, order:[["activityDate", 'DESC']],
+  const { email, count } = req.body;
+  
+  UserActivity.findAll({ where: { user: email }, raw: true, limit : count ? count : 250, order:[["activityDate", 'DESC']],
     attributes : ['id', 'type', 'duration', 'source', 'averageSpeed', 'maxSpeed', 'elevationGain',  'activityDate']
   }).then((results) =>{
     if(results.length){
-      const datesArray = results.map((result, i) =>{
-        return result.activityDate;
-      });
+      const activities = [];
+      const datesArray = [];
 
-      let moments = datesArray.map(d => moment(d, 'YYYY-MM-DD HH:mm:ss')),
-      //maxDate = moment.utc(moment.max(moments)).format('YYYY-MM-DD HH:mm:ss');
-      maxDate = moment.utc(moment.max(moments), 'YYYY-MM-DD HH:mm:ss');
+      results.forEach((result) =>{
+        activities.push(parseActivityData(result));
+        datesArray.push(moment(result.activityDate));
+      })
 
-      console.log('RESULTS', results);
-      console.log('LATEST _SAVED - ',maxDate);
-      res.formatter.ok({ activities : results, latestActivityDate : maxDate });
+      maxDate = moment.utc(moment.max(datesArray), 'YYYY-MM-DD HH:mm:ss');
+
+      res.formatter.ok({ activities, latestActivityDate : maxDate });
     }else{
       res.formatter.ok({ activities : null });
     }
@@ -215,85 +214,5 @@ router.post('/get-hero-name-by-username', body('username').isString(), (req, res
   });
 });
 
-
-
-router.post('/set-new-activity-fields', (req, res) =>{
-
-  UserActivity.update({ 
-    type: literal(`activity ->> 'type'`),
-    duration: literal(`activity ->> 'moving_time'`),
-    distance: literal(`activity ->> 'distance'`),
-    averageSpeed: literal(`activity ->> 'average_speed'`),
-    maxSpeed: literal(`activity ->> 'max_speed'`),
-    elevationGain: literal(`activity ->> 'total_elevation_gain'`),
-    source: "strava"
-  }, {
-    where : { 
-      elevationGain: null
-    } 
-  }).then((data) =>{
-    console.log(data);
-    res.formatter.ok();
-  }).catch((error) =>{
-    console.log('Error - ', error);
-    res.formatter.serverError(error.toString(), `Error Setting new activty fields - ${error}`);
-  })
-  
-});
-
-
-
-
-
-
-
-
-// ONE TIME USE FIX
-// Loop over all activities of a user and recalculate user totals.
-// router.post('/recalculate-user-totals', body('email').isEmail(), (req, res) => {
-//   const errors = validationResult(req);
-//   if(!errors.isEmpty()){
-//     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /recalculate-user-totals Endpoint");
-//   }
-//   const { email } = req.body;
-
-//   UserTotal.findOne(
-//     { where: { user : email }, raw : true }
-//   ).then((utData) => { console.log('UTD',utData);
-//     if(!utData){
-//       throw new Error(`No User Totals for user ${email}`);
-//     }
-//     // Then Update userTotals
-//     const { update, initialUpdate, reset } = utCalc(utData);
-//     const utAfterRest = reset();
-
-//     console.log('UTAR', utAfterRest);
-//     UserActivity.findAll({
-//       where : { user : email }
-//     }).then((activities) =>{
-//       //console.log('THE RESULT - ', activities);
-//       const actsWithoutExtraData = activities.map((a) =>{
-//         return a.activity;
-//       });
-//       console.log(actsWithoutExtraData[0]);
-//       const updatedUT = update(actsWithoutExtraData);
-
-//       console.log('UDPATED - ', updatedUT);
-//       // Finally, save to DB
-//       return UserTotal.update(
-//         updatedUT,
-//         { where: { user: email }, returning : true }
-//       );
-//     }).then((data) =>{
-//       console.log('THE END DATA - ', data);
-//       res.formatter.ok('test');
-//     }).catch((error) =>{
-//       console.log('error - ', error);
-//     });
-
-
-//   });
-
-// });
 
 module.exports = router;

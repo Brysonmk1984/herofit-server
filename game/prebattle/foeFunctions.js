@@ -147,11 +147,11 @@ function generateFoeStats(avatar, foe){
       const bosses = ['Storming Oni', 'Hulking Aggro Crag', 'Scorching Archfiend', 'High Priestess of the Tides'];
       const adepts = ['Wheezing Jinn', 'Granite Golem', 'Burning Jinn', 'Cyclonic Siren'];
       if(bosses.includes(foe.type)){
-        elementalQp *= 1.3;
-        baseHealth *= 1.2;
-        basePower *= 1.1;
+        elementalQp *= 1.2;
+        baseHealth *= 1.1;
+        basePower *= 1.0;
       }else if(adepts.includes(foe.type)){
-        elementalQp *= 1.3;
+        elementalQp *= 1.2;
         baseHealth *= 1.1;
       }else{
         elementalQp *= 1.3;
@@ -192,7 +192,7 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["earth", "armor","power","health"]; 
           break; 
         case "Burning Jinn":
-          fws.fire = (150 + totalLevel + Math.floor(totalLevel * .75));
+          fws.fire = (175 + totalLevel + Math.floor(totalLevel * .75));
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
@@ -211,7 +211,7 @@ function generateFoeStats(avatar, foe){
           // Scorching Archfiend Still needs more difficulty;
           randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP * 1.5));
 
-          fws.fire = (200 + (4 * totalLevel));
+          fws.fire = (200 + (4.3 * totalLevel));
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           
           break; 
