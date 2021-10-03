@@ -38,6 +38,7 @@ function avCalc(userTotals){
             updatedHealth = oldHealth;
             break;
           case 'Recovering':
+          case 'Rested':
             updatedHealth = updatedMaxHealth;
             break;
           default:

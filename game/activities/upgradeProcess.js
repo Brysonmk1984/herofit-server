@@ -217,7 +217,6 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
     try{
       const activityPromiseResults = await _insertActivityData(email, activities, t);
 
-      console.log('WAAT4', activityPromiseResults);
       const updatedActivities = activityPromiseResults[1].value.map(actResult => {
         return {
           type : actResult.type,
@@ -259,7 +258,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
       // Return package to be used on the frontend
       return {
         activities,
-        avatar : updatedAvatar,
+        avatar : parseAvatarProperties(updatedAvatar, true),
         improvements : parseAvatarProperties(improvements, true),
         reachedLevel : levelInfo.lvlUp ? levelInfo.lvlAfterBuff : null,
         qpEarned : levelInfo.qpEarned,

@@ -105,7 +105,7 @@ router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isA
   }
 
   const { email, activities, accountDate, hasBeenUpgraded } = req.body;
-  
+    console.log('HEREREERRERER', email, activities, accountDate, hasBeenUpgraded);
   // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
   upgradeProcess(email, activities, accountDate, hasBeenUpgraded)
   .then((returnPackage) =>{
