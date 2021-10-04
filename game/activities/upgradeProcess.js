@@ -2,6 +2,7 @@ const { User, UserActivity, UserTotal, Avatar, Items } = require('../../config/d
 const db = require('../../config/db').db;
 const { Op } = require("sequelize");
 const moment = require('moment');
+const crypto = require('crypto');
 const { parseAvatarProperties, range } = require('../../lib/helperFunctions');
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require('../CONSTANTS');
 const utCalc = require('../upgrades/utCalc');
@@ -11,18 +12,40 @@ const { activityItemFind, insertItemsFromItemFind } = require('./activityItemFin
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('./activityRewards');
 const activityHeal = require('./activityHeal');
 
+
+function _determineActivityId(id, source){
+  if(source === 'herofit'){
+    return `hf-${crypto.randomBytes(5).toString('hex')}`;
+  }else if(id){
+    return id;
+  }
+  throw new Error("No activityId supplied");
+}
+
 // UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
 function _insertActivityData(email, activities, t){
     // Need latest Activity to be added to user's account
     let latestActivityUpdate;
     const activityEntries = activities.map((activity) =>{
       const activityDate = moment.utc(activity.start_date);
-      const activityId = activity.id;
-      
+      const activityId = _determineActivityId(activity.id, activity.source);
+      console.log('ACTID',activityId);
       // Check for latest activity (doesn't include DB activities)
       if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
         latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
       }
+
+      console.log('WTF', { user : email, 
+        type : activity.type,
+        averageSpeed: activity.averageSpeed,
+        maxSpeed: activity.maxSpeed,
+        distance: activity.distance,
+        duration: activity.duration,
+        elevationGain: activity.elevationGain,
+        source: activity.source,
+        activityDate : latestActivityUpdate,
+        activityId 
+      });
       return { user : email, 
         type : activity.type,
         averageSpeed: activity.averageSpeed,
@@ -35,7 +58,7 @@ function _insertActivityData(email, activities, t){
         activityId 
       };
     });
-
+    console.log('HERE@!', activityEntries);
     const allPromises = [
       // Update latestActivity Date on USER
       User.update({ latestActivityUpdate },{ where: { email }, transaction: t }),
@@ -216,6 +239,10 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
   return db.transaction(async t => {
     try{
       const activityPromiseResults = await _insertActivityData(email, activities, t);
+      const promiseStatuses = [activityPromiseResults[0].status,activityPromiseResults[1].status,activityPromiseResults[2].status]
+      if(promiseStatuses.includes('rejected')){
+        throw new Error('Activity Insertion Failed');
+      }
 
       const updatedActivities = activityPromiseResults[1].value.map(actResult => {
         return {

@@ -94,7 +94,7 @@ router.post('/update-avatar-stats', body('avatar').isObject(), body('email').isE
 
 // When a user applies their latest Strava activities, adjust avatar
 router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isArray(), body('activities').custom((activities) =>{
-    const invalidActivities = activities.find(act => !act.id);
+    const invalidActivities = activities.find(act => !act.id && act.source === 'strava');
     // In case the activities are invalid... this should eventually be moved to the validation middleware.
     return invalidActivities ? res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /upgrade-sequence Endpoint, One or more activities are invalid: ACT - ${invalidActivities}`) : true;
 }), body('accountDate').isString(), body('hasBeenUpgraded').isBoolean(), authenticateJWT, (req, res) => {

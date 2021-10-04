@@ -1,5 +1,8 @@
 {
- "cSpell.words": ["Recaptcha"],
+ "cSpell.words": [
+  "herofit",
+  "Recaptcha"
+],
  "files.exclude": {
   "**/.git": true,
   "**/.svn": true,
