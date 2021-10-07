@@ -15,17 +15,14 @@ function determineFireCrit(fire, d){
 }
 
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
-function determineAirEvade(air, d){
-  //console.log('the air params - ',air,d);
-  let evadeChance = Number((air*10)/((air*10)+(AIR_EVASION_CHANCE_MOD))).toFixed(2) * 100;
+function determineAirEvade(air){
+  let evadeChance = Number((air*5)/(air*5+AIR_EVASION_CHANCE_MOD)).toFixed(2);
+
   if(evadeChance > 60){
     evadeChance = 60;
   }
-
   const evaded = chance.bool({ likelihood: evadeChance});
-  const damageAvoided = evaded ? d : 0;
-  //console.log('AIR - ', { evadeChance, damageAvoided, evaded });
-  return { evadeChance, damageAvoided, evaded};
+  return { evaded };
 }
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)

@@ -69,7 +69,7 @@ function _determineElmMatchups(elm){
 }
 
 
-function _calcElementDamage(attacker, receiver){
+function _calcElementDamage(attacker, receiver, evaded){
   // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms = {
     fire : Math.ceil(chance.floating({ min: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], max: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1], fixed: 2 })),
@@ -167,9 +167,9 @@ function _calcElementDamage(attacker, receiver){
   
 
   //   return { critChance, critDamage };
-  const airProc = determineAirEvade(receiver.air, turnElmDamageDone.total);
+
   //console.log(airProc);
-  if(airProc.evaded){
+  if(evaded){
     turnElmDamageDone = { fire : 0, earth : 0, water : 0, air : 0, total : 0 };
     turnElmDamagePrevented = { fire : 0, earth : 0, water : 0, air : 0, total : 0 };
   }
@@ -177,7 +177,7 @@ function _calcElementDamage(attacker, receiver){
 
 
   //console.log('ENDING ATTACKER ELM DAMAGE :', turnElmDamageDone, turnElmDamagePrevented);
-  return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented, fireProc, airProc };
+  return { turnElmDamageDone : turnElmDamageDone, turnElmDamagePrevented : turnElmDamagePrevented, fireProc };
 }
 
 // Calculates damage done against an element's counter element (F on E)
@@ -192,7 +192,10 @@ function _calcArmorDR(aPower, rArmor){
  return { reduction : parseFloat((d * dr).toFixed(2)), netDamage : Math.floor(d - (d * dr)) };
 }
 
-function _calcDamage(aPower, rArmor){
+function _calcDamage(aPower, rArmor, evaded){
+  if(evaded){
+    return { physicalDamage : 0, physicalReduction : 0 }
+  }
   const lowEnd = aPower * DAMAGE_VARIANCE_RANGE[0];
   const highEnd = aPower * DAMAGE_VARIANCE_RANGE[1];
   const power = chance.floating({ min: lowEnd, max: highEnd, fixed: 2 });
@@ -202,7 +205,7 @@ function _calcDamage(aPower, rArmor){
   const armor = chance.floating({ min: lowEndArmor, max: highEndArmor, fixed: 2 });
 
   const { reduction, netDamage } = _calcArmorDR(power, armor);
-  //console.log('DAMAGE - ', netDamage, 'REDUCTION - ', reduction);
+
   return { physicalDamage : Math.floor(netDamage), physicalReduction : Math.floor(reduction) }
 }
 
@@ -235,12 +238,16 @@ function _calcHealthLoss(health, damage){
 }
 
 function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals){
+  // Now determining evasion here to prevent physical damage
+  const airProc = determineAirEvade(defender.air);
+
+
   // IF AVATAR ROUND
   if(aggressorString === 'Avatar'){
     // Calc physical damage, get back damage done and how much was prevented
-    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor); 
+    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded); 
     // Calc elm damage, get back damage done and how much was prevented
-    const { turnElmDamageDone, turnElmDamagePrevented, fireProc, airProc } = _calcElementDamage(aggressor, defender);
+    const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
 
     // Add to totals done for damage and reduction
     totals.aPhyDamage += physicalDamage;
@@ -257,7 +264,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       fire : fireProc,
       air : airProc,
       earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + totals.aPhyDamage)),
-      water : determineWaterHeal(aggressor.water, turnElmDamageDone.total),
+      water : determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage),
     }
 
     // EARTH - Deal damage back to attacker based on earthProc
@@ -284,8 +291,8 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     // If foe has no elemental power, calc physical damage twice instead of physical + elemental
     if(!foeIsElemental){
       // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor); 
-      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor); 
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded); 
+      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded); 
       physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
 
@@ -311,11 +318,11 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
 
     }else{
       // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor); 
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded); 
       physicalDamage = damageAndReduction1.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction;
       // Calc elm damage, get back damage done and how much was prevented
-      const { turnElmDamageDone, turnElmDamagePrevented, fireProc, airProc } = _calcElementDamage(aggressor, defender);
+      const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
       //console.log('FOE ELM DAMAGE THIS ROUND = ', turnElmDamageDone, 'was evaded? ', airProc.evaded);
       // Add to totals done for damage and reduction
       totals.fPhyDamage += physicalDamage;
@@ -333,7 +340,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         fire : fireProc,
         air : airProc,
         earth : determineEarthThorns(defender.earth, (turnElmDamageDone.total + physicalDamage)),
-        water : determineWaterHeal(aggressor.water, turnElmDamageDone.total),
+        water : determineWaterHeal(aggressor.water, turnElmDamageDone.total + physicalDamage),
       }
 
       // EARTH - Deal damage back to attacker based on earthProc

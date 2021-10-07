@@ -196,11 +196,11 @@ function generateFoeStats(avatar, foe){
           qpAdjustedStats = ["fire", "armor","power","health"]; 
           break; 
         case "Cyclonic Siren":
-          fws.water = (100 + totalLevel + Math.floor(totalLevel * .75));
+          fws.water = (175 + totalLevel + Math.floor(totalLevel * .75));
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         case "Storming Oni":
-          fws.air = (200 + (4 * totalLevel));
+          fws.air = (125 + (4 * totalLevel));
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
         case "Hulking Aggro Crag":
@@ -216,7 +216,7 @@ function generateFoeStats(avatar, foe){
           
           break; 
         case "High Priestess of the Tides":
-          fws.water = (150 + (4 * totalLevel));
+          fws.water = (200 + (4.3 * totalLevel));
           qpAdjustedStats = ["water", "armor","power","health"]; 
           break; 
         default :
