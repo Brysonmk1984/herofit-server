@@ -229,16 +229,11 @@ function generateFoeStats(avatar, foe){
       randomizedPower = randomizer(baseFoePower);
       randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
 
-
-
-      // Titans base elemental power is their power, divided by 4 - 1 for each element. Their QP adjusted stats are all
-      const powerQuarter = Math.floor(randomizedPower.stat / 4);
       
       fws.health = randomizedHealth < 200 ? 200 : Math.floor(randomizedHealth.stat);
       fws.power = Math.floor(randomizedPower.stat);
-
-      fws.earth = powerQuarter;
-      fws.water = powerQuarter;
+      fws.earth = (50 + (2 * totalLevel));
+      fws.water = (50 + (2 * totalLevel));
 
       qpAdjustedStats = ["health","power","armor","earth","water"]; 
       break;
