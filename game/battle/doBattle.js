@@ -241,7 +241,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
-
+  console.log('AP!', airProc);
   // IF AVATAR ROUND
   if(aggressorString === 'Avatar'){
     // Calc physical damage, get back damage done and how much was prevented

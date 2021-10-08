@@ -40,7 +40,10 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     avatar = parseAvatarProperties(result[0].dataValues);
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = [];
-
+    const { colors, alias } = heroList.find(av => av.character === avatar.character);
+    avatar.alias = alias
+    avatar.colors = colors;
+    
     res.formatter.ok({
       avatarId : avatar.id,
       avatar,
@@ -158,8 +161,9 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
     avatar.equipped = avatar.equipped === null ? [] : avatar.equipped;
     avatar.healthRegenRate = determineRecoveryPerHour(avatar.recovery);
-    avatar.alias = heroList.find(av => av.character === avatar.character).alias;
-
+    const { colors, alias } = heroList.find(av => av.character === avatar.character);
+    avatar.alias = alias
+    avatar.colors = colors;
     
     return res.formatter.ok( avatar );
 

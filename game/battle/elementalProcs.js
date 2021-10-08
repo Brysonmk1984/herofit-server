@@ -16,8 +16,9 @@ function determineFireCrit(fire, d){
 
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
 function determineAirEvade(air){
-  let evadeChance = Number((air*5)/(air*5+AIR_EVASION_CHANCE_MOD)).toFixed(2);
-
+  
+  let evadeChance = Number((air*5)/(air*5+AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100;
+  console.log(air, evadeChance);
   if(evadeChance > 60){
     evadeChance = 60;
   }
