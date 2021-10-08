@@ -5,8 +5,8 @@ const testSpecificFoe = {
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
     odds : 100,
-    foe : 'Wheezing Jinn',
-    foeClass : 'Elementals'
+    foe : 'Shadow-Self',
+    foeClass : 'Spirits'
   },
   {
     type : 'foeLikelihood',
