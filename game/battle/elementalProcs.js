@@ -8,7 +8,7 @@ function determineFireCrit(fire, d){
     critChance = 60;
   }
   const isCrit = chance.bool({ likelihood: critChance });
-  const averageElms = Math.floor(d/4 * 1.75);
+  const averageElms = Math.floor(d/4 * 1.85);
   const critDamage = isCrit ? averageElms : 0;
   //console.log('FIRE - ', { critChance, critDamage });
   return { critChance, critDamage };
