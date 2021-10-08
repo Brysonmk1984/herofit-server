@@ -375,7 +375,7 @@ function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound
   return { aggressorString, aggressor, defenderString, defender }
 }
 
-// Interdimentional strike has a chance to repeat rounds by Avatar
+// Temporal Distortion has a chance to repeat rounds by Avatar
 function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesFirst){
   // Round must be avatar as aggressor, av must have aether, and round must not already be an IDS round
   if(aggressorString === 'Avatar' && aether && !nextRoundIDS){
