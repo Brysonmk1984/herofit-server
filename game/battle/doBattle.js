@@ -376,7 +376,7 @@ function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound
 }
 
 // Interdimentional strike has a chance to repeat rounds by Avatar
-function _testForIDStrike(aggressorString, aether, nextRoundIDS, goesFirst){
+function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesFirst){
   // Round must be avatar as aggressor, av must have aether, and round must not already be an IDS round
   if(aggressorString === 'Avatar' && aether && !nextRoundIDS){
     return determineIDS(aether, goesFirst);
@@ -419,7 +419,7 @@ function doBattle(avatar, foe, goesFirst){
     const { aggressorString, aggressor, defenderString, defender } = _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, nextRoundIDS);
     
     // LATE GAME ELEMENTAL TRAIT - Determine if IDS round, if so, set variable to flag it for next round and change whoGoes first in order to reverse the turn order
-    ({ ids : nextRoundIDS, gf : goesFirst } = _testForIDStrike(aggressorString, avatar.aether, nextRoundIDS, goesFirst));
+    ({ ids : nextRoundIDS, gf : goesFirst } = _testForTemporalDistortion(aggressorString, avatar.aether, nextRoundIDS, goesFirst));
 
 
     // Compute battle turn and add results to total
