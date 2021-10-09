@@ -79,7 +79,7 @@ router.post('/fetch-battle-report', oneOf([body('avatarID').isNumeric().optional
           attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
         }).then((items) =>{
-          adjResult.itemsAquired = items;
+          adjResult.itemsAcquired = items;
           res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
         }).catch((error) =>{
           console.log('ERR', error);
@@ -124,7 +124,7 @@ router.post('/fetch-battle-report-by-id', body('avatarID').isNumeric(), body('id
     }
     return null;
   }).then((items) =>{
-    adjResult.itemsAquired = items;
+    adjResult.itemsAcquired = items;
     // Need correct Skin :( just to show the user in the battle report modal on the Profile Page
     return AvatarItems.findOne({ 
       attributes : ['itemID','avatarID'],
