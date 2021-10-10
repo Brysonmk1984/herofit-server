@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult, oneOf } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const { Op, col, fn } = require("sequelize");
+const { Op, col, fn, or } = require("sequelize");
 const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
 const villains = require('../game/villains.json');
 const avCalc = require('../game/upgrades/avCalc');
@@ -297,6 +297,41 @@ router.post('/run-specific-battle', body('avatarID').isNumeric(), authenticateJW
 /*
   MIGRATION
 */
+
+// modify each battle that has "effects" and map the arrays to be just effect names
+router.get('/change-effects-entries', (req, res) => {
+  Battle.findAll(
+    {
+      attributes : ["id", "effects"],
+      where:{ effects : {[Op.ne]: null} }, raw : true
+    }
+  ).then((results)=> {
+    const idArray = results.map(result => result.id);
+    const effectsArray = results.map(result => result.effects.map(effect => effect.name));
+    console.log(idArray,effectsArray);
+
+    const promiseArr=[];
+
+    for(let i=0; i< idArray.length; i++){
+      promiseArr.push(
+        Battle.update(
+          {effects : effectsArray[i]  },
+          {where:{ id : idArray[i] }, raw : true}
+        )  
+      )
+    }
+    return Promise.all(promiseArr)
+
+  }).then((results) =>{
+
+    res.formatter.ok(results);
+  }).catch((error) =>{
+    res.formatter.serverError(error.toString());
+  });
+});
+
+
+
 
 // modify each battle that has "effects" and map the arrays to be just effect names
 // router.get('/change-effects-entries', (req, res) => {
