@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult, oneOf } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const router = express.Router(); 
-const { Op } = require("sequelize");
+const { Op, col, fn } = require("sequelize");
 const { Avatar, AvatarItems, Battle, Items } = require('../config/db');
 const villains = require('../game/villains.json');
 const avCalc = require('../game/upgrades/avCalc');
@@ -292,9 +292,26 @@ router.post('/run-specific-battle', body('avatarID').isNumeric(), authenticateJW
     }
     res.formatter.serverError(error.toString(), 'Retrieved Data Error for /run-specific-battle');
   });
-
-
-
 });
+
+/*
+  MIGRATION
+*/
+
+// modify each battle that has "effects" and map the arrays to be just effect names
+// router.get('/change-effects-entries', (req, res) => {
+//   Battle.update(
+//     {effects : col('effects').map(effect => effect.name)  },
+//     {where:{ effects : {[Op.ne]: null} }, raw : true}
+//   ).then((results)=> {
+//     console.log(results);
+//     res.formatter.ok(results);
+//   }).catch((error) =>{
+//     res.formatter.serverError(error.toString());
+//   });
+// });
+
+
+
 
 module.exports = router;
