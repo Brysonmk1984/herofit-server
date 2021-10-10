@@ -21,22 +21,6 @@ const BattleModel = function(db, DataTypes){
       type : DataTypes.STRING,
       allowNull: true,
     },
-    aPhyDamage : {
-      type : DataTypes.INTEGER,
-      allowNull: true
-    },
-    fPhyReduction : {
-      type : DataTypes.NUMERIC,
-      allowNull: true
-    },
-    fPhyDamage : {
-      type : DataTypes.INTEGER,
-      allowNull: true
-    },
-    aPhyReduction : {
-      type : DataTypes.NUMERIC,
-      allowNull: true
-    },
     xpGain: {
       type: DataTypes.INTEGER,
       allowNull: true
@@ -48,14 +32,6 @@ const BattleModel = function(db, DataTypes){
     avatarName : {
       type : DataTypes.STRING,
       allowNull: false,
-    },
-    aHealthRemaining : {
-      type : DataTypes.INTEGER,
-      allowNull: true
-    },
-    fHealthRemaining : {
-      type : DataTypes.INTEGER,
-      allowNull: true
     },
     avatar : {
       type : DataTypes.JSONB,
@@ -74,22 +50,6 @@ const BattleModel = function(db, DataTypes){
       allowNull: true
     },
     brf : {
-      type : DataTypes.JSONB,
-      allowNull: true
-    },
-    aElmDamage : {
-      type : DataTypes.JSONB,
-      allowNull: true
-    },
-    aElmReduction : {
-      type : DataTypes.JSONB,
-      allowNull: true
-    },
-    fElmDamage : {
-      type : DataTypes.JSONB,
-      allowNull: true
-    },
-    fElmReduction : {
       type : DataTypes.JSONB,
       allowNull: true
     },

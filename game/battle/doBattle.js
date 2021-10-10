@@ -475,14 +475,6 @@ function doBattle(avatar, foe, goesFirst){
   const outcomeData = _determineOutcome(winnerString); 
   //console.log('RB=', roundBreakdown, outcomeData);
   const results = {
-    aElmDamage : grandTotals.aElmDamage,
-    fElmReduction : grandTotals.fElmReduction,
-    fElmDamage : grandTotals.fElmDamage,
-    aElmReduction : grandTotals.aElmReduction,
-    aPhyDamage : grandTotals.aPhyDamage,
-    fPhyReduction : grandTotals.fPhyReduction,
-    fPhyDamage : grandTotals.fPhyDamage,
-    aPhyReduction : grandTotals.aPhyReduction,
     aHealthRemaining : grandTotals.avHealthRemaining,
     fHealthRemaining : grandTotals.foeHealthRemaining,
     outcomeData,
