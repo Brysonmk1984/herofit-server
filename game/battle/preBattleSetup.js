@@ -11,7 +11,7 @@ const preBattleSetup = function(avatar, foe){
   let beginnersLuck;
   let scenario;
   let goesFirst;
-  let effectProcs;
+  let effectProcs = [];
 
   return {
     determineBeginnersLuck : () => {

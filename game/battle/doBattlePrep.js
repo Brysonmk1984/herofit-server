@@ -237,17 +237,17 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
           
           // Finds the property of that value
           let avStatObj = mappedToOb.find(obj => {
-            console.log('look', Object.keys(obj), Object.keys(obj)[0]);
+            //console.log('look', Object.keys(obj), Object.keys(obj)[0]);
             const currentKey = Object.keys(obj)[0];
             if(obj[currentKey] === lowestAvVal){
-              console.log('in lowest match', lowestAvVal);
+              //console.log('in lowest match', lowestAvVal);
               return Object.keys(lowestAvVal);
             }
           });
           
           // Can't figure out why 
           if(!avStatObj){
-            console.log('avStatObj is undefined or null for some reason', avStatObj);
+            //console.log('avStatObj is undefined or null for some reason', avStatObj);
             break;
           }
           // THIS IS WHERE IT FAILED (BELOW)
@@ -361,7 +361,7 @@ function doFoeBattlePrep(avatar, foe, scenarioId){
           break;
       }
 
-      return { avatar : fAvatar, foe : fFoe };
+      return { avatar : fAvatar, foe : fFoe, procs : effectProcs  };
 
     }
   }

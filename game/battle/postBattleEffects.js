@@ -1,15 +1,12 @@
 const chance = require('chance')();
 
+// Effects passed in here are the ones saved in the 'effects' column'
+// The 'effectProcs' column, which is only used for display purposes, will include both these effects AND 'effects' from avatar & foe abilities
 function postBattleEffects(a, f, outcomeData, effects){
   let avatar = { ...a };
   let foe = { ...f };
   let outcomeStatus = outcomeData.outcome;
-  let postBattleEffects = [];
   let effectProcs = [];
-  
-  if(effects && effects.length){
-    postBattleEffects = effects.filter(effect => effect.type === 'postbattle');
-  }
 
   // FOE POSTBATTLE ABILITIES
   if(f.ability.type === 'postbattle'){
@@ -23,6 +20,7 @@ function postBattleEffects(a, f, outcomeData, effects){
           avatar = Object.assign({}, a, { status, statusFade });
           effectProcs.push({
             effect : "Infect",
+            type : "postbattle"
           });
         }
         break;
@@ -42,6 +40,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             }
             effectProcs.push({
               effect : "-10% Health Afterburn",
+              type : "postbattle"
             });
           }
         }
@@ -52,7 +51,7 @@ function postBattleEffects(a, f, outcomeData, effects){
   }
 
   // AVATAR POSTBATTLE ABILITIES
-  postBattleEffects.forEach((effect) =>{
+  effects.forEach((effect) =>{
     switch(effect.name){
       // Chameleon
       case 'Adaptive Camouflage':
@@ -64,6 +63,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
             effectProcs.push({
               effect : "Adaptive Camouflage",
+              type : "postbattle"
             });
           }
         }
@@ -77,6 +77,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             outcomeStatus = 'Double KO';
             effectProcs.push({
               effect : "Unstable Prototype",
+              type : "postbattle"
             });
           }
         }else if(outcomeData.outcome === 'Avatar Wins'){
@@ -86,6 +87,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             avatar = Object.assign({}, a, { health : 0, status : 'Knocked Out' });
             effectProcs.push({
               effect : "Unstable Prototype",
+              type : "postbattle"
             });
           }
         }
@@ -99,6 +101,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
             effectProcs.push({
               effect : "Heroes Never Die",
+              type : "postbattle"
             });
           }
         }
@@ -118,6 +121,7 @@ function postBattleEffects(a, f, outcomeData, effects){
             }
             effectProcs.push({
               effect : "+25 Damage Afterburn",
+              type : "postbattle"
             });
           }
         }
@@ -131,7 +135,7 @@ function postBattleEffects(a, f, outcomeData, effects){
           const status = 'Recovering';
           const statusFade = 0;
           avatar = Object.assign({}, a, { status, statusFade });
-          effectProcs.push({ effect : "Bolstered Immune System"}); 
+          effectProcs.push({ effect : "Bolstered Immune System", type : "postbattle"}); 
         }
         break;
       default:

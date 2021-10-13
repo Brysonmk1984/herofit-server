@@ -17,17 +17,16 @@ function battleProcess(battleInstance, avatarInstance){
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
   determineBeginnersLuck();
-  
 
   // PREBATTLE STEP 1 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   doScenarioAndBonus();
-  
+
   // PREBATTLE STEP 2 APPLY EFFECTS FROM ITEMS
   doPreBattleEffects(battle.effects);
 
   // PREBATTLE STEP 3 - APPLY FOE PREBATTLE ABILITY
   prepareFoe();
-  
+
   // PREBATTLE STEP 4 - ADJUST THE SEASONAL ELEMENT ON BOTH FOE AND AVATAR
   applyElementalBonus();
 
@@ -41,7 +40,7 @@ function battleProcess(battleInstance, avatarInstance){
 
   // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario, effectProcs } = getPreBattlePackage();
-  
+
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
   const b = doBattle(BRA, BRF, goesFirst);
@@ -68,7 +67,8 @@ function battleProcess(battleInstance, avatarInstance){
     })
     return AvatarItems.bulkCreate(itemsToInsert)
   }).then(() =>{
-    const { postAv, postOutcome, xpGain, ptGain, effectProcs } = getPostBattlePackage();
+    const { postAv, postOutcome, xpGain, ptGain, postEffectProcs } = getPostBattlePackage();
+
     // Only save the relevant avatar changes, all come from postAv
     const { goToBattle, qp, health, maxHealth, power, status, statusFade, battleXP, battleWins, battleLosses, battleDraws, battleDkos, photonTokens } = postAv;
     // In case of Vampiric Touch, don't heal beyond what Avatar went into battle with
@@ -92,7 +92,9 @@ function battleProcess(battleInstance, avatarInstance){
       // Update Av first, then the battle record
       return Avatar.update(combinedAv, { where: { id: avatar.id } })
       .then(() =>{
-      
+        // For displaying on the frontend, save regular prebattle effectProcs and postbattle effectprocs
+        const combinedEffectProcs = [...effectProcs, ...postEffectProcs];
+
         return Battle.update({
           scenario : scenario.id,
           outcome : postOutcome.outcome,
@@ -105,7 +107,7 @@ function battleProcess(battleInstance, avatarInstance){
           bra : BRA,
           brf : BRF,
           roundBreakdown : b.roundBreakdown,
-          effectProcs : effectProcs.length ? effectProcs : null
+          effectProcs : combinedEffectProcs.length ? combinedEffectProcs : null
         },
         { where: { id: battle.id }, raw : true }
         );

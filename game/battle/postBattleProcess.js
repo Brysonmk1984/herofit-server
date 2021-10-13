@@ -55,7 +55,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
     getPostBattlePackage : () => {
       // Outcome status may have changed due to post battle effects, so combine with default outcome object
       const fullOutcome = Object.assign({}, outcomeData, { outcome : o });
-      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain, postFoe : f, effectProcs };
+      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain, postFoe : f, postEffectProcs : effectProcs };
     }
   }
 }
