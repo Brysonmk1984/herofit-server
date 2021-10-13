@@ -5,7 +5,7 @@ const testSpecificFoe = {
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
     odds : 100,
-    foe : 'Plaguebringer',
+    foe : 'Guardian of the Depths',
     foeClass : 'Titans'
   },
   {
@@ -45,6 +45,18 @@ const attackOfTheElements = {
 ],
 }
 
-module.exports = { testSpecificFoe, attackOfTheElements };
+const helloween = {
+  eventName : "Helloween",
+  description : "Until Halloween, bonus chance to face the Guardian of the Depths",
+  actionTypes : [{
+    type : 'foeLikelihood',
+    action : "Increased Likelihood Foe",
+    odds : 13,
+    foe : 'Guardian of the Depths',
+    foeClass : 'Titans'
+  }]
+}
+
+module.exports = { testSpecificFoe, attackOfTheElements, helloween };
 
 

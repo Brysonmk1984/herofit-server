@@ -26,20 +26,22 @@ function postBattleEffects(a, f, outcomeData, effects){
         break;
 
       // Guardian of the Depths
-      case '-10% Health Afterburn':
-        // If Hero won, or Draw, deal 10% of health more damage to hero and potentially change outcome
+      case '-20% Health Afterburn':
+        // If Hero won, or Draw, deal 20% of target's health as damage to hero and potentially change outcome
         if(outcomeData.outcome === 'Avatar Wins' || outcomeData.outcome === 'Draw'){
-          avatar.health -= (avatar.maxHealth * .1);
+          avatar.health -= (avatar.maxHealth * .2);
           if(avatar.health <= 0){
             // If foe won, change to DKO since Afterburn killed foe
             if(outcomeData.outcome === 'Avatar Wins'){
               outcomeStatus = 'Double KO';
+              avatar.health = 0;
             // If Draw, change to Avatar Wins since Afterburn killed foe
             }else if(outcomeData.outcome === 'Draw'){
               outcomeStatus = 'Foe Wins';
+              avatar.health = 0;
             }
             effectProcs.push({
-              effect : "-10% Health Afterburn",
+              effect : "-20% Health Afterburn",
               type : "postbattle"
             });
           }

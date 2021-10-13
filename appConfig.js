@@ -1,9 +1,9 @@
-const { testSpecificFoe, attackOfTheElements } = require('./game/specialEvents/specialEventList');
+const { testSpecificFoe, helloween } = require('./game/specialEvents/specialEventList');
 
 const appState = ['live','maintenance'];
 const config = {
   mode : appState[0],
-  //specialEvent : testSpecificFoe,
+  specialEvent : helloween,
 
 
   // globalMessage : [

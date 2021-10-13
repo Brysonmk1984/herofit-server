@@ -60,6 +60,12 @@
       "type" : "Award Pet",
       "itemCategory": "pets",
       "outcome" : ["Avatar Wins", "Double KO"]
+    },{
+      "action" : "Grant GotD",
+      "name" : "Hellhound Whisperer",
+      "type" : "Award Title",
+      "itemCategory": "titles",
+      "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
       "action" : "Grant Gusty Rascal",

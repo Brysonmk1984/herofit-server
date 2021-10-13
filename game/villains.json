@@ -221,6 +221,25 @@
         "name" : "Plagueling"
       },
       "levelRequirement" : 20
+    },
+    {
+      "class" : "Titans",
+      "type": "Guardian of the Depths",
+      "foe": ["Guardian of the Depths"],
+      "ability": {
+        "name" : "-20% Health Afterburn",
+        "effect" : "If Hero wins or draws, deal an additional 20% of target's health as damage to hero, potentially changing the outcome",
+        "type" : "postbattle"
+      },
+      "color": null,
+      "bonusXpBase": 75,
+      "bonusPtBase": 100,
+      "pba" : ["Grant GotD"],
+      "reward" : {
+        "type" : "title",
+        "name" : "Hellhound Whisperer"
+      },
+      "levelRequirement" : 40
     }
   ],
   "Elementals": [

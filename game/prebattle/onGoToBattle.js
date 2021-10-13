@@ -83,7 +83,7 @@ function determinePostBattleActions(avatar, foe, resolve, reject){
     }
 
     if(foe.class === 'Titans'){
-      if(foe.type === 'Plaguebringer'){
+      if(VILLAINS.Titans.map(foe => foe.type).includes(foe.type)){
         const allPastRewards = [...skinNamesArray, ...titleNamesArray, ...petNamesArray];
         // Check if foe has been defeated
         allPbaCheckPromises.push(_checkDefeatedParticularFoe(avatar.id, foe.type, 'Titans', foe.name, allPastRewards));

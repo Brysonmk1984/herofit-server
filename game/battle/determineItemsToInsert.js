@@ -1,6 +1,7 @@
 const ALLPBAs = require('../postBattleActions.json');
 
 function determineItemsToInsert(postBattleActions, battleOutcome){  
+ 
   if(postBattleActions === null){
     return [];
   } 
