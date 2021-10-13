@@ -13,7 +13,6 @@ function battleProcess(battleInstance, avatarInstance){
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
-  console.log('BATTLE', battle.id, 'avatar', avatar);
   const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
@@ -59,7 +58,7 @@ function battleProcess(battleInstance, avatarInstance){
   // DONE! - INSERT all the items from the itemNames array, gathered from the PBAs
   return doAllPbas(battle.postBattleActions)
   .then((itemNames) =>{
-    console.log('INSERTING = ', itemNames);
+    //console.log('INSERTING = ', itemNames);
     return Items.findAll({
       where : { name : { [Op.in] : itemNames } }, raw : true
     });

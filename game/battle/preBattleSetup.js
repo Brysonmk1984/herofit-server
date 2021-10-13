@@ -29,10 +29,9 @@ const preBattleSetup = function(avatar, foe){
     doPreBattleEffects : (effects) => {
       // If there are any effects, find 'prebattle' effects and adjust avatar accordingly
       if(effects && effects.length){
-        const preBattleEffects = effects.filter(effect => effect.type === 'prebattle');
         // Buff or debuff hero and foe based on item effects
         // If new item effects are added, they need to be added in this function:
-        ({ avatar : a, foe : f } = doAvatarBattlePrep(a, f, preBattleEffects, scenario.id));
+        ({ avatar : a, foe : f } = doAvatarBattlePrep(a, f, effects, scenario.id));
       }
     },
     prepareFoe : () => {

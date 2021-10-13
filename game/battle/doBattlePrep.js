@@ -6,7 +6,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
   effects.forEach((effect) =>{
-    switch(effect.name){
+
+    switch(effect){
       case "Hero +5,+10% Water":
         eAvatar.water += 5;
         eAvatar.water += Math.floor(eAvatar.water * .10);
