@@ -11,6 +11,7 @@ const preBattleSetup = function(avatar, foe){
   let beginnersLuck;
   let scenario;
   let goesFirst;
+  let effectProcs;
 
   return {
     determineBeginnersLuck : () => {
@@ -29,13 +30,17 @@ const preBattleSetup = function(avatar, foe){
     doPreBattleEffects : (effects) => {
       // If there are any effects, find 'prebattle' effects and adjust avatar accordingly
       if(effects && effects.length){
+        let procs = [];
         // Buff or debuff hero and foe based on item effects
         // If new item effects are added, they need to be added in this function:
-        ({ avatar : a, foe : f } = doAvatarBattlePrep(a, f, effects, scenario.id));
+        ({ avatar : a, foe : f, procs } = doAvatarBattlePrep(a, f, effects, scenario.id));
+        effectProcs = [...effectProcs, ...procs];
       }
     },
     prepareFoe : () => {
-      ({ avatar : a, foe : f } = doFoeBattlePrep(a, f));
+      let procs = [];
+      ({ avatar : a, foe : f, procs } = doFoeBattlePrep(a, f));
+      effectProcs = [...effectProcs, ...procs];
     },
     applyElementalBonus : () => {
       // Figure out which season it is, so a 25% bonus can be given to a & f
@@ -70,7 +75,7 @@ const preBattleSetup = function(avatar, foe){
       a.earth = avatarEarthBoost;
       f.earth = foeEarthBoost;
     },
-    getPreBattlePackage : () => ({ BRA : a, BRF : f, goesFirst, scenario })
+    getPreBattlePackage : () => ({ BRA : a, BRF : f, goesFirst, scenario, effectProcs })
   }
 };
 

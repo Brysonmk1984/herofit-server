@@ -5,6 +5,8 @@ function postBattleEffects(a, f, outcomeData, effects){
   let foe = { ...f };
   let outcomeStatus = outcomeData.outcome;
   let postBattleEffects = [];
+  let effectProcs = [];
+  
   if(effects && effects.length){
     postBattleEffects = effects.filter(effect => effect.type === 'postbattle');
   }
@@ -18,8 +20,30 @@ function postBattleEffects(a, f, outcomeData, effects){
         if(outcomeStatus === 'Avatar Wins' || outcomeStatus === 'Draw'){
           const status = 'Infected';
           const statusFade = 12;
-          console.log('AAAA HEALTH - ', a);
           avatar = Object.assign({}, a, { status, statusFade });
+          effectProcs.push({
+            effect : "Infect",
+          });
+        }
+        break;
+
+      // Guardian of the Depths
+      case '-10% Health Afterburn':
+        // If Hero won, or Draw, deal 10% of health more damage to hero and potentially change outcome
+        if(outcomeData.outcome === 'Avatar Wins' || outcomeData.outcome === 'Draw'){
+          avatar.health -= (avatar.maxHealth * .1);
+          if(avatar.health <= 0){
+            // If foe won, change to DKO since Afterburn killed foe
+            if(outcomeData.outcome === 'Avatar Wins'){
+              outcomeStatus = 'Double KO';
+            // If Draw, change to Avatar Wins since Afterburn killed foe
+            }else if(outcomeData.outcome === 'Draw'){
+              outcomeStatus = 'Foe Wins';
+            }
+            effectProcs.push({
+              effect : "-10% Health Afterburn",
+            });
+          }
         }
         break;
       default:
@@ -38,6 +62,9 @@ function postBattleEffects(a, f, outcomeData, effects){
           if(camoWorked){
             outcomeStatus = 'Draw';
             avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
+            effectProcs.push({
+              effect : "Adaptive Camouflage",
+            });
           }
         }
         break;
@@ -48,12 +75,18 @@ function postBattleEffects(a, f, outcomeData, effects){
           const selfDestructWorked = chance.bool({ likelihood: 33 });
           if(selfDestructWorked){
             outcomeStatus = 'Double KO';
+            effectProcs.push({
+              effect : "Unstable Prototype",
+            });
           }
         }else if(outcomeData.outcome === 'Avatar Wins'){
           const selfDestructWorked = chance.bool({ likelihood: 2 });
           if(selfDestructWorked){
             outcomeStatus = 'Double KO';
             avatar = Object.assign({}, a, { health : 0, status : 'Knocked Out' });
+            effectProcs.push({
+              effect : "Unstable Prototype",
+            });
           }
         }
         break;
@@ -64,6 +97,9 @@ function postBattleEffects(a, f, outcomeData, effects){
           const reviveWorked = chance.bool({ likelihood: 50 });
           if(reviveWorked){
             avatar = Object.assign({}, a, { health : 1, status : 'Recovering' });
+            effectProcs.push({
+              effect : "Heroes Never Die",
+            });
           }
         }
         break;
@@ -80,9 +116,14 @@ function postBattleEffects(a, f, outcomeData, effects){
             }else if(outcomeData.outcome === 'Draw'){
               outcomeStatus = 'Avatar Wins';
             }
+            effectProcs.push({
+              effect : "+25 Damage Afterburn",
+            });
           }
         }
         break;
+        
+              
       // Plagueling
       case 'Bolstered Immune System':
         // Only apply if Hero is infected
@@ -90,6 +131,7 @@ function postBattleEffects(a, f, outcomeData, effects){
           const status = 'Recovering';
           const statusFade = 0;
           avatar = Object.assign({}, a, { status, statusFade });
+          effectProcs.push({ effect : "Bolstered Immune System"}); 
         }
         break;
       default:
@@ -98,7 +140,7 @@ function postBattleEffects(a, f, outcomeData, effects){
   });
 
   return {
-    avatar, foe, outcomeStatus
+    avatar, foe, outcomeStatus, effectProcs
   };
 }
 

@@ -82,6 +82,10 @@ const BattleModel = function(db, DataTypes){
     effects: {
       type : DataTypes.JSONB,
       allowNull: true
+    },
+    effectProcs: {
+      type : DataTypes.JSONB,
+      allowNull: true
     }
   });
 

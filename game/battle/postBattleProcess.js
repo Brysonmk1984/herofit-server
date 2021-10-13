@@ -16,7 +16,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
   return {
     doPostBattleEffects : (effects) => {
       // assign 'a' variable above the value of avatar, same with 'o'
-      ({ avatar : a, foe : f, outcomeStatus : o } = postBattleEffects(a,f,outcomeData, effects));
+      ({ avatar : a, foe : f, outcomeStatus : o, effectProcs } = postBattleEffects(a,f,outcomeData, effects));
     },
     updateAvatarByOutcome : () => {
       switch(o){
@@ -55,7 +55,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
     getPostBattlePackage : () => {
       // Outcome status may have changed due to post battle effects, so combine with default outcome object
       const fullOutcome = Object.assign({}, outcomeData, { outcome : o });
-      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain, postFoe : f };
+      return { postAv : a, postOutcome : fullOutcome, xpGain, ptGain, postFoe : f, effectProcs };
     }
   }
 }
