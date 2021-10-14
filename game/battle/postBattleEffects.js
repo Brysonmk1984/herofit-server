@@ -2,7 +2,7 @@ const chance = require('chance')();
 
 // Effects passed in here are the ones saved in the 'effects' column'
 // The 'effectProcs' column, which is only used for display purposes, will include both these effects AND 'effects' from avatar & foe abilities
-function postBattleEffects(a, f, outcomeData, effects){
+function postBattleEffects(a, f, outcomeData, effects = []){
   let avatar = { ...a };
   let foe = { ...f };
   let outcomeStatus = outcomeData.outcome;
