@@ -15,7 +15,7 @@ function selectFoeTemplate(level){
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if(event){
-    const foeLikelihoodAts = event.actionTypes.filter((at) => at.type === 'foeLikelihood');
+    const foeLikelihoodAts = event.actionTypes.filter((at) => (at.type === 'foeLikelihood' && level >= at.levelRequirement));
     // If the event contains foeLikelihood actions
     if(foeLikelihoodAts.length){
       // Result of handleChanceForFoe function could be a foe object, or null

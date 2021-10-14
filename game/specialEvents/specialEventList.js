@@ -53,7 +53,8 @@ const helloween = {
     action : "Increased Likelihood Foe",
     odds : 13,
     foe : 'Guardian of the Depths',
-    foeClass : 'Titans'
+    foeClass : 'Titans',
+    levelRequirement : 40
   }]
 }
 
