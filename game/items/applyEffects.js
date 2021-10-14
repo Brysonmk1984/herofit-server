@@ -74,8 +74,10 @@ function healCompletely(avatarID){
   return Avatar.update(
     { health : col('maxHealth'), status : 'Rested' } , { where : { id : avatarID }, returning : true }
   ).then((data) =>{
+    const avatar = data[1][0];
+    avatar.restedEnough = true;
     //RETURN UPDATED AVATAR
-    return data[1][0];
+    return avatar;
   }).catch((error) =>{
     console.log('error', error);
     return error;

@@ -327,7 +327,6 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
     });
 
     let avatar = parseAvatarProperties(data[0], true);
-
     AvatarItems.destroy({
       where : { id },
     }).then((data) =>{
