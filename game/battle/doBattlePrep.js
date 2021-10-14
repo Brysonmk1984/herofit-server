@@ -261,8 +261,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
 
           effectProcs.push({
             effect : "Frisky Mischief",
-            heroStatsEffected : [eAvatar[avStat]],
-            foeStatsEffected : [eFoe[avStat]]
+            heroStatsEffected : [avStat],
+            foeStatsEffected : [avStat]
           });
 
         }          
