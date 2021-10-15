@@ -225,22 +225,22 @@ function generateFoeStats(avatar, foe){
       }
       break;
     case 'Titans':
-      randomizedHealth = randomizer(baseFoeHealth);
+      randomizedHealth = randomizer(baseFoeHealth + (1.5 * totalLevel));
       randomizedPower = randomizer(baseFoePower);
       randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
 
       if(foe.type === 'Plaguebringer'){
-        fws.health = randomizedHealth < 200 ? 200 : Math.floor(randomizedHealth.stat);
-        fws.power = Math.floor(randomizedPower.stat);
-        fws.earth = (50 + (2 * totalLevel));
-        fws.water = (50 + (2 * totalLevel));
-  
-        qpAdjustedStats = ["health","power","armor","earth","water"]; 
-      }else if('Guardian of the Depths'){
         fws.health = randomizedHealth < 300 ? 300 : Math.floor(randomizedHealth.stat);
         fws.power = Math.floor(randomizedPower.stat);
         fws.earth = (50 + (2.15 * totalLevel));
-        fws.fire = (50 + (2.15 * totalLevel));
+        fws.water = (50 + (2.15 * totalLevel));
+  
+        qpAdjustedStats = ["health","power","armor","earth","water"]; 
+      }else if('Guardian of the Depths'){
+        fws.health = randomizedHealth < 400 ? 400 : Math.floor(randomizedHealth.stat);
+        fws.power = Math.floor(randomizedPower.stat);
+        fws.earth = (50 + (2.20 * totalLevel));
+        fws.fire = (50 + (2.20 * totalLevel));
   
         qpAdjustedStats = ["health","power","armor","earth","fire"]; 
       }

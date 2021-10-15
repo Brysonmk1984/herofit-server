@@ -311,10 +311,11 @@ function doFoeBattlePrep(avatar, foe, scenarioId){
           break;
         case "Unholy Armor":
           const foeArmor = foe.armor;
+          const foeHealth = foe.health;
           // Unholy Armor
-          // Bonus to Armor
-          // Also has higher health from stats
+          // Bonus to Armor & Health
           fFoe.armor = Math.floor(foeArmor + (foeArmor * .33));
+          fFoe.health = Math.floor(foeHealth + (foeHealth * .1));
           effectProcs.push({
             effect : "Unholy Armor",
             foeStatsEffected : ["health", "armor"]

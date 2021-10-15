@@ -65,8 +65,8 @@ router.post('/fetch-battle-report', oneOf([body('avatarID').isNumeric().optional
     if(result.length && !result[0].seenReport){
       
       adjResult = result[0];
-      adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
-      adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
+      // adjResult.aPhyReduction = Math.floor(parseInt(adjResult.aPhyReduction));
+      // adjResult.fPhyReduction = Math.floor(parseInt(adjResult.fPhyReduction));
       
       // Figure out which season it is, so a 25% bonus can be given to BRA & BRF
       const { determineAstrologySeason } = avCalc();  
