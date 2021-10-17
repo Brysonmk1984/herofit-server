@@ -420,11 +420,21 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
 });
 
 router.get('/strava-client-credentials-app', authenticateJWT, (req, res) =>{
-  res.formatter.ok({
-    clientId: process.env.STRAVA_CLIENT_ID_APP,
-    redirectUri : process.env.STRAVA_REDIRECT_APP,
-    clientSecret: process.env.STRAVA_CLIENT_SECRET_APP,
-  });
+  const clientId = process.env.STRAVA_CLIENT_ID_APP;
+  const redirectUri = process.env.STRAVA_REDIRECT_APP;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET_APP;
+  
+  if(clientId && redirectUri && clientSecret){
+    return res.formatter.ok({
+      clientId,
+      redirectUri,
+      clientSecret
+    });
+  }else{
+    const error = new Error("Missing credentials");
+    res.formatter.serverError(error);
+  }
+
 });
 module.exports = router;
 
