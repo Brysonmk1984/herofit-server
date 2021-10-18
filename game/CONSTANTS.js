@@ -93,9 +93,9 @@ const PT_EXPONENT = 1.2;
 
 const REVIVE_AMOUNT = 1;
 // higher is less effective
-const RECOVER_EARLY_MOD = 700;
+const RECOVER_EARLY_MOD = 1050;
 // higher is more effective
-const RECOVERY_EFFECTIVENESS_MOD = 45;
+const RECOVERY_EFFECTIVENESS_MOD = 55;
 
 // DO BATTLE
 
