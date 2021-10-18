@@ -241,7 +241,6 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
-  console.log('AP!', airProc);
   // IF AVATAR ROUND
   if(aggressorString === 'Avatar'){
     // Calc physical damage, get back damage done and how much was prevented
@@ -267,10 +266,14 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       water : determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage),
     }
 
-    // EARTH - Deal damage back to attacker based on earthProc
-    totals.avHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
-    // WATER - Heal based on waterProc
-    totals.avHealthRemaining += elementalProcs.water.amountHealed;
+    // Only adjust Health for Thorns & VampTouch IF evasion did not happen
+    if(!airProc.evaded){
+      // EARTH - Deal damage back to attacker based on earthProc
+      totals.avHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+      // WATER - Heal based on waterProc
+      totals.avHealthRemaining += elementalProcs.water.amountHealed;
+    }
+
 
     totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
 
@@ -310,8 +313,11 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         earth : determineEarthThorns(defender.earth, physicalDamage)
       }
 
-      // EARTH - Deal damage back to attacker based on earthProc
-      totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+      // Only adjust Health for Thorns & VampTouch IF evasion did not happen
+      if(!airProc.evaded){
+        // EARTH - Deal damage back to attacker based on earthProc
+        totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+      }
 
       totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
       return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals, elementalProcs };
@@ -343,10 +349,13 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         water : determineWaterHeal(aggressor.water, turnElmDamageDone.total + physicalDamage),
       }
 
-      // EARTH - Deal damage back to attacker based on earthProc
-      totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
-      // WATER - Heal based on waterProc
-      totals.foeHealthRemaining += elementalProcs.water.amountHealed;
+      // Only adjust Health for Thorns & VampTouch IF evasion did not happen
+      if(!airProc.evaded){
+        // EARTH - Deal damage back to attacker based on earthProc
+        totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+        // WATER - Heal based on waterProc
+        totals.foeHealthRemaining += elementalProcs.water.amountHealed;
+      }
 
       totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, ((turnElmDamageDone.total) + physicalDamage));
       return { defenderHealthLeft : totals.avHealthRemaining, aggressorHealthLeft : totals.foeHealthRemaining, physicalDamageDealt : physicalDamage,  elementalDamageDealt : turnElmDamageDone, physicalReduction, elementalReduction : turnElmDamagePrevented, totals, elementalProcs };
