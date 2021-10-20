@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router(); 
-const { Avatar, AvatarItems, Items } = require('../config/db');
+const { Avatar, AvatarItems, Items, db } = require('../config/db');
 const { Op, literal } = require("sequelize");
 const { stackItems, parseAvatarProperties, arrayChunker } = require('../lib/helperFunctions');
 const { itemEffects } = require('../game/items/applyEffects');
@@ -243,66 +243,83 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
   let { itemID, avatarID, ptCost } = req.body;
   const item = { itemID, avatarID, equipped : false };
   
-  let remainingPT;
-  Avatar.findOne({
-    attributes : ['photonTokens'],
-    where : { id : avatarID } 
-  }).then(({ photonTokens })=>{
-    if(photonTokens < ptCost){
-      const error = new Error("Not Enough Photon Tokens");
-      return res.formatter.badRequest(error.toString(), `Not Enough Photon Tokens POST /buy-item-by-avatar-id`);
-    }
+  db.transaction(async t => {
+    try{
+      const { photonTokens } =  await Avatar.findOne({
+        attributes : ['photonTokens'],
+        where : { id : avatarID },
+        transaction : t
+      });
 
-    return AvatarItems.create( item, { returning: true });
-  }).then((result) =>{
-    if(result.dataValues && result.dataValues.id){
-      // If made it this far, then item was created... deduct PT
-      return Avatar.update(
-        { photonTokens : literal(`"photonTokens" - ${ptCost}`) },
-        { where : { id : avatarID }, returning : true })
-    }else{
-      throw new Error('Item Could not be created');
-    }
-  }).then((result) =>{
-    // PT was deducted from avatar, now fetch all Avatar inventory items
+      if(photonTokens < ptCost){
+        throw new Error("Not Enough Photon Tokens");
+      }
 
-    remainingPT = result[1][0].photonTokens
-    AvatarItems.findAll({
-      attributes : ['id','avatarID','itemID','equipped'],
-      where : { avatarID },
-      include: [{
+      const matchingItem = await AvatarItems.findOne({
+        where : { itemID, avatarID }, transaction: t,
+        include: [{
           model: Items,
           as : 'item',
-          attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost'],
-          // Required is false by default, adding a where clause makes it true by default. 
-          // Still, false or true doesn't seem to have an impact here.
-          //required: false,
+          where : { id : itemID },
+          attributes: ['type'],
         }],
         raw : undefined,
-        nest : true,
-      }).then((rows) =>{ 
-
-        const inventory = rows.map((row)=>{
-          const { id, avatarID, itemID, equipped, item } = row;
-          return { id, avatarID, itemID, equipped, ...item.dataValues }
-        });
-  
-        // Massage the data for the frontend
-        const inventoryObj = { pets : [], skins : [], titles : [], consumables : [] };
-        inventory.forEach((item) =>{
-          if(inventoryObj[item.type +'s']){
-            inventoryObj[item.type +'s'].push(item);
-          }
-        });
-        inventoryObj.consumables = stackItems(inventoryObj.consumables);
-        inventoryObj.remainingPT = remainingPT;
-        res.formatter.ok(inventoryObj, 'Successfully ran POST /buy-item-by-avatar-id');
-      }).catch((error) =>{
-        res.formatter.serverError(error.toString(), 'Successfully ran POST /buy-item-by-avatar-id');
       });
-  }).catch((error) =>{console.log('BUYITEMERROR-', error);
-    res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
-  });
+ 
+      if(matchingItem && matchingItem.item.dataValues.type !== 'consumable'){
+        throw new Error("Item already owned!");
+      }
+      
+      const result = await AvatarItems.create( item, { returning: true, transaction: t });
+      if(!result.dataValues || !result.dataValues.id){
+        throw new Error('Item Could not be created');
+      }
+
+      // If made it this far, then item was created... deduct PT
+      const avatarUpdateResult = await Avatar.update(
+        { photonTokens : literal(`"photonTokens" - ${ptCost}`) },
+        { where : { id : avatarID }, returning : true, transaction : t 
+      });
+      const remainingPt = avatarUpdateResult[1][0].photonTokens;
+
+      // PT was deducted from avatar, now fetch all Avatar inventory items
+      const rows = await AvatarItems.findAll({
+        attributes : ['id','avatarID','itemID','equipped'],
+        where : { avatarID },
+        include: [{
+            model: Items,
+            as : 'item',
+            attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost'],
+            // Required is false by default, adding a where clause makes it true by default. 
+            // Still, false or true doesn't seem to have an impact here.
+            //required: false,
+          }],
+          raw : undefined,
+          nest : true,
+          transaction : t
+      });
+        
+
+      const inventory = rows.map((row)=>{
+        const { id, avatarID, itemID, equipped, item } = row;
+        return { id, avatarID, itemID, equipped, ...item.dataValues }
+      });
+  
+      // Massage the data for the frontend
+      const inventoryObj = { pets : [], skins : [], titles : [], consumables : [] };
+      inventory.forEach((item) =>{
+        if(inventoryObj[item.type +'s']){
+          inventoryObj[item.type +'s'].push(item);
+        }
+      });
+      inventoryObj.consumables = stackItems(inventoryObj.consumables);
+      inventoryObj.remainingPT = remainingPt;
+      res.formatter.ok(inventoryObj, 'Successfully ran POST /buy-item-by-avatar-id');
+    }catch(error){
+      console.log('BUYITEMERROR-', error);
+      res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
+    }
+  })
 });
 
 
