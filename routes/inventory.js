@@ -306,9 +306,11 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
       });
   
       // Massage the data for the frontend
-      const inventoryObj = { pets : [], skins : [], titles : [], consumables : [] };
-      inventory.forEach((item) =>{
-        if(inventoryObj[item.type +'s']){
+      const inventoryObj = { pets : [], skins : [], titles : [], consumables : [], codex : [] };
+      inventory.forEach((item) =>{ 
+        if(item.type === 'codex'){
+          inventoryObj['codex'].push(item);
+        }else if(inventoryObj[item.type +'s']){
           inventoryObj[item.type +'s'].push(item);
         }
       });

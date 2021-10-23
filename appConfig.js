@@ -6,9 +6,9 @@ const config = {
   specialEvent : helloween,
 
 
-  globalMessage : [
-    { type : 'info', persist : false, message : "Check out the latest updates on the upcoming HeroFit app!", link : "https://www.reddit.com/gallery/qdhgl5" }
-  ],
+  // globalMessage : [
+  //   { type : 'info', persist : false, message : "Check out the latest updates on the upcoming HeroFit app!", link : "https://www.reddit.com/gallery/qdhgl5" }
+  // ],
 
   // RANKING PAGE
   AVATAR_COUNT_PER_PAGE : 20
