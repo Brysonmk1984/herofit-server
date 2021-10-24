@@ -237,7 +237,8 @@ function generateFoeStats(avatar, foe){
   
         qpAdjustedStats = ["health","power","armor","earth","water"]; 
       }else if('Guardian of the Depths'){
-        fws.health = randomizedHealth < 400 ? 400 : Math.floor(randomizedHealth.stat);
+        const baseHealth = randomizedHealth < 400 ? 400 : Math.floor(randomizedHealth.stat);
+        fws.health = baseHealth * 1.1;
         fws.power = Math.floor(randomizedPower.stat);
         fws.earth = (50 + (2.3 * totalLevel));
         fws.fire = (50 + (2.3 * totalLevel));
