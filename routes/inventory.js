@@ -306,17 +306,16 @@ router.post('/buy-item-by-avatar-id', body('itemID').isNumeric(), body('ptCost')
       });
   
       // Massage the data for the frontend
-      const inventoryObj = { pets : [], skins : [], titles : [], consumables : [], codex : [] };
+      const inventoryObj = { pets : [], skins : [], titles : [], consumables : [], codices : [] };
       inventory.forEach((item) =>{ 
         if(item.type === 'codex'){
-          inventoryObj['codex'].push(item);
+          inventoryObj.codices.push(item);
         }else if(inventoryObj[item.type +'s']){
           inventoryObj[item.type +'s'].push(item);
         }
       });
       inventoryObj.consumables = stackItems(inventoryObj.consumables);
-      inventoryObj.remainingPT = remainingPt;
-      res.formatter.ok(inventoryObj, 'Successfully ran POST /buy-item-by-avatar-id');
+      res.formatter.ok({ inventory : inventoryObj, photonTokens : remainingPt });
     }catch(error){
       console.log('BUYITEMERROR-', error);
       res.formatter.serverError(error.toString(), `Error running POST /buy-item-by-avatar-id`);
@@ -375,6 +374,7 @@ router.delete('/use-consumable-item', body('id').isNumeric(), body('email').isEm
         }
       });
       const stackedItems = stackItems(consumables);
+      console.log('STACKEDITEMS', stackedItems);
       res.formatter.ok({ consumables : stackedItems, avatar });
     }).catch((error) =>{
       console.log('USE ITEM INNER ERROR - ', error);
