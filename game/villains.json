@@ -96,8 +96,8 @@
       "type": "Wraith",
       "foe": [
         "Methuselah",
-        "Mohandas",
         "Vlasta",
+        "Mohandas",
         "Azrail",
         "Fia",
         "Mercurius"
@@ -245,51 +245,6 @@
   "Elementals": [
     {
       "class" : "Elementals",
-      "type" : "Gusty Rascal",
-      "foe" : [
-        "Alya",
-        "Eteri",
-        "Pilvi",
-        "Tsisia",
-        "Tuuli",
-        "Yun"
-      ],
-      "ability": {
-        "name" : "Air Attuned",
-        "effect" : "Minor Air Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "pba" : ["Grant Gusty Rascal"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Gusty Rascal"
-      }
-    },{
-      "class" : "Elementals",
-      "type" : "Rock Skipper",
-      "foe" : [
-        "Avani",
-        "Demeter",
-        "Ki",
-        "Sten",
-        "Thea",
-        "Tor"
-      ],
-      "ability": {
-        "name" : "Earth Attuned",
-        "effect" : "Minor Earth Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "pba" : ["Grant Rock Skipper"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Rock Skipper"
-      }
-    },
-    {
-      "class" : "Elementals",
       "type" : "Flame Fiend",
       "foe" : [
         "Azar",
@@ -313,48 +268,70 @@
     },
     {
       "class" : "Elementals",
-      "type" : "Splash Artist",
+      "type" : "Burning Jinn",
       "foe" : [
-        "Aalto",
-        "Hai",
-        "Kai",
-        "Naia",
-        "Rio",
-        "Tasi"
+        "Agni",
+        "Helene",
+        "Heliodoro",
+        "Ravi",
+        "Sorin",
+        "Vulcan"
       ],
       "ability": {
-        "name" : "Water Attuned",
-        "effect" : "Minor Water Threat",
+        "name" : "Fire Proficiency",
+        "effect" : "Major Fire Threat",
         "type" : "prebattle"
       },
       "color" : null,
-      "pba" : ["Grant Splash Artist"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Splash Artist"
-      }
-    },
-    {
-      "class" : "Elementals",
-      "type" : "Wheezing Jinn",
-      "foe" : [
-        "Amaterasu",
-        "Anemone",
-        "Caelestis",
-        "Houa",
-        "Tempest",
-        "Zephyr"
-      ],
-      "ability": {
-        "name" : "Air Proficiency",
-        "effect" : "Major Air Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "pba" : ["Grant Air Stalker"],
+      "pba" : ["Grant Fire Hunter"],
       "reward" : {
         "type" : "title",
-        "name" : "Air Stalker"
+        "name" : "Fire Hunter"
+      }
+    },
+    
+    {
+      "class" : "Elementals",
+      "type" : "Scorching Archfiend",
+      "foe" : ["Helios"],
+      "ability": {
+        "name" : "Fire Mastery",
+        "effect" : "Profound Fire Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
+      "pba" : ["Grant Fire Tint"],
+      "reward" : {
+        "type" : "skin",
+        "name" : "Fire Tint"
+      },
+      "itemSummonOnly" : true,
+      "itemSummon" : "Smoldering Skull Torch"
+    },
+    
+    {
+      "class" : "Elementals",
+      "type" : "Rock Skipper",
+      "foe" : [
+        "Avani",
+        "Demeter",
+        "Ki",
+        "Sten",
+        "Thea",
+        "Tor"
+      ],
+      "ability": {
+        "name" : "Earth Attuned",
+        "effect" : "Minor Earth Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Rock Skipper"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Rock Skipper"
       }
     },
     {
@@ -382,25 +359,45 @@
     },
     {
       "class" : "Elementals",
-      "type" : "Burning Jinn",
-      "foe" : [
-        "Agni",
-        "Helene",
-        "Heliodoro",
-        "Ravi",
-        "Sorin",
-        "Vulcan"
-      ],
+      "type" : "Hulking Aggro Crag",
+      "foe" : ["Jötnar"],
       "ability": {
-        "name" : "Fire Proficiency",
-        "effect" : "Major Fire Threat",
+        "name" : "Earth Mastery",
+        "effect" : "Profound Earth Threat",
         "type" : "prebattle"
       },
       "color" : null,
-      "pba" : ["Grant Fire Hunter"],
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
+      "pba" : ["Grant Earth Tint"],
       "reward" : {
-        "type" : "title",
-        "name" : "Fire Hunter"
+        "type" : "skin",
+        "name" : "Earth Tint"
+      },
+      "itemSummonOnly" : true,
+      "itemSummon" : "Petrified Power Totem"
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Splash Artist",
+      "foe" : [
+        "Aalto",
+        "Hai",
+        "Kai",
+        "Naia",
+        "Rio",
+        "Tasi"
+      ],
+      "ability": {
+        "name" : "Water Attuned",
+        "effect" : "Minor Water Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Splash Artist"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Splash Artist"
       }
     },
     {
@@ -428,66 +425,6 @@
     },
     {
       "class" : "Elementals",
-      "type" : "Storming Oni",
-      "foe" : ["Fūjin"],
-      "ability": {
-        "name" : "Air Mastery",
-        "effect" : "Profound Air Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
-      "pba" : ["Grant Air Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Air Tint"
-      },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Storm Crow Bone Chimes"
-    },
-    {
-      "class" : "Elementals",
-      "type" : "Hulking Aggro Crag",
-      "foe" : ["Jötnar"],
-      "ability": {
-        "name" : "Earth Mastery",
-        "effect" : "Profound Earth Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
-      "pba" : ["Grant Earth Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Earth Tint"
-      },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Petrified Power Totem"
-    },
-    {
-      "class" : "Elementals",
-      "type" : "Scorching Archfiend",
-      "foe" : ["Helios"],
-      "ability": {
-        "name" : "Fire Mastery",
-        "effect" : "Profound Fire Threat",
-        "type" : "prebattle"
-      },
-      "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
-      "pba" : ["Grant Fire Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Fire Tint"
-      },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Smoldering Skull Torch"
-    },
-    {
-      "class" : "Elementals",
       "type" : "High Priestess of the Tides",
       "foe" : ["Maya"],
       "ability": {
@@ -505,6 +442,72 @@
       },
       "itemSummonOnly" : true,
       "itemSummon" : "Wave-Swept Battle Conch"
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Gusty Rascal",
+      "foe" : [
+        "Alya",
+        "Eteri",
+        "Pilvi",
+        "Tsisia",
+        "Tuuli",
+        "Yun"
+      ],
+      "ability": {
+        "name" : "Air Attuned",
+        "effect" : "Minor Air Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Gusty Rascal"],
+      "reward" : {
+        "type" : "pet",
+        "name" : "Gusty Rascal"
+      }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Wheezing Jinn",
+      "foe" : [
+        "Amaterasu",
+        "Anemone",
+        "Caelestis",
+        "Houa",
+        "Tempest",
+        "Zephyr"
+      ],
+      "ability": {
+        "name" : "Air Proficiency",
+        "effect" : "Major Air Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "pba" : ["Grant Air Stalker"],
+      "reward" : {
+        "type" : "title",
+        "name" : "Air Stalker"
+      }
+    },
+    {
+      "class" : "Elementals",
+      "type" : "Storming Oni",
+      "foe" : ["Fūjin"],
+      "ability": {
+        "name" : "Air Mastery",
+        "effect" : "Profound Air Threat",
+        "type" : "prebattle"
+      },
+      "color" : null,
+      "bonusXpBase": 25,
+      "bonusPtBase": 50,
+      "pba" : ["Grant Air Tint"],
+      "reward" : {
+        "type" : "skin",
+        "name" : "Air Tint"
+      },
+      "itemSummonOnly" : true,
+      "itemSummon" : "Storm Crow Bone Chimes"
     }
   ]
 }
