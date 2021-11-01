@@ -4,7 +4,7 @@ const db = require('../config/db').db;
 const { body, validationResult } = require('express-validator');
 const { authenticateJWT } = require('../jwt/validateJWT');
 const { Avatar, AvatarItems, User, UserTotal } = require('../config/db');
-const { AVATAR_COUNT_PER_PAGE } = require('../appConfig').config;
+
 const { literal, Op } = require("sequelize");
 const { parseAvatarProperties, paginate, range } = require('../lib/helperFunctions');
 const xpCalc = require('../game/upgrades/xpCalc');
@@ -12,8 +12,8 @@ const { activityStatRewards, activityLevelRewards, determineStatImprovements } =
 const { sendBackendOnlyEmail }= require('../mail');
 const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'walk', 'rowing', 'stairStepper', 'elliptical', 'swim', 'crossfit', 'run', 'kayaking'];
 const heroList = require("../heroList.json");
-
 const upgradeProcess = require('../game/activities/upgradeProcess');
+const AVATAR_COUNT_PER_PAGE = 20;
 
 // Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
