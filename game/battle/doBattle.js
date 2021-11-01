@@ -308,8 +308,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
         //fire : 0,
         //water : 0,
         // AIR and EARTH deal with defender's stats,  so they are included here because foe is not defender here
-        // Non elemental foe, attacking with no elements means the defender's evade wont kick in
-        //air : 0,
+        air : airProc,
         earth : determineEarthThorns(defender.earth, physicalDamage)
       }
 
