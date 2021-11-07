@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 
 function determineVerificationUrl(env, isApp){
   console.log(process.env.NODE_ENV, isApp);
+  //TEST=
+  //env="production";
   let environment = isApp && env === 'development' ? 'app-development' : isApp && env === 'production' ? 'app-production' : env;
   switch(environment){
     case 'production':
@@ -144,7 +146,6 @@ const sendCronErrorEmail = function({status, message, debug, meta, version, erro
   
 
   html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/><p>User not logged in.</p>`;
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
 
@@ -153,7 +154,7 @@ const sendCronErrorEmail = function({status, message, debug, meta, version, erro
       from: `${process.env.INFO_EMAIL}`,
       to: `${process.env.INFO_EMAIL}`,
       subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`, 
-      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ''} \n \n ${meta ? meta : ''} Error Location: ${location} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+      text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ''} \n \n ${meta ? meta : ''} Error Location: ${location} \n\n APP VERSION: ${version}`,
       html
   };
 

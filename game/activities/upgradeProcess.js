@@ -11,7 +11,7 @@ const xpCalc = require('../upgrades/xpCalc');
 const { activityItemFind, insertItemsFromItemFind } = require('./activityItemFind');
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require('./activityRewards');
 const activityHeal = require('./activityHeal');
-
+const { sendCronErrorEmail } = require('../../mail');
 
 function _determineActivityId(id, source){
   if(source === 'herofit'){
@@ -29,23 +29,12 @@ function _insertActivityData(email, activities, t){
     const activityEntries = activities.map((activity) =>{
       const activityDate = moment.utc(activity.start_date);
       const activityId = _determineActivityId(activity.id, activity.source);
-      console.log('ACTID',activityId);
+      //console.log('ACTID',activityId);
       // Check for latest activity (doesn't include DB activities)
       if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
         latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
       }
 
-      console.log('WTF', { user : email, 
-        type : activity.type,
-        averageSpeed: activity.averageSpeed,
-        maxSpeed: activity.maxSpeed,
-        distance: activity.distance,
-        duration: activity.duration,
-        elevationGain: activity.elevationGain,
-        source: activity.source,
-        activityDate : latestActivityUpdate,
-        activityId 
-      });
       return { user : email, 
         type : activity.type,
         averageSpeed: activity.averageSpeed,
@@ -58,12 +47,12 @@ function _insertActivityData(email, activities, t){
         activityId 
       };
     });
-    console.log('HERE@!', activityEntries);
+
     const allPromises = [
       // Update latestActivity Date on USER
       User.update({ latestActivityUpdate },{ where: { email }, transaction: t }),
       // Insert All activities
-      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: true, returning : true, transaction: t }),
+      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: false, returning : true, transaction: t }),
       // Find matching User Totals
       UserTotal.findOne({ attributes : [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], where: { user: email }, raw : true, transaction: t })
     ];
@@ -240,7 +229,11 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
     try{
       const activityPromiseResults = await _insertActivityData(email, activities, t);
       const promiseStatuses = [activityPromiseResults[0].status,activityPromiseResults[1].status,activityPromiseResults[2].status]
+      //console.log('PS=', activityPromiseResults[1]);
+     
+
       if(promiseStatuses.includes('rejected')){
+        sendCronErrorEmail({ status : 888, message : `USER = ${email} failed an upgrade`, debug : [], meta : JSON.stringify(activityPromiseResults[1]), version : "888", errorLocation : "backend - upgradeProcess"});
         throw new Error('Activity Insertion Failed');
       }
 

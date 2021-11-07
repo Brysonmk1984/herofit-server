@@ -244,8 +244,12 @@ router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
   }
 
   const { emailCode } = req.body;
+  console.log('EC = ', emailCode);
+
+
   User.update({ active : true }, { where : { emailCode }, returning : true, plain : true })
   .then((data) => {
+    console.log('USER DATA', data);
     return res.formatter.ok({ user : data[1] });
   }).catch((error) => {
     console.log('ERROR WITH EMAIL CODE', error);
