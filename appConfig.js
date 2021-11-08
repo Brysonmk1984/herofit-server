@@ -3,7 +3,7 @@ const { testSpecificFoe, helloween } = require('./game/specialEvents/specialEven
 const appState = ['live','maintenance'];
 const config = {
   mode : appState[0],
-  //specialEvent : helloween,
+  //specialEvent : testSpecificFoe,
 
   // globalMessage : [
   //   { type : 'info', persist : false, message : "Check out the latest updates on the upcoming HeroFit app!", link : "https://www.reddit.com/gallery/qdhgl5" }

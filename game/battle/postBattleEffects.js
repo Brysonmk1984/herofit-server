@@ -55,7 +55,7 @@ function postBattleEffects(a, f, outcomeData, effects){
   // AVATAR POSTBATTLE ABILITIES
   if(effects && effects.length){
     effects.forEach((effect) =>{
-      switch(effect.name){
+      switch(effect){
         // Chameleon
         case 'Adaptive Camouflage':
           // If Foe won, 33% chance outcomeStatus will be changed to Draw and set health to 1

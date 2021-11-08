@@ -14,12 +14,12 @@ const testSpecificFoe = {
     odds : 100,
     foe : 'Storming Oni',
     foeClass : 'Elementals'
-  },/*{
+  },{
     type : 'foeBonusToStats',
     action : "Increase Air",
-    bonusPercent : .25,
+    bonusPercent : .50,
     stats : ['air']
-  }*/],
+  }],
 }
 
 const attackOfTheElements = {

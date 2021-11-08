@@ -112,8 +112,10 @@ function setToHalfHealth(avatarID){
 
 
 function itemEffects(effects, avatarID, email){
+
   const effectPromises = [];
   effects.forEach((effect) =>{
+
       switch(effect.name){
         case 'Reset Hero':
           effectPromises.push(resetHero(avatarID, email)); 
