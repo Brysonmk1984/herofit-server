@@ -364,7 +364,7 @@ router.post('/update-seen-latest-patch', body('id').isNumeric(), authenticateJWT
   });
 });
 
-// Mobile app only
+// MOBILE APP ONLY
 router.get('/hero-list', (req, res) =>{
 
   if(!heroList){

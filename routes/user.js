@@ -91,7 +91,7 @@ router.post('/get-user-activities', body('email').isEmail(), body('count').isNum
   const { email, count } = req.body;
   
   UserActivity.findAll({ where: { user: email }, raw: true, limit : count ? count : 250, order:[["activityDate", 'DESC']],
-    attributes : ['id', 'type', 'duration', 'source', 'averageSpeed', 'maxSpeed', 'elevationGain',  'activityDate']
+    attributes : ['id', 'type', 'duration', 'distance', 'source', 'averageSpeed', 'maxSpeed', 'elevationGain',  'activityDate']
   }).then((results) =>{
     if(results.length){
       const activities = [];
@@ -213,6 +213,5 @@ router.post('/get-hero-name-by-username', body('username').isString(), (req, res
     res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-hero-name-by-username Endpoint`);
   });
 });
-
 
 module.exports = router;

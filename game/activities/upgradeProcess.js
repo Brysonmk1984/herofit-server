@@ -43,7 +43,7 @@ function _insertActivityData(email, activities, t){
         duration: activity.duration,
         elevationGain: activity.elevationGain,
         source: activity.source,
-        activityDate : latestActivityUpdate,
+        activityDate : activity.activityDate,
         activityId 
       };
     });
