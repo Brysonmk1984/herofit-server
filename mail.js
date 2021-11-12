@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 function determineVerificationUrl(env, isApp){
-  console.log(process.env.NODE_ENV, isApp);
+  console.log(env, isApp);
   //TEST=
   //env="production";
   let environment = isApp && env === 'development' ? 'app-development' : isApp && env === 'production' ? 'app-production' : env;

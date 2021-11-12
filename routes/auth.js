@@ -128,19 +128,25 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 });
 
+
+
+
+// FOR BOTH PASSWORD RESET AND LEGACY ACCOUNTS CONFIRMING EMAIL
+
 router.post('/reset-password-confirm-email', body('email').isEmail(), body('isApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
-  const { email } = req.body;
+  const { email, isApp } = req.body;
 
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
   .then((result) =>{
-    //console.log('DB email result = ', result);
+    console.log('DB email result = ', result);
+    
     if(result){
       const token = usePasswordHashToMakeToken(result);
-      sendResetPasswordEmail(email, token, true)
+      sendResetPasswordEmail(email, token, isApp)
       .then((result) =>{
         //console.log(result);
         return res.formatter.ok({ result });
@@ -153,6 +159,7 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isAp
     }
     
   }).catch((error) =>{
+    console.log('ERR = /reset-password-confirm-email', error);
     res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
   });
 
@@ -179,10 +186,12 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
         
         // Legacy Users migrating to new Auth System
         if(!active && !emailCode){
+          console.log('IS LEGACY');
           updateObj.active = true;
           updateObj.emailCode = 'legacy-user';
         }
-      
+        console.log('UPDATING WITH=', updateObj);
+
         User.update(updateObj, { where : { email }})
         .then((result) =>{
           if(!result[0]){
@@ -219,7 +228,17 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
   // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
   if(!emailCode){
     emailCode = randomEmailString();
-    User.update({ emailCode }, { where : { email }});
+    console.log('UPDATING EMAIL CODE', emailCode);
+   
+      User.update({ emailCode }, { where : { email }})
+      .then((data) =>{
+        console.log("DDD", data);
+      }).catch((error) =>{
+      
+          console.log('ERRRR', error);
+     
+      })
+
   }
 
   //console.log(email, emailCode);
