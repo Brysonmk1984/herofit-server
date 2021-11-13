@@ -133,22 +133,21 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 // FOR BOTH PASSWORD RESET AND LEGACY ACCOUNTS CONFIRMING EMAIL
 
-router.post('/reset-password-confirm-email', body('email').isEmail(), body('isApp').isBoolean().optional(), (req, res)=>{
+router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMobileApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
-  const { email, isApp } = req.body;
+  const { email, isMobileApp } = req.body;
+
 
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt" ], raw : true })
   .then((result) =>{
-    console.log('DB email result = ', result);
-    
     if(result){
       const token = usePasswordHashToMakeToken(result);
-      sendResetPasswordEmail(email, token, isApp)
+      sendResetPasswordEmail(email, token)
       .then((result) =>{
-        //console.log(result);
+        //console.log('RESET PASS RESult=', result);
         return res.formatter.ok({ result });
       }).catch((error) =>{
         console.log('Error', error);
@@ -159,7 +158,6 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isAp
     }
     
   }).catch((error) =>{
-    console.log('ERR = /reset-password-confirm-email', error);
     res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
   });
 
@@ -179,6 +177,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
       const { hash, createdAt, active, emailCode } = result;
       const secret = hash + "-" + createdAt;
       const payload = jwt.decode(token, secret);
+      console.log('TOKEN PAYLOAD = ', payload);
       if (payload.email === email) {
         const saltHash = genPassword(password);
         const { salt, hash } = saltHash;
@@ -190,7 +189,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
           updateObj.active = true;
           updateObj.emailCode = 'legacy-user';
         }
-        console.log('UPDATING WITH=', updateObj);
+        console.log('UPDATING PASSWORD, AND OTHER DETAILS=', updateObj);
 
         User.update(updateObj, { where : { email }})
         .then((result) =>{
@@ -214,7 +213,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
 });
 
 
-
+// Used when user clicks "resend link" from "login" modal on web or from mobile app auth flow "ConfirmEmail" modal
 router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional(), body('isMobileApp').isBoolean().optional(), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
@@ -223,25 +222,21 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
   
   let { email, emailCode, isMobileApp } = req.body;
 
-
-
   // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
   if(!emailCode){
     emailCode = randomEmailString();
     console.log('UPDATING EMAIL CODE', emailCode);
    
-      User.update({ emailCode }, { where : { email }})
-      .then((data) =>{
-        console.log("DDD", data);
-      }).catch((error) =>{
-      
-          console.log('ERRRR', error);
-     
-      })
+    User.update({ emailCode }, { where : { email }})
+    .then((data) =>{
+      console.log("DDD", data);
+    }).catch((error) =>{
+      console.log('ERRRR', error);
+    })
 
   }
 
-  //console.log(email, emailCode);
+  console.log('/resend-email-confirmation', email, emailCode);
   sendVerificationEmail(email, emailCode, isMobileApp)
   .then((data) => {
     if(data.error){
@@ -256,11 +251,16 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
 
 });
 
+
+// VALIDATE EMAIL - User clicked a link in their email and were redirected to either the
+// Oauth page or welcome page along with a 'verify' parameter containing a JWT of their password
+// NOTE! - not used for forgot password or updating legacy accounts
 router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /validated-email");
   }
+
 
   const { emailCode } = req.body;
   console.log('EC = ', emailCode);
@@ -459,5 +459,6 @@ router.get('/strava-client-credentials-app', authenticateJWT, (req, res) =>{
   }
 
 });
+
 module.exports = router;
 

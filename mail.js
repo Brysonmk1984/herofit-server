@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 function determineVerificationUrl(env, isApp){
-  console.log(env, isApp);
+  console.log("determineVerificationUrl", env, isApp);
   //TEST=
   //env="production";
   let environment = isApp && env === 'development' ? 'app-development' : isApp && env === 'production' ? 'app-production' : env;
@@ -21,7 +21,7 @@ function determineVerificationUrl(env, isApp){
   }
 }
 
-
+console.log('FOR TRANSPORTER=', process.env.NODE_ENV === 'development');
 // create reusable transporter object using the default SMTP transport
 let transporter = (process.env.NODE_ENV === 'development') ? 
   nodemailer.createTransport({
@@ -317,7 +317,7 @@ const sendVerificationEmail = function(email, code, isMobileApp){
         pass: process.env.EMAIL_PASSWORD
     }
   });
-
+  console.log('ENV=',process.env.NODE_ENV);
 
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
@@ -330,6 +330,7 @@ const sendVerificationEmail = function(email, code, isMobileApp){
     text: "Click on the link below to verify your account\n\n" + url,
     //html: `<div>Click on the link below to verify your account</div><br /><div><a href="${url}">${url}</a></div>`
   }
+  console.log('TRANSPORTER=', transporter);
   return new Promise((resolve, reject) =>{
     transporter.sendMail(mailOptions, (error, info) => {
       if(error) {
@@ -358,7 +359,7 @@ const sendResetPasswordEmail = function(email, code, isMobileApp){
 
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
-  const url = `${baseUrl}${route}?verify=${code}`;
+  const url = `${baseUrl}${route}?verifyPassword=${code}`;
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
