@@ -1,10 +1,11 @@
 const nodemailer = require('nodemailer');
 
-function determineVerificationUrl(env, isApp){
-  console.log("determineVerificationUrl", env, isApp);
+// Determines which email to send to, based on environment and whether or not it's coming from the mobile app
+function determineVerificationUrl(env, isMobileApp){
+  console.log("determineVerificationUrl", env, isMobileApp);
   //TEST=
   //env="production";
-  let environment = isApp && env === 'development' ? 'app-development' : isApp && env === 'production' ? 'app-production' : env;
+  let environment = isMobileApp && env === 'development' ? 'app-development' : isMobileApp && env === 'production' ? 'app-production' : env;
   switch(environment){
     case 'production':
       return process.env.EMAIL_REDIRECT_PROD;
@@ -21,7 +22,6 @@ function determineVerificationUrl(env, isApp){
   }
 }
 
-console.log('FOR TRANSPORTER=', process.env.NODE_ENV === 'development');
 // create reusable transporter object using the default SMTP transport
 let transporter = (process.env.NODE_ENV === 'development') ? 
   nodemailer.createTransport({
@@ -308,17 +308,6 @@ const sendBackendOnlyEmail = function(message, error){
 
 // VERIFICATION EMAIL For Verifying Account
 const sendVerificationEmail = function(email, code, isMobileApp){
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_PROVIDER,
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.INFO_EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-    }
-  });
-  console.log('ENV=',process.env.NODE_ENV);
-
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verify=${code}`;
@@ -328,9 +317,8 @@ const sendVerificationEmail = function(email, code, isMobileApp){
     to: email,
     subject: `HeroFit - Account Verification`, 
     text: "Click on the link below to verify your account\n\n" + url,
-    //html: `<div>Click on the link below to verify your account</div><br /><div><a href="${url}">${url}</a></div>`
   }
-  console.log('TRANSPORTER=', transporter);
+
   return new Promise((resolve, reject) =>{
     transporter.sendMail(mailOptions, (error, info) => {
       if(error) {
@@ -347,16 +335,6 @@ const sendVerificationEmail = function(email, code, isMobileApp){
 
 // RESET PASSWORD email verification
 const sendResetPasswordEmail = function(email, code, isMobileApp){
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_PROVIDER,
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.INFO_EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-    }
-  });
-
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verifyPassword=${code}`;
