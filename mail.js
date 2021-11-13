@@ -339,6 +339,17 @@ const sendResetPasswordEmail = function(email, code, isMobileApp){
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verifyPassword=${code}`;
 
+  // REAL transporter, delete this after testing:
+  // transporter = nodemailer.createTransport({
+  //   host: process.env.MAIL_PROVIDER,
+  //   port: 465,
+  //   secure: true,
+  //   auth: {
+  //       user: process.env.INFO_EMAIL,
+  //       pass: process.env.EMAIL_PASSWORD
+  //   }
+  // });
+
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: email,

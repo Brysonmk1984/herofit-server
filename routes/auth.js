@@ -145,7 +145,7 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMo
   .then((result) =>{
     if(result){
       const token = usePasswordHashToMakeToken(result);
-      sendResetPasswordEmail(email, token)
+      sendResetPasswordEmail(email, token, isMobileApp)
       .then((result) =>{
         //console.log('RESET PASS RESult=', result);
         return res.formatter.ok({ result });
@@ -168,7 +168,6 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
-
   const { email, token, password } = req.body;
   
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
@@ -177,7 +176,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
       const { hash, createdAt, active, emailCode } = result;
       const secret = hash + "-" + createdAt;
       const payload = jwt.decode(token, secret);
-      console.log('TOKEN PAYLOAD = ', payload);
+      //console.log('TOKEN PAYLOAD = ', payload);
       if (payload.email === email) {
         const saltHash = genPassword(password);
         const { salt, hash } = saltHash;
@@ -185,11 +184,9 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
         
         // Legacy Users migrating to new Auth System
         if(!active && !emailCode){
-          console.log('IS LEGACY');
           updateObj.active = true;
           updateObj.emailCode = 'legacy-user';
         }
-        console.log('UPDATING PASSWORD, AND OTHER DETAILS=', updateObj);
 
         User.update(updateObj, { where : { email }})
         .then((result) =>{
