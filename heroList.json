@@ -90,7 +90,7 @@
   "elms" : {"fire":2,"water":3,"air":3,"earth":2},
   "skills" : ["Surprise Saprolings", "Ten Ton Stomp","Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
   "ultimate" : "Purify by Chlorophyll",
-  "colors" : ["#3D2A18", "#1C130B"],
+  "colors" : ["#3D2A18", "#E8F1E3"],
   "image" : "../../../assets/images/heroes/timber_terror/timber_terror.webp",
   "description" : "Indomitable Forest Strider",
   "history" : "This indobidable elemental awakened after the great western wildfires of 2020; energy of the forest coalescing & manifesting as a massive treant. Systematically, the wooded walker is taking revenge for the destruction of its homeland by targeting all those guilty of deforestation and careless fires."
