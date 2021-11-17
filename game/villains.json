@@ -192,8 +192,8 @@
         "type" : "prebattle"
       },
       "color": "#0D0D0D",
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
+      "bonusXpBase": 10,
+      "bonusPtBase": 30,
       "pba" : ["Grant Shadow-Self"],
       "reward" : {
         "type" : "skin",
@@ -213,8 +213,8 @@
         "type" : "postbattle"
       },
       "color": null,
-      "bonusXpBase": 50,
-      "bonusPtBase": 75,
+      "bonusXpBase": 20,
+      "bonusPtBase": 40,
       "pba" : ["Grant Plaguebringer"],
       "reward" : {
         "type" : "pet",
@@ -232,8 +232,9 @@
         "type" : "postbattle"
       },
       "color": null,
-      "bonusXpBase": 75,
-      "bonusPtBase": 100,
+      "bonusXpBase": 30,
+      "bonusPtBase": 50,
+      
       "pba" : ["Grant GotD"],
       "reward" : {
         "type" : "title",
@@ -300,8 +301,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
+      "bonusXpBase": 15,
+      "bonusPtBase": 30,
       "pba" : ["Grant Fire Tint"],
       "reward" : {
         "type" : "skin",
@@ -367,8 +368,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
+      "bonusXpBase": 15,
+      "bonusPtBase": 30,
       "pba" : ["Grant Earth Tint"],
       "reward" : {
         "type" : "skin",
@@ -433,8 +434,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
+      "bonusXpBase": 15,
+      "bonusPtBase": 30,
       "pba" : ["Grant Water Tint"],
       "reward" : {
         "type" : "skin",
@@ -499,8 +500,8 @@
         "type" : "prebattle"
       },
       "color" : null,
-      "bonusXpBase": 25,
-      "bonusPtBase": 50,
+      "bonusXpBase": 15,
+      "bonusPtBase": 30,
       "pba" : ["Grant Air Tint"],
       "reward" : {
         "type" : "skin",
