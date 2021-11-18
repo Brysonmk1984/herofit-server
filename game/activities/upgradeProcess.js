@@ -52,7 +52,7 @@ function _insertActivityData(email, activities, t){
       // Update latestActivity Date on USER
       User.update({ latestActivityUpdate },{ where: { email }, transaction: t }),
       // Insert All activities
-      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: false, returning : true, transaction: t }),
+      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: true, returning : true, transaction: t }),
       // Find matching User Totals
       UserTotal.findOne({ attributes : [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], where: { user: email }, raw : true, transaction: t })
     ];
