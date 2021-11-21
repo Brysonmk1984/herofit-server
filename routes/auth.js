@@ -10,6 +10,8 @@ const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
+const axios = require('axios');
+const moment = require('moment');
 
 // mobile app only
 const heroList = require('../heroList.json');
@@ -440,22 +442,117 @@ router.post('/generate-datasrcid', body('email').isEmail(), authenticateJWT, (re
 });
 
 router.get('/strava-client-credentials-app', authenticateJWT, (req, res) =>{
-  const clientId = process.env.STRAVA_CLIENT_ID_APP;
+  const clientId = process.env.STRAVA_CLIENT_ID;
   const redirectUri = process.env.STRAVA_REDIRECT_APP;
-  const clientSecret = process.env.STRAVA_CLIENT_SECRET_APP;
-  
-  if(clientId && redirectUri && clientSecret){
+  if(clientId && redirectUri){
     return res.formatter.ok({
       clientId,
-      redirectUri,
-      clientSecret
+      redirectUri
     });
   }else{
     const error = new Error("Missing credentials");
-    res.formatter.serverError(error);
+    res.formatter.serverError(error.toString());
   }
 
 });
+
+// Updating access token functionality moved here instead of the frontend for the app
+router.post('/strava-fetch-and-update-access-token', body('email').isEmail(), authenticateJWT, async (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /non-strava-credentials");
+  }
+  const { email, authCode } = req.body;
+
+  const clientId = process.env.STRAVA_CLIENT_ID;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
+
+  try{
+
+    const { stravaRefreshToken } = await User.findOne({ where : { email  }, attributes: [ "stravaRefreshToken" ], raw : true});    
+    console.log('RT=', stravaRefreshToken);
+    const { data } = await axios.post(`https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${stravaRefreshToken}&grant_type=refresh_token`, {withCredentials:true});
+    console.log('THE DATA', data);
+    const { access_token, refresh_token, expires_in } = data;
+
+    const updateObj = { stravaAccessToken : access_token, stravaAccessTokenExpiration : expires_in, stravaRefreshToken : refresh_token };
+
+    // UPDATE DB WITH NEW STRAVA INFO
+    const userData = await User.update( updateObj, { where: { email }, returning : true, plain : true });
+    console.log('IPDATED!!!', userData[1]);
+
+    // If we are already saving the dataSrcId, then just return the user
+    if (userData[1].dataSrcId) {console.log('RETURNING EARLY');
+      res.formatter.ok({ user : userData[1] });
+    }else{console.log('DOING OTHER STEP');
+      //IF USER DATA DOES NOT INCLUDE A DATA SRC ID...
+      // FETCH USER INFO TO GET STRAVA ID, WHICH WILL ALSO BE SAVED TO DB
+      const { id: dataSrcId } = await axios.get(`https://www.strava.com/api/v3/athlete`, { headers: { Authorization: `Bearer ${access_token}` } })
+      const finalUserData = await User.update( { dataSrcId }, { where: { email }, returning : true, plain : true })
+      res.formatter.ok({
+        user : finalUserData[1]
+      });
+    }
+  }catch(error){
+    const errorString = error.toString();
+    console.log('ERR STR = ', errorString)
+    // If dataSrcId is already in use, send bad request
+    if(errorString === 'SequelizeUniqueConstraintError: Validation error'){
+      res.formatter.badRequest(errorString, `That Strava Account is Already in use! You can unlink a Strava Account from the Account Page of the other HeroFit account.`);
+    }else{
+      res.formatter.serverError(errorString, `Couldn't update Strava tokens for user ${email}`);
+    }
+  }
+  
+});
+
+
+// Connection Strava functionality moved here instead of the frontend for the app
+router.post('/strava-first-time-auth-code-exchange', body('email').isEmail(), body('authCode').isString(), authenticateJWT, async (req, res) =>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /non-strava-credentials");
+  }
+  const { email, authCode } = req.body;
+  const clientId = process.env.STRAVA_CLIENT_ID;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
+
+  try{
+    // MUST EXCHANGE AUTH CODE FOR REFRESH ACCESS TOKENS
+    const { data } = await axios.post(`https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${authCode}&grant_type=authorization_code`,{withCredentials:true})
+    const { access_token, expires_at, refresh_token } = data;
+    const updateObj = { 
+      stravaAccessToken : access_token,
+      stravaAccessTokenExpiration : expires_at,
+      stravaRefreshToken : refresh_token
+    }
+
+    // NEXT, FETCH USER INFO TO GET STRAVA ID, WHICH WILL ALSO BE SAVED TO DB
+    const { data : userData } = await axios.get(`https://www.strava.com/api/v3/athlete`, { headers: { Authorization: `Bearer ${access_token}` } });
+    updateObj.dataSrcId = userData.id;
+
+    // LASTLY, UPDATE USER AND RETURN RESULT
+    const finalUserData = await User.update( updateObj, { where: { email }, returning : true, plain : true })
+    res.formatter.ok({
+      user : finalUserData[1]
+    });
+  
+  }catch(error){
+    const errorString = error.toString();
+    console.log('ERR STR = ', errorString)
+    // If dataSrcId is already in use, send bad request
+    if(errorString === 'SequelizeUniqueConstraintError: Validation error'){
+      res.formatter.badRequest(errorString, `That Strava Account is Already in use! You can unlink a Strava Account from the Account Page of the other HeroFit account.`);
+    }else{
+      res.formatter.serverError(errorString, `Couldn't update Strava tokens for user ${email}`);
+    }
+  }
+  
+});
+
+
+
+
 
 module.exports = router;
 
