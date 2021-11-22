@@ -8,6 +8,7 @@ const xpCalc = require('../game/upgrades/xpCalc');
 const { Op, col, literal } = require('sequelize');
 const { config } = require('../appConfig');
 const { parseActivityData } = require('../lib/helperFunctions');
+const db = require('../config/db').db;
 
 // If an email is passed, get that user, otherwise get user based on JWT
 router.post('/user-details', body('email').isEmail().optional({ nullable: true, checkFalsy: true }), authenticateJWT, (req, res) => {
@@ -213,5 +214,66 @@ router.post('/get-hero-name-by-username', body('username').isString(), (req, res
     res.formatter.serverError(error.toString(), `Error retrieving username for  user ${email} - POST /get-hero-name-by-username Endpoint`);
   });
 });
+
+
+/*
+  MIGRATION
+*/
+
+// Write code to delete all bots
+router.get('/delete-bots', (req, res) => {
+
+  User.findAll(
+    { 
+      include : [
+        { model: Avatar,  attributes: ['id'] },
+      ],
+      where : { 
+        createdAt : {
+          [Op.gte]: moment("2021-08-27").toDate()
+        },
+        updatedAt : {
+          [Op.lte]: moment("2021-11-01").toDate()
+        },
+        latestActivityUpdate : null
+      },
+      raw : true
+    }
+  ).then((data) =>{
+    const emails = data.map(user => user.email);
+    const avatarIds = data.map(user => user['avatar.id']);
+    const userIds = data.map(user => user.id);
+
+    db.transaction(async t => {
+      try{
+        await AvatarItems.destroy({ transaction : t, where : { avatarID : {
+          [Op.in] : avatarIds
+        } }})
+    
+        await Battle.destroy({ transaction : t, where : { owner : {
+          [Op.in] : emails
+        } }});
+    
+        await Avatar.destroy({ transaction : t, where : { owner : {
+          [Op.in] : emails
+        } } });
+    
+        await User.destroy({ transaction : t, where : { id : {
+          [Op.in] : userIds
+        } }});
+
+        res.formatter.ok("successfully deleted!");
+      }catch(error){
+        throw error;
+      }
+    });
+
+  }).catch((error) =>{
+    console.log('ERR', error);
+    res.formatter.serverError(error.toString());
+  });
+
+});
+
 
 module.exports = router;
