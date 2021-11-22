@@ -50,14 +50,14 @@ router.post('/update-owner-username', body('owner').isEmail(), body('newUsername
 });
 
 // DELETE ACCOUNT
-router.delete('/:username', body('deleteFromAdminPanel').isBoolean().optional({nullable: true, checkFalsy: true}), body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
+router.delete('/:username', body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
   }
-  console.log('SHOULDBETRUE', req.body.deleteFromAdminPanel);
+
   // If deleting from the admin panel, use data from the body, otherwise from the passed in user token
-  const { id, email } =  req.body.deleteFromAdminPanel ? req.body : req.user;
+  const { id, email } =  req.user;
   const { avatarID } = req.body;
 
   const promises = [];
@@ -79,14 +79,14 @@ router.delete('/:username', body('deleteFromAdminPanel').isBoolean().optional({n
 });
 
 // DELETE ACCOUNT
-router.delete('/:email', body('deleteFromAdminPanel').isBoolean().optional({nullable: true, checkFalsy: true}), body('id').isNumeric().optional({nullable: true, checkFalsy: true}),  body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
+router.delete('/:email', body('id').isNumeric().optional({nullable: true, checkFalsy: true}),  body('username').isString(), body('email').isEmail(), body('avatarID').isNumeric(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
   }
 
   // If deleting from the admin panel, use data from the body, otherwise from the passed in user token
-  const { id, email } =  req.body.deleteFromAdminPanel ? req.body : req.user;
+  const { id, email } =  req.user;
   const { avatarID } = req.body;
 
   const promises = [];
