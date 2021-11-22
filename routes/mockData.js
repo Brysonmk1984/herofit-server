@@ -6,13 +6,13 @@ const fs = require('fs');
 const path = require("path");
 const moment = require('moment');
 const { shuffleArray, parseAvatarProperties, getRandomNumber } = require('../lib/helperFunctions');
-const { User, UserActivity, Avatar } = require('../config/db');
+const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require('../config/db');
 const db = require('../config/db').db;
 // MOCK DATA
 const mockAvatarNames = require('../mockData/mockAvatarNames');
 const mockActivities = require('../mockData/mockActivities');
 const heroList = require('../heroList');
-
+const { authenticateJWT } = require('../jwt/validateJWT');
 
 // Create fake account from passed COGNITO EMAIL and return to front end
 router.post('/create-cognito-linked-account', body('email').isEmail(), body('firstName').isLength({min:0, max: 30}).optional({ checkFalsy: true }), body('lastName').isLength({min:0, max: 30}).optional({ checkFalsy: true }),  authenticateAdminJWT, (req, res) => {
@@ -309,6 +309,42 @@ router.post('/toggle-feedback-boolean', body('setToTrue').isBoolean(), authentic
       return res.formatter.serverError(error.toString(), 'Unable to update avatar name - for /update-avatar-name endpoint');
     }
 
+
+});
+
+
+router.delete('/:email', body('email').isEmail(), body('deleteFromAdminPanel').isBoolean(), authenticateJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
+  }
+  if(!req.body.deleteFromAdminPanel){
+    return res.formatter.serverError('Improper delete attempt!');
+  }
+
+  const { email } = req.body;
+
+  db.transaction(async t => {
+    try{
+      const data = await User.findOne({ 
+        include : [ { model: Avatar,  attributes: ['id'] }, ],
+        where : { email },
+        raw : true
+      });
+
+      console.log('DATA!', data);
+
+      await AvatarItems.destroy({ transaction : t, where : { avatarID : data['avatar.id'] }})
+      await Battle.destroy({ transaction : t, where : { owner : email }});
+      await Avatar.destroy({ transaction : t, where : { owner : email } });
+      await User.destroy({ transaction : t, where : { id : data.id }});
+
+      res.formatter.ok("successfully deleted!");
+    }catch(error){
+      console.log('ERR', error);
+      res.formatter.serverError(error.toString());
+    }
+  });
 
 });
 
