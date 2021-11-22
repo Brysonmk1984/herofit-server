@@ -324,27 +324,29 @@ router.delete('/:email', body('email').isEmail(), body('deleteFromAdminPanel').i
 
   const { email } = req.body;
 
-  db.transaction(async t => {
-    try{
-      const data = await User.findOne({ 
-        include : [ { model: Avatar,  attributes: ['id'] }, ],
-        where : { email },
-        raw : true
-      });
+  res.formatter.ok("Must enable code on backend!");
 
-      console.log('DATA!', data);
+  // db.transaction(async t => {
+  //   try{
+  //     const data = await User.findOne({ 
+  //       include : [ { model: Avatar,  attributes: ['id'] }, ],
+  //       where : { email },
+  //       raw : true
+  //     });
 
-      await AvatarItems.destroy({ transaction : t, where : { avatarID : data['avatar.id'] }})
-      await Battle.destroy({ transaction : t, where : { owner : email }});
-      await Avatar.destroy({ transaction : t, where : { owner : email } });
-      await User.destroy({ transaction : t, where : { id : data.id }});
+  //     console.log('DATA!', data);
 
-      res.formatter.ok("successfully deleted!");
-    }catch(error){
-      console.log('ERR', error);
-      res.formatter.serverError(error.toString());
-    }
-  });
+  //     await AvatarItems.destroy({ transaction : t, where : { avatarID : data['avatar.id'] }})
+  //     await Battle.destroy({ transaction : t, where : { owner : email }});
+  //     await Avatar.destroy({ transaction : t, where : { owner : email } });
+  //     await User.destroy({ transaction : t, where : { id : data.id }});
+
+  //     res.formatter.ok("successfully deleted!");
+  //   }catch(error){
+  //     console.log('ERR', error);
+  //     res.formatter.serverError(error.toString());
+  //   }
+  // });
 
 });
 
