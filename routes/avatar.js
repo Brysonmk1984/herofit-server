@@ -24,13 +24,13 @@ async function appSignupAward(avatarID, itemID, checkForDuplicate){
     if(checkForDuplicate){
       const databaseItem = await AvatarItems.findOne({ where : { itemID, avatarID }});
       if(databaseItem){
-        return "Item already exists, just returning undefined";
-      }else{
-        console.log("Item doesn't exist, creating item");
+        return;
       }
     }
     
-    return await AvatarItems.create(item);
+    const result = await AvatarItems.create(item);
+    console.log(result);
+    return "Received the Snowshoe Hare pet, check your inventory!"
   }catch(error){
     console.log(error);
     sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
@@ -69,13 +69,14 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
 
     // Check to Award Snowshoe Hare
     if(specialEvent && specialEvent.eventName === "App Welcome"){
-      await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
+      const { awardedItemMessage } = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
     }
 
     res.formatter.ok({
       avatarId : avatar.id,
       avatar,
-      hasAvatar : true
+      hasAvatar : true,
+      awardedItemMessage : awardedItemMessage ? awardedItemMessage : null
     });
   }).catch((error) =>{
     console.log(`Couldn't insert Avatar for user ${email}, DEBUG: ${error}`);
@@ -195,16 +196,13 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
     avatar.alias = alias
     avatar.colors = colors;
     
-
+    let awardedItemMessage;
     // Check to Award Snowshoe Hare
     if(isMobileApp && specialEvent && specialEvent.eventName === "App Welcome"){
-      await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
+      awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
     }
 
-
-
-    return res.formatter.ok( avatar );
-
+    return res.formatter.ok( { avatar, awardedItemMessage : awardedItemMessage ? awardedItemMessage : null } );
   }catch(error){
     console.log(`Could not get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
