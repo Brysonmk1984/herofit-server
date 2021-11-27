@@ -14,6 +14,29 @@ const RANKING_FILTER_ACTIVITIES = ['ride', 'weightTraining', 'hike', 'yoga', 'wa
 const heroList = require("../heroList.json");
 const upgradeProcess = require('../game/activities/upgradeProcess');
 const AVATAR_COUNT_PER_PAGE = 20;
+const { specialEvent } = require('../appConfig').config;
+
+
+// App signup award item
+async function appSignupAward(avatarID, itemID, checkForDuplicate){
+  const item = { avatarID, itemID };
+  try{
+    if(checkForDuplicate){
+      const databaseItem = await AvatarItems.findOne({ where : { itemID, avatarID }});
+      if(databaseItem){
+        return "Item already exists, just returning undefined";
+      }else{
+        console.log("Item doesn't exist, creating item");
+      }
+    }
+    
+    return await AvatarItems.create(item);
+  }catch(error){
+    console.log(error);
+    sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
+  }
+}
+
 
 // Create Avatar in DB after Signup
 router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
@@ -34,7 +57,7 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     where: { owner : email },
     // set the default properties if it doesn't exist
     defaults : Object.assign({},{ ...avatar }, { userId, owner: email})
-  }).then((result) =>{
+  }).then(async (result) =>{
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
     avatar = parseAvatarProperties(result[0].dataValues);
@@ -43,7 +66,12 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     const { colors, alias } = heroList.find(av => av.character === avatar.character);
     avatar.alias = alias
     avatar.colors = colors;
-    
+
+    // Check to Award Snowshoe Hare
+    if(specialEvent && specialEvent.eventName === "App Welcome"){
+      await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
+    }
+
     res.formatter.ok({
       avatarId : avatar.id,
       avatar,
@@ -127,12 +155,13 @@ router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isA
 });
 
 // Retrieve Avatar on login
-router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req, res) => {
+// Mobile app check only for awarding pet
+router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), authenticateJWT, async (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-avatar Endpoint");
   }
-  const { email } = req.body;
+  const { email, isMobileApp } = req.body;
 
   // 'equipped' refers to 2 things here. the property on the avatar (which is described in the SELECT statement), as well as the equipped boolean that each item posseses. 
   // This query only grabs items that have equipped set to true.
@@ -166,6 +195,14 @@ router.post('/get-avatar', body('email').isEmail(), authenticateJWT, async (req,
     avatar.alias = alias
     avatar.colors = colors;
     
+
+    // Check to Award Snowshoe Hare
+    if(isMobileApp && specialEvent && specialEvent.eventName === "App Welcome"){
+      await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
+    }
+
+
+
     return res.formatter.ok( avatar );
 
   }catch(error){
@@ -465,6 +502,19 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 //   }).catch((error) =>{
 //     res.formatter.serverError(error.toString());
 //   });
+// });
+
+
+
+// router.get('/test-item-check', async (req, res) => {
+//   try{
+//     const result = specialEvent && specialEvent.eventName === "App Welcome" && await appSignupAward(288, specialEvent.actionTypes[0].itemID, true);
+//     console.log(result);
+//     res.formatter.ok(result);
+//   }catch(error){
+//     console.log(error);
+//     res.formatter.serverError(error.toString());
+//   }
 // });
 
 module.exports = router;

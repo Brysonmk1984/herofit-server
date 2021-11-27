@@ -3,11 +3,11 @@ const chance = require('chance')();
 const { scrambleStats } = require('../../lib/helperFunctions');
 
 function doAvatarBattlePrep(avatar, foe, effects, scenario){
+  
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
   const effectProcs = [];
   effects.forEach((effect) =>{
-
     switch(effect){
       case "Hero +5,+10% Water":
         eAvatar.water += 5;
@@ -166,10 +166,10 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
 
         let illOmenProc = false;
         if(isNegativeScenario && isHigherDifficulty){
-          illOmenProc = chance.bool({ likelihood: 75 });
+          illOmenProc = chance.bool({ likelihood: 90 });
         }
         if(illOmenProc){
-          eAvatar.health = Math.floor(avatar.health * 1.2);
+          eAvatar.health = Math.floor(avatar.health * 1.25);
           effectProcs.push({
             effect : "Ill Omen",
             heroStatsEffected : ["health"]
@@ -267,7 +267,21 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
 
         }          
         break;
-        default:
+      case 'Rabbit Tactics':
+        eAvatar.armor = Math.floor(avatar.armor * .33);
+        const conversionBonus = avatar.armor * .66;
+        const avatarLevel = (avatar.level);
+
+        //onsole.log(avatarLevel, eAvatar.power += Math.floor(conversionBonus * avatarLevel / 15));
+        eAvatar.power = Math.floor(eAvatar.power  + conversionBonus * avatarLevel / 15) || eAvatar.power;
+        eAvatar.air = Math.floor(eAvatar.air  + conversionBonus * avatarLevel / 15) || eAvatar.air;
+  
+        effectProcs.push({
+          effect : "Rabbit Tactics",
+          heroStatsEffected : ["armor", "power", "air"]
+        });
+        console.log(eAvatar);
+      default:
         break;
     }
   });

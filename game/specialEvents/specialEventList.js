@@ -58,6 +58,15 @@ const helloween = {
   }]
 }
 
-module.exports = { testSpecificFoe, attackOfTheElements, helloween };
+const appWelcome = {
+  eventName : "App Welcome",
+  description : "For the first month after launch, users who install the app will receive the white rabbit for free.",
+  actionTypes : [{
+    type : 'onAuth',
+    itemID : 111
+  }]
+}
+
+module.exports = { testSpecificFoe, attackOfTheElements, helloween, appWelcome };
 
 

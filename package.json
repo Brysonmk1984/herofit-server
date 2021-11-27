@@ -20,8 +20,9 @@
     ],
     "testPathIgnorePatterns": [
       "./__tests__/setup",
-      "./__tests__/battles",
+     
       "./__tests__/activityTraits",
+      "./__tests__/itemFind",
       "./__tests__/itemRewards"
     ]
   },
