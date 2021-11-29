@@ -96,14 +96,19 @@ router.post('/get-user-activities', body('email').isEmail(), body('count').isNum
   }).then((results) =>{
     if(results.length){
       const activities = [];
-      const datesArray = [];
+      // Only concerned with non-manual activities for determining latestActivityDate
+      // since latestActivityDate is only used for Data fetching
+      const nonHerofitDatesArray = [];
 
       results.forEach((result) =>{
         activities.push(parseActivityData(result));
-        datesArray.push(moment(result.activityDate));
+       if(result.source !== "herofit"){
+          nonHerofitDatesArray.push(moment(result.activityDate));
+        }
       })
 
-      maxDate = moment.utc(moment.max(datesArray), 'YYYY-MM-DD HH:mm:ss');
+      // Use latest non manual herofit date for maxDate
+      maxDate = nonHerofitDatesArray.length ? moment.utc(moment.max(nonHerofitDatesArray), 'YYYY-MM-DD HH:mm:ss') : null;
 
       res.formatter.ok({ activities, latestActivityDate : maxDate });
     }else{

@@ -336,16 +336,16 @@ router.post('/strava-credentials', body('email').isEmail(), body('stravaAccessTo
   });
 });
 
-router.post('/disconnect-strava', body('email').isEmail(), authenticateJWT, (req, res) => {
+router.post('/disconnect-data-src', body('email').isEmail(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /disconnect-strava");
   }
   const { email } = req.body;
 
-  User.update({ stravaAccessToken : null, stravaAccessTokenExpiration : null, stravaRefreshToken : null, dataSrcId : null }, { where : { email }})
+  User.update({ stravaAccessToken : null, stravaAccessTokenExpiration : null, stravaRefreshToken : null, dataSrcId : null }, { where : { email }, returning : true })
   .then((result) =>{
-    return res.formatter.ok();
+    return res.formatter.ok({ user : result[1][0] });
   }).catch((error) =>{
     console.log(`Couldn't Disconnect Strava for account email ${email}`);
     res.formatter.serverError(error.toString(), "Database or server code error for POST /disconnect-strava");
