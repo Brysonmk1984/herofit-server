@@ -67,17 +67,27 @@ router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeri
     avatar.alias = alias
     avatar.colors = colors;
 
-    // Check to Award Snowshoe Hare
-    if(specialEvent && specialEvent.eventName === "App Welcome"){
-      const { awardedItemMessage } = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
+    try{
+      // Check to Award Snowshoe Hare
+      if(specialEvent && specialEvent.eventName === "App Welcome"){
+        const awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
+        res.formatter.ok({
+          avatarId : avatar.id,
+          avatar,
+          hasAvatar : true,
+          awardedItemMessage
+        });
+      }else{
+        res.formatter.ok({
+          avatarId : avatar.id,
+          avatar,
+          hasAvatar : true,
+          awardedItemMessage : null
+        });
+      }
+    }catch(error){
+      throw error;
     }
-
-    res.formatter.ok({
-      avatarId : avatar.id,
-      avatar,
-      hasAvatar : true,
-      awardedItemMessage : awardedItemMessage ? awardedItemMessage : null
-    });
   }).catch((error) =>{
     console.log(`Couldn't insert Avatar for user ${email}, DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't insert Avatar for user ${email} for POST /insert-avatar Endpoint`);
