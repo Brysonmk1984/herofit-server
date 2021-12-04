@@ -1,5 +1,6 @@
 const { FOE_NON_ACTION } = require('../CONSTANTS'); 
 const chance = require('chance')();
+const xpCalc = require('../upgrades/xpCalc');
 const { scrambleStats } = require('../../lib/helperFunctions');
 
 function doAvatarBattlePrep(avatar, foe, effects, scenario){
@@ -268,13 +269,14 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         }          
         break;
       case 'Rabbit Tactics':
+        const { getCurrentLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
+        const { total : avatarLevel } = getCurrentLevel();  
         eAvatar.armor = Math.floor(avatar.armor * .33);
         const conversionBonus = avatar.armor * .66;
-        const avatarLevel = (avatar.level);
 
-        //onsole.log(avatarLevel, eAvatar.power += Math.floor(conversionBonus * avatarLevel / 15));
-        eAvatar.power = Math.floor(eAvatar.power  + conversionBonus * avatarLevel / 15) || eAvatar.power;
-        eAvatar.air = Math.floor(eAvatar.air  + conversionBonus * avatarLevel / 15) || eAvatar.air;
+        const RABBIT_TACTICS_MODIFIER = 25; // Lower is stronger
+        eAvatar.power = Math.floor(eAvatar.power  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.power;
+        eAvatar.air = Math.floor(eAvatar.air  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.air;
   
         effectProcs.push({
           effect : "Rabbit Tactics",
