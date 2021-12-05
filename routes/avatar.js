@@ -229,17 +229,17 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
     avatar.alias = alias
     avatar.colors = colors;
     
-    let awardedItemMessage;
+    let awardedItemMessage = null;
     // Check to Award Snowshoe Hare
     if(isMobileApp && specialEvent && specialEvent.eventName === "App Welcome"){
       try{
         awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
-        console.log('ASD', awardedItemMessage);
-        return res.formatter.ok( { avatar, awardedItemMessage : awardedItemMessage ? awardedItemMessage : null } );
+        return res.formatter.ok( { avatar, awardedItemMessage } );
       }catch(error){
-        throw error;
+        return res.formatter.serverError(error.toString(), `Couldn't get Avatar for user, but with awarding item for /get-avatar Endpoint`);
       }
     }
+    return res.formatter.ok( { avatar, awardedItemMessage } );
   }catch(error){
     console.log(`Could not get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
