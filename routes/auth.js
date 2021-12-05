@@ -11,7 +11,6 @@ const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
 const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
 const axios = require('axios');
-const moment = require('moment');
 
 // mobile app only
 const heroList = require('../heroList.json');
@@ -472,16 +471,12 @@ router.post('/strava-fetch-and-update-access-token', body('email').isEmail(), au
   try{
 
     const { stravaRefreshToken } = await User.findOne({ where : { email  }, attributes: [ "stravaRefreshToken" ], raw : true});    
-    console.log('RT=', stravaRefreshToken);
     const { data } = await axios.post(`https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&refresh_token=${stravaRefreshToken}&grant_type=refresh_token`, {withCredentials:true});
-    console.log('THE DATA', data);
     const { access_token, refresh_token, expires_in } = data;
-
     const updateObj = { stravaAccessToken : access_token, stravaAccessTokenExpiration : expires_in, stravaRefreshToken : refresh_token };
 
     // UPDATE DB WITH NEW STRAVA INFO
     const userData = await User.update( updateObj, { where: { email }, returning : true, plain : true });
-    console.log('IPDATED!!!', userData[1]);
 
     // If we are already saving the dataSrcId, then just return the user
     if (userData[1].dataSrcId) {console.log('RETURNING EARLY');

@@ -18,80 +18,103 @@ const { specialEvent } = require('../appConfig').config;
 
 
 // App signup award item
-async function appSignupAward(avatarID, itemID, checkForDuplicate){
+async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null){
   const item = { avatarID, itemID };
   try{
     if(checkForDuplicate){
-      const databaseItem = await AvatarItems.findOne({ where : { itemID, avatarID }});
+      const databaseItem = await AvatarItems.findOne({ where : { itemID, avatarID }, transaction : t});
       if(databaseItem){
         return;
       }
     }
-    
-    const result = await AvatarItems.create(item);
-    console.log(result);
+    const result = await AvatarItems.create(item, t ? {transaction : t} : null);
     return "Received the Snowshoe Hare pet, check your inventory!"
-  }catch(error){
-    console.log(error);
+  }catch(error){console.log('should be here');
     sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
+    throw error;
   }
 }
 
 
 // Create Avatar in DB after Signup
-router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, (req, res) => {
+router.post('/insert-avatar', body('avatar').isObject(), body('userId').isNumeric(), body('email').isEmail(), authenticateJWT, async (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
   }
   
   let { avatar, userId, email } = req.body;
-  console.log('IN!', avatar, userId, email);
 
   // This is to allow the user to Go To Battle after signup.
   if(avatar.status === 'New Recruit'){
     avatar.status = 'Rested';
   }
 
-  Avatar.findOrCreate({
-    where: { owner : email },
-    // set the default properties if it doesn't exist
-    defaults : Object.assign({},{ ...avatar }, { userId, owner: email})
-  }).then(async (result) =>{
-    const created = result[1];
-    // Avatar from results, parse properties that are strings that need to be numbers
-    avatar = parseAvatarProperties(result[0].dataValues);
-    avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
-    avatar.equipped = [];
-    const { colors, alias } = heroList.find(av => av.character === avatar.character);
-    avatar.alias = alias
-    avatar.colors = colors;
 
     try{
-      // Check to Award Snowshoe Hare
-      if(specialEvent && specialEvent.eventName === "App Welcome"){
-        const awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
-        res.formatter.ok({
-          avatarId : avatar.id,
-          avatar,
-          hasAvatar : true,
-          awardedItemMessage
-        });
-      }else{
-        res.formatter.ok({
+      const result = await Avatar.findOrCreate({
+        where: { owner : email },
+        // set the default properties if it doesn't exist
+        defaults : Object.assign({},{ ...avatar }, { userId, owner: email})
+      });
+
+      const created = result[1];
+      // Avatar from results, parse properties that are strings that need to be numbers
+      avatar = parseAvatarProperties(result[0].dataValues);
+      avatar.restedEnough = avatar.maxHealth * .8 <= avatar.health;
+      avatar.equipped = [];
+      const { colors, alias } = heroList.find(av => av.character === avatar.character);
+      avatar.alias = alias
+      avatar.colors = colors;
+  
+      try{
+
+        const returnObj = {
           avatarId : avatar.id,
           avatar,
           hasAvatar : true,
           awardedItemMessage : null
-        });
+        }
+
+        // Check to Award Snowshoe Hare
+        if(specialEvent && specialEvent.eventName === "App Welcome"){
+          try{
+            const awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, false);
+            returnObj.awardedItemMessage = awardedItemMessage;
+            return res.formatter.ok(returnObj);
+          }catch(error){
+            // Couldn't award item, but we still want the user to continue since the avatar was made
+            // An email has been sent about the problem
+            return res.formatter.ok(returnObj);
+          }
+        }else{
+          return res.formatter.ok(returnObj);
+        }
+      }catch(error){
+        throw error;
       }
     }catch(error){
-      throw error;
+      return (async () =>{
+        console.log(`Couldn't insert Avatar for user ${email}, DEBUG: ${error}`);
+        // Need to delete user, otherwise it's floating around without an avatar
+        try{
+          const result = await Avatar.destroy({ where : { owner : email } });
+          if(result === 1){
+            await User.destroy({ where : { id : userId }});
+            sendBackendOnlyEmail("Major Error in user signup Deleting user and Avatar", error.toString());
+            return res.formatter.serverError({ message : 'There was a problem creating your account, try again later.' });
+          }else{
+            sendBackendOnlyEmail("Major Error in user signup, no avatar to delete, theres a floating user account without an avatar", error.toString());
+            return res.formatter.serverError({ message : 'There was a problem creating your account, try again later.' });
+          }
+        }catch(error){
+          sendBackendOnlyEmail("Major Error in user signup, and User didnt get destroryed", error.toString());
+          return res.formatter.serverError(error.toString(), `There was a problem creating your account, try again later.`);
+        }
+      })();
     }
-  }).catch((error) =>{
-    console.log(`Couldn't insert Avatar for user ${email}, DEBUG: ${error}`);
-    res.formatter.serverError(error.toString(), `Couldn't insert Avatar for user ${email} for POST /insert-avatar Endpoint`);
-  });
+
+  
 });
 
 // Update Avatar without full buff sequence. Used when spending QP points
@@ -209,10 +232,14 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
     let awardedItemMessage;
     // Check to Award Snowshoe Hare
     if(isMobileApp && specialEvent && specialEvent.eventName === "App Welcome"){
-      awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
+      try{
+        awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
+        console.log('ASD', awardedItemMessage);
+        return res.formatter.ok( { avatar, awardedItemMessage : awardedItemMessage ? awardedItemMessage : null } );
+      }catch(error){
+        throw error;
+      }
     }
-
-    return res.formatter.ok( { avatar, awardedItemMessage : awardedItemMessage ? awardedItemMessage : null } );
   }catch(error){
     console.log(`Could not get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
