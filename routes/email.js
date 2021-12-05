@@ -66,7 +66,7 @@ router.post('/contact-form', body('email').isEmail(), body('feedbackType').isStr
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     const { email, message, feedbackType, accountInfo } = req.body;
-    console.log(email, message, feedbackType, accountInfo);
+    console.log('THE DETAILS', req.body.email, req.body.message, feedbackType, accountInfo);
     return res.formatter.badRequest(errors.array(), "Validation Error - for /contact-form'");
   }
   const { email, message, feedbackType, accountInfo } = req.body;
