@@ -518,7 +518,6 @@ router.post('/strava-first-time-auth-code-exchange', body('email').isEmail(), bo
   const { email, authCode } = req.body;
   const clientId = process.env.STRAVA_CLIENT_ID;
   const clientSecret = process.env.STRAVA_CLIENT_SECRET;
-
   try{
     // MUST EXCHANGE AUTH CODE FOR REFRESH ACCESS TOKENS
     const { data } = await axios.post(`https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${authCode}&grant_type=authorization_code`,{withCredentials:true})
@@ -544,9 +543,9 @@ router.post('/strava-first-time-auth-code-exchange', body('email').isEmail(), bo
     console.log('ERR STR = ', errorString)
     // If dataSrcId is already in use, send bad request
     if(errorString === 'SequelizeUniqueConstraintError: Validation error'){
-      res.formatter.badRequest(errorString, `That Strava Account is Already in use! You can unlink a Strava Account from the Account Page of the other HeroFit account.`);
+      return res.formatter.badRequest(errorString, `That Strava Account is Already in use! You can unlink a Strava Account from the Account Page of the other HeroFit account.`);
     }else{
-      res.formatter.serverError(errorString, `Couldn't update Strava tokens for user ${email}`);
+      return res.formatter.serverError(errorString, `Couldn't update Strava tokens for user ${email}`);
     }
   }
   
