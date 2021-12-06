@@ -9,7 +9,7 @@ const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
-const { sendVerificationEmail, sendResetPasswordEmail } = require('../mail');
+const { sendVerificationEmail, sendResetPasswordEmail, sendCronErrorEmail } = require('../mail');
 const axios = require('axios');
 
 // mobile app only
@@ -176,25 +176,25 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
   }
   const { email, token, password } = req.body;
   // Can theoretically change someone elses email... figure out a better way in the future
-  User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
+  return User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
   .then((result) =>{console.log('RES!', result);
     if(result){
       const saltHash = genPassword(password);
       const { salt, hash } = saltHash;
       const updateObj = { salt, hash };
-      
+        console.log('SH',salt, hash);
       // Legacy Users migrating to new Auth System
-      if(!active && !emailCode){
+      if(!active && !emailCode){console.log('IS LEGACY');
         updateObj.active = true;
         updateObj.emailCode = 'legacy-user';
       }
-
-      User.update(updateObj, { where : { email }})
-      .then((result) =>{
+      console.log('UPDATE OBJ', updateObj, 'email', email);
+      return User.update(updateObj, { where : { email }})
+      .then((result) =>{console.log('UPDATE RESULT!', result);
         return res.formatter.ok({ message : "Successfully updated password" });
       }).catch((error) =>{
         console.log('ERROR', error);
-        res.formatter.serverError(error.toString(), 'Unable to update Password');
+        return res.formatter.serverError(error.toString(), 'Unable to update Password');
       });
     }else{
       console.log("Email doesn't match record in DB");
@@ -202,7 +202,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
     }
   }).catch((error) =>{
     sendCronErrorEmail({ status : 777, message : `USER = ${email} Couldn't reset password`, debug : error.toString(), meta : "This is a bug with the last step of Forgot password, where user has already been returned to the app and submitted the update form. Something went wrong with the backend /reset-password route", version : "777", errorLocation : "backend - reset password / oldUserMigration"});
-    res.formatter.serverError(error.toString());
+    return res.formatter.serverError(error.toString());
   });
 
 });
