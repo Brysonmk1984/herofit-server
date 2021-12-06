@@ -168,13 +168,16 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMo
 
 router.post('/reset-password', body('email').isEmail(), body('token').isString(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
+  console.log('RESET PASSWORD TEST');
+  console.log(req.body.email, req.body.token, req.body.password);
   if(!errors.isEmpty()){
+    console.log('INVALIDATION ERROR');
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
   const { email, token, password } = req.body;
   
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
-  .then((result) =>{
+  .then((result) =>{console.log('RES!', result);
     if(result){
       const { hash, createdAt, active, emailCode } = result;
       const secret = hash + "-" + createdAt;
@@ -208,6 +211,9 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
     }else{
       return res.formatter.badRequest("No matching email.");
     }
+  }).catch((error) =>{
+    sendCronErrorEmail({ status : 777, message : `USER = ${email} Couldn't reset password`, debug : error.toString(), meta : "This is a bug with the last step of Forgot password, where user has already been returned to the app and submitted the update form. Something went wrong with the backend /reset-password route", version : "777", errorLocation : "backend - reset password / oldUserMigration"});
+    res.formatter.serverError(error.toString());
   });
 
 });
@@ -479,7 +485,7 @@ router.post('/strava-fetch-and-update-access-token', body('email').isEmail(), au
     const userData = await User.update( updateObj, { where: { email }, returning : true, plain : true });
 
     // If we are already saving the dataSrcId, then just return the user
-    if (userData[1].dataSrcId) {console.log('RETURNING EARLY');
+    if (userData[1].dataSrcId) {
       res.formatter.ok({ user : userData[1] });
     }else{console.log('DOING OTHER STEP');
       //IF USER DATA DOES NOT INCLUDE A DATA SRC ID...
