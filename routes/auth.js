@@ -201,8 +201,13 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
       return res.formatter.badRequest("No matching email.");
     }
   }).catch((error) =>{
-    sendCronErrorEmail({ status : 777, message : `USER = ${email} Couldn't reset password`, debug : error.toString(), meta : "This is a bug with the last step of Forgot password, where user has already been returned to the app and submitted the update form. Something went wrong with the backend /reset-password route", version : "777", errorLocation : "backend - reset password / oldUserMigration"});
-    return res.formatter.serverError(error.toString());
+    console.log('ERRROR', error);
+    new Promise((resolve, reject) =>{
+      return sendCronErrorEmail({ status : 777, message : `USER = ${email} Couldn't reset password`, debug : error, meta : "This is a bug with the last step of Forgot password, where user has already been returned to the app and submitted the update form. Something went wrong with the backend /reset-password route", version : "777", errorLocation : "backend - reset password / oldUserMigration"}, resolve, reject);
+    }).finally(() =>{
+      return res.formatter.serverError(error.toString());
+    });
+ 
   });
 
 });
