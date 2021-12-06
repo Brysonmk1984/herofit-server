@@ -175,40 +175,29 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
   const { email, token, password } = req.body;
-  
+  // Can theoretically change someone elses email... figure out a better way in the future
   User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
   .then((result) =>{console.log('RES!', result);
     if(result){
-      const { hash, createdAt, active, emailCode } = result;
-      const secret = hash + "-" + createdAt;
-      const payload = jwt.decode(token, secret);
-      //console.log('TOKEN PAYLOAD = ', payload);
-      if (payload.email === email) {
-        const saltHash = genPassword(password);
-        const { salt, hash } = saltHash;
-        const updateObj = { salt, hash };
-        
-        // Legacy Users migrating to new Auth System
-        if(!active && !emailCode){
-          updateObj.active = true;
-          updateObj.emailCode = 'legacy-user';
-        }
-
-        User.update(updateObj, { where : { email }})
-        .then((result) =>{
-          if(!result[0]){
-            const error = new Error('No matching Email');
-            return res.formatter.badRequest(error.toString());
-          }
-          return res.formatter.ok();
-        }).catch((error) =>{
-          console.log('ERROR', error);
-          res.formatter.serverError(error.toString(), 'Unable to update Password');
-        });
-      }else{
-        res.formatter.badRequest('Email Mismatch!');
+      const saltHash = genPassword(password);
+      const { salt, hash } = saltHash;
+      const updateObj = { salt, hash };
+      
+      // Legacy Users migrating to new Auth System
+      if(!active && !emailCode){
+        updateObj.active = true;
+        updateObj.emailCode = 'legacy-user';
       }
+
+      User.update(updateObj, { where : { email }})
+      .then((result) =>{
+        return res.formatter.ok({ message : "Successfully updated password" });
+      }).catch((error) =>{
+        console.log('ERROR', error);
+        res.formatter.serverError(error.toString(), 'Unable to update Password');
+      });
     }else{
+      console.log("Email doesn't match record in DB");
       return res.formatter.badRequest("No matching email.");
     }
   }).catch((error) =>{
