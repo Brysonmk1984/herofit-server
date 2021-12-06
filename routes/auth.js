@@ -179,6 +179,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
   return User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
   .then((result) =>{console.log('RES!', result);
     if(result){
+      const { active, emailCode } = result;
       const saltHash = genPassword(password);
       const { salt, hash } = saltHash;
       const updateObj = { salt, hash };
@@ -202,8 +203,10 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
     }
   }).catch((error) =>{
     console.log('ERRROR', error);
-    new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) =>{
       return sendCronErrorEmail({ status : 777, message : `USER = ${email} Couldn't reset password`, debug : error, meta : "This is a bug with the last step of Forgot password, where user has already been returned to the app and submitted the update form. Something went wrong with the backend /reset-password route", version : "777", errorLocation : "backend - reset password / oldUserMigration"}, resolve, reject);
+    }).catch((error) =>{
+      console.log('email error', error);
     }).finally(() =>{
       return res.formatter.serverError(error.toString());
     });
