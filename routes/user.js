@@ -51,7 +51,7 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /instantiate-user-totals Endpoint");
   }
   const { email, avatarId } = req.body;
-
+  
   UserTotal.findOrCreate({
     where: {
       user: email

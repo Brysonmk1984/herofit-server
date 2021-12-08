@@ -2,8 +2,8 @@ const { arrayChunker, roundNumber, parseAvatarProperties } = require('../../lib/
 const battleProcess = require('./battleProcess');
 const { sendBattleReportEmail } = require('../../mail');
 
-const BATCH_CHUNK = 9;
-const BATCH_TIMEOUT = 3000;
+const BATCH_CHUNK = 12;
+const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard){

@@ -34,7 +34,7 @@ const options = {
 };
 
 const strategy = new Strategy(options, (payload, done) =>{
-  console.log('PAYLOADS', payload);
+  console.log('email from JWT', payload.email);
   // payload.sub should contain the user id & findByPk is a sequelize method for retrieving by id
   return User.findByPk(payload.sub)
   .then((user) => {

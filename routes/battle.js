@@ -74,12 +74,13 @@ router.post('/fetch-battle-report', oneOf([body('avatarID').isNumeric().optional
 
       // IF the avatar won, Get the items acquired from the action types in the battle report
       if(adjResult.outcome === 'Avatar Wins' && adjResult.postBattleActions){
-
+          console.log('!!!', adjResult.postBattleActions);
         Items.findAll({
           attributes: ['type','name','description','lore','effects','icon','class','exhaustible','ptCost','action'],
           where : { action : { [Op.in] : adjResult.postBattleActions } }
         }).then((items) =>{
           adjResult.itemsAcquired = items;
+          console.log('ITEMS AQ', adjResult.itemsAcquired);
           res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
         }).catch((error) =>{
           console.log('ERR', error);

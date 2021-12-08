@@ -183,7 +183,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
       const saltHash = genPassword(password);
       const { salt, hash } = saltHash;
       const updateObj = { salt, hash };
-        console.log('SH',salt, hash);
+        console.log('SH',salt, hash, active, emailCode);
       // Legacy Users migrating to new Auth System
       if(!active && !emailCode){console.log('IS LEGACY');
         updateObj.active = true;
