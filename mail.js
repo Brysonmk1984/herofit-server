@@ -37,7 +37,7 @@ let transporter = (process.env.NODE_ENV === 'development') ?
   nodemailer.createTransport({
     host: "smtp.mailgun.org",
     port: 587,
-    secure: true,
+    secure: false,
     auth: {
       user: process.env.MAIL_PROVIDER,
       pass: process.env.MAIL_PROVIDER_PASSWORD
