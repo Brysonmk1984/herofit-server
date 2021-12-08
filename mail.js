@@ -22,7 +22,7 @@ function determineVerificationUrl(env, isMobileApp){
   }
 }
 
-// create reusable transporter object using the default SMTP transport
+//create reusable transporter object using the default SMTP transport
 let transporter = (process.env.NODE_ENV === 'development') ? 
   nodemailer.createTransport({
     host: 'smtp.ethereal.email',
@@ -35,16 +35,29 @@ let transporter = (process.env.NODE_ENV === 'development') ?
   })
 :
   nodemailer.createTransport({
-    host: process.env.MAIL_PROVIDER,
-    port: 465,
+    host: "smtp.mailgun.org",
+    port: 587,
     secure: true,
     auth: {
-        user: process.env.INFO_EMAIL,
-        pass: process.env.EMAIL_PASSWORD
+      user: process.env.MAIL_PROVIDER,
+      pass: process.env.MAIL_PROVIDER_PASSWORD
     }
   });
 
 
+  // // TESTING NEW MAILGUN SETUP LOCALLY
+  // let transporter = nodemailer.createTransport({
+  //   host: "smtp.mailgun.org",
+  //   port: 587,
+  //   secure: false,
+  //   auth: {
+  //       user: "postmaster@mail.herofit.io",
+  //       pass: "bcc7e86ac8a81862a4f6660d98cd5a5f-7005f37e-cc374f17"
+  //   }
+  // });
+
+
+  
 const sendContactEmail = function(formData, resolve, reject){
   const accountInfo = formData.accountInfo;
  

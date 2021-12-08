@@ -104,7 +104,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;
     }
-
+    console.log('THE RES', response);
     sendVerificationEmail(email, emailCode, isMobileApp)
     .then((data) =>{
       //console.log(data);
