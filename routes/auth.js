@@ -104,7 +104,6 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     if(config.globalMessage && config.globalMessage.length){
       response.globalMessage = config.globalMessage;
     }
-    console.log('THE RES', response);
     sendVerificationEmail(email, emailCode, isMobileApp)
     .then((data) =>{
       //console.log(data);
@@ -138,7 +137,8 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMobileApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
-  if(!errors.isEmpty()){
+  console.log(req.body);
+  if(!errors.isEmpty()){console.log('ERRORS', errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
   const { email, isMobileApp } = req.body;
