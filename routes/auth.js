@@ -137,8 +137,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 
 router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMobileApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
-  console.log(req.body);
-  if(!errors.isEmpty()){console.log('ERRORS', errors);
+  if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
   const { email, isMobileApp } = req.body;
@@ -177,19 +176,18 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
   const { email, token, password } = req.body;
   // Can theoretically change someone elses email... figure out a better way in the future
   return User.findOne({ where : { email }, attributes: [ "email", "hash", "createdAt", "active", "emailCode" ], raw : true })
-  .then((result) =>{console.log('RES!', result);
+  .then((result) =>{
     if(result){
       const { active, emailCode } = result;
       const saltHash = genPassword(password);
       const { salt, hash } = saltHash;
-      const updateObj = { salt, hash };
-        console.log('SH',salt, hash, active, emailCode);
+      const updateObj = { salt, hash, active : true };
+
       // Legacy Users migrating to new Auth System
       if(!active && !emailCode){console.log('IS LEGACY');
-        updateObj.active = true;
         updateObj.emailCode = 'legacy-user';
       }
-      console.log('UPDATE OBJ', updateObj, 'email', email);
+
       return User.update(updateObj, { where : { email }})
       .then((result) =>{console.log('UPDATE RESULT!', result);
         return res.formatter.ok({ message : "Successfully updated password" });
