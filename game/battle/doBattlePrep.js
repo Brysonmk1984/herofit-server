@@ -274,7 +274,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         eAvatar.armor = Math.floor(avatar.armor * .33);
         const conversionBonus = avatar.armor * .66;
 
-        const RABBIT_TACTICS_MODIFIER = 25; // Lower is stronger
+        const RABBIT_TACTICS_MODIFIER = 27; // Lower is stronger
         eAvatar.power = Math.floor(eAvatar.power  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.power;
         eAvatar.air = Math.floor(eAvatar.air  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.air;
   
@@ -282,7 +282,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
           effect : "Rabbit Tactics",
           heroStatsEffected : ["armor", "power", "air"]
         });
-        console.log(eAvatar);
+
       default:
         break;
     }

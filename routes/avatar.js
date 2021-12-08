@@ -196,7 +196,7 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /get-avatar Endpoint");
   }
   const { email, isMobileApp } = req.body;
-  console.log('POINT 1', email, isMobileApp);
+
   // 'equipped' refers to 2 things here. the property on the avatar (which is described in the SELECT statement), as well as the equipped boolean that each item posseses. 
   // This query only grabs items that have equipped set to true.
   const q = `
@@ -206,16 +206,17 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
       FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
     WHERE avatars.owner = $1
   `;
-  try{console.log('POINT 2');
+  try{
     const [ results ] = await db.query(q, { bind : [email] });
-    if(results.length === 0){console.log('POINT A', 'NO RESULTS');
+    if(results.length === 0){
+      console.log(`ERROR: no avatar corresponding to owner ${email}`);
       const error = new Error("Error retrieving Hero, Please try again later.");
       return res.formatter.serverError(error.toString(), `No Avatar Saved... Likely from initial account setup failure." ${email} for /get-avatar Endpoint`);
     }
     
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseAvatarProperties(results[0], true);
-    console.log('POINT 3', avatar);
+
     const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { level, albedo } = getCurrentLevel();
     avatar.level = level;
@@ -228,19 +229,20 @@ router.post('/get-avatar', body('email').isEmail(), body('isMobileApp').isBoolea
     const { colors, alias } = heroList.find(av => av.character === avatar.character);
     avatar.alias = alias
     avatar.colors = colors;
-    console.log('POINT 4');
+ 
     let awardedItemMessage = null;
     // Check to Award Snowshoe Hare
     if(isMobileApp && specialEvent && specialEvent.eventName === "App Welcome"){
-      try{console.log('POINT 5');
+      try{
         awardedItemMessage = await appSignupAward(avatar.id, specialEvent.actionTypes[0].itemID, true);
         return res.formatter.ok( { avatar, awardedItemMessage } );
-      }catch(error){console.log('POINT B', error);
+      }catch(error){
+        console.log('Failed to award special event item to existing user', error);
         return res.formatter.serverError(error.toString(), `Couldn't get Avatar for user, but with awarding item for /get-avatar Endpoint`);
       }
-    }console.log('POINT 6');
+    }
     return res.formatter.ok( { avatar, awardedItemMessage } );
-  }catch(error){console.log('POINT C', error);
+  }catch(error){
     console.log(`Could not get Avatar for user ${email} DEBUG: ${error}`);
     res.formatter.serverError(error.toString(), `Couldn't get Avatar for user ${email} for /get-avatar Endpoint`);
   }
