@@ -202,6 +202,7 @@ function generateFoeStats(avatar, foe){
         case "Storming Oni":
           // Storming Oni Still needs more difficulty;
           randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP * 1.2));
+          
           fws.air = (125 + (4 * totalLevel));
           qpAdjustedStats = ["air", "armor","power","health"]; 
           break; 
