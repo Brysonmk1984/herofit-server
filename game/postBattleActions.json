@@ -89,8 +89,8 @@
       "outcome" : ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Splash Artists",
-      "name" : "Splash Artists",
+      "action" : "Grant Splash Artist",
+      "name" : "Splash Artist",
       "type" : "Award Pet",
       "itemCategory": "pets",
       "outcome" : ["Avatar Wins", "Double KO"]
