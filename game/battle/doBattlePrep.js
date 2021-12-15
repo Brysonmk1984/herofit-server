@@ -274,7 +274,18 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         eAvatar.armor = Math.floor(avatar.armor * .33);
         const conversionBonus = avatar.armor * .66;
 
-        const RABBIT_TACTICS_MODIFIER = 27; // Lower is stronger
+
+        // function log(base, number) {
+        //   return Math.log(number) / Math.log(base);
+        // }
+        // const value = log(2, 119);
+        //const RABBIT_TACTICS_MODIFIER = 27; // Lower is stronger
+        
+        
+        const naturalLogOfLevel = Math.log(avatarLevel);
+        const RABBIT_TACTICS_MODIFIER = (naturalLogOfLevel * avatarLevel) / 10;
+
+        
         eAvatar.power = Math.floor(eAvatar.power  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.power;
         eAvatar.air = Math.floor(eAvatar.air  + conversionBonus * avatarLevel / RABBIT_TACTICS_MODIFIER) || eAvatar.air;
   

@@ -2,6 +2,7 @@ const avatarProfiles = require('./heroProfiles.json');
 const { selectFoeTemplate, generateFoeStats } = require('../../game/prebattle/foeFunctions');
 const { calcScenarioBonuses, determineScenario } = require('../../game/battle/scenario');
 const { doAvatarBattlePrep } = require("../../game/battle/doBattlePrep"); 
+const xpCalc = require('../../game/upgrades/xpCalc');
 
 let randomAv;
 let foeTemplate;
@@ -284,10 +285,17 @@ describe('Rabbit effects should correctly modify stats', ()=>{
   // Rabbit
   it('Should Adjust Armor, Air, and Power from Rabbit Tactics', () => {
     const effects = ["Rabbit Tactics"];
-
+    const { getCurrentLevel } = xpCalc(sAvatar.activityXP, sAvatar.battleXP);
+    const avatarLevel = getCurrentLevel().total;
+    const naturalLogOfLevel = Math.log(avatarLevel);
+    const RABBIT_TACTICS_MODIFIER = (naturalLogOfLevel * avatarLevel) / 10;
+    console.log(avatarLevel)
     const expectedArmor = Math.floor(sAvatar.armor * .33);
-    const expectedPower = Math.floor(sAvatar.power + (sAvatar.armor * .66 * sAvatar.level) / 15) || sAvatar.power;
-    const expectedAir = Math.floor(sAvatar.air + (sAvatar.armor * .66 * sAvatar.level) / 15) || sAvatar.air;
+    const expectedPower = Math.floor(sAvatar.power + (sAvatar.armor * .66 * avatarLevel) / RABBIT_TACTICS_MODIFIER) || sAvatar.power;
+    const expectedAir = Math.floor(sAvatar.air + (sAvatar.armor * .66 * avatarLevel) / RABBIT_TACTICS_MODIFIER) || sAvatar.air;
+    
+    console.log(avatarLevel, sAvatar.power, expectedPower, sAvatar.air, expectedAir);
+    
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
 
     expect(avatar.armor).toBe(expectedArmor);
