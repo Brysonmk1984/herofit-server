@@ -13,6 +13,7 @@ const { activityStatRewards, activityLevelRewards, determineStatImprovements } =
 const activityHeal = require('./activityHeal');
 const { sendCronErrorEmail } = require('../../mail');
 
+// If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
 function _determineActivityId(id, source){
   if(source === 'herofit'){
     return `hf-${crypto.randomBytes(5).toString('hex')}`;
@@ -22,37 +23,77 @@ function _determineActivityId(id, source){
   throw new Error("No activityId supplied");
 }
 
-// UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
-function _insertActivityData(email, activities, t){
-    // Need latest Activity to be added to user's account
-    let latestActivityUpdate;
-    const activityEntries = activities.map((activity) =>{
-      const activityDate = moment.utc(activity.start_date);
-      const activityId = _determineActivityId(activity.id, activity.source);
-      //console.log('ACTID',activityId);
-      // Check for latest activity (doesn't include DB activities)
-      if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
-        latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
-      }
+// Need to adjust the date and activityId, and add email in preparation for DB insertion
+function _prepareActivitiesForDb(email, activities){
+  // Need latest Activity to be added to user's account
+  let latestActivityUpdate;
+  const activityEntries = activities.map((activity) =>{
+    const activityDate = moment.utc(activity.start_date);
+    const activityId = _determineActivityId(activity.id, activity.source);
 
-      return { user : email, 
-        type : activity.type,
-        averageSpeed: activity.averageSpeed,
-        maxSpeed: activity.maxSpeed,
-        distance: activity.distance,
-        duration: activity.duration,
-        elevationGain: activity.elevationGain,
-        source: activity.source,
-        activityDate : activity.activityDate,
-        activityId 
-      };
+    // Check for latest activity (doesn't include DB activities)
+    if(!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))){
+      latestActivityUpdate = moment.utc(activity.start_date).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    return { user : email, 
+      type : activity.type,
+      averageSpeed: activity.averageSpeed,
+      maxSpeed: activity.maxSpeed,
+      distance: activity.distance,
+      duration: activity.duration,
+      elevationGain: activity.elevationGain,
+      source: activity.source,
+      activityDate : activity.activityDate,
+      activityId : activityId.toString()
+    };
+  });
+
+  return { activityEntries, latestActivityUpdate };
+}
+
+function _dedupActivities(activities, t){
+  const actIdArray = activities.map(act => act.activityId.toString());
+  actIdArray.push('6394793236', '6395862627');
+
+  return UserActivity.findAll({
+    attributes : ['activityId'],
+    where : { activityId : { [Op.in] : actIdArray } },
+    transaction: t
+  }).then((duplicateActivities) =>{
+    const duplicateActivityIds = duplicateActivities.map(act => act.activityId);
+    //console.log('THE activityIds of the duplicate activities', duplicateActivityIds);
+    
+    // duplicateActivityIds is an array of activities that are confirmed already in the DB
+    // we want to exclude all 'activities' that match these ids.
+    return activities.filter(act => {
+      // Only return activities that are not in the duplicateActivityId array
+      return !duplicateActivityIds.includes(act.activityId);
     });
+  }).catch((error) =>{
+    console.log('ERROR-', error);
+    throw error;
+  });
+}
 
+
+// UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
+async function _insertActivityData(email, activities, t){
+    // In the future, consider pushing back the latestActivityUpdate determination until after the dedup
+    // Prepare activities for DB
+    const { activityEntries, latestActivityUpdate } = _prepareActivitiesForDb(email, activities);
+    //console.log(activityEntries);
+    // Dedup any activities that conflict with entries in the DB
+    const dedupedEntries = await _dedupActivities(activityEntries, t);
+    //console.log('DEDUPED!', dedupedEntries);
+    if(dedupedEntries.length === 0){
+      throw new Error("Duplicate Activity Entry, couldn't update Hero!")
+    }
     const allPromises = [
       // Update latestActivity Date on USER
       User.update({ latestActivityUpdate },{ where: { email }, transaction: t }),
       // Insert All activities
-      UserActivity.bulkCreate(activityEntries, { ignoreDuplicates: true, returning : true, transaction: t }),
+      UserActivity.bulkCreate(dedupedEntries, { ignoreDuplicates: true, returning : true, transaction: t }),
       // Find matching User Totals
       UserTotal.findOne({ attributes : [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], where: { user: email }, raw : true, transaction: t })
     ];
@@ -227,6 +268,10 @@ function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInf
 function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
   return db.transaction(async t => {
     try{
+      // Before inserting activities, do separate db check to remove duplicates
+      // This is needed since Sequelize's 'ignoreDuplicates' sucks and doesn't behave as expected
+
+
       const activityPromiseResults = await _insertActivityData(email, activities, t);
       const promiseStatuses = [activityPromiseResults[0].status,activityPromiseResults[1].status,activityPromiseResults[2].status]
       //console.log('PS=', activityPromiseResults[1]);

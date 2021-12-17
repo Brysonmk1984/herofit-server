@@ -29,7 +29,7 @@ async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null){
     }
     const result = await AvatarItems.create(item, t ? {transaction : t} : null);
     return "Received the Snowshoe Hare pet, check your inventory!"
-  }catch(error){console.log('should be here');
+  }catch(error){
     sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
     throw error;
   }
@@ -175,14 +175,18 @@ router.post('/upgrade-sequence', body('email').isEmail(), body('activities').isA
   // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
   upgradeProcess(email, activities, accountDate, hasBeenUpgraded)
   .then((returnPackage) =>{
-    //console.log('return package!', returnPackage);
+    //console.log('return package!', returnPackage.activities);
     // Transaction has been committed
     // result is whatever the result of the promise chain returned to the transaction callback
     return res.formatter.ok(returnPackage);
   }).catch((error) =>{
+    const errorString = error.toString();
     // Transaction has been rolled back
-    console.log('INSIDE transaction', error);
-    return res.formatter.serverError(error.toString(), `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
+    console.log('INSIDE transaction', errorString);
+    if(errorString === "Error: Duplicate Activity Entry, couldn't update Hero!"){
+      return res.formatter.badRequest(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
+    }
+    return res.formatter.serverError(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
   });
   
 
