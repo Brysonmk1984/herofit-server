@@ -54,8 +54,6 @@ function _prepareActivitiesForDb(email, activities){
 
 function _dedupActivities(activities, t){
   const actIdArray = activities.map(act => act.activityId.toString());
-  actIdArray.push('6394793236', '6395862627');
-
   return UserActivity.findAll({
     attributes : ['activityId'],
     where : { activityId : { [Op.in] : actIdArray } },
@@ -319,7 +317,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded){
       if(levelRewards){
         rewards.push(...levelRewards.value);
       }
-
+      console.log('IMPROVEMENTS-', improvements);
       // Return package to be used on the frontend
       return {
         activities,

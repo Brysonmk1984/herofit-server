@@ -4,7 +4,7 @@ const preventDuplicateItems = require('../items/preventDuplicateItems');
 const { OUTCOME_XP } = require('../CONSTANTS'); 
 
 const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining){
-  console.log('AVATAR', avatar);
+
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, { goToBattle : false, status : outcomeData.avatarStatus, health : aHealthRemaining < 0 ? 0 : aHealthRemaining });
 

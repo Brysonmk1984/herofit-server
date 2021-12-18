@@ -285,7 +285,7 @@ function generateFoeStats(avatar, foe){
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar, foeTemplate = null){
   const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
-
+  //console.log('FT', foeTemplate);
   // Use passed in foe template, otherwise randomly pick one
   foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(level);
 
@@ -300,10 +300,11 @@ function determineFoeWithStats(avatar, foeTemplate = null){
     
     foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
   }
-  
+
   const foe = {
     id : foeTemplate.id,
     type : foeTemplate.type,
+    difficultyLevel : foeTemplate.difficultyLevel,
     name : foeName,
     ability : foeTemplate.ability,
     class : foeTemplate.class

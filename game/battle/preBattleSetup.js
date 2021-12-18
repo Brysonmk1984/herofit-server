@@ -40,6 +40,7 @@ const preBattleSetup = function(avatar, foe){
     prepareFoe : () => {
       let procs = [];
       ({ avatar : a, foe : f, procs } = doFoeBattlePrep(a, f));
+
       effectProcs = [...effectProcs, ...procs];
     },
     applyElementalBonus : () => {

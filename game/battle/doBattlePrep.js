@@ -162,18 +162,22 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
         });
         break;
       case "Ill Omen":
-        const isNegativeScenario = scenario === 1 || scenario === 3 ? true : false;
-        const isHigherDifficulty = foe.difficulty >= .07 || foe.class === 'titan' || foe.type === "Shadow Self" || foe.type === "High Priestess of the Tides" || foe.type === "Scorching Archfiend" || foe.type === "Hulking Aggro Crag" || foe.type === "Storming Oni";
-
-        let illOmenProc = false;
-        if(isNegativeScenario && isHigherDifficulty){
-          illOmenProc = chance.bool({ likelihood: 90 });
+ 
+        const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
+        let illOmenProc = eFoe.difficultyLevel === 'high' ? true : false;
+        
+        if(eFoe.difficultyLevel === 'medium'){
+          if(eFoe.difficulty >= .08 || isNegativeScenario){
+            illOmenProc = true;
+          }
         }
+ 
         if(illOmenProc){
           eAvatar.health = Math.floor(avatar.health * 1.25);
+          eAvatar.air = Math.floor(avatar.air * 1.25);
           effectProcs.push({
             effect : "Ill Omen",
-            heroStatsEffected : ["health"]
+            heroStatsEffected : ["health", "air"]
           });
         }
         

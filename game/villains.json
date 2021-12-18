@@ -2,6 +2,7 @@
   "Spirits": [{
       "class" : "Spirits",
       "type" : "Shade",
+      "difficultyLevel" : "medium",
       "foe": [
         "Kerrim",
         "Thames",
@@ -25,6 +26,7 @@
     {
       "class" : "Spirits",
       "type": "Apparition",
+      "difficultyLevel" : "medium",
       "foe": [
         "Githinji",
         "Mardochaios",
@@ -48,6 +50,7 @@
     {
       "class" : "Spirits",
       "type": "Phantasm",
+      "difficultyLevel" : "medium",
       "foe": [
         "Fridtjof",
         "Nyx",
@@ -71,6 +74,7 @@
     {
       "class" : "Spirits",
       "type" : "Phantom",
+      "difficultyLevel" : "medium",
       "foe": [
         "Seth",
         "Ambrosia",
@@ -94,6 +98,7 @@
     {
       "class" : "Spirits",
       "type": "Wraith",
+      "difficultyLevel" : "medium",
       "foe": [
         "Methuselah",
         "Vlasta",
@@ -117,6 +122,7 @@
     {
       "class" : "Spirits",
       "type": "Poltergeist",
+      "difficultyLevel" : "medium",
       "foe": [
         "Phobus",
         "Herod",
@@ -140,6 +146,7 @@
     {
       "class" : "Spirits",
       "type" : "Specter",
+      "difficultyLevel" : "medium",
       "foe": [
         "Brody",
         "Raven",
@@ -163,6 +170,7 @@
     {
       "class" : "Spirits",
       "type": "Banshee",
+      "difficultyLevel" : "medium",
       "foe": [
         "Laverna",
         "Melania",
@@ -185,6 +193,7 @@
     },{
       "class" : "Spirits",
       "type": "Shadow-Self",
+      "difficultyLevel" : "high",
       "foe": ["Shadow-Self"],
       "ability": {
         "name" : "Self-Awareness",
@@ -206,6 +215,7 @@
     {
       "class" : "Titans",
       "type": "Plaguebringer",
+      "difficultyLevel" : "high",
       "foe": ["The Plaguebringer"],
       "ability": {
         "name" : "Infect",
@@ -225,6 +235,7 @@
     {
       "class" : "Titans",
       "type": "Guardian of the Depths",
+      "difficultyLevel" : "high",
       "foe": ["Guardian of the Depths"],
       "ability": {
         "name" : "-20% Health Afterburn",
@@ -247,6 +258,7 @@
     {
       "class" : "Elementals",
       "type" : "Flame Fiend",
+      "difficultyLevel" : "low",
       "foe" : [
         "Azar",
         "Fajra",
@@ -270,6 +282,7 @@
     {
       "class" : "Elementals",
       "type" : "Burning Jinn",
+      "difficultyLevel" : "medium",
       "foe" : [
         "Agni",
         "Helene",
@@ -294,6 +307,7 @@
     {
       "class" : "Elementals",
       "type" : "Scorching Archfiend",
+      "difficultyLevel" : "high",
       "foe" : ["Helios"],
       "ability": {
         "name" : "Fire Mastery",
@@ -315,6 +329,7 @@
     {
       "class" : "Elementals",
       "type" : "Rock Skipper",
+      "difficultyLevel" : "low",
       "foe" : [
         "Avani",
         "Demeter",
@@ -338,6 +353,7 @@
     {
       "class" : "Elementals",
       "type" : "Granite Golem",
+      "difficultyLevel" : "medium",
       "foe" : [
         "Bhumi",
         "Eardwulf",
@@ -361,6 +377,7 @@
     {
       "class" : "Elementals",
       "type" : "Hulking Aggro Crag",
+      "difficultyLevel" : "high",
       "foe" : ["Jötnar"],
       "ability": {
         "name" : "Earth Mastery",
@@ -381,6 +398,7 @@
     {
       "class" : "Elementals",
       "type" : "Splash Artist",
+      "difficultyLevel" : "low",
       "foe" : [
         "Aalto",
         "Hai",
@@ -404,6 +422,7 @@
     {
       "class" : "Elementals",
       "type" : "Cyclonic Siren",
+      "difficultyLevel" : "medium",
       "foe" : [
         "Asherah",
         "Llyr",
@@ -427,6 +446,7 @@
     {
       "class" : "Elementals",
       "type" : "High Priestess of the Tides",
+      "difficultyLevel" : "high",
       "foe" : ["Maya"],
       "ability": {
         "name" : "Water Mastery",
@@ -447,6 +467,7 @@
     {
       "class" : "Elementals",
       "type" : "Gusty Rascal",
+      "difficultyLevel" : "low",
       "foe" : [
         "Alya",
         "Eteri",
@@ -470,6 +491,7 @@
     {
       "class" : "Elementals",
       "type" : "Wheezing Jinn",
+      "difficultyLevel" : "medium",
       "foe" : [
         "Amaterasu",
         "Anemone",
@@ -493,6 +515,7 @@
     {
       "class" : "Elementals",
       "type" : "Storming Oni",
+      "difficultyLevel" : "high",
       "foe" : ["Fūjin"],
       "ability": {
         "name" : "Air Mastery",

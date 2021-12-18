@@ -5,10 +5,10 @@ const config = {
   mode : appState[0],
   specialEvent : appWelcome,
 
-  // globalMessage : [
-  //   { type : 'info', persist : false, message : "You can now donate on herofitgame.com if you're feeling generous :)", link : "https://herofitgame.com" },
-  //   { type : 'info', persist : false, message : "You can now donate CAKE :)", persist : true }
-  // ],
+  globalMessage : [
+    { type : 'info', persist : false, message : "Raven Has been buffed. See changes by clicking on the pet in your inventory" },
+    //{ type : 'info', persist : false, message : "You can now donate CAKE :)", persist : true }
+  ],
 };
 
 module.exports = { config };

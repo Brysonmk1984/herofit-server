@@ -80,7 +80,6 @@ router.post('/fetch-battle-report', oneOf([body('avatarID').isNumeric().optional
           where : { action : { [Op.in] : adjResult.postBattleActions } }
         }).then((items) =>{
           adjResult.itemsAcquired = items;
-          console.log('ITEMS AQ', adjResult.itemsAcquired);
           res.formatter.ok({ result : adjResult }, 'Retrieved Latest Battle Results');
         }).catch((error) =>{
           console.log('ERR', error);

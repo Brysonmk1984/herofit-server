@@ -16,6 +16,7 @@ const generateFoe = function(av){
   const foe = {
     id : foeTemplate.id,
     type : foeTemplate.type,
+    difficultyLevel : foeTemplate.difficultyLevel,
     name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
     ability : foeTemplate.ability,
     class : foeTemplate.class
@@ -63,7 +64,32 @@ describe('All EXISTING item effects should correctly modify stats', ()=>{
 
 
 describe('All NEW item effects should correctly modify stats', ()=>{
-  // HAWK
+    // RAVEN
+    it('Should return an avatar with +5 Air & run Ill Omen buff if necessary', () => {
+      const effects = ["Ill Omen"];
+      const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+      console.log(sFoe.type, sFoe.difficulty, sFoe.difficultyLevel);
+      const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
+      let illOmenProc = sFoe.difficultyLevel === 'high' ? true : false;
+      if(sFoe.difficultyLevel === 'medium'){
+        if(sFoe.difficulty >= .08 || isNegativeScenario){
+          illOmenProc = true;
+        }
+      }
+      console.log(isNegativeScenario, sFoe.difficulty >= .075, illOmenProc);
+      if(illOmenProc){
+        console.log('RECEIVED ILL OMEN BUFF');
+        expect(avatar.health).toBe(Math.floor(sAvatar.health * 1.25));
+        expect(avatar.air).toBe(Math.floor(sAvatar.air * 1.25));
+      }else{
+        console.log('NO ILL OMEN BUFF');
+        expect(avatar.health).toBe(sAvatar.health);
+        expect(avatar.air).toBe(sAvatar.air);
+      }
+  
+    });
+
+  // // HAWK
   it('Should return an avatar with +10 health & +5 Air', () => {
     const effects =   ["Hero +5,+10% Air", "Hero +10,+15% Power"];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
@@ -75,28 +101,7 @@ describe('All NEW item effects should correctly modify stats', ()=>{
     expect(avatar.air).toBe(adjustedTotalAir);
   });
 
-  // RAVEN
-  it('Should return an avatar with +5 Air & run Ill Omen buff if necessary', () => {
-    const effects = ["Hero +5,+10% Air", "Ill Omen"];
-    const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-    const adjustedBase = sAvatar.air + 5;
-    const adjustedTotal = adjustedBase + Math.floor(adjustedBase * .1);
-    expect(avatar.air).toBe(adjustedTotal);
-
-    const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
-    const isHigherDifficulty = sFoe.difficulty >= .07 || sFoe.class === 'titan' || sFoe.type === "Shadow Self";
-    if(isNegativeScenario && isHigherDifficulty){
-      console.log('RECEIVED ILL OMEN BUFF');
-      expect(avatar.health).toBe(Math.floor(sAvatar.health * 1.25));
-    }else{
-      console.log('NO ILL OMEN BUFF');
-      expect(avatar.health).toBe(sAvatar.health);
-    }
-
-  });
-
-
-  // CAT
+ // CAT
   it('Should trigger a Bad Luck Proc proc 15% of the time', () => {
     const effects =   ["Bad Luck"];
 

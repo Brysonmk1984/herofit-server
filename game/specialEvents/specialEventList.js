@@ -4,14 +4,14 @@ const testSpecificFoe = {
   actionTypes : [{
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
-    odds : 0,
-    foe : 'Guardian of the Depths',
-    foeClass : 'Titans'
+    odds : 100,
+    foe : 'Specter',
+    foeClass : 'Spirits'
   },
   {
     type : 'foeLikelihood',
     action : "Increased Likelihood Foe",
-    odds : 100,
+    odds : 0,
     foe : 'Storming Oni',
     foeClass : 'Elementals'
   },{
