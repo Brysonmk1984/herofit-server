@@ -155,7 +155,7 @@ router.post('/generate-foe', body('avatar').isObject(), authenticateAdminJWT, (r
   }
   const foe = selectFoeTemplate(req.body.avatar.level);
   const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
-  if(foeWithStats){console.log(foeWithStats);
+  if(foeWithStats){
     res.formatter.ok(foeWithStats);
   }else{
     const error =  new Error("Couldn't generate foe");
