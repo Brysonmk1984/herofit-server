@@ -88,6 +88,15 @@ const UserModel = function(db, DataTypes){
         allowNull: false,
         defaultValue: true
     },
+    foundOutBy:{
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
+    isMetric : {
+        type : DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    }
   });
 
       
