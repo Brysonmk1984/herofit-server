@@ -107,5 +107,25 @@ router.delete('/:email', body('id').isNumeric().optional({nullable: true, checkF
 
 });
 
+/* 
+  MOBILE APP ONLY
+*/
+
+router.put('/toggle-metric-system', body('isMetric').isBoolean(), body('email').isEmail(), authenticateJWT, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /toggle-metric-system");
+  }
+  const { isMetric, email } = req.body;
+
+  try{
+    const result = await User.update( { isMetric }, { where : { email }, returning : true} );
+    return res.formatter.ok({ user : result[1][0], message : `Successfully toggled ${isMetric ? 'Metric system' : 'Imperial system'} on!` });
+  }catch(error){
+    return res.formatter.serverError(error.toString(), `Unable to toggle metric/imperial system mode for ${email}, - PUT /toggle-metric-system endpoint`);
+  }
+
+});
+
 
 module.exports = router;

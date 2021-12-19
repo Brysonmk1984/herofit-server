@@ -32,11 +32,11 @@ function instantiateBattle(avatarID, foeType = null){
     const { total } = getCurrentLevel();  
     // Getting Foe Template
     const foe = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(total);
-    console.log('FOPE', foe);
+
     // Adding stats to Foe
     const foeWithStats = determineFoeWithStats(avatar, foe);
 
-    console.log('FWS', foeWithStats);
+
     // Get corresponding items for avatar
     return Items.findAll({
       where : { id : { [Op.in] : equippedItemIds } }, attributes : ['id', 'type', 'name', 'effects', 'action']

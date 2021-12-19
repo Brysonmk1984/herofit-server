@@ -96,7 +96,11 @@ const UserModel = function(db, DataTypes){
         type : DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-    }
+    },
+    referredBy:{
+        type : DataTypes.STRING,
+        allowNull: true,
+    },
   });
 
       

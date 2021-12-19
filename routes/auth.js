@@ -57,7 +57,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 });
 
 // captchaValue is optional since App isn't using it
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional(), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
@@ -74,8 +74,8 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
 
-  let { email, username, password, firstName, lastName, emailMarketingOptIn, isMobileApp } = req.body;
-  
+  let { email, username, password, firstName, lastName, emailMarketingOptIn, isMetric, foundOutBy, referredBy, isMobileApp } = req.body;
+
   fistName = firstName || null;
   lastName = lastName || null;
   const saltHash = genPassword(password);
@@ -90,7 +90,10 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     hash,
     salt,
     emailCode,
-    emailMarketingOptIn
+    emailMarketingOptIn,
+    isMetric,
+    foundOutBy,
+    referredBy
   };
 
   User.create(newUser)
@@ -111,7 +114,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
         return res.formatter.serverError(error.toString());
       }
 
-      console.log('sending OK RESPONSE');
+      //console.log('sending OK RESPONSE');
       return res.formatter.ok(response);
     }).catch((error) =>{
       console.log('THE ERROR', error);

@@ -558,4 +558,5 @@ router.post('/fetch-avatars-by-page-and-ranking-type-battle', body('rankingType'
 //   }
 // });
 
+
 module.exports = router;
