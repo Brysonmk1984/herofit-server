@@ -58,9 +58,8 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 
 // captchaValue is optional since App isn't using it
 router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional(), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
-  console.log(req.body);
   const errors = validationResult(req);
-  if(!errors.isEmpty()){console.log(errors);
+  if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
 
