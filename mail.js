@@ -329,7 +329,7 @@ const sendVerificationEmail = function(email, code, isMobileApp){
     from: `${process.env.INFO_EMAIL}`,
     to: email,
     subject: `HeroFit - Account Verification`, 
-    text: "Click on the link below to verify your account\n\n" + url,
+    text: `From the device you've installed HeroFit on, press link below to verify your email address: \n\n ${url} \n\n NOTE: If you're having problems, try long-pressing the link to copy it, then paste it in Chrome or Safari.`,
   }
 
   return new Promise((resolve, reject) =>{
@@ -367,7 +367,7 @@ const sendResetPasswordEmail = function(email, code, isMobileApp){
     from: `${process.env.INFO_EMAIL}`,
     to: email,
     subject: `HeroFit - Account Verification`, 
-    text: "Click on the link below to verify your email address: \n\n" + url,
+    text: `From the device you've installed HeroFit on, press link below to verify your email address: \n\n ${url} \n\n NOTE: If you're having problems, try long-pressing the link to copy it, then paste it in Chrome or Safari.`,
   }
   return new Promise((resolve, reject) =>{
     transporter.sendMail(mailOptions, (error, info) => {
