@@ -34,6 +34,14 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario){
           heroStatsEffected : ["earth"]
         });
         break;
+      case "Hero +5,+10% Fire":
+        eAvatar.fire += 5;
+        eAvatar.fire += Math.floor(eAvatar.fire * .10);
+        effectProcs.push({
+          effect : "Hero +5,+10% Fire",
+          heroStatsEffected : ["fire"]
+        });
+        break;
       case "Hero +10 Health":
         eAvatar.health += 10;
         effectProcs.push({

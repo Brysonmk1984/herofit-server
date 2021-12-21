@@ -6,7 +6,7 @@ const config = {
   specialEvent : appWelcome,
 
   globalMessage : [
-    { type : 'info', persist : false, message : "Did somebody ask for METRIC mode? You can now access it through the settings page :) Please report any bugs." },
+    { type : 'success', persist : false, message : "The HeroFit mobile app is available in the App & Play store! Try it out if you haven't already!" },
     //{ type : 'info', persist : false, message : "You can now donate CAKE :)", persist : true }
   ],
 };
