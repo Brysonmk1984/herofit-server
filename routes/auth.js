@@ -60,10 +60,10 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 // * TURNS OUT, passing null to something optional will still trigger an error unless "{nullable: true, checkFalsy: true}" is passed in
 router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
-  if(!errors.isEmpty()){console.log('ERRS', errors);
+  if(!errors.isEmpty()){console.log('VALIDATION ERRS ON REGISTER:', errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
-  console.log('made it past errors');
+
   if(config.mode === 'maintenance'){
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
@@ -74,9 +74,8 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
   if(!successfulRecaptcha){
     return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
   }
-  console.log('here');
+
   let { email, username, password, firstName, lastName, emailMarketingOptIn, isMetric, foundOutBy, referredBy, isMobileApp } = req.body;
-  console.log(email, username, password, firstName, lastName, emailMarketingOptIn, isMetric, foundOutBy, referredBy, isMobileApp);
   fistName = firstName || null;
   lastName = lastName || null;
   const saltHash = genPassword(password);
@@ -96,7 +95,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     foundOutBy,
     referredBy
   };
-  console.log(newUser);
+
   User.create(newUser)
   .then((result) => {
     // Not sure why sequelize can't do raw : true, so we need this:
@@ -110,7 +109,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     }
     sendVerificationEmail(email, emailCode, isMobileApp)
     .then((data) =>{
-      console.log(data);
+
       if(data.error){
         return res.formatter.serverError(error.toString());
       }
