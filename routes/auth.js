@@ -57,7 +57,8 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 });
 
 // captchaValue is optional since App isn't using it
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional(), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
+// * TURNS OUT, passing null to something optional will still trigger an error unless "{nullable: true, checkFalsy: true}" is passed in
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){console.log('ERRS', errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
