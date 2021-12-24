@@ -4,7 +4,8 @@
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles --ci --forceExit",
+    "test": "jest --verbose --ci",
+    "test:precommit": "jest --verbose --ci --forceExit",
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js",
@@ -64,12 +65,12 @@
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pg": "^6.1.5",
+    "pg": "^8.7.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "4.44.4",
     "verify-cognito-token": "^1.2.2"
   },
   "engines": {
-    "node": "13.x"
+    "node": "16.x"
   }
 }

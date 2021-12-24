@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm test auth
+npm run test:precommit auth
 prettier --write . && git add -A .

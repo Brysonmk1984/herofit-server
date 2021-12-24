@@ -41,6 +41,7 @@ router.post("/login", body("email").isEmail(), body("password").isString({ min: 
       const isValid = validatePassword(password, user.hash, user.salt);
       if (isValid) {
         const tokenObject = issueJWT(user);
+        console.log(tokenObject);
         return res.formatter.ok({ user, tokenObject });
       } else {
         return res.formatter.unauthorized(`Incorrect password, please try again.`);
