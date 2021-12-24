@@ -8,7 +8,8 @@
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "prettier --check ."
   },
   "jest": {
     "watchPathIgnorePatterns": [
@@ -39,6 +40,7 @@
     "jest": "^26.6.1",
     "jest-extended": "^0.11.5",
     "nodemon": "^2.0.6",
+    "prettier": "^2.5.1",
     "supertest": "^3.4.2"
   },
   "dependencies": {
@@ -69,5 +71,8 @@
   },
   "engines": {
     "node": "13.x"
+  },
+  "husky": {
+    "pre-commit": "prettier --write . && git add -A ."
   }
 }
