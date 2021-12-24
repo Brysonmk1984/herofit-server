@@ -16,9 +16,7 @@
       "description": "A special event running now until Halloween. There is a 13% bonus chance to face the Guardian of the Depths in random encounters"
     }
   ],
-  "bugFixes": [
-    "Fixed a bug recently introduced where pet abilities were not being applied before battles"
-  ],
+  "bugFixes": ["Fixed a bug recently introduced where pet abilities were not being applied before battles"],
   "balanceChanges": ["Reduced difficulty of all foes very slightly"],
   "closingRemarks": "Very excited about the progress being made on the mobile app, but I had to get this new baddy in the game!"
 }

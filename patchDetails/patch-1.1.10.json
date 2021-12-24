@@ -12,19 +12,8 @@
       "description": "Various UI improvements and all earned costumes are now showing up in profile"
     }
   ],
-  "bugFixes": [
-    "The server errors people experienced over the last week were related to implementation of improved security measures, and should be resolved",
-    "After Spending all your QP, the 'Quantum Points Activated' message will go away",
-    "Resolved error where sometimes users couldn't Go To Battle when they should have been able to"
-  ],
-  "balanceChanges": [
-    "Reduced difficulty of foes slightly across the board",
-    "Reduced XP gained for battles in general"
-  ],
-  "miscDetails": [
-    "The Hero Name input on the Select Hero page will now check to see if the name is available as they type. This was added to prevent naming collisions and improve new user's experience",
-    "Security has been improved across the application",
-    "Major code refactoring related to http requests both on the client side and server side has been completed"
-  ],
+  "bugFixes": ["The server errors people experienced over the last week were related to implementation of improved security measures, and should be resolved", "After Spending all your QP, the 'Quantum Points Activated' message will go away", "Resolved error where sometimes users couldn't Go To Battle when they should have been able to"],
+  "balanceChanges": ["Reduced difficulty of foes slightly across the board", "Reduced XP gained for battles in general"],
+  "miscDetails": ["The Hero Name input on the Select Hero page will now check to see if the name is available as they type. This was added to prevent naming collisions and improve new user's experience", "Security has been improved across the application", "Major code refactoring related to http requests both on the client side and server side has been completed"],
   "closingRemarks": "More code refactoring ahead, but there's more new content in the works too ;)"
 }

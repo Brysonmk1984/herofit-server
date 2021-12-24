@@ -9,14 +9,14 @@ Battle.findAll({
   where: { outcome: "TBD" },
   raw: true,
 })
-  .then((battles) => {
+  .then(battles => {
     return runAllBattles(battles, true);
   })
-  .then((data) => {
+  .then(data => {
     console.log("cronBattleHour successfully ran");
     process.exit();
   })
-  .catch((error) => {
+  .catch(error => {
     new Promise((resolve, reject) => {
       return sendCronErrorEmail(
         {
@@ -26,13 +26,13 @@ Battle.findAll({
           errorLocation: "Cron Script",
         },
         resolve,
-        reject
+        reject,
       );
     })
       .then(() => {
         process.exit();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log("couldn't send error email for REVIVE AVATARS - ", error);
         process.exit();
       });

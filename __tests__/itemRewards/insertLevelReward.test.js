@@ -1,9 +1,5 @@
 const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
-const {
-  activityLevelRewards,
-  activityStatRewards,
-  determineStatImprovements,
-} = require("../../game/activities/activityRewards");
+const { activityLevelRewards, activityStatRewards, determineStatImprovements } = require("../../game/activities/activityRewards");
 const { range } = require("../../lib/helperFunctions");
 const preventDuplicateItems = require("../../game/items/preventDuplicateItems");
 
@@ -107,7 +103,7 @@ const preventDuplicateItems = require("../../game/items/preventDuplicateItems");
 
 it("Should return a false value for red belt, and a true value for black belt", () => {
   const items = ["Red Belt", "Black Belt", "Health Potion"];
-  return preventDuplicateItems(items, 254).then((data) => {
+  return preventDuplicateItems(items, 254).then(data => {
     console.log("DATA", data);
     // Already have a red belt, so it should return true, indicating we already have it
     expect(data[0]).toBe(true);

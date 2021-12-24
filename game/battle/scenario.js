@@ -22,8 +22,7 @@ function determineScenario(beginnersLuck) {
   // If beginners luck, only choose from favorable or neutral scenarios
   if (beginnersLuck) {
     const positiveScenarios = [0, 2, 4, 5];
-    const scenarioIndex =
-      positiveScenarios[Math.floor(Math.random() * positiveScenarios.length)];
+    const scenarioIndex = positiveScenarios[Math.floor(Math.random() * positiveScenarios.length)];
     return BATTLE_SCENARIOS[scenarioIndex];
   }
   return BATTLE_SCENARIOS[Math.floor(Math.random() * BATTLE_SCENARIOS.length)];

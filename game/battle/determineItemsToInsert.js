@@ -5,21 +5,20 @@ function determineItemsToInsert(postBattleActions, battleOutcome) {
     return [];
   }
   // ALL PBAs FROM BATTLE
-  const itemsToInsert = postBattleActions.map((ACTION) => {
+  const itemsToInsert = postBattleActions.map(ACTION => {
     let matchingPBA;
     // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
     // ACTION TYPES = WINTOTAL, WINSTREAK, DEFEATEDFOE
     for (let actionType in ALLPBAs) {
       // Find the PBA that matches the pba.action property
-      let matching = ALLPBAs[actionType].find((pba) => {
+      let matching = ALLPBAs[actionType].find(pba => {
         return pba.action === ACTION;
       });
 
       // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
       if (matching) {
         // Usually a win is required, but might be DKO. In the future will have some for Draws and losses
-        const matchesOutcomeCondition =
-          matching.outcome.includes(battleOutcome);
+        const matchesOutcomeCondition = matching.outcome.includes(battleOutcome);
         if (matchesOutcomeCondition) {
           matchingPBA = matching;
           break;

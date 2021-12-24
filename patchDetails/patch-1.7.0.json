@@ -16,22 +16,8 @@
       "description": "See the item wiki or the latest reddit post for details."
     }
   ],
-  "bugFixes": [
-    "Fixed UI bug where users couldn't click the footer links",
-    "Fixed a new bug with deleting accounts"
-  ],
-  "balanceChanges": [
-    "Fire Trait - Critical Strike damage has been buffed significantly",
-    "Armor effectiveness increased",
-    "Power effectiveness increased, as well as variance in randomly generated value",
-    "Tweaked foe difficulty across the board",
-    "Slight buff to Banshees",
-    "Elemental Boss difficulty increased"
-  ],
-  "miscDetails": [
-    "First Codex item added to the game - The Timber Terror Origin Story!",
-    "Changed Profile page to search by Hero Name primarily rather than user name",
-    "More improvements to the Upgrade algorithm, greatly reducing potential for errors when upgrading hero"
-  ],
+  "bugFixes": ["Fixed UI bug where users couldn't click the footer links", "Fixed a new bug with deleting accounts"],
+  "balanceChanges": ["Fire Trait - Critical Strike damage has been buffed significantly", "Armor effectiveness increased", "Power effectiveness increased, as well as variance in randomly generated value", "Tweaked foe difficulty across the board", "Slight buff to Banshees", "Elemental Boss difficulty increased"],
+  "miscDetails": ["First Codex item added to the game - The Timber Terror Origin Story!", "Changed Profile page to search by Hero Name primarily rather than user name", "More improvements to the Upgrade algorithm, greatly reducing potential for errors when upgrading hero"],
   "closingRemarks": "While most dev time has gone to the upcoming mobile app, I wanted to sneak in some easy but exciting updates!"
 }

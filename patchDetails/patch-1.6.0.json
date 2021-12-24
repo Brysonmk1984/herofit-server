@@ -28,23 +28,8 @@
       "description": "Since the elemental bosses are only engaged via item finds, it made sense to release them all at once. This first week, the Storm Crow Bone Chimes will have an enhanced drop rate and defeating the Storming Oni will grant bonus XP & PT. Next week will be the Hulking Aggro Crag Earth Boss, and so forth."
     }
   ],
-  "bugFixes": [
-    "Fixed bug where new users were not receiving their initial 5 recovery points",
-    "Fixed bug where navigating to the ranking page would cause a blank screen",
-    "Fixed bug where low level heroes were getting matched up against bosses",
-    "Fixed bug where 'Buy More Items' link wouldn't load items"
-  ],
-  "balanceChanges": [
-    "Elemental trait changes: Thorns Damage & Vampiric Touch have been nerfed. They now max out at 45% and the effectiveness curve has been adjusted accordingly",
-    "Boosted pet special ability chance for Black Cat, Octopus of Cunning, Feisty Coon, & Arizona Rattlesnake",
-    "Shade and Apparition are now a bit more difficult"
-  ],
-  "miscDetails": [
-    "Added Earth, Fire, Water, Air costume tints for defeating elemental bosses",
-    "Completely refactored code for instantiating and running battles. This is an under-the-hood change that greatly improves the maintainability of the code and allows for bulk and single battles to be ran.",
-    "Updated the Shadow-Self costumes do be more distinct and interesting!",
-    "New Item Wiki Page accessible through the sidebar menu",
-    "Added 50 Win Streak Title to the game"
-  ],
+  "bugFixes": ["Fixed bug where new users were not receiving their initial 5 recovery points", "Fixed bug where navigating to the ranking page would cause a blank screen", "Fixed bug where low level heroes were getting matched up against bosses", "Fixed bug where 'Buy More Items' link wouldn't load items"],
+  "balanceChanges": ["Elemental trait changes: Thorns Damage & Vampiric Touch have been nerfed. They now max out at 45% and the effectiveness curve has been adjusted accordingly", "Boosted pet special ability chance for Black Cat, Octopus of Cunning, Feisty Coon, & Arizona Rattlesnake", "Shade and Apparition are now a bit more difficult"],
+  "miscDetails": ["Added Earth, Fire, Water, Air costume tints for defeating elemental bosses", "Completely refactored code for instantiating and running battles. This is an under-the-hood change that greatly improves the maintainability of the code and allows for bulk and single battles to be ran.", "Updated the Shadow-Self costumes do be more distinct and interesting!", "New Item Wiki Page accessible through the sidebar menu", "Added 50 Win Streak Title to the game"],
   "closingRemarks": "This is such a loaded update, but there's one more thing... HeroFit turns 1 on the 4th of July! Compost Creature has baked us a cake to celebrate and a slice has been added to your inventory! Enjoy :)"
 }

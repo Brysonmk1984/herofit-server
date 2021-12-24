@@ -4,13 +4,7 @@
     "character": "Chrono Guy",
     "alias": "Chrono Guy",
     "elms": { "fire": 0, "water": 0, "air": 10, "earth": 0 },
-    "skills": [
-      "Time Freeze",
-      "Quantum Teleportation",
-      "Cognitive Flash Forward",
-      "Entropy Ray",
-      "Slow Speed Field"
-    ],
+    "skills": ["Time Freeze", "Quantum Teleportation", "Cognitive Flash Forward", "Entropy Ray", "Slow Speed Field"],
     "ultimate": "Timeline Shift",
     "colors": ["#4B4B4B", "#E25926"],
     "image": "../../../assets/images/heroes/chrono_guy/chrono_guy.webp",
@@ -22,13 +16,7 @@
     "character": "Compost Creature",
     "alias": "Compost Creature",
     "elms": { "fire": 2, "water": 2, "air": 2, "earth": 4 },
-    "skills": [
-      "Unsatisfactory Olfactory",
-      "Mulch Munch",
-      "Regenerative Recess",
-      "Coons & Creepy Crawlers",
-      "Decomposing Breath"
-    ],
+    "skills": ["Unsatisfactory Olfactory", "Mulch Munch", "Regenerative Recess", "Coons & Creepy Crawlers", "Decomposing Breath"],
     "ultimate": "Purge, Plant & Propagate",
     "colors": ["#796D20", "#E0E393"],
     "image": "../../../assets/images/heroes/compost_creature/compost_creature.webp",
@@ -40,13 +28,7 @@
     "character": "Filtron Five",
     "alias": "Filtron Five",
     "elms": { "fire": 0, "water": 5, "air": 5, "earth": 0 },
-    "skills": [
-      "Alkalize & Purify",
-      "Corrosive Toxicity",
-      "Hot Air Hot Head",
-      "pH Paralysis",
-      "Problematic Plumbing"
-    ],
+    "skills": ["Alkalize & Purify", "Corrosive Toxicity", "Hot Air Hot Head", "pH Paralysis", "Problematic Plumbing"],
     "ultimate": "Reverse Osmosis Psychosis",
     "colors": ["#EBEBEB", "#FF0000"],
     "image": "../../../assets/images/heroes/filtron_five/filtron_five.webp",
@@ -58,13 +40,7 @@
     "character": "Empath Aurelia",
     "alias": "Empath",
     "elms": { "fire": 0, "water": 10, "air": 0, "earth": 0 },
-    "skills": [
-      "Intuitive Teamwork",
-      "Toroidal Force Field",
-      "Reflect Inner Demons",
-      "Hold the Space",
-      "Funnel of Forgiveness"
-    ],
+    "skills": ["Intuitive Teamwork", "Toroidal Force Field", "Reflect Inner Demons", "Hold the Space", "Funnel of Forgiveness"],
     "ultimate": "Gift of Divine Love",
     "colors": ["#7D0110", "#F9F18E"],
     "image": "../../../assets/images/heroes/the_empath/the_empath.webp",
@@ -76,13 +52,7 @@
     "character": "Boulder Bro",
     "alias": "Boulder Bro",
     "elms": { "fire": 0, "water": 0, "air": 0, "earth": 10 },
-    "skills": [
-      "Seismic Slam",
-      "Rubble Rouser",
-      "Party Hardy",
-      "Sentiment of the Sediment",
-      "Muddy Slippery Slide"
-    ],
+    "skills": ["Seismic Slam", "Rubble Rouser", "Party Hardy", "Sentiment of the Sediment", "Muddy Slippery Slide"],
     "ultimate": "The Aggro Crag",
     "colors": ["#986634", "#110B05"],
     "image": "../../../assets/images/heroes/boulder_bro/boulder_bro.webp",
@@ -94,13 +64,7 @@
     "character": "Natural Ninja",
     "alias": "Natural Ninja",
     "elms": { "fire": 4, "water": 2, "air": 2, "earth": 2 },
-    "skills": [
-      "Bamboo Blade",
-      "Hemp Hogtie",
-      "Sneak in Solidarity",
-      "All Natural Nunchaku",
-      "Obsidian Shuriken"
-    ],
+    "skills": ["Bamboo Blade", "Hemp Hogtie", "Sneak in Solidarity", "All Natural Nunchaku", "Obsidian Shuriken"],
     "ultimate": "Fermentation Frenzy",
     "colors": ["#0C2613", "#93C64B"],
     "image": "../../../assets/images/heroes/natural_ninja/natural_ninja.webp",
@@ -112,13 +76,7 @@
     "character": "RePete",
     "alias": "Scavenger Robot",
     "elms": { "fire": 5, "water": 0, "air": 5, "earth": 0 },
-    "skills": [
-      "Scrapyard Scavenge",
-      "Reduce, Reuse, Recycle Foe",
-      "Law-Binding Lasso",
-      "Muffler Mortar",
-      "Uncanny Decoy"
-    ],
+    "skills": ["Scrapyard Scavenge", "Reduce, Reuse, Recycle Foe", "Law-Binding Lasso", "Muffler Mortar", "Uncanny Decoy"],
     "ultimate": "Mini RePete Multiplicity",
     "colors": ["#9B9B9B", "#232323"],
     "image": "../../../assets/images/heroes/repete/repete.webp",
@@ -130,13 +88,7 @@
     "character": "Timber Terror",
     "alias": "Timber Terror",
     "elms": { "fire": 2, "water": 3, "air": 3, "earth": 2 },
-    "skills": [
-      "Surprise Saprolings",
-      "Ten Ton Stomp",
-      "Recursive Regeneration",
-      "Rabid Squirrel Stampede",
-      "Perennial Pounding"
-    ],
+    "skills": ["Surprise Saprolings", "Ten Ton Stomp", "Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
     "ultimate": "Purify by Chlorophyll",
     "colors": ["#3D2A18", "#E8F1E3"],
     "image": "../../../assets/images/heroes/timber_terror/timber_terror.webp",
@@ -148,13 +100,7 @@
     "character": "Solar Celeste",
     "alias": "Solar Warrior",
     "elms": { "fire": 10, "water": 0, "air": 0, "earth": 0 },
-    "skills": [
-      "Million-Degree Beam",
-      "Core-Forged Aegis",
-      "Speed of Light Strike",
-      "Photon Flashbang",
-      "Solar Flare EMP"
-    ],
+    "skills": ["Million-Degree Beam", "Core-Forged Aegis", "Speed of Light Strike", "Photon Flashbang", "Solar Flare EMP"],
     "ultimate": "Avatar of the Sun",
     "colors": ["#EBDD49", "#000000"],
     "image": "../../../assets/images/heroes/solar_celeste/solar_celeste.webp",
@@ -166,13 +112,7 @@
     "character": "Wilhelm the Wild",
     "alias": "Wildspeaker",
     "elms": { "fire": 3, "water": 3, "air": 2, "earth": 2 },
-    "skills": [
-      "Collude with the Crows",
-      "Wolf Pack Attack",
-      "Beastly Behavior",
-      "Off-the-Grid Offense",
-      "Axecution"
-    ],
+    "skills": ["Collude with the Crows", "Wolf Pack Attack", "Beastly Behavior", "Off-the-Grid Offense", "Axecution"],
     "ultimate": "Every Beast Stampede",
     "colors": ["#533B27", "#272920"],
     "image": "../../../assets/images/heroes/wilhelm_the_wild/wilhelm_the_wild.webp",

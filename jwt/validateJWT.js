@@ -32,20 +32,13 @@ const authenticateAdminJWT = (req, res, next) => {
       console.log("NO USER");
       const error = new Error("Authorization token invalid or expired");
       return res.formatter.unauthorized(error.toString());
-    } else if (
-      user.email !== process.env.ADMIN_PANEL_EMAIL &&
-      user.email !== process.env.ADMIN_PANEL_EMAIL_2 &&
-      user.email !== process.env.ADMIN_PANEL_EMAIL_3
-    ) {
+    } else if (user.email !== process.env.ADMIN_PANEL_EMAIL && user.email !== process.env.ADMIN_PANEL_EMAIL_2 && user.email !== process.env.ADMIN_PANEL_EMAIL_3) {
       const error = {
         status: 401,
         message: `Unauthorized - Non-Admin User`,
         debug: `${user.email} Attempted Access to Admin Panel`,
       };
-      return res.formatter.unauthorized(
-        error,
-        "Unauthorized Non-Admin User attempted access at control panel"
-      );
+      return res.formatter.unauthorized(error, "Unauthorized Non-Admin User attempted access at control panel");
     }
     req.user = user;
     next();

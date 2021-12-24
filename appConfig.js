@@ -1,7 +1,4 @@
-const {
-  testSpecificFoe,
-  appWelcome,
-} = require("./game/specialEvents/specialEventList");
+const { testSpecificFoe, appWelcome } = require("./game/specialEvents/specialEventList");
 
 const appState = ["live", "maintenance"];
 const config = {

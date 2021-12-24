@@ -1,16 +1,6 @@
-const {
-  BASE_POWER,
-  BASE_HEALTH,
-  MINUTES_PER_ELM,
-  MINUTES_PER_ALL_ELM,
-  TIME_AND_HALF_ACTIVITIES,
-  MAX_LEVEL,
-} = require("../CONSTANTS");
+const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } = require("../CONSTANTS");
 const moment = require("moment");
-const {
-  cloneObj,
-  adjustActivityMinutes,
-} = require("../../lib/helperFunctions");
+const { cloneObj, adjustActivityMinutes } = require("../../lib/helperFunctions");
 const avatarList = require("../../heroList.json");
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
@@ -31,15 +21,7 @@ function avCalc(userTotals) {
       const totalAether = albedoLevel * 5 + qpAether;
       return totalAether;
     },
-    updateHealth: function (
-      level,
-      qpHealth,
-      oldHealth,
-      oldMaxHealth,
-      oldStatus,
-      lvlUp,
-      reset
-    ) {
+    updateHealth: function (level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp, reset) {
       let updatedHealth = oldHealth;
       let updatedMaxHealth = oldMaxHealth;
 
@@ -75,31 +57,22 @@ function avCalc(userTotals) {
     updateElements: function (character, qpSpent, dateOfCreation) {
       // Need to calculate the default elms each time the avatar is buffed, otherwise it will reset the original values are not accounted for
       const avatarBasics = cloneObj(
-        avatarList.find((av) => {
+        avatarList.find(av => {
           return character === av.character;
         }),
-        true
+        true,
       );
       //console.log('CB elms - ', avatarBasics.elms);
-      const e = avReturn._determineAstrologyBonus(
-        avatarBasics.elms,
-        dateOfCreation
-      );
+      const e = avReturn._determineAstrologyBonus(avatarBasics.elms, dateOfCreation);
 
       //console.log('CB elms AND astro bonus - ', e);
       // Loop over each activity saved in userTotals and do a fresh calculation of what the element values are
       // Then they get added to the defaultElement congifuration above
       for (const activityType in userTotals) {
-        let activityMinutes = userTotals[activityType]
-          ? userTotals[activityType].duration / 60
-          : 0;
+        let activityMinutes = userTotals[activityType] ? userTotals[activityType].duration / 60 : 0;
         // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
         // Currently, not tracking timeAndHalf exercises with a constant. Instead, using the adjustedActivity minutes above. Consider changing this in the future
-        let adjustedActivityMinutes = adjustActivityMinutes(
-          activityMinutes,
-          activityType,
-          TIME_AND_HALF_ACTIVITIES
-        );
+        let adjustedActivityMinutes = adjustActivityMinutes(activityMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
         //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes, 'adjusted - ', adjustedActivityMinutes);
         switch (activityType) {
           case "run":
@@ -167,9 +140,7 @@ function avCalc(userTotals) {
 
     // ADDS 5 TO WHICHEVER ELEMENT OF THE SIGN OF THE SEASON WHEN ACCOUNT WAS CREATED
     _determineAstrologyBonus: function (defaultelms, dateOfCreation) {
-      const bonusElement = avReturn
-        .determineAstrologySeason(dateOfCreation)
-        .element.toLowerCase();
+      const bonusElement = avReturn.determineAstrologySeason(dateOfCreation).element.toLowerCase();
 
       defaultelms[bonusElement] += 5;
       return defaultelms;
@@ -184,54 +155,40 @@ function avCalc(userTotals) {
 
       switch (true) {
         // Capricorn
-        case (date.isAfter(`${lastYear}-12-31`) &&
-          date.isBefore(`${thisYear}-01-20`)) ||
-          (date.isAfter(`${thisYear}-12-21`) &&
-            date.isBefore(`${nextYear}-01-01`)):
+        case (date.isAfter(`${lastYear}-12-31`) && date.isBefore(`${thisYear}-01-20`)) || (date.isAfter(`${thisYear}-12-21`) && date.isBefore(`${nextYear}-01-01`)):
           return { sign: "Capricorn", element: "Earth" };
         // Aquarius
-        case date.isAfter(`${thisYear}-01-19`) &&
-          date.isBefore(`${thisYear}-02-19`):
+        case date.isAfter(`${thisYear}-01-19`) && date.isBefore(`${thisYear}-02-19`):
           return { sign: "Aquarius", element: "Air" };
         // Pisces
-        case date.isAfter(`${thisYear}-02-18`) &&
-          date.isBefore(`${thisYear}-03-21`):
+        case date.isAfter(`${thisYear}-02-18`) && date.isBefore(`${thisYear}-03-21`):
           return { sign: "Pisces", element: "Water" };
         // Aries
-        case date.isAfter(`${thisYear}-03-20`) &&
-          date.isBefore(`${thisYear}-04-20`):
+        case date.isAfter(`${thisYear}-03-20`) && date.isBefore(`${thisYear}-04-20`):
           return { sign: "Aries", element: "Fire" };
         // Taurus
-        case date.isAfter(`${thisYear}-04-19`) &&
-          date.isBefore(`${thisYear}-05-21`):
+        case date.isAfter(`${thisYear}-04-19`) && date.isBefore(`${thisYear}-05-21`):
           return { sign: "Taurus", element: "Earth" };
         // Gemini
-        case date.isAfter(`${thisYear}-05-20`) &&
-          date.isBefore(`${thisYear}-06-21`):
+        case date.isAfter(`${thisYear}-05-20`) && date.isBefore(`${thisYear}-06-21`):
           return { sign: "Gemini", element: "Air" };
         // Cancer
-        case date.isAfter(`${thisYear}-06-20`) &&
-          date.isBefore(`${thisYear}-07-23`):
+        case date.isAfter(`${thisYear}-06-20`) && date.isBefore(`${thisYear}-07-23`):
           return { sign: "Cancer", element: "Water" };
         // Leo
-        case date.isAfter(`${thisYear}-07-22`) &&
-          date.isBefore(`${thisYear}-08-23`):
+        case date.isAfter(`${thisYear}-07-22`) && date.isBefore(`${thisYear}-08-23`):
           return { sign: "Leo", element: "Fire" };
         // Virgo
-        case date.isAfter(`${thisYear}-08-22`) &&
-          date.isBefore(`${thisYear}-09-23`):
+        case date.isAfter(`${thisYear}-08-22`) && date.isBefore(`${thisYear}-09-23`):
           return { sign: "Virgo", element: "Earth" };
         // Libra
-        case date.isAfter(`${thisYear}-09-22`) &&
-          date.isBefore(`${thisYear}-10-23`):
+        case date.isAfter(`${thisYear}-09-22`) && date.isBefore(`${thisYear}-10-23`):
           return { sign: "Libra", element: "Air" };
         // Scorpio
-        case date.isAfter(`${thisYear}-10-22`) &&
-          date.isBefore(`${thisYear}-11-22`):
+        case date.isAfter(`${thisYear}-10-22`) && date.isBefore(`${thisYear}-11-22`):
           return { sign: "Scorpio", element: "Water" };
         // Sagittarius
-        case date.isAfter(`${thisYear}-11-21`) &&
-          date.isBefore(`${thisYear}-12-22`):
+        case date.isAfter(`${thisYear}-11-21`) && date.isBefore(`${thisYear}-12-22`):
           return { sign: "Sagittarius", element: "Fire" };
         default:
           return { sign: "Capricorn", element: "Earth" };

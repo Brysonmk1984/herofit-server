@@ -1,8 +1,4 @@
-const {
-  arrayChunker,
-  roundNumber,
-  parseAvatarProperties,
-} = require("../../lib/helperFunctions");
+const { arrayChunker, roundNumber, parseAvatarProperties } = require("../../lib/helperFunctions");
 const battleProcess = require("./battleProcess");
 const { sendBattleReportEmail } = require("../../mail");
 
@@ -11,13 +7,11 @@ const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard) {
-  const allAvatars = shard.map((battle) => battle.avatar);
+  const allAvatars = shard.map(battle => battle.avatar);
 
   let battlePromises = [];
   for (let i = 0; i < shard.length; i++) {
-    battlePromises.push(
-      battleProcess(shard[i], parseAvatarProperties(allAvatars[i]))
-    );
+    battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
   }
   return Promise.allSettled(battlePromises);
 }
@@ -44,18 +38,14 @@ async function runAllBattles(battles, sendReport) {
   }
 
   try {
-    const battlesResults = await new Promise((resolve) =>
-      staggerBattleBatches(resolve)
-    );
+    const battlesResults = await new Promise(resolve => staggerBattleBatches(resolve));
     console.log("BATTLES RAN!", battlesResults);
 
     // If there's an error in the battle processing, throw error before trying to calculate totals
     if (battlesResults.length && battlesResults[0].value instanceof Error) {
       throw battlesResults[0].value;
     }
-    const allOutcomes = battlesResults.map((promiseResult) =>
-      promiseResult.value.map((innerPr) => innerPr.value)
-    );
+    const allOutcomes = battlesResults.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value));
     const outcomeList = [].concat.apply([], allOutcomes);
     const tally = {
       "Avatar Wins": 0,
@@ -74,25 +64,13 @@ async function runAllBattles(battles, sendReport) {
 
       // If last outcome, compute totals
       if (i + 1 === outcomeList.length) {
-        tally.avWinPercent = `${
-          roundNumber(
-            tally["Avatar Wins"] / (tally["Avatar Wins"] + tally["Foe Wins"]),
-            2
-          ) * 100
-        }%`;
-        tally.avWinPercentOverall = `${
-          roundNumber(tally["Avatar Wins"] / tally.total, 2) * 100
-        }%`;
+        tally.avWinPercent = `${roundNumber(tally["Avatar Wins"] / (tally["Avatar Wins"] + tally["Foe Wins"]), 2) * 100}%`;
+        tally.avWinPercentOverall = `${roundNumber(tally["Avatar Wins"] / tally.total, 2) * 100}%`;
         const ties = tally["Draw"] + tally["Double KO"];
         tally.tiePercent = `${roundNumber(ties / tally.total, 2) * 100}%`;
       }
     });
-    tally.failedToRun =
-      tally.total -
-      (tally["Avatar Wins"] +
-        tally["Foe Wins"] +
-        tally["Draw"] +
-        tally["Double KO"]);
+    tally.failedToRun = tally.total - (tally["Avatar Wins"] + tally["Foe Wins"] + tally["Draw"] + tally["Double KO"]);
     // Return battle results tally to be emailed
 
     // TALLY UP THE RESULTS AND SEND EMAIL

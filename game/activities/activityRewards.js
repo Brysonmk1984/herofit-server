@@ -7,22 +7,18 @@ const preventDuplicateItems = require("../items/preventDuplicateItems");
 
 function _insertLevelRewards(avatarID, levelsEarned, t) {
   // Filter all possible rewards down to just the ones that match the type 'levelReward' AND are of one of the levels passed in the levelsEarned array
-  const levelRewards = upgradeActions
-    .filter((action) => action.type === "levelReward")
-    .filter((action) =>
-      levelsEarned.find((lvl) => lvl === action.requiredLevel)
-    );
-  const levelRewardNames = levelRewards.map((reward) => reward.name);
+  const levelRewards = upgradeActions.filter(action => action.type === "levelReward").filter(action => levelsEarned.find(lvl => lvl === action.requiredLevel));
+  const levelRewardNames = levelRewards.map(reward => reward.name);
 
   return preventDuplicateItems(levelRewardNames, avatarID)
-    .then((dedupedRewards) => {
+    .then(dedupedRewards => {
       return Items.findAll({
         attributes: { id: avatarID },
         where: { name: { [Op.in]: dedupedRewards } },
         raw: true,
       })
-        .then((items) => {
-          const avItems = items.map((item) => {
+        .then(items => {
+          const avItems = items.map(item => {
             return { avatarID, itemID: item.id };
           });
 
@@ -30,7 +26,7 @@ function _insertLevelRewards(avatarID, levelsEarned, t) {
             .then(() => {
               // Used for displaying rewards to user after level up only
               const rewards = [];
-              items.forEach((item) => {
+              items.forEach(item => {
                 rewards.push({
                   type: item.type,
                   name: item.name,
@@ -41,17 +37,17 @@ function _insertLevelRewards(avatarID, levelsEarned, t) {
               //console.log('AWARDS TO DISPLAY:', rewards);
               return rewards;
             })
-            .catch((error) => {
+            .catch(error => {
               console.log("ERROR WITH CREATING AVATARITEMS", error);
               throw error;
             });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log("ERROR FINDING ITEMS", error);
           throw error;
         });
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR PREVENTING DUPES", error);
       throw error;
     });
@@ -62,25 +58,23 @@ function _insertStatRewards(avatarID, statObj, t) {
   for (let stat in statObj) {
     // For each stat, find the matching Upgrade Actions for each point the hero achieved
     const matchingActions = statObj[stat]
-      .map((statPoint) => {
-        return upgradeActions
-          .filter((action) => action.stat === stat)
-          .find((action) => action.requiredAmount === statPoint);
+      .map(statPoint => {
+        return upgradeActions.filter(action => action.stat === stat).find(action => action.requiredAmount === statPoint);
       })
       .filter(Boolean);
-    const rewardNames = matchingActions.map((reward) => reward.name);
+    const rewardNames = matchingActions.map(reward => reward.name);
     statRewardNames.push(...rewardNames);
   }
 
   return preventDuplicateItems(statRewardNames, avatarID)
-    .then((dedupedStatRewards) => {
+    .then(dedupedStatRewards => {
       return Items.findAll({
         attributes: { id: avatarID },
         where: { name: { [Op.in]: dedupedStatRewards } },
         raw: true,
       })
-        .then((items) => {
-          const avItems = items.map((item) => {
+        .then(items => {
+          const avItems = items.map(item => {
             return { avatarID, itemID: item.id };
           });
 
@@ -88,7 +82,7 @@ function _insertStatRewards(avatarID, statObj, t) {
             .then(() => {
               // Used for displaying rewards to user after level up only
               const rewards = [];
-              items.forEach((item) => {
+              items.forEach(item => {
                 rewards.push({
                   type: item.type,
                   name: item.name,
@@ -98,17 +92,17 @@ function _insertStatRewards(avatarID, statObj, t) {
 
               return rewards;
             })
-            .catch((error) => {
+            .catch(error => {
               console.log("ERROR WITH CREATING AVATARITEMS", error);
               throw error;
             });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log("ERROR FINDING ITEMS", error);
           throw error;
         });
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR PREVENTING DUPES", error);
       throw error;
     });
@@ -120,10 +114,7 @@ function determineStatImprovements(improvements, snapshot) {
 
   for (stat in improvements) {
     if (statsToCheck.includes(stat) && improvements[stat] > 0) {
-      statObj[stat] = range(
-        Math.floor(snapshot[stat] + 1),
-        Math.floor(snapshot[stat] + improvements[stat])
-      );
+      statObj[stat] = range(Math.floor(snapshot[stat] + 1), Math.floor(snapshot[stat] + improvements[stat]));
     }
   }
 
@@ -132,10 +123,10 @@ function determineStatImprovements(improvements, snapshot) {
 
 function activityLevelRewards(avatarID, levelsEarned, t) {
   return _insertLevelRewards(avatarID, levelsEarned, t)
-    .then((data) => {
+    .then(data => {
       return data;
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error in main activityRewards function", error);
       throw error;
     });
@@ -143,10 +134,10 @@ function activityLevelRewards(avatarID, levelsEarned, t) {
 
 function activityStatRewards(avatarID, statObj, t) {
   return _insertStatRewards(avatarID, statObj, t)
-    .then((data) => {
+    .then(data => {
       return data;
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error in main activityRewards function", error);
       throw error;
     });

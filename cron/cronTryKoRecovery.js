@@ -12,7 +12,7 @@ Avatar.findAll({
   raw: true,
   attributes: ["health", "recovery", "status", "owner"],
 })
-  .then((results) => {
+  .then(results => {
     console.log("all KO results", results);
     const recoveredAvatars = [];
 
@@ -21,8 +21,7 @@ Avatar.findAll({
       results.forEach((result, i) => {
         avatar = parseAvatarProperties(result);
         const recovery = avatar.recovery;
-        const recoverEarlyChance =
-          (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
+        const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
         const recoveredEarly = chance.bool({ likelihood: recoverEarlyChance });
 
         // Revive avatar to the 1 HP
@@ -33,32 +32,25 @@ Avatar.findAll({
         return null;
       });
       console.log("recovered avs", recoveredAvatars);
-      return Avatar.update(
-        { health: REVIVE_AMOUNT, status: "Recovering" },
-        { where: { owner: { [Op.in]: recoveredAvatars } } }
-      );
+      return Avatar.update({ health: REVIVE_AMOUNT, status: "Recovering" }, { where: { owner: { [Op.in]: recoveredAvatars } } });
     } else {
       console.log("No Avs to Recover");
       process.exit();
     }
   })
-  .then((avUpdate) => {
+  .then(avUpdate => {
     console.log("SHOULD HAVE ATTEMPTED KO RECOVERY", avUpdate);
     process.exit();
   })
-  .catch((error) => {
+  .catch(error => {
     console.log("ERROR TRYING TO DO KO REVIVES", error);
     return new Promise((resolve, reject) => {
-      return sendCronErrorEmail(
-        { message: error.message, name: error.name },
-        resolve,
-        reject
-      );
+      return sendCronErrorEmail({ message: error.message, name: error.name }, resolve, reject);
     })
       .then(() => {
         process.exit();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log("couldn't send error email TRY KO RECOVERY - ", error);
         process.exit();
       });

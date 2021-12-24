@@ -1,9 +1,6 @@
 const { Avatar } = require("../config/db");
 const { Op, col } = require("sequelize");
-const {
-  RESTED_THRESHOLD,
-  RECOVERY_EFFECTIVENESS_MOD,
-} = require("../game/CONSTANTS");
+const { RESTED_THRESHOLD, RECOVERY_EFFECTIVENESS_MOD } = require("../game/CONSTANTS");
 const { sendCronErrorEmail } = require("../mail");
 const { parseAvatarProperties } = require("../lib/helperFunctions");
 console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
@@ -13,25 +10,17 @@ Avatar.findAll({
   //where: { health : { [Op.lt] : col('maxHealth') } },
   where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } },
   raw: true,
-  attributes: [
-    "health",
-    "maxHealth",
-    "recovery",
-    "status",
-    "owner",
-    "statusFade",
-  ],
+  attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"],
 })
-  .then((results) => {
+  .then(results => {
     const allPromises = [];
     // Loop over each avatar and either regen health if recovering or other status effects
-    results.forEach((avatar) => {
+    results.forEach(avatar => {
       avatar = parseAvatarProperties(avatar);
       let avatarHealth = avatar.health;
       const maxHealth = avatar.maxHealth;
       const recovery = avatar.recovery;
-      const recoveryRetarder =
-        recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
+      const recoveryRetarder = recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
       const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
       let avatarStatus = avatar.status;
       let avatarStatusFade = avatar.statusFade;
@@ -89,17 +78,17 @@ Avatar.findAll({
             returning: true,
             raw: true,
             plain: true,
-          }
-        )
+          },
+        ),
       );
     });
     return Promise.allSettled(allPromises);
   })
-  .then((results) => {
+  .then(results => {
     //results.forEach((result) => console.log('All Regenerate Results - ', result.status));
     return process.exit();
   })
-  .catch((error) => {
+  .catch(error => {
     console.log("ERROR DOING BULK HEALTH UPDATE", error);
     //db.close();
     return new Promise((resolve, reject) => {
@@ -110,9 +99,9 @@ Avatar.findAll({
           errorLocation: "Cron Script",
         },
         resolve,
-        reject
+        reject,
       );
-    }).catch((error) => {
+    }).catch(error => {
       console.log("couldn't send error email for UPDATE AVATAR CRON - ", error);
       process.exit();
     });

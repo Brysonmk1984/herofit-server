@@ -1,10 +1,6 @@
 const { Avatar, Battle, AvatarItems, Items } = require("../../config/db");
 const { Op } = require("sequelize");
-const {
-  DEFEATEDFOE,
-  WINSTREAK,
-  WINTOTAL,
-} = require("../postBattleActions.json");
+const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require("../postBattleActions.json");
 const VILLAINS = require("../villains.json");
 
 // ON GOTOBATTLE, save list of effects from avatar's items
@@ -32,11 +28,11 @@ function determineItemEffects(equipment) {
 // Filter item effects down to just battle effects and return only their names
 function _filterBattleEffects(itemEffects) {
   const battleItemEffects = itemEffects
-    .filter((effect) => {
+    .filter(effect => {
       //console.log('EFFECTTT - ', effect);
       return effect.type === "prebattle" || effect.type === "postbattle";
     })
-    .map((effect) => {
+    .map(effect => {
       return effect.name;
     });
   return battleItemEffects;
@@ -63,26 +59,20 @@ function determinePostBattleActions(avatar, foe, resolve, reject) {
     raw: undefined,
     nest: true,
   })
-    .then((records) => {
+    .then(records => {
       // Filter results by non consumables, and convert dataValues to actual javascript object
       const avatarItems = records
-        .filter((record) => record.dataValues.item)
-        .map((record) => {
+        .filter(record => record.dataValues.item)
+        .map(record => {
           const itemID = record.dataValues.itemID;
           const item = record.dataValues.item.dataValues;
           return Object.assign({}, { itemID }, item);
         });
       //console.log('CONVERTED-', avatarItems);
       //Convert avatarItems into a series of different arrays based on type. This is to check if the player has already earned an award.
-      const skinNamesArray = avatarItems
-        .filter((item) => item.type === "skin")
-        .map((skin) => skin.name);
-      const titleNamesArray = avatarItems
-        .filter((item) => item.type === "title")
-        .map((title) => title.name);
-      const petNamesArray = avatarItems
-        .filter((item) => item.type === "pet")
-        .map((pet) => pet.name);
+      const skinNamesArray = avatarItems.filter(item => item.type === "skin").map(skin => skin.name);
+      const titleNamesArray = avatarItems.filter(item => item.type === "title").map(title => title.name);
+      const petNamesArray = avatarItems.filter(item => item.type === "pet").map(pet => pet.name);
       //console.log('SNA - ',skinNamesArray,'TNA - ', titleNamesArray,'PNA - ', petNamesArray);
       const allPbaCheckPromises = [];
 
@@ -95,95 +85,36 @@ function determinePostBattleActions(avatar, foe, resolve, reject) {
       // Spirits get a skin if they defeat all of a particular type
       if (foe.class === "Spirits") {
         // Check if current foe is last of type of foe
-        allPbaCheckPromises.push(
-          _checkDefeatedAllOfTypeButCurrent(
-            avatar.id,
-            foe.type,
-            "Spirits",
-            foe.name,
-            skinNamesArray
-          )
-        );
+        allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, "Spirits", foe.name, skinNamesArray));
       }
 
       if (foe.class === "Titans") {
-        if (VILLAINS.Titans.map((foe) => foe.type).includes(foe.type)) {
-          const allPastRewards = [
-            ...skinNamesArray,
-            ...titleNamesArray,
-            ...petNamesArray,
-          ];
+        if (VILLAINS.Titans.map(foe => foe.type).includes(foe.type)) {
+          const allPastRewards = [...skinNamesArray, ...titleNamesArray, ...petNamesArray];
           // Check if foe has been defeated
-          allPbaCheckPromises.push(
-            _checkDefeatedParticularFoe(
-              avatar.id,
-              foe.type,
-              "Titans",
-              foe.name,
-              allPastRewards
-            )
-          );
+          allPbaCheckPromises.push(_checkDefeatedParticularFoe(avatar.id, foe.type, "Titans", foe.name, allPastRewards));
         }
       }
 
       if (foe.class === "Elementals") {
-        const minorFoes = [
-          "Gusty Rascal",
-          "Rock Skipper",
-          "Flame Fiend",
-          "Splash Artist",
-        ];
-        const midLevelFoes = [
-          "Wheezing Jinn",
-          "Granite Golem",
-          "Burning Jinn",
-          "Cyclonic Siren",
-        ];
-        const highLevelFoes = [
-          "Storming Oni",
-          "Hulking Aggro Crag",
-          "Scorching Archfiend",
-          "High Priestess of the Tides",
-        ];
+        const minorFoes = ["Gusty Rascal", "Rock Skipper", "Flame Fiend", "Splash Artist"];
+        const midLevelFoes = ["Wheezing Jinn", "Granite Golem", "Burning Jinn", "Cyclonic Siren"];
+        const highLevelFoes = ["Storming Oni", "Hulking Aggro Crag", "Scorching Archfiend", "High Priestess of the Tides"];
 
         if (minorFoes.includes(foe.type)) {
           // Check if current foe is last of type of foe
-          allPbaCheckPromises.push(
-            _checkDefeatedAllOfTypeButCurrent(
-              avatar.id,
-              foe.type,
-              "Elementals",
-              foe.name,
-              petNamesArray
-            )
-          );
+          allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, "Elementals", foe.name, petNamesArray));
         } else if (midLevelFoes.includes(foe.type)) {
           // Check if current foe is last of type of foe
-          allPbaCheckPromises.push(
-            _checkDefeatedAllOfTypeButCurrent(
-              avatar.id,
-              foe.type,
-              "Elementals",
-              foe.name,
-              titleNamesArray
-            )
-          );
+          allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, "Elementals", foe.name, titleNamesArray));
         } else if (highLevelFoes.includes(foe.type)) {
           // Check if current foe is last of type of foe
-          allPbaCheckPromises.push(
-            _checkDefeatedAllOfTypeButCurrent(
-              avatar.id,
-              foe.type,
-              "Elementals",
-              foe.name,
-              skinNamesArray
-            )
-          );
+          allPbaCheckPromises.push(_checkDefeatedAllOfTypeButCurrent(avatar.id, foe.type, "Elementals", foe.name, skinNamesArray));
         }
       }
 
       return Promise.allSettled(allPbaCheckPromises)
-        .then((resolvedPromises) => {
+        .then(resolvedPromises => {
           const totalCheck = resolvedPromises[0];
           const streakCheck = resolvedPromises[1];
           const defeatFoeCheck = resolvedPromises[2];
@@ -211,25 +142,19 @@ function determinePostBattleActions(avatar, foe, resolve, reject) {
           // ALL PBAs as action strings in an array
           resolve(PBAs);
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("err", err);
           reject(err);
         });
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error Getting all titles", error);
       return reject(error);
     });
 }
 
 // CHECKS IF THE CURRENT FOE WILL GRANT A REWARD
-function _checkDefeatedParticularFoe(
-  avatarId,
-  foeType,
-  foeClass,
-  currentFoeName,
-  arrayOfPastRewards
-) {
+function _checkDefeatedParticularFoe(avatarId, foeType, foeClass, currentFoeName, arrayOfPastRewards) {
   // FIND ALL BATTLES WHERE THE AVATAR WON AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
   return Battle.findAll({
     attributes: ["foe"],
@@ -240,28 +165,25 @@ function _checkDefeatedParticularFoe(
     },
     raw: true,
   })
-    .then((results) => {
+    .then(results => {
       // All foes defeated within a type (eg. Banshee)
       if (results) {
         // From resulting battles, make an array that's only the names of the foes. Then sort it in alphabetical order
         const foesDefeated = results
-          .map((result) => result.foe.name)
+          .map(result => result.foe.name)
           .slice()
           .sort();
 
         // Remove duplicates from foesDefeated
         const fdNoDUpes = [...new Set(foesDefeated)];
 
-        const hasBeenDefeated = fdNoDUpes.includes(currentFoeName)
-          ? true
-          : false;
+        const hasBeenDefeated = fdNoDUpes.includes(currentFoeName) ? true : false;
         //console.log('hasBeenDefeated', hasBeenDefeated);
         // If last foe of type, return matching PBA action
         if (!hasBeenDefeated) {
           // Consider moving the PBA action to the normal PBA JSON file
-          const action = VILLAINS[foeClass].find((f) => f.type === foeType)
-            .pba[0];
-          const matchingPBA = DEFEATEDFOE.find((pba) => pba.action === action);
+          const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];
+          const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
           //console.log('action', action, 'MPBA - ', matchingPBA);
           // Check to make sure the user doesn't already have the item
           const isCriticalWin = !arrayOfPastRewards.includes(matchingPBA.name);
@@ -278,19 +200,13 @@ function _checkDefeatedParticularFoe(
       // THIS SHOULDN'T HAPPEN, BUT I WANT TO PREVENT THE SCRIPT FROM STALLING IF IT DOES
       return undefined;
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERR - ", error);
     });
 }
 
 // CHECKS IF THE CURRENT FOE WILL GRANT A NEW SKIN FOR BEING LAST OF TYPE
-function _checkDefeatedAllOfTypeButCurrent(
-  avatarId,
-  foeType,
-  foeClass,
-  currentFoeName,
-  itemTypeNamesArray
-) {
+function _checkDefeatedAllOfTypeButCurrent(avatarId, foeType, foeClass, currentFoeName, itemTypeNamesArray) {
   // FIND ALL BATTLES WHERE THE AVATAR WON or DKO AND WHERE THE FOE MATCHES THE FOETYPE PASSED IN
   return Battle.findAll({
     attributes: ["foe"],
@@ -301,17 +217,14 @@ function _checkDefeatedAllOfTypeButCurrent(
     },
     raw: true,
   })
-    .then((results) => {
+    .then(results => {
       // All foes defeated within a type (eg. Banshee)
       if (results) {
         // From resulting battles, make an array that's only the names of the foes. Then sort it in alphabetical order
         const foesDefeated = results
-          .map((result) => {
+          .map(result => {
             // Need to check for Shadow-Self instead of Shadow-Grabbler
-            const foeName =
-              result.foe.type === "Shadow-Self"
-                ? "Shadow-Self"
-                : result.foe.name;
+            const foeName = result.foe.type === "Shadow-Self" ? "Shadow-Self" : result.foe.name;
             return foeName;
           })
           .slice()
@@ -322,7 +235,7 @@ function _checkDefeatedAllOfTypeButCurrent(
         //console.log('NO DUPES-', fdNoDUpes);
         // All foes of a certain type
         const allFoes = VILLAINS[foeClass]
-          .find((foe) => foe.type === foeType)
+          .find(foe => foe.type === foeType)
           .foe.slice()
           .sort();
         //console.log('AF',allFoes);
@@ -335,23 +248,17 @@ function _checkDefeatedAllOfTypeButCurrent(
         if (currentFoeName.includes("Shadow")) {
           const currentFoeName = "Shadow-Self";
           // If Shadow self was already defeated, or f user already has the Shadow Self Skin, just return undefined
-          if (
-            fdNoDUpes.includes("Shadow-Self") ||
-            itemTypeNamesArray.includes("Shadow Self")
-          ) {
+          if (fdNoDUpes.includes("Shadow-Self") || itemTypeNamesArray.includes("Shadow Self")) {
             return undefined;
             // If Shadow-Self wasn't defeated, then add the GRANT Shadow-Self award
           } else {
-            return VILLAINS["Spirits"].find((f) => f.type === "Shadow-Self")
-              .pba[0];
+            return VILLAINS["Spirits"].find(f => f.type === "Shadow-Self").pba[0];
           }
           // ANY OTHER FOE
         } else {
           //console.log('CN = ', currentFoeName);
           // Make an array of all foes of type EXCLUDING the name of the current foe
-          const allFoesMinusCurrent = allFoes.filter(
-            (foe) => foe !== currentFoeName
-          );
+          const allFoesMinusCurrent = allFoes.filter(foe => foe !== currentFoeName);
           //console.log('AFMC', allFoesMinusCurrent);
           //console.log('the two arrays',allFoesMinusCurrent, fdNoDUpes);
           // Compare the previous array to the deduped foes defeated array
@@ -362,16 +269,11 @@ function _checkDefeatedAllOfTypeButCurrent(
           // If last foe of type, return matching PBA action
           if (isLastOfType) {
             // Consider moving the PBA action to the normal PBA JSON file
-            const action = VILLAINS[foeClass].find((f) => f.type === foeType)
-              .pba[0];
-            const matchingPBA = DEFEATEDFOE.find(
-              (pba) => pba.action === action
-            );
+            const action = VILLAINS[foeClass].find(f => f.type === foeType).pba[0];
+            const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
             //console.log('action', action, 'MPBA - ', matchingPBA);
             // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin
-            const isCriticalWin = !itemTypeNamesArray.includes(
-              matchingPBA.name
-            );
+            const isCriticalWin = !itemTypeNamesArray.includes(matchingPBA.name);
             //console.log('IS CRITICAL WIN', isCriticalWin);
             // Win is critical if it's unearned
             if (isCriticalWin) {
@@ -385,7 +287,7 @@ function _checkDefeatedAllOfTypeButCurrent(
       // THIS SHOULDN'T HAPPEN, BUT I WANT TO PREVENT THE SCRIPT FROM STALLING IF IT DOES
       return undefined;
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERR - ", error);
     });
 }
@@ -400,7 +302,7 @@ function _checkWinStreak(avatarId, titleNamesArray) {
     order: [["createdAt", "DESC"]],
     raw: true,
   })
-    .then((results) => {
+    .then(results => {
       let streak = 0;
       for (let i = 0; i < results.length; i++) {
         if (results[i].outcome === "Avatar Wins") {
@@ -414,9 +316,7 @@ function _checkWinStreak(avatarId, titleNamesArray) {
       const streakIfWin = streak + 1;
 
       // Need to find the streak that matches a pba requirement, if one exists
-      const matchingPBA = WINSTREAK.find(
-        (pba) => pba.requirement === streakIfWin
-      );
+      const matchingPBA = WINSTREAK.find(pba => pba.requirement === streakIfWin);
 
       // If with a win tonight, the pba name matches a streak in the items file
       // If a match
@@ -430,7 +330,7 @@ function _checkWinStreak(avatarId, titleNamesArray) {
         }
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error getting win streak - ", error);
     });
 }
@@ -445,9 +345,7 @@ function _checkWinTotal(avatarId, titleNamesArray) {
     .then(({ battleWins }) => {
       const battleWinsIfWinTonight = battleWins + 1;
       // Check if the potential win total will match a new PBA
-      const matchingPBA = WINTOTAL.find(
-        (pba) => pba.requirement === battleWinsIfWinTonight
-      );
+      const matchingPBA = WINTOTAL.find(pba => pba.requirement === battleWinsIfWinTonight);
       //console.log('TOTAL IF WIN -', battleWinsIfWinTonight, 'MAA-',matchingPBA);
       // If this win matches a new PBA
       if (matchingPBA) {
@@ -461,7 +359,7 @@ function _checkWinTotal(avatarId, titleNamesArray) {
         }
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error getting battle wins - ", error);
     });
 }

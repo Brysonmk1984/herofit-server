@@ -27,8 +27,7 @@ const testSpecificFoe = {
 
 const attackOfTheElements = {
   eventName: "Attack of the Elements",
-  description:
-    "For twelve weeks, a new Elemental foe will be released in the game! During this time, there will be an increased chance to battle the new foe, as well as bonus Photon Tokens and XP for winning!",
+  description: "For twelve weeks, a new Elemental foe will be released in the game! During this time, there will be an increased chance to battle the new foe, as well as bonus Photon Tokens and XP for winning!",
   actionTypes: [
     {
       type: "ptBooster",
@@ -53,8 +52,7 @@ const attackOfTheElements = {
 
 const helloween = {
   eventName: "Helloween",
-  description:
-    "Until Halloween, bonus chance to face the Guardian of the Depths",
+  description: "Until Halloween, bonus chance to face the Guardian of the Depths",
   actionTypes: [
     {
       type: "foeLikelihood",
@@ -69,8 +67,7 @@ const helloween = {
 
 const appWelcome = {
   eventName: "App Welcome",
-  description:
-    "For the first month after launch, users who install the app will receive the white rabbit for free.",
+  description: "For the first month after launch, users who install the app will receive the white rabbit for free.",
   actionTypes: [
     {
       type: "onAuth",

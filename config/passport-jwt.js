@@ -37,19 +37,19 @@ const strategy = new Strategy(options, (payload, done) => {
   console.log("email from JWT", payload.email);
   // payload.sub should contain the user id & findByPk is a sequelize method for retrieving by id
   return User.findByPk(payload.sub)
-    .then((user) => {
+    .then(user => {
       //console.log('USR', user);
       if (!user) {
         return done(null, false);
       }
       return done(null, user);
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("Error findByPk", error);
       return done(error);
     });
 });
 
-module.exports = (passport) => {
+module.exports = passport => {
   passport.use(strategy);
 };

@@ -3,7 +3,7 @@ const app = require("../../index.js");
 
 // LOGIN ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/login", () => {
-  it("respond with json", (done) => {
+  it("respond with json", done => {
     request(app)
       .post("/auth/login")
 
@@ -13,11 +13,11 @@ describe("POST /auth/login", () => {
       })
       .set("Accept", "application/json")
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const { email } = response.body.data.user;
         expect(email).toBe(process.env.TEST_SIGN_IN_EMAIL);
         done();
       })
-      .catch((err) => done(err));
+      .catch(err => done(err));
   });
 });

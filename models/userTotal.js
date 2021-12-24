@@ -90,7 +90,7 @@ const UserTotalModel = function (db, DataTypes) {
         allowNull: true,
       },
     },
-    { timestamps: false }
+    { timestamps: false },
   );
 
   return UserTotal;

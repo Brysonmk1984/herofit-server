@@ -1,9 +1,6 @@
 const { Op } = require("sequelize");
 const { Avatar, Battle, Items } = require("../../config/db");
-const {
-  determineItemEffects,
-  determinePostBattleActions,
-} = require("./onGoToBattle");
+const { determineItemEffects, determinePostBattleActions } = require("./onGoToBattle");
 const ALLPBAs = require("../postBattleActions.json");
 
 // Used for inserting a battle for an individual user
@@ -13,7 +10,7 @@ function insertBattle(avatar, foe) {
   return new Promise((resolve, reject) => {
     return determinePostBattleActions(avatar, foe, resolve, reject);
   })
-    .then((pbas) => {
+    .then(pbas => {
       // Need parent context;
       postBattleActions = pbas.length ? pbas : null;
       //console.log('PBAS on insert = ', postBattleActions);
@@ -53,28 +50,26 @@ function insertBattle(avatar, foe) {
         {
           goToBattle: true,
         },
-        { where: { owner: avatar.owner }, raw: true }
+        { where: { owner: avatar.owner }, raw: true },
       );
     })
-    .then((result) => {
+    .then(result => {
       console.log("UPDATED AV GOTOBATTLE", result);
       // SHOULD NEVER HAPPEN
       if (!result) {
         console.log("THIS ERROR SHOULD NEVER HAPPEN", error);
-        const error = new Error(
-          `No Avatar associated with user ${avatar.owner}`
-        );
+        const error = new Error(`No Avatar associated with user ${avatar.owner}`);
         return error;
       }
 
       // Get the items acquired from the action types in the battle report
       let rewards = null;
       if (postBattleActions) {
-        rewards = postBattleActions.map((action) => {
+        rewards = postBattleActions.map(action => {
           let matchingPBA;
 
           for (let actionType in ALLPBAs) {
-            const match = ALLPBAs[actionType].find((pba) => {
+            const match = ALLPBAs[actionType].find(pba => {
               return pba.action === action;
             });
             if (match) {
@@ -90,28 +85,17 @@ function insertBattle(avatar, foe) {
       return new Promise((resolve, reject) => {
         if (rewards) {
           return Items.findAll({
-            attributes: [
-              "type",
-              "name",
-              "description",
-              "lore",
-              "effects",
-              "icon",
-              "class",
-              "exhaustible",
-              "ptCost",
-              "action",
-            ],
+            attributes: ["type", "name", "description", "lore", "effects", "icon", "class", "exhaustible", "ptCost", "action"],
             where: { name: { [Op.in]: rewards } },
           })
-            .then((matchingItems) => {
+            .then(matchingItems => {
               resolve({
                 goToBattle: true,
                 foe,
                 rewards: matchingItems,
               });
             })
-            .catch((error) => {
+            .catch(error => {
               reject(error);
             });
         } else {
@@ -123,12 +107,12 @@ function insertBattle(avatar, foe) {
           resolve(battleObj);
         }
       })
-        .then((result) => {
+        .then(result => {
           return result;
         })
-        .catch((error) => reject(error));
+        .catch(error => reject(error));
     })
-    .catch((error) => {
+    .catch(error => {
       error = error.toString();
       console.log(`Couldn't Send Avatar to battle: ${error}`);
       return { error };

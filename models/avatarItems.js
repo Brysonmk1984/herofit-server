@@ -31,7 +31,7 @@ const AvatarItemsModel = function (db, DataTypes) {
         defaultValue: false,
       },
     },
-    { freezeTableName: true }
+    { freezeTableName: true },
   );
 
   return AvatarItems;

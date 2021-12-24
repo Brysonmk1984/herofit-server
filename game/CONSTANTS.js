@@ -38,42 +38,9 @@ const ACTIVITY_MAP = {
   Kayaking: "kayaking",
 };
 const COMPETITIVE_ACTIVITIES = ["run", "hike", "ride", "walk"];
-const NONCOMPETITIVE_ACTIVITIES = [
-  "stairStepper",
-  "elliptical",
-  "swim",
-  "weightTraining",
-  "yoga",
-  "rowing",
-  "crossfit",
-  "standUpPaddling",
-  "ski",
-  "snowboard",
-  "snowshoe",
-  "kayaking",
-  "workout",
-];
-const TIME_AND_HALF_ACTIVITIES = [
-  "stairStepper",
-  "elliptical",
-  "swim",
-  "crossfit",
-  "run",
-];
-const NON_TIME_AND_HALF_ACTIVITIES = [
-  "ride",
-  "weightTraining",
-  "hike",
-  "yoga",
-  "walk",
-  "rowing",
-  "standUpPaddling",
-  "ski",
-  "snowboard",
-  "snowshoe",
-  "kayaking",
-  "workout",
-];
+const NONCOMPETITIVE_ACTIVITIES = ["stairStepper", "elliptical", "swim", "weightTraining", "yoga", "rowing", "crossfit", "standUpPaddling", "ski", "snowboard", "snowshoe", "kayaking", "workout"];
+const TIME_AND_HALF_ACTIVITIES = ["stairStepper", "elliptical", "swim", "crossfit", "run"];
+const NON_TIME_AND_HALF_ACTIVITIES = ["ride", "weightTraining", "hike", "yoga", "walk", "rowing", "standUpPaddling", "ski", "snowboard", "snowshoe", "kayaking", "workout"];
 
 // FOR BATTLES
 const REGENERATION_RATE = 5;
@@ -164,18 +131,12 @@ const ARMOR_DRF = 1.7;
 // variation on the power each attack (one per turn)
 const DAMAGE_PERCENT_PER_TURN = 0.2;
 const DAMAGE_VARIANCE_PER_TURN = 0.07;
-const DAMAGE_VARIANCE_RANGE = [
-  DAMAGE_PERCENT_PER_TURN - DAMAGE_VARIANCE_PER_TURN,
-  DAMAGE_PERCENT_PER_TURN + DAMAGE_VARIANCE_PER_TURN,
-];
+const DAMAGE_VARIANCE_RANGE = [DAMAGE_PERCENT_PER_TURN - DAMAGE_VARIANCE_PER_TURN, DAMAGE_PERCENT_PER_TURN + DAMAGE_VARIANCE_PER_TURN];
 
 // ELEMENTAL variation on the elemental power each attack (turns 2,3,6,7,10,11)
 const ELM_DAMAGE_PERCENT_PER_TURN = 0.15;
 const ELM_DAMAGE_VARIANCE_PER_TURN = 0.05;
-const ELM_DAMAGE_VARIANCE_RANGE = [
-  ELM_DAMAGE_PERCENT_PER_TURN - ELM_DAMAGE_VARIANCE_PER_TURN,
-  ELM_DAMAGE_PERCENT_PER_TURN + ELM_DAMAGE_VARIANCE_PER_TURN,
-];
+const ELM_DAMAGE_VARIANCE_RANGE = [ELM_DAMAGE_PERCENT_PER_TURN - ELM_DAMAGE_VARIANCE_PER_TURN, ELM_DAMAGE_PERCENT_PER_TURN + ELM_DAMAGE_VARIANCE_PER_TURN];
 
 // TWEAKS CURVE, CAREFUL MODIFYING THIS... WOULD NEED TO UPDATE TABLE ON EVENT PAGE
 const FIRE_CRIT_CHANCE_MOD = 1650;

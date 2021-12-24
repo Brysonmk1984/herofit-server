@@ -1,7 +1,4 @@
-const {
-  BEGINNERS_LUCK_MAX_XP,
-  BEGINNERS_LUCK_LIKELIHOOD,
-} = require("../CONSTANTS");
+const { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../CONSTANTS");
 const { determineScenario, calcScenarioBonuses } = require("./scenario");
 const { doAvatarBattlePrep, doFoeBattlePrep } = require("./doBattlePrep");
 const avCalc = require("../upgrades/avCalc");
@@ -29,17 +26,13 @@ const preBattleSetup = function (avatar, foe) {
       // assign 'a' variable above the value of sAvatar, same with 'f'
       ({ sAvatar: a, sFoe: f } = calcScenarioBonuses(a, f, scenario));
     },
-    doPreBattleEffects: (effects) => {
+    doPreBattleEffects: effects => {
       // If there are any effects, find 'prebattle' effects and adjust avatar accordingly
       if (effects && effects.length) {
         let procs = [];
         // Buff or debuff hero and foe based on item effects
         // If new item effects are added, they need to be added in this function:
-        ({
-          avatar: a,
-          foe: f,
-          procs,
-        } = doAvatarBattlePrep(a, f, effects, scenario.id));
+        ({ avatar: a, foe: f, procs } = doAvatarBattlePrep(a, f, effects, scenario.id));
         effectProcs = [...effectProcs, ...procs];
       }
     },
@@ -52,9 +45,7 @@ const preBattleSetup = function (avatar, foe) {
     applyElementalBonus: () => {
       // Figure out which season it is, so a 25% bonus can be given to a & f
       const { determineAstrologySeason } = avCalc();
-      const seasonalBonusElement = determineAstrologySeason(
-        Date.now()
-      ).element.toLowerCase();
+      const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
 
       a[seasonalBonusElement] *= 1.25;
       f[seasonalBonusElement] *= 1.25;
@@ -75,14 +66,7 @@ const preBattleSetup = function (avatar, foe) {
         }
       }
     },
-    applyCheat: (
-      avPowerBoost = 1,
-      foePowerBoost = 1,
-      avHealthBoost = 1,
-      foeHealthBoost = 1,
-      avatarEarthBoost = 1,
-      foeEarthBoost = 1
-    ) => {
+    applyCheat: (avPowerBoost = 1, foePowerBoost = 1, avHealthBoost = 1, foeHealthBoost = 1, avatarEarthBoost = 1, foeEarthBoost = 1) => {
       a.power = avPowerBoost;
       f.power = foePowerBoost;
       a.health = avHealthBoost;

@@ -16,20 +16,8 @@
       "description": "The new in-game currency is here! PT is earned mostly through winning battles, but in the future may come from activities too. Spend your PT by going to the inventory page and clicking 'Buy'."
     }
   ],
-  "bugFixes": [
-    "Battle history on the user profile page is now showing up in reverse chronological order",
-    "General workouts were showing 'NaN' on the Training page. This is resolved",
-    "Fixed bug with showing and clicking item rewards on the 'Go to Battle' window"
-  ],
-  "balanceChanges": [
-    "New users now only receive their previous 5 activities. This is to account for the initial hero levels being easier to achieve under the new XP curve",
-    "Phantom & Phantasm now will only trade their health/armor with yours if you have the higher value to being with. Previously, these dim-witted ghosts would make bad deals for themselves"
-  ],
-  "miscDetails": [
-    "Big improvements to various window UIs and more content is visible within the windows",
-    "Battle Report Detail window is now easier to understand",
-    "Certain alerts are now clickable, this will be handy if I need to include links on things such as server-wide messages",
-    "Updating hero names from the account page now uses the same availability check as is on the select-hero page"
-  ],
+  "bugFixes": ["Battle history on the user profile page is now showing up in reverse chronological order", "General workouts were showing 'NaN' on the Training page. This is resolved", "Fixed bug with showing and clicking item rewards on the 'Go to Battle' window"],
+  "balanceChanges": ["New users now only receive their previous 5 activities. This is to account for the initial hero levels being easier to achieve under the new XP curve", "Phantom & Phantasm now will only trade their health/armor with yours if you have the higher value to being with. Previously, these dim-witted ghosts would make bad deals for themselves"],
+  "miscDetails": ["Big improvements to various window UIs and more content is visible within the windows", "Battle Report Detail window is now easier to understand", "Certain alerts are now clickable, this will be handy if I need to include links on things such as server-wide messages", "Updating hero names from the account page now uses the same availability check as is on the select-hero page"],
   "closingRemarks": "I understand this patch has some drastic changes, and I appreciate your understanding. These balance changes really needed to happen sooner rather than later, and HeroFit will be better off because of it!"
 }

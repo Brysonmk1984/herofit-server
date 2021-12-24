@@ -2,11 +2,7 @@ const { col, literal } = require("sequelize");
 const { Avatar, UserTotal } = require("../../config/db");
 const xpCalc = require("../upgrades/xpCalc");
 const avCalc = require("../upgrades/avCalc");
-const {
-  COMPETITIVE_ACTIVITIES,
-  NONCOMPETITIVE_ACTIVITIES,
-  BASE_RECOVERY,
-} = require("../CONSTANTS");
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require("../CONSTANTS");
 const instantiateBattle = require("../prebattle/instantiateBattle");
 
 // Retrocausal Capsule
@@ -18,99 +14,74 @@ function resetHero(avatarID, email) {
     attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES],
     raw: true,
   })
-    .then((ut) => {
+    .then(ut => {
       userTotals = ut;
       // GET AVATAR
       return Avatar.findOne({
-        attributes: [
-          "health",
-          "maxHealth",
-          "activityXP",
-          "battleXP",
-          "character",
-          "createdAt",
-          "owner",
-        ],
+        attributes: ["health", "maxHealth", "activityXP", "battleXP", "character", "createdAt", "owner"],
         where: { id: avatarID },
       });
     })
-    .then(
-      ({ health, maxHealth, activityXP, battleXP, character, createdAt }) => {
-        const { getCurrentLevel } = xpCalc(activityXP, battleXP);
-        const { total: heroLevel } = getCurrentLevel();
+    .then(({ health, maxHealth, activityXP, battleXP, character, createdAt }) => {
+      const { getCurrentLevel } = xpCalc(activityXP, battleXP);
+      const { total: heroLevel } = getCurrentLevel();
 
-        // CALCULATE ATTRIBUTES BASED ON (what should be) the updated XP curve.
-        const { updatePower, updateHealth, updateElements } =
-          avCalc(userTotals);
-        const { fire, earth, water, air } = updateElements(
-          character,
-          { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 },
-          createdAt
-        );
-        const power = updatePower(heroLevel, 0);
-        const { updatedMaxHealth, updatedHealth } = updateHealth(
-          heroLevel,
-          0,
-          health,
-          maxHealth,
-          "rested",
-          false,
-          true
-        );
+      // CALCULATE ATTRIBUTES BASED ON (what should be) the updated XP curve.
+      const { updatePower, updateHealth, updateElements } = avCalc(userTotals);
+      const { fire, earth, water, air } = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
+      const power = updatePower(heroLevel, 0);
+      const { updatedMaxHealth, updatedHealth } = updateHealth(heroLevel, 0, health, maxHealth, "rested", false, true);
 
-        return {
-          power,
-          health: updatedHealth,
-          maxHealth: updatedMaxHealth,
-          fire,
-          earth,
-          water,
-          air,
-          heroLevel,
-        };
-      }
-    )
-    .then(
-      ({ power, health, maxHealth, fire, earth, water, air, heroLevel }) => {
-        //const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
-        //console.log('THE GS', theGoods);
-        const updatedAttributes = {
-          /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */
-          /* +5 Signup bonus, +5 Strava Bonus */
-          qp: (heroLevel - 1) * 5 + 5 + 5,
-          power,
-          maxHealth,
-          armor: 0,
-          recovery: BASE_RECOVERY,
-          fire,
-          earth,
-          air,
-          water,
-          qpPower: 0,
-          qpHealth: 0,
-          qpArmor: 0,
-          qpRecovery: 0,
-          qpFire: 0,
-          qpEarth: 0,
-          qpAir: 0,
-          qpWater: 0,
-          // Need to change health of avatar if it's over the amount of the new maxHealth
-          health: health > maxHealth ? maxHealth : health,
-        };
+      return {
+        power,
+        health: updatedHealth,
+        maxHealth: updatedMaxHealth,
+        fire,
+        earth,
+        water,
+        air,
+        heroLevel,
+      };
+    })
+    .then(({ power, health, maxHealth, fire, earth, water, air, heroLevel }) => {
+      //const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
+      //console.log('THE GS', theGoods);
+      const updatedAttributes = {
+        /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */
+        /* +5 Signup bonus, +5 Strava Bonus */
+        qp: (heroLevel - 1) * 5 + 5 + 5,
+        power,
+        maxHealth,
+        armor: 0,
+        recovery: BASE_RECOVERY,
+        fire,
+        earth,
+        air,
+        water,
+        qpPower: 0,
+        qpHealth: 0,
+        qpArmor: 0,
+        qpRecovery: 0,
+        qpFire: 0,
+        qpEarth: 0,
+        qpAir: 0,
+        qpWater: 0,
+        // Need to change health of avatar if it's over the amount of the new maxHealth
+        health: health > maxHealth ? maxHealth : health,
+      };
 
-        // UPDATE AVATAR
-        return Avatar.update(updatedAttributes, {
-          where: { id: avatarID },
-          returning: true,
-        });
-      }
-    )
-    .then((data) => {
+      // UPDATE AVATAR
+      return Avatar.update(updatedAttributes, {
+        where: { id: avatarID },
+        returning: true,
+      });
+    })
+    .then(data => {
       console.log("success!", data);
       //RETURN UPDATED AVATAR
       return data[1][0];
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("error", error);
       return error;
     });
@@ -118,17 +89,14 @@ function resetHero(avatarID, email) {
 
 // Health Potion
 function healCompletely(avatarID) {
-  return Avatar.update(
-    { health: col("maxHealth"), status: "Rested" },
-    { where: { id: avatarID }, returning: true }
-  )
-    .then((data) => {
+  return Avatar.update({ health: col("maxHealth"), status: "Rested" }, { where: { id: avatarID }, returning: true })
+    .then(data => {
       const avatar = data[1][0];
       avatar.restedEnough = true;
       //RETURN UPDATED AVATAR
       return avatar;
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("error", error);
       return error;
     });
@@ -136,15 +104,12 @@ function healCompletely(avatarID) {
 
 // Antidote Potion
 function removeInfected(avatarID) {
-  return Avatar.update(
-    { status: "Recovering" },
-    { where: { id: avatarID }, returning: true }
-  )
-    .then((data) => {
+  return Avatar.update({ status: "Recovering" }, { where: { id: avatarID }, returning: true })
+    .then(data => {
       //RETURN UPDATED AVATAR
       return data[1][0];
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("error", error);
       return error;
     });
@@ -152,15 +117,12 @@ function removeInfected(avatarID) {
 
 // Birthday Cake
 function setToHalfHealth(avatarID) {
-  return Avatar.update(
-    { health: literal(`"maxHealth" / 2`), status: "Recovering" },
-    { where: { id: avatarID }, returning: true }
-  )
-    .then((data) => {
+  return Avatar.update({ health: literal(`"maxHealth" / 2`), status: "Recovering" }, { where: { id: avatarID }, returning: true })
+    .then(data => {
       //RETURN UPDATED AVATAR
       return data[1][0];
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("error", error);
       return error;
     });
@@ -168,7 +130,7 @@ function setToHalfHealth(avatarID) {
 
 function itemEffects(effects, avatarID, email) {
   const effectPromises = [];
-  effects.forEach((effect) => {
+  effects.forEach(effect => {
     switch (effect.name) {
       case "Reset Hero":
         effectPromises.push(resetHero(avatarID, email));
@@ -191,9 +153,7 @@ function itemEffects(effects, avatarID, email) {
         effectPromises.push(instantiateBattle(avatarID, "Scorching Archfiend"));
         break;
       case "Summon High Priestess of the Tides":
-        effectPromises.push(
-          instantiateBattle(avatarID, "High Priestess of the Tides")
-        );
+        effectPromises.push(instantiateBattle(avatarID, "High Priestess of the Tides"));
         break;
       case "Summon Plaguebringer":
         effectPromises.push(instantiateBattle(avatarID, "Plaguebringer"));
@@ -206,15 +166,15 @@ function itemEffects(effects, avatarID, email) {
     }
   });
   return Promise.all(effectPromises)
-    .then((results) => {
-      results.forEach((result) => {
+    .then(results => {
+      results.forEach(result => {
         if (result.error) {
           throw result.error;
         }
       });
       return results;
     })
-    .catch((error) => {
+    .catch(error => {
       return { error };
     });
 }

@@ -68,7 +68,7 @@ const ItemsModel = function (db, DataTypes) {
         allowNull: true,
       },
     },
-    { freezeTableName: true }
+    { freezeTableName: true },
   );
 
   return Items;

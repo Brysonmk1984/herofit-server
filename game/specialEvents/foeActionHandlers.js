@@ -11,7 +11,7 @@ const handleFoeLikelihood = function (foeLikelihoodAts) {
     // 33% Chance to get Elemental.
     const battleSpecialEventFoe = chance.bool({ likelihood: at.odds });
     if (battleSpecialEventFoe) {
-      return villains[at.foeClass].find((foe) => foe.type === at.foe);
+      return villains[at.foeClass].find(foe => foe.type === at.foe);
     }
   }
 
@@ -25,7 +25,7 @@ const handleFoeBonusToStats = function (foeBonusToStatsAts, fws) {
   for (let i = 0; i < foeBonusToStatsAts.length; i++) {
     const at = foeBonusToStatsAts[i];
     // For each statwithin the at.stats array, give a boost
-    at.stats.forEach((stat) => {
+    at.stats.forEach(stat => {
       boostedFoe[stat] = boostedFoe[stat] * at.bonusPercent + boostedFoe[stat];
     });
   }

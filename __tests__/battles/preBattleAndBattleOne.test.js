@@ -1,24 +1,9 @@
 const avatarProfiles = require("./heroProfiles.json");
-const {
-  selectFoeTemplate,
-  generateFoeStats,
-} = require("../../game/prebattle/foeFunctions");
-const {
-  calcScenarioBonuses,
-  determineScenario,
-} = require("../../game/battle/scenario");
-const {
-  doAvatarBattlePrep,
-  doFoeBattlePrep,
-} = require("../../game/battle/doBattlePrep");
+const { selectFoeTemplate, generateFoeStats } = require("../../game/prebattle/foeFunctions");
+const { calcScenarioBonuses, determineScenario } = require("../../game/battle/scenario");
+const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
 const doBattle = require("../../game/battle/doBattle");
-const {
-  OUTCOME_XP,
-  FOE_NON_ACTION,
-  AVATAR_NON_ACTION,
-  BEGINNERS_LUCK_MAX_XP,
-  BEGINNERS_LUCK_LIKELIHOOD,
-} = require("../../game/CONSTANTS");
+const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../game/CONSTANTS");
 const avCalc = require("../../game/upgrades/avCalc");
 const chance = require("chance")();
 
@@ -74,7 +59,7 @@ describe("Load profiles and generate foes from random Profile", () => {
           description: expect.any(String),
           level: expect.any(Number),
         }),
-      ])
+      ]),
     );
   });
 
@@ -111,9 +96,7 @@ describe("Do battle setup with random av and generated foe template", () => {
   let goesFirst;
   function generateBraBrf() {
     const { determineAstrologySeason } = avCalc();
-    const seasonalBonusElement = determineAstrologySeason(
-      Date.now()
-    ).element.toLowerCase();
+    const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
 
     // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
     let beginnersLuck = false;
@@ -124,11 +107,7 @@ describe("Do battle setup with random av and generated foe template", () => {
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const scenario = determineScenario(beginnersLuck);
-    const scenarioBonuses = calcScenarioBonuses(
-      randomAv,
-      foeWithStats,
-      scenario
-    );
+    const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
     const sAvatar = scenarioBonuses.sAvatar;
     const sFoe = scenarioBonuses.sFoe;
 
@@ -188,44 +167,28 @@ describe("Do battle setup with random av and generated foe template", () => {
         earth: expect.any(Number),
         water: expect.any(Number),
         air: expect.any(Number),
-        total:
-          b.aElmDamage.fire +
-          b.aElmDamage.air +
-          b.aElmDamage.water +
-          b.aElmDamage.earth,
+        total: b.aElmDamage.fire + b.aElmDamage.air + b.aElmDamage.water + b.aElmDamage.earth,
       }),
       fElmReduction: expect.objectContaining({
         fire: expect.any(Number),
         earth: expect.any(Number),
         water: expect.any(Number),
         air: expect.any(Number),
-        total:
-          b.fElmReduction.fire +
-          b.fElmReduction.air +
-          b.fElmReduction.water +
-          b.fElmReduction.earth,
+        total: b.fElmReduction.fire + b.fElmReduction.air + b.fElmReduction.water + b.fElmReduction.earth,
       }),
       fElmDamage: expect.objectContaining({
         fire: expect.any(Number),
         earth: expect.any(Number),
         water: expect.any(Number),
         air: expect.any(Number),
-        total:
-          b.fElmDamage.fire +
-          b.fElmDamage.air +
-          b.fElmDamage.water +
-          b.fElmDamage.earth,
+        total: b.fElmDamage.fire + b.fElmDamage.air + b.fElmDamage.water + b.fElmDamage.earth,
       }),
       aElmReduction: expect.objectContaining({
         fire: expect.any(Number),
         earth: expect.any(Number),
         water: expect.any(Number),
         air: expect.any(Number),
-        total:
-          b.aElmReduction.fire +
-          b.aElmReduction.air +
-          b.aElmReduction.water +
-          b.aElmReduction.earth,
+        total: b.aElmReduction.fire + b.aElmReduction.air + b.aElmReduction.water + b.aElmReduction.earth,
       }),
       aPhyDamage: expect.any(Number),
       fPhyReduction: expect.any(Number),

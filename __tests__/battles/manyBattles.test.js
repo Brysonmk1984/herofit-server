@@ -1,23 +1,10 @@
 const avatarProfiles = require("./heroProfiles.json");
 const avatarPowerSpecProfiles = require("./powerProfiles.json");
-const {
-  selectFoeTemplate,
-  generateFoeStats,
-} = require("../../game/prebattle/foeFunctions");
-const {
-  calcScenarioBonuses,
-  determineScenario,
-} = require("../../game/battle/scenario");
-const {
-  doAvatarBattlePrep,
-  doFoeBattlePrep,
-} = require("../../game/battle/doBattlePrep");
+const { selectFoeTemplate, generateFoeStats } = require("../../game/prebattle/foeFunctions");
+const { calcScenarioBonuses, determineScenario } = require("../../game/battle/scenario");
+const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
 const doBattle = require("../../game/battle/doBattle");
-const {
-  FOE_NON_ACTION,
-  BEGINNERS_LUCK_MAX_XP,
-  BEGINNERS_LUCK_LIKELIHOOD,
-} = require("../../game/CONSTANTS");
+const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../game/CONSTANTS");
 const avCalc = require("../../game/upgrades/avCalc");
 const xpCalc = require("../../game/upgrades/xpCalc");
 const chance = require("chance")();
@@ -26,7 +13,7 @@ const chance = require("chance")();
 // Use toBe for scalar (primitive) data types only.
 // check the response data type use typeof operator
 const generateFoes = function (avatars) {
-  return avatars.map((av) => {
+  return avatars.map(av => {
     const foeTemplate = selectFoeTemplate(av.level);
 
     const foe = {
@@ -42,9 +29,7 @@ const generateFoes = function (avatars) {
 
 function generateBrs(avatars, foesWithStats) {
   const { determineAstrologySeason } = avCalc();
-  const seasonalBonusElement = determineAstrologySeason(
-    Date.now()
-  ).element.toLowerCase();
+  const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
   return avatars.map((av, i) => {
     let BRA;
     let BRF;
@@ -74,10 +59,7 @@ function generateBrs(avatars, foesWithStats) {
     // BATTLE STEP 3 - NOT IN GAME YET
 
     // BATTLE STEP 4 - FOE USES prebattle ABILITY
-    if (
-      foesWithStats[i].ability &&
-      foesWithStats[i].ability.type === "prebattle"
-    ) {
+    if (foesWithStats[i].ability && foesWithStats[i].ability.type === "prebattle") {
       if (scenario.id !== FOE_NON_ACTION) {
         const foeBP = doFoeBattlePrep(BRA, BRF, foesWithStats[i].ability);
         BRF = foeBP.foe;
@@ -104,7 +86,7 @@ function generateBrs(avatars, foesWithStats) {
 }
 
 describe("Battle all generated foes against av profiles", () => {
-  let avatars = avatarProfiles.map((av) => {
+  let avatars = avatarProfiles.map(av => {
     const { getCurrentLevel } = xpCalc(av.activityXP, av.battleXP);
     return Object.assign({}, av, { level: getCurrentLevel().total });
   });
@@ -122,7 +104,7 @@ describe("Battle all generated foes against av profiles", () => {
 
   // BATTLE STEP 5 - EXCHANGE DAMAGE
 
-  const allBattles = preBattles.map((b) => {
+  const allBattles = preBattles.map(b => {
     return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), {
       foeType: b.BRF.type,
       foeClass: b.BRF.class,
@@ -270,9 +252,7 @@ describe("Battle all generated foes against av profiles", () => {
 
   console.log("Battle Totals - ", totals);
 
-  const lowLevelPreBattles = preBattles.filter(
-    (battle) => battle.BRA.level < 15
-  );
+  const lowLevelPreBattles = preBattles.filter(battle => battle.BRA.level < 15);
   const lowLevelBattles = allBattles.slice(0, lowLevelPreBattles.length);
 
   //console.log('Low level prebattles -',lowLevelPreBattles.length, lowLevelPreBattles);
@@ -302,8 +282,7 @@ describe("Battle all generated foes against av profiles", () => {
 
   // WIN RATES VS FOE CLASS
   const winRateVsSpirits = totals.winsVs.spirits / totals.totalsVs.spirits;
-  const winRateVsElementals =
-    totals.winsVs.elementals / totals.totalsVs.elementals;
+  const winRateVsElementals = totals.winsVs.elementals / totals.totalsVs.elementals;
   const winRateVsTitans = totals.winsVs.titans / totals.totalsVs.titans;
 
   //console.log('TITANS - battles, winrate',totals.totalsVs.titans, winRateVsTitans);

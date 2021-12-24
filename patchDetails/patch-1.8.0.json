@@ -2,17 +2,8 @@
   "version": "1.8.0",
   "headline": "Changes to Strava Data Fetching, Foe Balance Tweaks - version 1.8.0",
   "openingRemarks": "Mostly an administrative patch to pave the way for manually adding activities down the road. If you have issues uploading new activities, consider clearing your cache.",
-  "bugFixes": [
-    "Fixed a bug that was preventing new users form confirming their accounts"
-  ],
-  "balanceChanges": [
-    "Elemental Bosses now contain more of their specific element, but less of other stats",
-    "Elemental Adepts - same as above, but to a lesser extent",
-    "Foe difficulty for heroes over level 15 now scales slightly more per level"
-  ],
-  "miscDetails": [
-    "Rather than saving the entire Strava activity to the HeroFit DB, we're now only saving the relevant information to HeroFit. This change opens the door to implementing other data fetching services and manual activity uploading in the future.",
-    "HeroFit is no longer saving heart rate data"
-  ],
+  "bugFixes": ["Fixed a bug that was preventing new users form confirming their accounts"],
+  "balanceChanges": ["Elemental Bosses now contain more of their specific element, but less of other stats", "Elemental Adepts - same as above, but to a lesser extent", "Foe difficulty for heroes over level 15 now scales slightly more per level"],
+  "miscDetails": ["Rather than saving the entire Strava activity to the HeroFit DB, we're now only saving the relevant information to HeroFit. This change opens the door to implementing other data fetching services and manual activity uploading in the future.", "HeroFit is no longer saving heart rate data"],
   "closingRemarks": "Still chipping away at the mobile app, see our subreddit for past updates about the progress on that."
 }

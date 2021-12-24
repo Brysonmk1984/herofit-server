@@ -5,18 +5,9 @@ const router = express.Router();
 const { Avatar, AvatarItems, Items, Battle } = require("../config/db");
 const { Op, col } = require("sequelize");
 const { parseAvatarProperties } = require("../lib/helperFunctions");
-const {
-  REVIVE_AMOUNT,
-  RECOVER_EARLY_MOD,
-  RECOVERY_EFFECTIVENESS_MOD,
-} = require("../game/CONSTANTS");
-const {
-  selectFoeTemplate,
-  generateFoeStats,
-} = require("../game/prebattle/foeFunctions");
-const {
-  determinePostBattleActions,
-} = require("../game/prebattle/onGoToBattle");
+const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD } = require("../game/CONSTANTS");
+const { selectFoeTemplate, generateFoeStats } = require("../game/prebattle/foeFunctions");
+const { determinePostBattleActions } = require("../game/prebattle/onGoToBattle");
 const runAllBattles = require("../game/battle/runAllBattles");
 const ALLPBAs = require("../game/postBattleActions.json");
 const chance = require("chance")();
@@ -25,10 +16,7 @@ const chance = require("chance")();
 router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.formatter.badRequest(
-      errors.array(),
-      "Validation Error - for /regenerate-health endpoint"
-    );
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /regenerate-health endpoint");
   }
 
   //Get all avatars who aren't at full health
@@ -36,26 +24,18 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
     //where: { health : { [Op.lt] : col('maxHealth') } },
     where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } },
     raw: true,
-    attributes: [
-      "health",
-      "maxHealth",
-      "recovery",
-      "status",
-      "owner",
-      "statusFade",
-    ],
+    attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"],
   })
-    .then((results) => {
+    .then(results => {
       const allPromises = [];
       // Loop over each avatar and either regen health if recovering or other status effects
-      results.forEach((avatar) => {
+      results.forEach(avatar => {
         avatar = parseAvatarProperties(avatar);
         console.log("AVV", avatar);
         let avatarHealth = avatar.health;
         const maxHealth = avatar.maxHealth;
         const recovery = avatar.recovery;
-        const recoveryRetarder =
-          recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
+        const recoveryRetarder = recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
         const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
         let avatarStatus = avatar.status;
         let avatarStatusFade = avatar.statusFade;
@@ -114,24 +94,19 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
               returning: true,
               raw: true,
               plain: true,
-            }
-          )
+            },
+          ),
         );
       });
       return Promise.allSettled(allPromises);
     })
-    .then((results) => {
-      results.forEach((result) =>
-        console.log("All Regenerate Results - ", result.status)
-      );
+    .then(results => {
+      results.forEach(result => console.log("All Regenerate Results - ", result.status));
       res.formatter.ok(null, "Successfully ran /regenerate-health");
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR DOING BULK HEALTH UPDATE", error);
-      res.formatter.serverError(
-        error.toString(),
-        `Error running /regenerate-health`
-      );
+      res.formatter.serverError(error.toString(), `Error running /regenerate-health`);
     });
 });
 
@@ -139,10 +114,7 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
 router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.formatter.badRequest(
-      errors.array(),
-      "Validation Error - for /try-recovery endpoint"
-    );
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /try-recovery endpoint");
   }
 
   // Get all avatars who are KOed
@@ -151,7 +123,7 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
     raw: true,
     attributes: ["health", "recovery", "status", "owner"],
   })
-    .then((results) => {
+    .then(results => {
       console.log("all KO results", results);
       const recoveredAvatars = [];
 
@@ -161,8 +133,7 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
           const avatar = parseAvatarProperties(result);
 
           const recovery = avatar.recovery;
-          const recoverEarlyChance =
-            (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
+          const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
           const recoveredEarly = chance.bool({
             likelihood: recoverEarlyChance,
           });
@@ -175,103 +146,62 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
           return null;
         });
         console.log("recovered avs", recoveredAvatars);
-        return Avatar.update(
-          { health: REVIVE_AMOUNT, status: "Recovering" },
-          { where: { owner: { [Op.in]: recoveredAvatars } } }
-        );
+        return Avatar.update({ health: REVIVE_AMOUNT, status: "Recovering" }, { where: { owner: { [Op.in]: recoveredAvatars } } });
       } else {
-        res.formatter.ok(
-          null,
-          "Successfully ran /try-recovery, no Avatars to Recover"
-        );
+        res.formatter.ok(null, "Successfully ran /try-recovery, no Avatars to Recover");
       }
     })
     .then(() => {
       return res.formatter.ok(null, "Successfully ran /try-recovery");
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR DOING BULK HEALTH UPDATE", error);
-      res.formatter.serverError(
-        error.toString(),
-        `Error running /try-recovery`
-      );
+      res.formatter.serverError(error.toString(), `Error running /try-recovery`);
     });
 });
 
 // RANDOMLY GENERATE A FOE
-router.post(
-  "/generate-foe",
-  body("avatar").isObject(),
-  authenticateAdminJWT,
-  (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.formatter.badRequest(
-        errors.array(),
-        "Validation Error - for /generate-foe endpoint"
-      );
-    }
-    const foe = selectFoeTemplate(req.body.avatar.level);
-    const foeWithStats = Object.assign(
-      {},
-      foe,
-      generateFoeStats(req.body.avatar, foe)
-    );
-    if (foeWithStats) {
-      res.formatter.ok(foeWithStats);
-    } else {
-      const error = new Error("Couldn't generate foe");
-      res.formatter.serverError(error);
-    }
+router.post("/generate-foe", body("avatar").isObject(), authenticateAdminJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
   }
-);
+  const foe = selectFoeTemplate(req.body.avatar.level);
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
+  if (foeWithStats) {
+    res.formatter.ok(foeWithStats);
+  } else {
+    const error = new Error("Couldn't generate foe");
+    res.formatter.serverError(error);
+  }
+});
 
 // MOCK ENDPOINT for DETERMINING PBAs
-router.post(
-  "/mock-determine-pbas",
-  body("avatar").isObject(),
-  authenticateAdminJWT,
-  (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.formatter.badRequest(
-        errors.array(),
-        "Validation Error - for /mock-determine-pbas"
-      );
-    }
-    const foe = selectFoeTemplate(req.body.avatar.level);
-    const foeWithStats = Object.assign(
-      {},
-      foe,
-      generateFoeStats(req.body.avatar, foe)
-    );
-
-    new Promise((resolve, reject) => {
-      return determinePostBattleActions(
-        req.body.avatar,
-        foeWithStats,
-        resolve,
-        reject
-      );
-    })
-      .then((postBattleActions) => {
-        res.formatter.ok({ postBattleActions });
-      })
-      .catch((error) => {
-        res.formatter.serverError(error.toString());
-      });
+router.post("/mock-determine-pbas", body("avatar").isObject(), authenticateAdminJWT, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.formatter.badRequest(errors.array(), "Validation Error - for /mock-determine-pbas");
   }
-);
+  const foe = selectFoeTemplate(req.body.avatar.level);
+  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
+
+  new Promise((resolve, reject) => {
+    return determinePostBattleActions(req.body.avatar, foeWithStats, resolve, reject);
+  })
+    .then(postBattleActions => {
+      res.formatter.ok({ postBattleActions });
+    })
+    .catch(error => {
+      res.formatter.serverError(error.toString());
+    });
+});
 
 // MOCK ENDPOINT for RUNNING PBAs
 router.get("/mock-run-pbas", authenticateAdminJWT, (req, res) => {
   console.log("didnt get here");
   const errors = validationResult(req);
   if (!errors.isEmpty) {
-    return res.formatter.badRequest(
-      errors.array(),
-      "Validation Error - /mock-run-pbas endpoint"
-    );
+    return res.formatter.badRequest(errors.array(), "Validation Error - /mock-run-pbas endpoint");
   }
   let _avatarID, _postBattleActions;
   // only meant to grab latest TBD battle, look at the PBAs, and create items from them
@@ -285,14 +215,12 @@ router.get("/mock-run-pbas", authenticateAdminJWT, (req, res) => {
       const itemNames = [];
 
       // ALL PBAs FROM BATTLE
-      postBattleActions.forEach((ACTION) => {
+      postBattleActions.forEach(ACTION => {
         let matchingPBA;
         // FOR EACH ACTION TYPE WITHIN THE postBattleActions JSON file.
         for (let actionType in ALLPBAs) {
           // Find the PBA that matches the pba.action property
-          let matching = ALLPBAs[actionType].find(
-            (pba) => pba.action === ACTION
-          );
+          let matching = ALLPBAs[actionType].find(pba => pba.action === ACTION);
           // If there's a match, assign the entire matching PBA to a variable that we'll use to get the actual item
           if (matching) {
             matchingPBA = matching;
@@ -311,8 +239,8 @@ router.get("/mock-run-pbas", authenticateAdminJWT, (req, res) => {
         raw: true,
       });
     })
-    .then((results) => {
-      const itemsToInsert = results.map((item) => {
+    .then(results => {
+      const itemsToInsert = results.map(item => {
         return { avatarID: _avatarID, itemID: item.id };
       });
 
@@ -324,12 +252,9 @@ router.get("/mock-run-pbas", authenticateAdminJWT, (req, res) => {
         postBattleActions: _postBattleActions,
       });
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
-      res.formatter.serverError(
-        error.toString(),
-        "Database or Server code error for POST /mock-run-pbas endpoint"
-      );
+      res.formatter.serverError(error.toString(), "Database or Server code error for POST /mock-run-pbas endpoint");
     });
 });
 
@@ -340,16 +265,13 @@ router.get("/run-all-battles", authenticateAdminJWT, (req, res) => {
     where: { outcome: "TBD" },
     raw: true,
   })
-    .then((battles) => {
+    .then(battles => {
       return runAllBattles(battles, true);
     })
-    .then((data) => {
-      res.formatter.ok(
-        data,
-        "Successfully ran all battles through endpoint - GET /run-all-battles"
-      );
+    .then(data => {
+      res.formatter.ok(data, "Successfully ran all battles through endpoint - GET /run-all-battles");
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR - GET /run-all-battles", error);
     });
 });

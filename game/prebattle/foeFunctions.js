@@ -1,23 +1,11 @@
 const xpCalc = require("../upgrades/xpCalc");
-const {
-  determineXpBounty,
-  determinePtBounty,
-} = require("../battle/determineBounties");
+const { determineXpBounty, determinePtBounty } = require("../battle/determineBounties");
 const { OUTCOME_XP } = require("../CONSTANTS");
 const chance = require("chance")();
-const {
-  FOE_MOD,
-  LEVEL_DIFFICULTY_MOD,
-  LOW_LEVEL,
-  HIGH_LEVEL,
-  HIGH_LEVEL_DIFFICULTY_MOD,
-} = require("../CONSTANTS");
+const { FOE_MOD, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require("../CONSTANTS");
 const villains = require("../villains.json");
 const { config } = require("../../appConfig");
-const {
-  handleFoeLikelihood,
-  handleFoeBonusToStats,
-} = require("../specialEvents/foeActionHandlers");
+const { handleFoeLikelihood, handleFoeBonusToStats } = require("../specialEvents/foeActionHandlers");
 
 const { currentLevelByInput } = xpCalc();
 
@@ -27,11 +15,7 @@ function selectFoeTemplate(level) {
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if (event) {
-    const foeLikelihoodAts = event.actionTypes.filter(
-      (at) =>
-        at.type === "foeLikelihood" &&
-        (at.levelRequirement ? level >= at.levelRequirement : true)
-    );
+    const foeLikelihoodAts = event.actionTypes.filter(at => at.type === "foeLikelihood" && (at.levelRequirement ? level >= at.levelRequirement : true));
     // If the event contains foeLikelihood actions
     if (foeLikelihoodAts.length) {
       // Result of handleChanceForFoe function could be a foe object, or null
@@ -49,7 +33,7 @@ function selectFoeTemplate(level) {
   // Each class of foes
   for (let fClass in villains) {
     // assign foes to two different arrays depending on if there is a level requirement
-    villains[fClass].forEach((foe) => {
+    villains[fClass].forEach(foe => {
       const req = foe.levelRequirement;
       //console.log(foe.type, req);
       // If foe is not an item only foe
@@ -76,21 +60,17 @@ function selectFoeTemplate(level) {
 }
 
 function generateFoeStats(avatar, foe) {
-  const { total: totalLevel } = currentLevelByInput(
-    avatar.activityXP + avatar.battleXP
-  );
+  const { total: totalLevel } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
   // Random modifier within -15% of base stat
   function randomizer(stat, modifierInteger = -15) {
-    let randomModifierDecimal =
-      Math.floor(Math.random() * modifierInteger) * 0.01;
+    let randomModifierDecimal = Math.floor(Math.random() * modifierInteger) * 0.01;
     const modifiedStat = stat + randomModifierDecimal * stat;
     return { stat: Math.floor(modifiedStat), modifier: randomModifierDecimal };
   }
 
   const isHighLevel = totalLevel >= HIGH_LEVEL ? true : false;
-  const isMidLevel =
-    LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL ? true : false;
+  const isMidLevel = LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL ? true : false;
 
   let baseQP = Math.floor(totalLevel * 5 - 5);
   let baseFoeHealth = Math.floor((totalLevel * 5 + 100) * FOE_MOD.HEALTH);
@@ -160,18 +140,8 @@ function generateFoeStats(avatar, foe) {
       let elementalQp = FOE_MOD.QP;
       let baseHealth = baseFoeHealth;
       let basePower = baseFoePower;
-      const bosses = [
-        "Storming Oni",
-        "Hulking Aggro Crag",
-        "Scorching Archfiend",
-        "High Priestess of the Tides",
-      ];
-      const adepts = [
-        "Wheezing Jinn",
-        "Granite Golem",
-        "Burning Jinn",
-        "Cyclonic Siren",
-      ];
+      const bosses = ["Storming Oni", "Hulking Aggro Crag", "Scorching Archfiend", "High Priestess of the Tides"];
+      const adepts = ["Wheezing Jinn", "Granite Golem", "Burning Jinn", "Cyclonic Siren"];
       if (bosses.includes(foe.type)) {
         elementalQp *= 1.2;
         baseHealth *= 1.1;
@@ -248,15 +218,7 @@ function generateFoeStats(avatar, foe) {
           qpAdjustedStats = ["water", "armor", "power", "health"];
           break;
         default:
-          qpAdjustedStats = [
-            "health",
-            "power",
-            "armor",
-            "fire",
-            "earth",
-            "water",
-            "air",
-          ];
+          qpAdjustedStats = ["health", "power", "armor", "fire", "earth", "water", "air"];
           break;
       }
       break;
@@ -266,16 +228,14 @@ function generateFoeStats(avatar, foe) {
       randomizedQP = randomizer(Math.floor(baseQP * FOE_MOD.QP));
 
       if (foe.type === "Plaguebringer") {
-        fws.health =
-          randomizedHealth < 300 ? 300 : Math.floor(randomizedHealth.stat);
+        fws.health = randomizedHealth < 300 ? 300 : Math.floor(randomizedHealth.stat);
         fws.power = Math.floor(randomizedPower.stat);
         fws.earth = 50 + 2.15 * totalLevel;
         fws.water = 50 + 2.15 * totalLevel;
 
         qpAdjustedStats = ["health", "power", "armor", "earth", "water"];
       } else if ("Guardian of the Depths") {
-        const baseHealth =
-          randomizedHealth < 400 ? 400 : Math.floor(randomizedHealth.stat);
+        const baseHealth = randomizedHealth < 400 ? 400 : Math.floor(randomizedHealth.stat);
         fws.health = baseHealth * 1.1;
         fws.power = Math.floor(randomizedPower.stat);
         fws.earth = 50 + 2.3 * totalLevel;
@@ -292,18 +252,12 @@ function generateFoeStats(avatar, foe) {
   // ON ALL FOES EXCEPT SHADOW-SELF:
 
   // Calculates the overall difficulty modification after randomization. Used for pt and xp after battles
-  fws.difficulty = -(
-    (randomizedHealth.modifier +
-      randomizedPower.modifier +
-      randomizedQP.modifier) /
-    3
-  ).toFixed(3);
+  fws.difficulty = -((randomizedHealth.modifier + randomizedPower.modifier + randomizedQP.modifier) / 3).toFixed(3);
 
   // Randomize the stat distribution for foes
   const baseFoeQp = randomizedQP.stat;
   for (let points = baseFoeQp; points > 0; points--) {
-    const attr =
-      qpAdjustedStats[Math.floor(Math.random() * qpAdjustedStats.length)];
+    const attr = qpAdjustedStats[Math.floor(Math.random() * qpAdjustedStats.length)];
     fws[attr] += 1;
   }
 
@@ -311,9 +265,7 @@ function generateFoeStats(avatar, foe) {
   const event = config.specialEvent;
   // If Special Event is live, run code to attempt any special foe events
   if (event) {
-    const foeBonusToStatsAts = event.actionTypes.filter(
-      (at) => at.type === "foeBonusToStats"
-    );
+    const foeBonusToStatsAts = event.actionTypes.filter(at => at.type === "foeBonusToStats");
     // If the event contains foeLikelihood actions
     if (foeBonusToStatsAts.length) {
       // Result of handleChanceForFoe function could be a foe object, or null
@@ -327,9 +279,7 @@ function generateFoeStats(avatar, foe) {
 
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar, foeTemplate = null) {
-  const { level, albedo } = currentLevelByInput(
-    avatar.activityXP + avatar.battleXP
-  );
+  const { level, albedo } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
   //console.log('FT', foeTemplate);
   // Use passed in foe template, otherwise randomly pick one
   foeTemplate = foeTemplate ? foeTemplate : selectFoeTemplate(level);
@@ -342,8 +292,7 @@ function determineFoeWithStats(avatar, foeTemplate = null) {
     // specific foe for testing purposes
     //foeName = foeTemplate.foe[1];
 
-    foeName =
-      foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
+    foeName = foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)];
   }
 
   const foe = {
@@ -356,18 +305,8 @@ function determineFoeWithStats(avatar, foeTemplate = null) {
   };
   const foeWithStats = Object.assign({}, foe, generateFoeStats(avatar, foe));
 
-  foeWithStats.xpBounty = determineXpBounty(
-    OUTCOME_XP.base,
-    foeWithStats.difficulty,
-    level,
-    foeTemplate.bonusXpBase,
-    foeWithStats.type
-  );
-  foeWithStats.ptBounty = determinePtBounty(
-    level,
-    foeTemplate.bonusPtBase,
-    foeWithStats.type
-  );
+  foeWithStats.xpBounty = determineXpBounty(OUTCOME_XP.base, foeWithStats.difficulty, level, foeTemplate.bonusXpBase, foeWithStats.type);
+  foeWithStats.ptBounty = determinePtBounty(level, foeTemplate.bonusPtBase, foeWithStats.type);
 
   return foeWithStats;
 }
@@ -378,7 +317,7 @@ function findFoeTemplateByType(foeType) {
     allFoes.push(...villains[foeClass]);
   }
 
-  return allFoes.find((foe) => foe.type === foeType);
+  return allFoes.find(foe => foe.type === foeType);
 }
 
 module.exports = {

@@ -21,14 +21,7 @@
       "class": "Spirits",
       "type": "Apparition",
       "difficultyLevel": "medium",
-      "foe": [
-        "Githinji",
-        "Mardochaios",
-        "Medeia",
-        "Edana",
-        "Tamisra",
-        "Colvin"
-      ],
+      "foe": ["Githinji", "Mardochaios", "Medeia", "Edana", "Tamisra", "Colvin"],
       "ability": {
         "name": "Intimidation",
         "effect": "Power Reduction",

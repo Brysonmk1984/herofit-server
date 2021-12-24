@@ -1,20 +1,10 @@
 const avatarProfiles = require("./heroProfiles.json");
-const {
-  selectFoeTemplate,
-  generateFoeStats,
-} = require("../../game/prebattle/foeFunctions");
-const {
-  calcScenarioBonuses,
-  determineScenario,
-} = require("../../game/battle/scenario");
+const { selectFoeTemplate, generateFoeStats } = require("../../game/prebattle/foeFunctions");
+const { calcScenarioBonuses, determineScenario } = require("../../game/battle/scenario");
 const { doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
 const doBattle = require("../../game/battle/doBattle");
 const postBattleProcess = require("../../game/battle/postBattleProcess");
-const {
-  FOE_NON_ACTION,
-  BEGINNERS_LUCK_MAX_XP,
-  BEGINNERS_LUCK_LIKELIHOOD,
-} = require("../../game/CONSTANTS");
+const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../game/CONSTANTS");
 const avCalc = require("../../game/upgrades/avCalc");
 const chance = require("chance")();
 
@@ -47,9 +37,7 @@ describe("Do battle setup with random av and generated foe template", () => {
   let goesFirst;
   function generateBraBrf() {
     const { determineAstrologySeason } = avCalc();
-    const seasonalBonusElement = determineAstrologySeason(
-      Date.now()
-    ).element.toLowerCase();
+    const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
 
     // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
     let beginnersLuck = false;
@@ -60,11 +48,7 @@ describe("Do battle setup with random av and generated foe template", () => {
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
     const scenario = determineScenario(beginnersLuck);
-    const scenarioBonuses = calcScenarioBonuses(
-      randomAv,
-      foeWithStats,
-      scenario
-    );
+    const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
     const sAvatar = scenarioBonuses.sAvatar;
     const sFoe = scenarioBonuses.sFoe;
 
@@ -117,12 +101,7 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(
-      BRA,
-      BRF,
-      b.outcomeData,
-      b.aHealthRemaining
-    );
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
     const effects = [{ name: "Adaptive Camouflage", type: "postbattle" }];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
@@ -138,12 +117,7 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(
-      BRA,
-      BRF,
-      b.outcomeData,
-      b.aHealthRemaining
-    );
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
     const effects = [{ name: "Unstable Prototype", type: "postbattle" }];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
@@ -159,21 +133,12 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(
-      BRA,
-      BRF,
-      b.outcomeData,
-      b.aHealthRemaining
-    );
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
     const effects = [{ name: "Heroes Never Die", type: "postbattle" }];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
 
-    if (
-      (postOutcome.outcome === "Foe Wins" ||
-        postOutcome.outcome === "Double KO") &&
-      postAv.health === 1
-    ) {
+    if ((postOutcome.outcome === "Foe Wins" || postOutcome.outcome === "Double KO") && postAv.health === 1) {
       console.log("Heroes Never Die WORKED");
       expect(postAv.health).toBe(1);
       expect(postAv.status).toBe("Recovering");
@@ -185,13 +150,7 @@ describe("Do battle setup with random av and generated foe template", () => {
     //BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(
-      BRA,
-      BRF,
-      b.outcomeData,
-      b.aHealthRemaining,
-      b.fHealthRemaining
-    );
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
     const effects = [{ name: "+15 Damage Afterburn", type: "postbattle" }];
     doPostBattleEffects(effects);
     const { postAv, postOutcome, postFoe } = getPostBattlePackage();
@@ -201,11 +160,7 @@ describe("Do battle setup with random av and generated foe template", () => {
       if (b.fHealthRemaining - 25 <= 0) {
         expect(postOutcome.outcome).toBe("Double KO");
       }
-      console.log(
-        "Foe Health before and after Afterburn = ",
-        b.fHealthRemaining,
-        postFoe.health
-      );
+      console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
       expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
     }
 
@@ -214,11 +169,7 @@ describe("Do battle setup with random av and generated foe template", () => {
       if (b.fHealthRemaining - 25 <= 0) {
         expect(postOutcome.outcome).toBe("Avatar Wins");
       }
-      console.log(
-        "Foe Health before and after Afterburn = ",
-        b.fHealthRemaining,
-        postFoe.health
-      );
+      console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
       expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
     }
   });

@@ -1,32 +1,15 @@
-const {
-  User,
-  UserActivity,
-  UserTotal,
-  Avatar,
-  Items,
-} = require("../../config/db");
+const { User, UserActivity, UserTotal, Avatar, Items } = require("../../config/db");
 const db = require("../../config/db").db;
 const { Op } = require("sequelize");
 const moment = require("moment");
 const crypto = require("crypto");
 const { parseAvatarProperties, range } = require("../../lib/helperFunctions");
-const {
-  COMPETITIVE_ACTIVITIES,
-  NONCOMPETITIVE_ACTIVITIES,
-  MAX_LEVEL,
-} = require("../CONSTANTS");
+const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require("../CONSTANTS");
 const utCalc = require("../upgrades/utCalc");
 const avCalc = require("../upgrades/avCalc");
 const xpCalc = require("../upgrades/xpCalc");
-const {
-  activityItemFind,
-  insertItemsFromItemFind,
-} = require("./activityItemFind");
-const {
-  activityStatRewards,
-  activityLevelRewards,
-  determineStatImprovements,
-} = require("./activityRewards");
+const { activityItemFind, insertItemsFromItemFind } = require("./activityItemFind");
+const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("./activityRewards");
 const activityHeal = require("./activityHeal");
 const { sendCronErrorEmail } = require("../../mail");
 
@@ -44,18 +27,13 @@ function _determineActivityId(id, source) {
 function _prepareActivitiesForDb(email, activities) {
   // Need latest Activity to be added to user's account
   let latestActivityUpdate;
-  const activityEntries = activities.map((activity) => {
+  const activityEntries = activities.map(activity => {
     const activityDate = moment.utc(activity.start_date);
     const activityId = _determineActivityId(activity.id, activity.source);
 
     // Check for latest activity (doesn't include DB activities)
-    if (
-      !latestActivityUpdate ||
-      activityDate.isAfter(moment.utc(latestActivityUpdate))
-    ) {
-      latestActivityUpdate = moment
-        .utc(activity.start_date)
-        .format("YYYY-MM-DD HH:mm:ss");
+    if (!latestActivityUpdate || activityDate.isAfter(moment.utc(latestActivityUpdate))) {
+      latestActivityUpdate = moment.utc(activity.start_date).format("YYYY-MM-DD HH:mm:ss");
     }
 
     return {
@@ -76,26 +54,24 @@ function _prepareActivitiesForDb(email, activities) {
 }
 
 function _dedupActivities(activities, t) {
-  const actIdArray = activities.map((act) => act.activityId.toString());
+  const actIdArray = activities.map(act => act.activityId.toString());
   return UserActivity.findAll({
     attributes: ["activityId"],
     where: { activityId: { [Op.in]: actIdArray } },
     transaction: t,
   })
-    .then((duplicateActivities) => {
-      const duplicateActivityIds = duplicateActivities.map(
-        (act) => act.activityId
-      );
+    .then(duplicateActivities => {
+      const duplicateActivityIds = duplicateActivities.map(act => act.activityId);
       //console.log('THE activityIds of the duplicate activities', duplicateActivityIds);
 
       // duplicateActivityIds is an array of activities that are confirmed already in the DB
       // we want to exclude all 'activities' that match these ids.
-      return activities.filter((act) => {
+      return activities.filter(act => {
         // Only return activities that are not in the duplicateActivityId array
         return !duplicateActivityIds.includes(act.activityId);
       });
     })
-    .catch((error) => {
+    .catch(error => {
       console.log("ERROR-", error);
       throw error;
     });
@@ -105,10 +81,7 @@ function _dedupActivities(activities, t) {
 async function _insertActivityData(email, activities, t) {
   // In the future, consider pushing back the latestActivityUpdate determination until after the dedup
   // Prepare activities for DB
-  const { activityEntries, latestActivityUpdate } = _prepareActivitiesForDb(
-    email,
-    activities
-  );
+  const { activityEntries, latestActivityUpdate } = _prepareActivitiesForDb(email, activities);
   //console.log(activityEntries);
   // Dedup any activities that conflict with entries in the DB
   const dedupedEntries = await _dedupActivities(activityEntries, t);
@@ -138,14 +111,7 @@ async function _insertActivityData(email, activities, t) {
 }
 
 // UPDATE USER TOTALS
-async function _handleUserTotalsUpdate(
-  email,
-  hasBeenUpgraded,
-  updatedActivities,
-  accountDate,
-  userTotals,
-  t
-) {
+async function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t) {
   if (!userTotals) {
     throw new Error(`No User Totals for user ${email}`);
   }
@@ -153,9 +119,7 @@ async function _handleUserTotalsUpdate(
   const { update, initialUpdate } = utCalc(userTotals);
 
   // If user has already updated avatar, run update function, otherwise the initialUpdate which uses previous 10 activities.
-  const ut = hasBeenUpgraded
-    ? update(updatedActivities)
-    : initialUpdate(updatedActivities, accountDate);
+  const ut = hasBeenUpgraded ? update(updatedActivities) : initialUpdate(updatedActivities, accountDate);
   // Finally, save to DB
   await UserTotal.update(ut, { where: { user: email }, transaction: t });
   return ut;
@@ -166,43 +130,13 @@ function _getAvatarAndItems(email, t) {
   return Promise.all([
     Avatar.findOne({
       where: { owner: email },
-      attributes: [
-        "id",
-        "character",
-        "createdAt",
-        "activityXP",
-        "battleXP",
-        "power",
-        "health",
-        "maxHealth",
-        "fire",
-        "earth",
-        "water",
-        "air",
-        "aether",
-        "qpFire",
-        "qpEarth",
-        "qpWater",
-        "qpAir",
-        "qpPower",
-        "qpHealth",
-        "qpAether",
-        "qp",
-        "photonTokens",
-        "status",
-      ],
+      attributes: ["id", "character", "createdAt", "activityXP", "battleXP", "power", "health", "maxHealth", "fire", "earth", "water", "air", "aether", "qpFire", "qpEarth", "qpWater", "qpAir", "qpPower", "qpHealth", "qpAether", "qp", "photonTokens", "status"],
       raw: true,
       transaction: t,
     }),
     Items.findAll({
       where: { dropRate: { [Op.ne]: null }, disabled: false },
-      attributes: [
-        "name",
-        "dropRate",
-        "levelRestriction",
-        "activityRestriction",
-        "disabled",
-      ],
+      attributes: ["name", "dropRate", "levelRestriction", "activityRestriction", "disabled"],
       raw: true,
       transaction: t,
     }),
@@ -210,10 +144,7 @@ function _getAvatarAndItems(email, t) {
 }
 
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(
-  avStatSnapshot,
-  { power, maxHealth, health, air, water, fire, earth, aether }
-) {
+function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }) {
   // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
   // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
   // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
@@ -260,32 +191,21 @@ function _calcProgress(avatar, ut) {
         air: avatar.air,
         aether: avatar.aether,
         health: avatar.health,
-      }
-    )
+      },
+    ),
   );
-  const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(
-    avatar.activityXP,
-    avatar.battleXP
-  );
+  const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
-  const {
-    updatePower,
-    updateHealth,
-    updateAether,
-    updateElements,
-    updateStatus,
-  } = avCalc(ut);
+  const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);
 
   // Updated aXP
   const updatedAXP = calcNewActivityXPFromUt(ut);
   const aXPDiff = updatedAXP - avStatSnapshot.activityXP;
 
-  const { leveledUp, startingLevel, endingLevel, qpEarned } =
-    checkLevelUp(aXPDiff);
+  const { leveledUp, startingLevel, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
   const lvlUp = leveledUp;
   // endingLevel starts over after MAX_LEVEL(100)
-  const lvlAfterBuff =
-    endingLevel > MAX_LEVEL ? endingLevel - MAX_LEVEL : endingLevel;
+  const lvlAfterBuff = endingLevel > MAX_LEVEL ? endingLevel - MAX_LEVEL : endingLevel;
   const levelInfo = {
     startingLevel,
     endingLevel,
@@ -298,14 +218,7 @@ function _calcProgress(avatar, ut) {
   const updatedQP = qpEarned + avatar.qp;
   const updatedPower = updatePower(endingLevel, avatar.qpPower);
   const updatedAether = updateAether(endingLevel, avatar.qpAether);
-  let { updatedHealth, updatedMaxHealth } = updateHealth(
-    endingLevel,
-    avatar.qpHealth,
-    avatar.health,
-    avatar.maxHealth,
-    avatar.status,
-    lvlUp
-  );
+  let { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
   const updatedStatus = updateStatus(avatar.status, lvlUp);
   const { fire, earth, water, air } = updateElements(
     avatar.character,
@@ -315,15 +228,10 @@ function _calcProgress(avatar, ut) {
       qpWater: avatar.qpWater,
       qpAir: avatar.qpAir,
     },
-    avatar.createdAt
+    avatar.createdAt,
   );
   // For users with Aether, heal a portion of health based on activity time and aether
-  updatedHealth = activityHeal(
-    updatedHealth,
-    updatedMaxHealth,
-    avatar.aether,
-    aXPDiff
-  );
+  updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
 
   return {
     avStatSnapshot,
@@ -346,26 +254,13 @@ function _calcProgress(avatar, ut) {
 }
 
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-function _handleActivityItemFind(
-  weightedElms,
-  improvements,
-  levelInfo,
-  updatedAvatar,
-  possibleItemDrops
-) {
+function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
 
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
   // Items & PT found during activity
-  const { items, pt } = activityItemFind(
-    aXPDiff,
-    endingLevel,
-    weightedElms,
-    null,
-    null,
-    possibleItemDrops
-  );
+  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, null, null, possibleItemDrops);
 
   return {
     foundItems: items,
@@ -378,19 +273,13 @@ function _handleActivityItemFind(
 
 // UPDATE HERO IN DB
 function _updateAvatar(email, updatedAvatar, t) {
-  return Avatar.update(
-    { ...updatedAvatar },
-    { where: { owner: email }, transaction: t }
-  );
+  return Avatar.update({ ...updatedAvatar }, { where: { owner: email }, transaction: t });
 }
 
 // APPEND ALL EXTRA INFO NEEDED FOR HERO ON FRONTEND
 function _appendLevelInfo(updatedAvatar) {
   const { activityXP, battleXP, recovery, health, maxHealth } = updatedAvatar;
-  const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(
-    activityXP,
-    battleXP
-  );
+  const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(activityXP, battleXP);
   const { level, albedo } = getCurrentLevel();
 
   return Object.assign({}, updatedAvatar, {
@@ -404,19 +293,9 @@ function _appendLevelInfo(updatedAvatar) {
 }
 
 // RUN FUNCTIONS FOR ITEM FIND & REWARDS
-function _handleAllItemAwarding(
-  avatarID,
-  improvements,
-  avStatSnapshot,
-  levelInfo,
-  foundItems,
-  t
-) {
+function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInfo, foundItems, t) {
   const { startingLevel, endingLevel } = levelInfo;
-  const statObjForUpgrade = determineStatImprovements(
-    improvements,
-    avStatSnapshot
-  );
+  const statObjForUpgrade = determineStatImprovements(improvements, avStatSnapshot);
   const allItemPromises = [
     // ITEMS FROM ITEM FIND
     insertItemsFromItemFind(avatarID, foundItems, t),
@@ -435,21 +314,13 @@ function _handleAllItemAwarding(
 
 // ROOT FUNCTION FOR UPGRADING HERO
 function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
-  return db.transaction(async (t) => {
+  return db.transaction(async t => {
     try {
       // Before inserting activities, do separate db check to remove duplicates
       // This is needed since Sequelize's 'ignoreDuplicates' sucks and doesn't behave as expected
 
-      const activityPromiseResults = await _insertActivityData(
-        email,
-        activities,
-        t
-      );
-      const promiseStatuses = [
-        activityPromiseResults[0].status,
-        activityPromiseResults[1].status,
-        activityPromiseResults[2].status,
-      ];
+      const activityPromiseResults = await _insertActivityData(email, activities, t);
+      const promiseStatuses = [activityPromiseResults[0].status, activityPromiseResults[1].status, activityPromiseResults[2].status];
       //console.log('PS=', activityPromiseResults[1]);
 
       if (promiseStatuses.includes("rejected")) {
@@ -464,31 +335,19 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
         throw new Error("Activity Insertion Failed");
       }
 
-      const updatedActivities = activityPromiseResults[1].value.map(
-        (actResult) => {
-          return {
-            type: actResult.type,
-            duration: actResult.duration,
-          };
-        }
-      );
+      const updatedActivities = activityPromiseResults[1].value.map(actResult => {
+        return {
+          type: actResult.type,
+          duration: actResult.duration,
+        };
+      });
       let userTotals = activityPromiseResults[2].value;
 
-      userTotals = await _handleUserTotalsUpdate(
-        email,
-        hasBeenUpgraded,
-        updatedActivities,
-        accountDate,
-        userTotals,
-        t
-      );
+      userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
       const [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
 
       // Determine all progress made with XP, levels, etc.
-      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(
-        avatar,
-        userTotals
-      );
+      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
       let improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
@@ -498,13 +357,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
 
       let foundItems;
       // Run activity find module to see if any items were found from latest upgrade
-      ({ foundItems, improvements, updatedAvatar } = _handleActivityItemFind(
-        weightedElms,
-        improvements,
-        levelInfo,
-        updatedAvatar,
-        possibleItemDrops
-      ));
+      ({ foundItems, improvements, updatedAvatar } = _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops));
 
       // Save new Av to DB
       await _updateAvatar(email, updatedAvatar, t);
@@ -514,15 +367,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
 
       // Returns all promise results from itemFind, activityStatRewards, activityLevelRewards
       // Destructures into itemsFromItemFind, rewards, and a possible levelReward (will be undefined unless a user earned a level up)
-      [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] =
-        await _handleAllItemAwarding(
-          avatar.id,
-          improvements,
-          avStatSnapshot,
-          levelInfo,
-          foundItems,
-          t
-        );
+      [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] = await _handleAllItemAwarding(avatar.id, improvements, avStatSnapshot, levelInfo, foundItems, t);
 
       if (levelRewards) {
         rewards.push(...levelRewards.value);

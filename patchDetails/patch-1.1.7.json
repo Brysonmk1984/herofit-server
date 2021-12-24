@@ -16,15 +16,8 @@
       "description": "Now when you Go To Battle, if you're on the verge of earning a new costume or title, it will be visible from the Go To Battle Window. Additionally, you'll see the rewards in the Battle Report window the next day."
     }
   ],
-  "bugFixes": [
-    "Fixed an error where sometimes a costume wouldn't be rewarded",
-    "Fixed an error where the Battle Report would say you earned a reward when you did not.",
-    "Fixed an error that would occure if a new user picked an already taken hero name.",
-    "Fixed a bug that was preventing accounts from being deleted if they had earned items."
-  ],
-  "balanceChanges": [
-    "Difficulty of foes increased slightly to make up for extra seasonal elemental power, which will most of the time benefit the hero more."
-  ],
+  "bugFixes": ["Fixed an error where sometimes a costume wouldn't be rewarded", "Fixed an error where the Battle Report would say you earned a reward when you did not.", "Fixed an error that would occure if a new user picked an already taken hero name.", "Fixed a bug that was preventing accounts from being deleted if they had earned items."],
+  "balanceChanges": ["Difficulty of foes increased slightly to make up for extra seasonal elemental power, which will most of the time benefit the hero more."],
   "miscDetails": null,
   "closingRemarks": "After the successful launch of the big 1.1.0 patch, there were some issues that cropped up and are now mostly resolved. If anyone is still experiencing problems with either the battle system or items, please report it, Thanks!"
 }

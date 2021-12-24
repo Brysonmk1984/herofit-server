@@ -7,7 +7,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
   const effectProcs = [];
-  effects.forEach((effect) => {
+  effects.forEach(effect => {
     switch (effect) {
       case "Hero +5,+10% Water":
         eAvatar.water += 5;
@@ -169,8 +169,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
         });
         break;
       case "Ill Omen":
-        const isNegativeScenario =
-          scenario.id === 1 || scenario.id === 3 ? true : false;
+        const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
         let illOmenProc = eFoe.difficultyLevel === "high" ? true : false;
 
         if (eFoe.difficultyLevel === "medium") {
@@ -194,15 +193,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
 
         // If badluck effect happens, randomly reduce a non-zero foe stat to 50%
         if (badLuckProc) {
-          const possibleStats = [
-            "power",
-            "armor",
-            "health",
-            "water",
-            "air",
-            "fire",
-            "earth",
-          ];
+          const possibleStats = ["power", "armor", "health", "water", "air", "fire", "earth"];
           const foeStatArr = [];
 
           for (let stat in eFoe) {
@@ -213,8 +204,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
             }
           }
 
-          const statToReduce =
-            foeStatArr[Math.floor(Math.random() * foeStatArr.length)];
+          const statToReduce = foeStatArr[Math.floor(Math.random() * foeStatArr.length)];
           eFoe[statToReduce] = Math.floor(foe[statToReduce] * 0.5);
           effectProcs.push({
             effect: "Bad Luck",
@@ -235,45 +225,21 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
       case "Eight-Legged Ingenuity":
         const ingenuityProc = chance.bool({ likelihood: 33 });
         if (ingenuityProc) {
-          const possibleStats = [
-            "power",
-            "armor",
-            "health",
-            "water",
-            "air",
-            "fire",
-            "earth",
-          ];
+          const possibleStats = ["power", "armor", "health", "water", "air", "fire", "earth"];
           eFoe = { ...scrambleStats(possibleStats, foe) };
           effectProcs.push({
             effect: "Eight-Legged Ingenuity",
-            foeStatsEffected: [
-              "power",
-              "armor",
-              "health",
-              "water",
-              "air",
-              "fire",
-              "earth",
-            ],
+            foeStatsEffected: ["power", "armor", "health", "water", "air", "fire", "earth"],
           });
         }
         break;
       case "Frisky Mischief":
         const friskyProc = chance.bool({ likelihood: 75 });
         if (friskyProc) {
-          const possibleStats = [
-            "power",
-            "armor",
-            "health",
-            "water",
-            "air",
-            "fire",
-            "earth",
-          ];
+          const possibleStats = ["power", "armor", "health", "water", "air", "fire", "earth"];
           const mappedToOb = possibleStats
-            .filter((stat) => avatar[stat] > 0)
-            .map((stat) => {
+            .filter(stat => avatar[stat] > 0)
+            .map(stat => {
               return { [stat]: avatar[stat] || 0 };
             });
 
@@ -283,7 +249,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
           }, Infinity);
 
           // Finds the property of that value
-          let avStatObj = mappedToOb.find((obj) => {
+          let avStatObj = mappedToOb.find(obj => {
             //console.log('look', Object.keys(obj), Object.keys(obj)[0]);
             const currentKey = Object.keys(obj)[0];
             if (obj[currentKey] === lowestAvVal) {
@@ -328,16 +294,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
         const naturalLogOfLevel = Math.log(avatarLevel);
         const RABBIT_TACTICS_MODIFIER = (naturalLogOfLevel * avatarLevel) / 10;
 
-        eAvatar.power =
-          Math.floor(
-            eAvatar.power +
-              (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER
-          ) || eAvatar.power;
-        eAvatar.air =
-          Math.floor(
-            eAvatar.air +
-              (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER
-          ) || eAvatar.air;
+        eAvatar.power = Math.floor(eAvatar.power + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER) || eAvatar.power;
+        eAvatar.air = Math.floor(eAvatar.air + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER) || eAvatar.air;
 
         effectProcs.push({
           effect: "Rabbit Tactics",
@@ -378,28 +336,12 @@ function doFoeBattlePrep(avatar, foe, scenarioId) {
           break;
         case "Paranormal Pandemonium":
           // Stat Scramble
-          const stats = [
-            "armor",
-            "earth",
-            "fire",
-            "water",
-            "air",
-            "power",
-            "health",
-          ];
+          const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
 
           fAvatar = { ...scrambleStats(stats, avatar) };
           effectProcs.push({
             effect: "Paranormal Pandemonium",
-            heroStatsEffected: [
-              "armor",
-              "earth",
-              "fire",
-              "water",
-              "air",
-              "power",
-              "health",
-            ],
+            heroStatsEffected: ["armor", "earth", "fire", "water", "air", "power", "health"],
           });
           break;
         case "Unholy Armor":

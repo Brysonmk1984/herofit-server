@@ -28,10 +28,7 @@ function postBattleEffects(a, f, outcomeData, effects) {
       // Guardian of the Depths
       case "-20% Health Afterburn":
         // If Hero won, or Draw, deal 20% of target's health as damage to hero and potentially change outcome
-        if (
-          outcomeData.outcome === "Avatar Wins" ||
-          outcomeData.outcome === "Draw"
-        ) {
+        if (outcomeData.outcome === "Avatar Wins" || outcomeData.outcome === "Draw") {
           avatar.health -= avatar.maxHealth * 0.2;
           if (avatar.health <= 0) {
             // If foe won, change to DKO since Afterburn killed foe
@@ -57,7 +54,7 @@ function postBattleEffects(a, f, outcomeData, effects) {
 
   // AVATAR POSTBATTLE ABILITIES
   if (effects && effects.length) {
-    effects.forEach((effect) => {
+    effects.forEach(effect => {
       switch (effect) {
         // Chameleon
         case "Adaptive Camouflage":
@@ -107,10 +104,7 @@ function postBattleEffects(a, f, outcomeData, effects) {
         // Unicorn
         case "Heroes Never Die":
           // If Foe won, 50% chance to revive
-          if (
-            outcomeData.outcome === "Foe Wins" ||
-            outcomeData.outcome === "Double KO"
-          ) {
+          if (outcomeData.outcome === "Foe Wins" || outcomeData.outcome === "Double KO") {
             const reviveWorked = chance.bool({ likelihood: 50 });
             if (reviveWorked) {
               avatar = Object.assign({}, a, {
@@ -127,10 +121,7 @@ function postBattleEffects(a, f, outcomeData, effects) {
         // Dragon Whelp
         case "+25 Damage Afterburn":
           // If Foe won, or Draw, deal 25 more damage to foe and potentially change outcome
-          if (
-            outcomeData.outcome === "Foe Wins" ||
-            outcomeData.outcome === "Draw"
-          ) {
+          if (outcomeData.outcome === "Foe Wins" || outcomeData.outcome === "Draw") {
             foe.health -= 25;
             if (foe.health <= 0) {
               // If foe won, change to DKO since Afterburn killed foe
