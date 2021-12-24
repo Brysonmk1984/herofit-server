@@ -17,7 +17,7 @@ const heroList = require('../heroList.json');
 const crypto = require('crypto');
 
 
-router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
+router.post('/login', body('email').isEmail(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /login");
@@ -26,7 +26,7 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
   if(config.mode === 'maintenance'){
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
-  const { email, password, isMobileApp } = req.body;
+  const { email, password } = req.body;
 
 
   User.findOne({ where : { email }, raw : true })
@@ -40,10 +40,6 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
     const isValid = validatePassword(password, user.hash, user.salt);
     if(isValid){
       const tokenObject = issueJWT(user);
-  
-      // if(!user.active){
-      //   return res.formatter.ok({ user : { active : false, emailCode : user.emailCode }, tokenObject });
-      // }
       return res.formatter.ok({ user, tokenObject });
     }else{
       return res.formatter.unauthorized(`Incorrect password, please try again.`);
