@@ -1,39 +1,51 @@
-const avatarProfiles = require('./heroProfiles.json');
-const avatarPowerSpecProfiles = require('./powerProfiles.json');
-const { selectFoeTemplate, generateFoeStats } = require('../../game/prebattle/foeFunctions');
-const { calcScenarioBonuses, determineScenario } = require('../../game/battle/scenario');
-const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
-const doBattle = require('../../game/battle/doBattle');
-const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require('../../game/CONSTANTS');
-const avCalc = require('../../game/upgrades/avCalc');
-const xpCalc = require('../../game/upgrades/xpCalc');
-const chance = require('chance')();
-
+const avatarProfiles = require("./heroProfiles.json");
+const avatarPowerSpecProfiles = require("./powerProfiles.json");
+const {
+  selectFoeTemplate,
+  generateFoeStats,
+} = require("../../game/prebattle/foeFunctions");
+const {
+  calcScenarioBonuses,
+  determineScenario,
+} = require("../../game/battle/scenario");
+const {
+  doAvatarBattlePrep,
+  doFoeBattlePrep,
+} = require("../../game/battle/doBattlePrep");
+const doBattle = require("../../game/battle/doBattle");
+const {
+  FOE_NON_ACTION,
+  BEGINNERS_LUCK_MAX_XP,
+  BEGINNERS_LUCK_LIKELIHOOD,
+} = require("../../game/CONSTANTS");
+const avCalc = require("../../game/upgrades/avCalc");
+const xpCalc = require("../../game/upgrades/xpCalc");
+const chance = require("chance")();
 
 // Use toEqual for objects and arrays
-// Use toBe for scalar (primitive) data types only. 
+// Use toBe for scalar (primitive) data types only.
 // check the response data type use typeof operator
-const generateFoes = function(avatars){
-  return avatars.map((av) =>{
-   const foeTemplate = selectFoeTemplate(av.level);
+const generateFoes = function (avatars) {
+  return avatars.map((av) => {
+    const foeTemplate = selectFoeTemplate(av.level);
 
     const foe = {
-      id : foeTemplate.id,
-      type : foeTemplate.type,
-      name : foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
-      ability : foeTemplate.ability,
-      class : foeTemplate.class
-    }
+      id: foeTemplate.id,
+      type: foeTemplate.type,
+      name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+      ability: foeTemplate.ability,
+      class: foeTemplate.class,
+    };
     return Object.assign({}, foe, generateFoeStats(av, foe));
   });
 };
 
-
-
-function generateBrs(avatars, foesWithStats){
+function generateBrs(avatars, foesWithStats) {
   const { determineAstrologySeason } = avCalc();
-  const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
-  return avatars.map((av, i) =>{
+  const seasonalBonusElement = determineAstrologySeason(
+    Date.now()
+  ).element.toLowerCase();
+  return avatars.map((av, i) => {
     let BRA;
     let BRF;
     let goesFirst;
@@ -41,8 +53,8 @@ function generateBrs(avatars, foesWithStats){
     // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
     let beginnersLuck = false;
     const avTXP = av.activityXP + av.battleXP;
-    if(avTXP < BEGINNERS_LUCK_MAX_XP){
-      beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD});
+    if (avTXP < BEGINNERS_LUCK_MAX_XP) {
+      beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD });
     }
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
@@ -62,8 +74,11 @@ function generateBrs(avatars, foesWithStats){
     // BATTLE STEP 3 - NOT IN GAME YET
 
     // BATTLE STEP 4 - FOE USES prebattle ABILITY
-    if(foesWithStats[i].ability && foesWithStats[i].ability.type === 'prebattle'){
-      if(scenario.id !== FOE_NON_ACTION){
+    if (
+      foesWithStats[i].ability &&
+      foesWithStats[i].ability.type === "prebattle"
+    ) {
+      if (scenario.id !== FOE_NON_ACTION) {
         const foeBP = doFoeBattlePrep(BRA, BRF, foesWithStats[i].ability);
         BRF = foeBP.foe;
         BRA = foeBP.avatar;
@@ -71,198 +86,194 @@ function generateBrs(avatars, foesWithStats){
     }
 
     // WHO SWINGS FIRST
-    if(scenario.id === 0){
-      goesFirst = 'Avatar';
-    }else if(scenario.id === 3){
-      goesFirst = 'Foe';
-    }else{
+    if (scenario.id === 0) {
+      goesFirst = "Avatar";
+    } else if (scenario.id === 3) {
+      goesFirst = "Foe";
+    } else {
       // 75% Chance the Avatar will go first if below level 15
-      if(beginnersLuck){
-        goesFirst = 'Avatar';
-      }else{
+      if (beginnersLuck) {
+        goesFirst = "Avatar";
+      } else {
         const randDecider = Math.floor(Math.random() * 2);
-        goesFirst = randDecider === 0 ? 'Avatar' : 'Foe';
+        goesFirst = randDecider === 0 ? "Avatar" : "Foe";
       }
     }
-    return { BRA, BRF, goesFirst }
-
+    return { BRA, BRF, goesFirst };
   });
-
 }
 
-
-
-describe('Battle all generated foes against av profiles', ()=>{
-
+describe("Battle all generated foes against av profiles", () => {
   let avatars = avatarProfiles.map((av) => {
     const { getCurrentLevel } = xpCalc(av.activityXP, av.battleXP);
-    return Object.assign({}, av, { level : getCurrentLevel().total });
+    return Object.assign({}, av, { level: getCurrentLevel().total });
   });
   let multipliedAvatars = [];
   // Multiplies the instances of avatar profiles to create more battles
   const battleMultiplier = 5;
-  for(let i = 0; i < battleMultiplier; i++){
+  for (let i = 0; i < battleMultiplier; i++) {
     multipliedAvatars.push(...avatars);
   }
 
-  console.log('MULT AV - ', multipliedAvatars.length);
+  console.log("MULT AV - ", multipliedAvatars.length);
 
   let foesWithStats = generateFoes(multipliedAvatars);
-  let preBattles =  generateBrs(multipliedAvatars, foesWithStats);
-
-
-
+  let preBattles = generateBrs(multipliedAvatars, foesWithStats);
 
   // BATTLE STEP 5 - EXCHANGE DAMAGE
 
-
-  const allBattles = preBattles.map((b) =>{
-    return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), { foeType :  b.BRF.type, foeClass : b.BRF.class });
+  const allBattles = preBattles.map((b) => {
+    return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), {
+      foeType: b.BRF.type,
+      foeClass: b.BRF.class,
+    });
   });
 
   //console.log('FIRST BATTLE - ', allBattles[0]);
 
   const totals = {
-    count : 0,
+    count: 0,
     // Overall - All levels
-    overall : {
-      wins : 0,
-      losses : 0,
-      draws : 0,
-      dkos : 0,
-      total : 0
+    overall: {
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      dkos: 0,
+      total: 0,
     },
     // Below level 15
-    lowLevel : {
-      wins : 0,
-      losses : 0,
-      draws : 0,
-      dkos : 0,
-      total : 0
+    lowLevel: {
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      dkos: 0,
+      total: 0,
     },
     // level 15-24
-    lowMidLevel : {
-      wins : 0,
-      losses : 0,
-      draws : 0,
-      dkos : 0,
-      total : 0
+    lowMidLevel: {
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      dkos: 0,
+      total: 0,
     },
     // 15 - 60
-    midLevel : {
-      wins : 0,
-      losses : 0,
-      draws : 0,
-      dkos : 0,
-      total : 0
+    midLevel: {
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      dkos: 0,
+      total: 0,
     },
     // Over 60
-    highLevel : {
-      wins : 0,
-      losses : 0,
-      draws : 0,
-      dkos : 0,
-      total : 0
+    highLevel: {
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      dkos: 0,
+      total: 0,
     },
-    winsVs : {
-      spirits : 0,
-      elementals : 0,
-      titans : 0
+    winsVs: {
+      spirits: 0,
+      elementals: 0,
+      titans: 0,
     },
-    totalsVs : {
-      spirits : 0,
-      elementals : 0,
-      titans : 0
-    }
-  }
+    totalsVs: {
+      spirits: 0,
+      elementals: 0,
+      titans: 0,
+    },
+  };
 
-  allBattles.forEach((b, i) =>{
+  allBattles.forEach((b, i) => {
     const level = b.level;
 
-    switch(b.outcomeData.outcome){
-      case 'Avatar Wins':
-        if(level < 15){
-          totals.lowLevel.wins ++;
-          totals.lowLevel.total ++;
-        }else if(level >= 15 && level < 60){
-          totals.midLevel.wins ++;
-          totals.midLevel.total ++;
+    switch (b.outcomeData.outcome) {
+      case "Avatar Wins":
+        if (level < 15) {
+          totals.lowLevel.wins++;
+          totals.lowLevel.total++;
+        } else if (level >= 15 && level < 60) {
+          totals.midLevel.wins++;
+          totals.midLevel.total++;
           // Start of extra difficulty curve
-          if(level >= 15 && level < 25){
-            totals.lowMidLevel.wins ++;
-            totals.lowMidLevel.total ++;
+          if (level >= 15 && level < 25) {
+            totals.lowMidLevel.wins++;
+            totals.lowMidLevel.total++;
           }
-        }else if(level >= 60){
-          totals.highLevel.wins ++;
-          totals.highLevel.total ++;
+        } else if (level >= 60) {
+          totals.highLevel.wins++;
+          totals.highLevel.total++;
         }
-        totals.overall.wins ++;
-        totals.winsVs[b.foeClass.toLowerCase()] ++;
+        totals.overall.wins++;
+        totals.winsVs[b.foeClass.toLowerCase()]++;
         break;
-      case 'Foe Wins':
-        if(level < 15){
-          totals.lowLevel.losses ++;
-          totals.lowLevel.total ++;
-        }else if(level >= 15 && level < 60){
-          totals.midLevel.losses ++;
-          totals.midLevel.total ++;
+      case "Foe Wins":
+        if (level < 15) {
+          totals.lowLevel.losses++;
+          totals.lowLevel.total++;
+        } else if (level >= 15 && level < 60) {
+          totals.midLevel.losses++;
+          totals.midLevel.total++;
           // Start of extra difficulty curve
-          if(level >= 15 && level < 25){
-            totals.lowMidLevel.losses ++;
-            totals.lowMidLevel.total ++;
+          if (level >= 15 && level < 25) {
+            totals.lowMidLevel.losses++;
+            totals.lowMidLevel.total++;
           }
-        }else if(level >= 60){
-          totals.highLevel.losses ++;
-          totals.highLevel.total ++;
+        } else if (level >= 60) {
+          totals.highLevel.losses++;
+          totals.highLevel.total++;
         }
-        totals.overall.losses ++;
+        totals.overall.losses++;
         break;
-      case 'Draw':
-        if(level < 15){
-          totals.lowLevel.draws ++;
-          totals.lowLevel.total ++;
-        }else if(level >= 15 && level < 60){
-          totals.midLevel.draws ++;
-          totals.midLevel.total ++;
+      case "Draw":
+        if (level < 15) {
+          totals.lowLevel.draws++;
+          totals.lowLevel.total++;
+        } else if (level >= 15 && level < 60) {
+          totals.midLevel.draws++;
+          totals.midLevel.total++;
           // Start of extra difficulty curve
-          if(level >= 15 && level < 25){
-            totals.lowMidLevel.draws ++;
-            totals.lowMidLevel.total ++;
+          if (level >= 15 && level < 25) {
+            totals.lowMidLevel.draws++;
+            totals.lowMidLevel.total++;
           }
-        }else if(level >= 60){
-          totals.highLevel.draws ++;
-          totals.highLevel.total ++;
+        } else if (level >= 60) {
+          totals.highLevel.draws++;
+          totals.highLevel.total++;
         }
-        totals.overall.draws ++;
+        totals.overall.draws++;
         break;
-      case 'Double KO':
-        if(level < 15){
-          totals.lowLevel.dkos ++;
-          totals.lowLevel.total ++;
-        }else if(level >= 15 && level < 60){
-          totals.midLevel.dkos ++;
-          totals.midLevel.total ++;
+      case "Double KO":
+        if (level < 15) {
+          totals.lowLevel.dkos++;
+          totals.lowLevel.total++;
+        } else if (level >= 15 && level < 60) {
+          totals.midLevel.dkos++;
+          totals.midLevel.total++;
           // Start of extra difficulty curve
-          if(level >= 15 && level < 25){
-            totals.lowMidLevel.dkos ++;
-            totals.lowMidLevel.total ++;
+          if (level >= 15 && level < 25) {
+            totals.lowMidLevel.dkos++;
+            totals.lowMidLevel.total++;
           }
-        }else if(level >= 60){
-          totals.highLevel.dkos ++;
-          totals.highLevel.total ++;
+        } else if (level >= 60) {
+          totals.highLevel.dkos++;
+          totals.highLevel.total++;
         }
-        totals.overall.total ++;
-        totals.overall.dkos ++;
+        totals.overall.total++;
+        totals.overall.dkos++;
         break;
     }
-    totals.count ++;
-    totals.totalsVs[b.foeClass.toLowerCase()] ++;
+    totals.count++;
+    totals.totalsVs[b.foeClass.toLowerCase()]++;
   });
 
-  console.log('Battle Totals - ', totals);
+  console.log("Battle Totals - ", totals);
 
-  const lowLevelPreBattles = preBattles.filter(battle => battle.BRA.level < 15);
-  const lowLevelBattles = allBattles.slice(0,lowLevelPreBattles.length);
+  const lowLevelPreBattles = preBattles.filter(
+    (battle) => battle.BRA.level < 15
+  );
+  const lowLevelBattles = allBattles.slice(0, lowLevelPreBattles.length);
 
   //console.log('Low level prebattles -',lowLevelPreBattles.length, lowLevelPreBattles);
 
@@ -291,91 +302,57 @@ describe('Battle all generated foes against av profiles', ()=>{
 
   // WIN RATES VS FOE CLASS
   const winRateVsSpirits = totals.winsVs.spirits / totals.totalsVs.spirits;
-  const winRateVsElementals = totals.winsVs.elementals / totals.totalsVs.elementals;
+  const winRateVsElementals =
+    totals.winsVs.elementals / totals.totalsVs.elementals;
   const winRateVsTitans = totals.winsVs.titans / totals.totalsVs.titans;
 
   //console.log('TITANS - battles, winrate',totals.totalsVs.titans, winRateVsTitans);
 
-
-  it('Win % for each avatar level group should be above the threshold', () =>{
+  it("Win % for each avatar level group should be above the threshold", () => {
     //console.log('RRR-', totals.lowLevel.wins, totals.count, (totals.lowLevel.wins / totals.count), ((totals.lowLevel.wins / totals.count) > .65));
     // Above min threshold
-    
-    expect(lowLevelWinRate).toBeGreaterThanOrEqual(.74);
-    expect(midLevelWinRate).toBeGreaterThanOrEqual(.60);
-    expect(highLevelWinRate).toBeGreaterThanOrEqual(.60);
-    expect(overallWinRate).toBeGreaterThanOrEqual(.60);
+
+    expect(lowLevelWinRate).toBeGreaterThanOrEqual(0.74);
+    expect(midLevelWinRate).toBeGreaterThanOrEqual(0.6);
+    expect(highLevelWinRate).toBeGreaterThanOrEqual(0.6);
+    expect(overallWinRate).toBeGreaterThanOrEqual(0.6);
     // Below max threshold
-    expect(lowLevelWinRate).toBeLessThan(.85);
-    expect(midLevelWinRate).toBeLessThan(.75);
-    expect(highLevelWinRate).toBeLessThan(.75);
-    expect(overallWinRate).toBeLessThan(.75);
+    expect(lowLevelWinRate).toBeLessThan(0.85);
+    expect(midLevelWinRate).toBeLessThan(0.75);
+    expect(highLevelWinRate).toBeLessThan(0.75);
+    expect(overallWinRate).toBeLessThan(0.75);
   });
 
-  it('Loss % for each avatar level group should be below the threshold', () =>{
-    expect(lowLevelLossRate).toBeLessThan(.35);
-    expect(midLevelLossRate).toBeLessThan(.35);
-    expect(highLevelLossRate).toBeLessThan(.35);
-    expect(overallLossRate).toBeLessThan(.35);
+  it("Loss % for each avatar level group should be below the threshold", () => {
+    expect(lowLevelLossRate).toBeLessThan(0.35);
+    expect(midLevelLossRate).toBeLessThan(0.35);
+    expect(highLevelLossRate).toBeLessThan(0.35);
+    expect(overallLossRate).toBeLessThan(0.35);
   });
 
-  it('Draw % for each avatar level group should be below the threshold', () =>{
-    expect(lowLevelDrawRates).toBeLessThan(.15);
-    expect(midLevelDrawRates).toBeLessThan(.15);
-    expect(highLevelDrawRates).toBeLessThan(.15);
-    expect(overallDrawRates).toBeLessThan(.15);
+  it("Draw % for each avatar level group should be below the threshold", () => {
+    expect(lowLevelDrawRates).toBeLessThan(0.15);
+    expect(midLevelDrawRates).toBeLessThan(0.15);
+    expect(highLevelDrawRates).toBeLessThan(0.15);
+    expect(overallDrawRates).toBeLessThan(0.15);
   });
 
-  it('DKO % for each avatar level group should be below the threshold', () =>{
-    expect(lowLevelDkoRates).toBeLessThan(.15);
-    expect(midLevelDkoRates).toBeLessThan(.15);
-    expect(highLevelDkoRates).toBeLessThan(.15);
-    expect(overallLevelDkoRates).toBeLessThan(.15);
+  it("DKO % for each avatar level group should be below the threshold", () => {
+    expect(lowLevelDkoRates).toBeLessThan(0.15);
+    expect(midLevelDkoRates).toBeLessThan(0.15);
+    expect(highLevelDkoRates).toBeLessThan(0.15);
+    expect(overallLevelDkoRates).toBeLessThan(0.15);
   });
 
-  it('Win % by class should be within threshold', () =>{
-    expect(winRateVsSpirits).toBeGreaterThanOrEqual(.60);
-    expect(winRateVsElementals).toBeGreaterThanOrEqual(.60);
-    if(totals.totalsVs.titans > 2){
-      expect(winRateVsTitans).toBeGreaterThanOrEqual(.33);
-      expect(winRateVsTitans).toBeLessThanOrEqual(.66);
+  it("Win % by class should be within threshold", () => {
+    expect(winRateVsSpirits).toBeGreaterThanOrEqual(0.6);
+    expect(winRateVsElementals).toBeGreaterThanOrEqual(0.6);
+    if (totals.totalsVs.titans > 2) {
+      expect(winRateVsTitans).toBeGreaterThanOrEqual(0.33);
+      expect(winRateVsTitans).toBeLessThanOrEqual(0.66);
     }
   });
-
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* POWER SPEC ONLY */
 // describe('Battle all generated foes against av profiles', ()=>{
@@ -396,11 +373,7 @@ describe('Battle all generated foes against av profiles', ()=>{
 //   let foesWithStats = generateFoes(multipliedAvatars);
 //   let preBattles =  generateBrs(multipliedAvatars, foesWithStats);
 
-
-
-
 //   // BATTLE STEP 5 - EXCHANGE DAMAGE
-
 
 //   const allBattles = preBattles.map((b) =>{
 //     return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), { foeType :  b.BRF.type, foeClass : b.BRF.class });
@@ -582,11 +555,10 @@ describe('Battle all generated foes against av profiles', ()=>{
 
 //   //console.log('TITANS - battles, winrate',totals.totalsVs.titans, winRateVsTitans);
 
-
 //   it('POWER Win % for each avatar level group should be above the threshold', () =>{
 //     //console.log('RRR-', totals.lowLevel.wins, totals.count, (totals.lowLevel.wins / totals.count), ((totals.lowLevel.wins / totals.count) > .65));
 //     // Above min threshold
-    
+
 //     expect(lowLevelWinRate).toBeGreaterThanOrEqual(.65);
 //     expect(midLevelWinRate).toBeGreaterThanOrEqual(.65);
 //     expect(highLevelWinRate).toBeGreaterThanOrEqual(.65);

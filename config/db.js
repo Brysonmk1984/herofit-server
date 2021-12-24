@@ -1,52 +1,51 @@
-const Sequelize = require('sequelize');
-const UserModel = require('../models/user.js');
-const AvatarModel = require('../models/avatar.js');
-const UserActivityModel = require('../models/userActivity.js');
-const UserTotalModel = require('../models/userTotal.js');
-const BattleModel = require('../models/battle.js');
-const AvatarItemsModel = require('../models/avatarItems.js');
-const ItemsModel = require('../models/items.js');
+const Sequelize = require("sequelize");
+const UserModel = require("../models/user.js");
+const AvatarModel = require("../models/avatar.js");
+const UserActivityModel = require("../models/userActivity.js");
+const UserTotalModel = require("../models/userTotal.js");
+const BattleModel = require("../models/battle.js");
+const AvatarItemsModel = require("../models/avatarItems.js");
+const ItemsModel = require("../models/items.js");
 let db;
 let dbUrl;
 let sequelizeSettings;
 
-if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'proxy'){
+if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   // PRODUCTION or Locally running backend through PROXY
   sequelizeSettings = {
-    dialect: 'postgres',
+    dialect: "postgres",
     dialectOptions: {
-      ssl : true
+      ssl: true,
     },
-    protocol: 'postgres',
-    timezone: 'utc',
+    protocol: "postgres",
+    timezone: "utc",
     operatorsAliases: false,
     host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {
       max: 20,
       min: 0,
       acquire: 30000,
-      idle: 8000
+      idle: 8000,
     },
-    query:{raw:true}
-  }
+    query: { raw: true },
+  };
   dbUrl = process.env.DATABASE_URL;
-
-}else{
+} else {
   // DEVELOPMENT
   sequelizeSettings = {
-    host: 'localhost',
-    dialect: 'postgres',
-    protocol: 'postgres',
+    host: "localhost",
+    dialect: "postgres",
+    protocol: "postgres",
     operatorsAliases: false,
     pool: {
       max: 5,
       min: 0,
       acquire: 30000,
-      idle: 10000
+      idle: 10000,
     },
-    query:{raw:true}
-  }
-  
+    query: { raw: true },
+  };
+
   dbUrl = process.env.DATABASE_URL_LOCAL;
 }
 
@@ -61,15 +60,28 @@ const Battle = BattleModel(db, Sequelize);
 const AvatarItems = AvatarItemsModel(db, Sequelize);
 const Items = ItemsModel(db, Sequelize);
 // User - Avatar JOIN
-User.hasOne(Avatar, {foreignKey: 'userId'});
-Avatar.belongsTo(User, {foreignKey: 'userId', onDelete: 'CASCADE'});
+User.hasOne(Avatar, { foreignKey: "userId" });
+Avatar.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 
 // Avatar-AvatarItems
-Avatar.hasMany(AvatarItems, {foreignKey: 'avatarID', as: 'equipped', onDelete: 'CASCADE'});
-AvatarItems.belongsTo(Avatar, {foreignKey: 'avatarID', onDelete: 'CASCADE'});
+Avatar.hasMany(AvatarItems, {
+  foreignKey: "avatarID",
+  as: "equipped",
+  onDelete: "CASCADE",
+});
+AvatarItems.belongsTo(Avatar, { foreignKey: "avatarID", onDelete: "CASCADE" });
 
 // Items - AvatarItems
-Items.hasMany(AvatarItems, {foreignKey: 'itemID', as: 'items'});
-AvatarItems.belongsTo(Items, {foreignKey: 'itemID', onDelete: 'CASCADE'});
+Items.hasMany(AvatarItems, { foreignKey: "itemID", as: "items" });
+AvatarItems.belongsTo(Items, { foreignKey: "itemID", onDelete: "CASCADE" });
 
-module.exports = { User, Avatar, UserActivity, UserTotal, Battle, AvatarItems, Items, db }
+module.exports = {
+  User,
+  Avatar,
+  UserActivity,
+  UserTotal,
+  Battle,
+  AvatarItems,
+  Items,
+  db,
+};

@@ -1,102 +1,99 @@
-
-
-const UserTotalModel = function(db, DataTypes){
-  const UserTotal = db.define('user_totals', {
+const UserTotalModel = function (db, DataTypes) {
+  const UserTotal = db.define(
+    "user_totals",
+    {
       id: {
-          type: DataTypes.INTEGER,
-          primaryKey: true,
-          autoIncrement: true
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
-      user : {
-          type : DataTypes.STRING,
-          unique : true,
-          allowNull: false,
+      user: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
       },
       avatarId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
-      lastUpdate : {
-        type : DataTypes.TIME,
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
-        allowNull: false
+      lastUpdate: {
+        type: DataTypes.TIME,
+        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
       },
       run: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       hike: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       walk: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       ride: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       swim: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       yoga: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       weightTraining: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       stairStepper: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       elliptical: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       standUpPaddling: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       crossfit: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       rowing: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       ski: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       snowboard: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       snowshoe: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       kayaking: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
       workout: {
         type: DataTypes.JSONB,
-        allowNull: true
+        allowNull: true,
       },
-  }, {timestamps: false});
-
-      
-     
-
+    },
+    { timestamps: false }
+  );
 
   return UserTotal;
-
-}
+};
 
 module.exports = UserTotalModel;

@@ -1,13 +1,13 @@
-require('dotenv').config()
-const { loadDb, closeDb } = require('../setup/databaseForTests.setup.js');
-const chance = require('chance')();
-const vals = require('../../game/activities/activityItemFind');
-const mockItemDrops = require('./mockItemDrops.json');
+require("dotenv").config();
+const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
+const chance = require("chance")();
+const vals = require("../../game/activities/activityItemFind");
+const mockItemDrops = require("./mockItemDrops.json");
 beforeAll(async () => {
   await loadDb();
 });
 // let weightedElms;
-// beforeAll(() =>{ 
+// beforeAll(() =>{
 //   const improvements = { air : 0, water : 0, fire : .2, earth : .8 };
 //   const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
 //   weightedElms = {
@@ -30,7 +30,6 @@ beforeAll(async () => {
 //   return Promise.all(testRuns);
 // });
 
-
 // it('Should call _chancePTFind, which will return either null or the amount found in PT', ()=>{
 //   const NUMBER_OF_RUNS = 1;
 //   const testRuns = [];
@@ -47,9 +46,8 @@ beforeAll(async () => {
 
 //   }
 //   return Promise.all(testRuns);
-  
-// });
 
+// });
 
 // it('Should run _callXTimes 3 times, with the third time with an optional param and return either null or an array of items randomly found', ()=>{
 //   const xpGain = 96;
@@ -74,7 +72,6 @@ beforeAll(async () => {
 
 //   return Promise.all(testRuns);
 // });
-
 
 // it('Should Run Whole Item find sequence, starting with activityItemFind, an object with ptgained and items found (or null for each) will be returned', ()=>{
 //   const xpGain = 62;
@@ -101,5 +98,3 @@ beforeAll(async () => {
 afterAll(async () => {
   await closeDb();
 });
-
-

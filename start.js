@@ -1,3 +1,3 @@
-const app = require('./index.js');
+const app = require("./index.js");
 
-app.listen( process.env.PORT || 3001 );
+app.listen(process.env.PORT || 3001);

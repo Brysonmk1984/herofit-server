@@ -31,4 +31,4 @@
     "Likewise on the frontend, we're working on refactoring how the http requests are handled and presenting error messages."
   ],
   "closingRemarks": "It's clear from the previous patch feedback that there hasn't been enough documentation about how to use new features. Also, more items are needed, especially at the lower levels. This will be addressed in upcoming patches. Thanks again for playing!"
-} 
+}

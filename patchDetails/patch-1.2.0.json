@@ -32,4 +32,4 @@
     "Updating hero names from the account page now uses the same availability check as is on the select-hero page"
   ],
   "closingRemarks": "I understand this patch has some drastic changes, and I appreciate your understanding. These balance changes really needed to happen sooner rather than later, and HeroFit will be better off because of it!"
-} 
+}

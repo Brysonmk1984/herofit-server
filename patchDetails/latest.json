@@ -19,8 +19,6 @@
   "bugFixes": [
     "Fixed a bug recently introduced where pet abilities were not being applied before battles"
   ],
-  "balanceChanges": [
-    "Reduced difficulty of all foes very slightly"
-  ],
+  "balanceChanges": ["Reduced difficulty of all foes very slightly"],
   "closingRemarks": "Very excited about the progress being made on the mobile app, but I had to get this new baddy in the game!"
-} 
+}

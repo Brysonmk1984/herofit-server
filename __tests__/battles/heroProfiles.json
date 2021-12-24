@@ -13,7 +13,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newbie",
-    "description":"Low Level, Random Stats"
+    "description": "Low Level, Random Stats"
   },
   {
     "activityXP": 200,
@@ -29,7 +29,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newArmor",
-    "description":"Low Level, ARMOR Stats"
+    "description": "Low Level, ARMOR Stats"
   },
   {
     "activityXP": 200,
@@ -45,7 +45,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newPower",
-    "description":"Low Level, POWER Stats"
+    "description": "Low Level, POWER Stats"
   },
   {
     "activityXP": 200,
@@ -61,7 +61,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newHealth",
-    "description":"Low Level, HEALTH Stats"
+    "description": "Low Level, HEALTH Stats"
   },
   {
     "activityXP": 200,
@@ -77,7 +77,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newRecovery",
-    "description":"Low Level, RECOVERY Stats"
+    "description": "Low Level, RECOVERY Stats"
   },
   {
     "activityXP": 200,
@@ -93,7 +93,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newAir",
-    "description":"Low Level, AIR Stats"
+    "description": "Low Level, AIR Stats"
   },
   {
     "activityXP": 200,
@@ -109,7 +109,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newWater",
-    "description":"Low Level, WATER Stats"
+    "description": "Low Level, WATER Stats"
   },
   {
     "activityXP": 200,
@@ -125,7 +125,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newEarth",
-    "description":"Low Level, EARTH Stats"
+    "description": "Low Level, EARTH Stats"
   },
   {
     "activityXP": 200,
@@ -141,7 +141,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newFire",
-    "description":"Low Level, FIRE Stats",
+    "description": "Low Level, FIRE Stats",
     "level": 3
   },
 
@@ -159,7 +159,7 @@
     "character": "RePete",
     "equipped": [],
     "name": "newPower lvl 7",
-    "description":"Low Level, POWER Stats"
+    "description": "Low Level, POWER Stats"
   },
 
   {
@@ -176,7 +176,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "Garbo Bactroid Fire",
-    "description":"Low-mid Level, FIRE Stats",
+    "description": "Low-mid Level, FIRE Stats",
     "level": 9
   },
   {
@@ -193,7 +193,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "Garbo Bactroid EARTH",
-    "description":"Low-mid Level, EARTH Stats",
+    "description": "Low-mid Level, EARTH Stats",
     "level": 9
   },
   {
@@ -210,7 +210,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "Garbo Bactroid Balanced",
-    "description":"Low-mid Level, Balanced Stats",
+    "description": "Low-mid Level, Balanced Stats",
     "level": 9
   },
 
@@ -228,7 +228,7 @@
     "character": "Wilhelm the Wild",
     "equipped": [],
     "name": "Kakes naturally Balanced",
-    "description":"Low-mid Level, Balanced Stats",
+    "description": "Low-mid Level, Balanced Stats",
     "level": 11
   },
 
@@ -246,7 +246,7 @@
     "character": "Wilhelm the Wild",
     "equipped": [],
     "name": "Kakes Air",
-    "description":"Low-mid Level, AIR Stats",
+    "description": "Low-mid Level, AIR Stats",
     "level": 11
   },
   {
@@ -263,7 +263,7 @@
     "character": "Wilhelm the Wild",
     "equipped": [],
     "name": "Kakes FIRE",
-    "description":"Low-mid Level, Fire Stats",
+    "description": "Low-mid Level, Fire Stats",
     "level": 11
   },
   {
@@ -280,7 +280,7 @@
     "character": "Wilhelm the Wild",
     "equipped": [],
     "name": "Kakes EARTH",
-    "description":"Low-mid Level, EARTH Stats",
+    "description": "Low-mid Level, EARTH Stats",
     "level": 11
   },
   {
@@ -297,7 +297,7 @@
     "character": "Wilhelm the Wild",
     "equipped": [],
     "name": "Kakes WATER",
-    "description":"Low-mid Level, WATER Stats",
+    "description": "Low-mid Level, WATER Stats",
     "level": 11
   },
 
@@ -305,7 +305,7 @@
     "activityXP": 2825,
     "battleXP": 30,
     "air": 15,
-    "earth":4,
+    "earth": 4,
     "fire": 83,
     "water": 7,
     "power": 15,
@@ -315,14 +315,14 @@
     "character": "Natural Ninja",
     "equipped": [],
     "name": "Serena FIRE",
-    "description":"low mid Level, naturally FIRE stats",
+    "description": "low mid Level, naturally FIRE stats",
     "level": 16
   },
   {
     "activityXP": 2825,
     "battleXP": 30,
     "air": 15,
-    "earth":7,
+    "earth": 7,
     "fire": 4,
     "water": 83,
     "power": 175,
@@ -332,14 +332,14 @@
     "character": "Natural Ninja",
     "equipped": [],
     "name": "Serena WATER",
-    "description":"low mid Level, naturally WATER stats",
+    "description": "low mid Level, naturally WATER stats",
     "level": 16
   },
   {
     "activityXP": 2825,
     "battleXP": 30,
     "air": 83,
-    "earth":15,
+    "earth": 15,
     "fire": 4,
     "water": 7,
     "power": 175,
@@ -349,14 +349,14 @@
     "character": "Natural Ninja",
     "equipped": [],
     "name": "Serena AIR",
-    "description":"low mid Level, naturally AIR stats",
+    "description": "low mid Level, naturally AIR stats",
     "level": 16
   },
   {
     "activityXP": 2825,
     "battleXP": 30,
     "air": 15,
-    "earth":83,
+    "earth": 83,
     "fire": 4,
     "water": 7,
     "power": 175,
@@ -366,7 +366,7 @@
     "character": "Natural Ninja",
     "equipped": [],
     "name": "Serena EARTH",
-    "description":"low mid Level, naturally EARTH stats",
+    "description": "low mid Level, naturally EARTH stats",
     "level": 16
   },
 
@@ -374,7 +374,7 @@
     "activityXP": 4101,
     "battleXP": 69,
     "air": 50,
-    "earth":51,
+    "earth": 51,
     "fire": 50,
     "water": 51,
     "power": 206,
@@ -384,14 +384,14 @@
     "character": "Timber Terror",
     "equipped": [],
     "name": "GROOOT Balanced",
-    "description":"low mid Level, balanced stats",
+    "description": "low mid Level, balanced stats",
     "level": 20
   },
   {
     "activityXP": 4101,
     "battleXP": 69,
     "air": 25,
-    "earth":107,
+    "earth": 107,
     "fire": 45,
     "water": 25,
     "power": 206,
@@ -401,14 +401,14 @@
     "character": "Timber Terror",
     "equipped": [],
     "name": "GROOOT EARTH",
-    "description":"low mid Level, naturally EARTH stats",
+    "description": "low mid Level, naturally EARTH stats",
     "level": 20
   },
   {
     "activityXP": 4101,
     "battleXP": 69,
     "air": 25,
-    "earth":45,
+    "earth": 45,
     "fire": 107,
     "water": 25,
     "power": 206,
@@ -418,14 +418,14 @@
     "character": "Timber Terror",
     "equipped": [],
     "name": "GROOOT FIRE",
-    "description":"low mid Level, FIRE stats",
+    "description": "low mid Level, FIRE stats",
     "level": 20
   },
   {
     "activityXP": 4101,
     "battleXP": 69,
     "air": 15,
-    "earth":87,
+    "earth": 87,
     "fire": 45,
     "water": 15,
     "power": 206,
@@ -435,18 +435,15 @@
     "character": "Timber Terror",
     "equipped": [],
     "name": "GROOOT high armor",
-    "description":"low mid Level, armor stats",
+    "description": "low mid Level, armor stats",
     "level": 20
   },
-
-
-
 
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 20,
-    "earth":152,
+    "earth": 152,
     "fire": 3,
     "water": 35,
     "power": 240,
@@ -456,14 +453,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro armor",
-    "description":"mid Level, naturally high armor",
+    "description": "mid Level, naturally high armor",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 20,
-    "earth":152,
+    "earth": 152,
     "fire": 3,
     "water": 35,
     "power": 240,
@@ -473,14 +470,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro health",
-    "description":"mid Level, high health",
+    "description": "mid Level, high health",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 20,
-    "earth":132,
+    "earth": 132,
     "fire": 3,
     "water": 35,
     "power": 350,
@@ -490,14 +487,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro armor",
-    "description":"mid Level, high power",
+    "description": "mid Level, high power",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 42,
-    "earth":122,
+    "earth": 122,
     "fire": 33,
     "water": 35,
     "power": 240,
@@ -507,14 +504,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro recovery",
-    "description":"mid Level, wasted on recovery",
+    "description": "mid Level, wasted on recovery",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 20,
-    "earth":22,
+    "earth": 22,
     "fire": 233,
     "water": 35,
     "power": 240,
@@ -524,14 +521,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro fire",
-    "description":"mid Level, high fire",
+    "description": "mid Level, high fire",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 233,
-    "earth":22,
+    "earth": 22,
     "fire": 20,
     "water": 35,
     "power": 240,
@@ -541,14 +538,14 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro air",
-    "description":"mid Level, air",
+    "description": "mid Level, air",
     "level": 30
   },
   {
     "activityXP": 5914,
     "battleXP": 1213,
     "air": 20,
-    "earth":22,
+    "earth": 22,
     "fire": 35,
     "water": 233,
     "health": 240,
@@ -557,30 +554,26 @@
     "character": "Empath Aurellia",
     "equipped": [],
     "name": "Howdy Bro water",
-    "description":"mid Level, water",
+    "description": "mid Level, water",
     "level": 30
   },
 
-
-
-
-
   {
-  "activityXP": 8525,
-  "battleXP": 3977,
-  "air": 77,
-  "earth": 195,
-  "fire": 66,
-  "water": 62,
-  "power": 320,
-  "health": 333,
-  "armor": 55,
-  "recovery": 50,
-  "character": "Boulder Bro",
-  "equipped": [],
-  "name": "Grabbler",
-  "description":"mid Level, Balance +  EARTH Stats",
-  "level": 44
+    "activityXP": 8525,
+    "battleXP": 3977,
+    "air": 77,
+    "earth": 195,
+    "fire": 66,
+    "water": 62,
+    "power": 320,
+    "health": 333,
+    "armor": 55,
+    "recovery": 50,
+    "character": "Boulder Bro",
+    "equipped": [],
+    "name": "Grabbler",
+    "description": "mid Level, Balance +  EARTH Stats",
+    "level": 44
   },
   {
     "activityXP": 8525,
@@ -596,7 +589,7 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "FIREGRABBLER",
-    "description":"mid Level, Balance + FIRE Stats",
+    "description": "mid Level, Balance + FIRE Stats",
     "level": 44
   },
   {
@@ -613,9 +606,9 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "AIRGRABBLER",
-    "description":"mid Level, Balance + AIR Stats",
+    "description": "mid Level, Balance + AIR Stats",
     "level": 44
-    },
+  },
   {
     "activityXP": 8525,
     "battleXP": 3977,
@@ -630,9 +623,9 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "WATERGRABBLER",
-    "description":"mid Level, Balance + WATER Stats",
+    "description": "mid Level, Balance + WATER Stats",
     "level": 44
-    },
+  },
   {
     "activityXP": 8525,
     "battleXP": 3977,
@@ -647,9 +640,9 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "ARMORGrabbler",
-    "description":"mid Level, ARMOR Stats",
+    "description": "mid Level, ARMOR Stats",
     "level": 44
-    },
+  },
   {
     "activityXP": 8525,
     "battleXP": 3977,
@@ -664,7 +657,7 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "POWERGrabbler",
-    "description":"mid Level, POWER Stats",
+    "description": "mid Level, POWER Stats",
     "level": 44
   },
   {
@@ -681,15 +674,9 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "HEALTHGrabbler",
-    "description":"mid Level, HEALTH Stats",
+    "description": "mid Level, HEALTH Stats",
     "level": 44
   },
-
-
-
-
-
-
 
   {
     "activityXP": 8525,
@@ -705,7 +692,7 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "midEarth",
-    "description":"mid Level, focused EARTH Stats",
+    "description": "mid Level, focused EARTH Stats",
     "level": 44
   },
   {
@@ -722,7 +709,7 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "midFire",
-    "description":"mid Level, focused  FIRE Stats",
+    "description": "mid Level, focused  FIRE Stats",
     "level": 44
   },
   {
@@ -739,7 +726,7 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "midAir",
-    "description":"mid Level, focused  AIR Stats",
+    "description": "mid Level, focused  AIR Stats",
     "level": 44
   },
   {
@@ -756,13 +743,9 @@
     "character": "Boulder Bro",
     "equipped": [],
     "name": "midWater",
-    "description":"mid Level, focused   WATER Stats",
+    "description": "mid Level, focused   WATER Stats",
     "level": 44
   },
-
-
-
-
 
   {
     "activityXP": 18793,
@@ -778,7 +761,7 @@
     "character": "Empath Aurelia",
     "equipped": [],
     "name": "SuperPoekie",
-    "description":"high Level, balanced + FIRE Stats",
+    "description": "high Level, balanced + FIRE Stats",
     "level": 66
   },
   {
@@ -795,7 +778,7 @@
     "character": "Empath Aurelia",
     "equipped": [],
     "name": "earthSuperPoekie",
-    "description":"high Level, balanced + EARTH Stats",
+    "description": "high Level, balanced + EARTH Stats",
     "level": 66
   },
   {
@@ -812,7 +795,7 @@
     "character": "Empath Aurelia",
     "equipped": [],
     "name": "waterSuperPoekie",
-    "description":"high Level, balanced + WATER Stats",
+    "description": "high Level, balanced + WATER Stats",
     "level": 66
   },
   {
@@ -829,12 +812,9 @@
     "character": "Empath Aurelia",
     "equipped": [],
     "name": "airSuperPoekie",
-    "description":"high Level, balanced + AIR Stats",
+    "description": "high Level, balanced + AIR Stats",
     "level": 66
   },
-
-
-
 
   {
     "activityXP": 24282,
@@ -850,7 +830,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "Bicycle Beserker",
-    "description":"very high Level, balanced + EARTH Stats",
+    "description": "very high Level, balanced + EARTH Stats",
     "level": 75
   },
   {
@@ -867,7 +847,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "fireBicycle Beserker",
-    "description":"very high Level, balanced + FIRE Stats",
+    "description": "very high Level, balanced + FIRE Stats",
     "level": 75
   },
   {
@@ -884,7 +864,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "waterBicycle Beserker",
-    "description":"very high Level, balanced + WATER Stats",
+    "description": "very high Level, balanced + WATER Stats",
     "level": 75
   },
   {
@@ -901,7 +881,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "airBicycle Beserker",
-    "description":"very high Level, balanced + AIR Stats",
+    "description": "very high Level, balanced + AIR Stats",
     "level": 75
   },
 
@@ -919,7 +899,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "powerBicycle Beserker",
-    "description":"very high Level, balanced + POWER Stats",
+    "description": "very high Level, balanced + POWER Stats",
     "level": 75
   },
   {
@@ -936,7 +916,7 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "healthBicycle Beserker",
-    "description":"very high Level, balanced + HEALTH Stats",
+    "description": "very high Level, balanced + HEALTH Stats",
     "level": 75
   },
   {
@@ -953,12 +933,9 @@
     "character": "Chrono Guy",
     "equipped": [],
     "name": "armorBicycle Beserker",
-    "description":"very high Level, balanced + ARMOR Stats",
+    "description": "very high Level, balanced + ARMOR Stats",
     "level": 75
   },
-  
-
-
 
   {
     "activityXP": 24282,
@@ -974,7 +951,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "armorElmBalance",
-    "description":"very high Level, focused ARMOR + balance elms",
+    "description": "very high Level, focused ARMOR + balance elms",
     "level": 75
   },
   {
@@ -991,7 +968,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "healthElmBalance",
-    "description":"very high Level, focused health + balance elms",
+    "description": "very high Level, focused health + balance elms",
     "level": 75
   },
   {
@@ -1008,7 +985,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "powerElmBalance",
-    "description":"very high Level, focused POWER + balance elms",
+    "description": "very high Level, focused POWER + balance elms",
     "level": 75
   },
   {
@@ -1025,7 +1002,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "recoveryElmBalance",
-    "description":"very high Level, focused RECOVERY + balance elms",
+    "description": "very high Level, focused RECOVERY + balance elms",
     "level": 75
   },
   {
@@ -1042,7 +1019,7 @@
     "character": "Compost Creature",
     "equipped": [],
     "name": "powerElmBalance",
-    "description":"very high Level, focused POWER + balance elms",
+    "description": "very high Level, focused POWER + balance elms",
     "level": 75,
     "aether": 100
   }

@@ -1,36 +1,40 @@
-const AvatarItemsModel = function(db, DataTypes){
-  const AvatarItems = db.define('avatar_items', {
+const AvatarItemsModel = function (db, DataTypes) {
+  const AvatarItems = db.define(
+    "avatar_items",
+    {
       id: {
-          type: DataTypes.INTEGER,
-          primaryKey: true,
-          autoIncrement: true
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       createdAt: {
-          type: DataTypes.TIME,
-          defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
-          allowNull: false
+        type: DataTypes.TIME,
+        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
       },
       updatedAt: {
         type: DataTypes.TIME,
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
-        allowNull: false
-    },
-      avatarID : {
-        type : DataTypes.INTEGER,
+        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
-      itemID : {
-        type : DataTypes.INTEGER,
+      avatarID: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      equipped : {
-        type : DataTypes.BOOLEAN,
-        allowNull : false,
+      itemID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      equipped: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
         defaultValue: false,
       },
-  }, { freezeTableName: true });
+    },
+    { freezeTableName: true }
+  );
 
   return AvatarItems;
-}
+};
 
 module.exports = AvatarItemsModel;

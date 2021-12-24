@@ -1,12 +1,15 @@
-const { loadDb, closeDb } = require('../setup/databaseForTests.setup.js');
-const { activityLevelRewards, activityStatRewards, determineStatImprovements } = require('../../game/activities/activityRewards');
-const { range } = require('../../lib/helperFunctions');
-const preventDuplicateItems = require('../../game/items/preventDuplicateItems');
+const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
+const {
+  activityLevelRewards,
+  activityStatRewards,
+  determineStatImprovements,
+} = require("../../game/activities/activityRewards");
+const { range } = require("../../lib/helperFunctions");
+const preventDuplicateItems = require("../../game/items/preventDuplicateItems");
 
 // beforeAll(async () => {
 //   await loadDb();
 // });
-
 
 // it('Should Insert the 2 items earned from reaching level 100', () => {
 //   const levelsToCheck = range(99,101);
@@ -20,7 +23,6 @@ const preventDuplicateItems = require('../../game/items/preventDuplicateItems');
 //   });
 // });
 
-
 // it('Should Insert Fire Skin for Grabbler', () => {
 //   statObj = {
 //     // pt. values earned
@@ -29,7 +31,7 @@ const preventDuplicateItems = require('../../game/items/preventDuplicateItems');
 //     water : [],
 //     air : [200]
 //   }
-    
+
 //   return activityStatRewards(254, statObj)
 //   .then((data) =>{
 //     console.log('returned data', data);
@@ -98,27 +100,23 @@ const preventDuplicateItems = require('../../game/items/preventDuplicateItems');
 //     healthRegenRate: 24
 //   };
 //   const statObj = determineStatImprovements(improvements, avStatSnapshot)
-  
+
 //   console.log('THESTATONK', statObj);
 //   expect(true);
 // });
 
-it('Should return a false value for red belt, and a true value for black belt', () =>{
-  const items = ['Red Belt', 'Black Belt', 'Health Potion'];
-  return preventDuplicateItems(items, 254)
-  .then((data) =>{
-    console.log('DATA', data);
+it("Should return a false value for red belt, and a true value for black belt", () => {
+  const items = ["Red Belt", "Black Belt", "Health Potion"];
+  return preventDuplicateItems(items, 254).then((data) => {
+    console.log("DATA", data);
     // Already have a red belt, so it should return true, indicating we already have it
     expect(data[0]).toBe(true);
     // Don't have Black belt yet, so it should return false
     expect(data[1]).toBe(false);
     // Health Potion is exhaustible, so it should return false, meaning it is not a duplicate item (even if there are more than 1)
     expect(data[2]).toBe(false);
-  })
-
+  });
 });
-
-
 
 // afterAll(async () => {
 //   await closeDb();

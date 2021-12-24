@@ -1,87 +1,87 @@
 {
-  "run" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "run": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "hike" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "hike": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "walk" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "walk": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "ride" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "ride": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "swim" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "swim": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "stairStepper" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "stairStepper": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "elliptical" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "elliptical": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "weightTraining" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "weightTraining": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "yoga" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "yoga": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "rowing" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "rowing": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "crossfit" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "crossfit": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "standUpPaddling" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "standUpPaddling": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "snowshoe" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "snowshoe": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "snowboard" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "snowboard": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "ski" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "ski": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "kayaking" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "kayaking": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   },
-  "workout" : {
-    "instance" : 0,
-    "duration" : 0,
-    "avgHeartrate" : 0
+  "workout": {
+    "instance": 0,
+    "duration": 0,
+    "avgHeartrate": 0
   }
 }

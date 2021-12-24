@@ -1,44 +1,44 @@
 [
   {
-    "name" : "Health Potion",
-    "dropRate" : 2.25,
-    "activityRestriction" : [],
-    "levelRestriction" : null,
-    "disabled" : false
+    "name": "Health Potion",
+    "dropRate": 2.25,
+    "activityRestriction": [],
+    "levelRestriction": null,
+    "disabled": false
   },
   {
-    "name" : "Antidote Potion",
-    "dropRate" : 0.75,
-    "activityRestriction" : [],
-    "levelRestriction" : null,
-    "disabled" : false
+    "name": "Antidote Potion",
+    "dropRate": 0.75,
+    "activityRestriction": [],
+    "levelRestriction": null,
+    "disabled": false
   },
   {
-    "name" : "Storm Crow Bone Chimes",
-    "dropRate" : 6.0,
-    "activityRestriction" : ["air"],
-    "levelRestriction" : 30,
-    "disabled" : false
+    "name": "Storm Crow Bone Chimes",
+    "dropRate": 6.0,
+    "activityRestriction": ["air"],
+    "levelRestriction": 30,
+    "disabled": false
   },
   {
-    "name" : "Smoldering Skull Torch",
-    "dropRate" : 6.0,
-    "activityRestriction" : ["fire"],
-    "levelRestriction" : 30,
-    "disabled" : false
+    "name": "Smoldering Skull Torch",
+    "dropRate": 6.0,
+    "activityRestriction": ["fire"],
+    "levelRestriction": 30,
+    "disabled": false
   },
   {
-    "name" : "Wave-Swept Battle Conch",
-    "dropRate" : 6.0,
-    "activityRestriction" : ["water"],
-    "levelRestriction" : 30,
-    "disabled" : false
+    "name": "Wave-Swept Battle Conch",
+    "dropRate": 6.0,
+    "activityRestriction": ["water"],
+    "levelRestriction": 30,
+    "disabled": false
   },
   {
-    "name" : "Petrified Power Totem",
-    "dropRate" : 6.0,
-    "activityRestriction" : ["earth"],
-    "levelRestriction" : 30,
-    "disabled" : false
+    "name": "Petrified Power Totem",
+    "dropRate": 6.0,
+    "activityRestriction": ["earth"],
+    "levelRestriction": 30,
+    "disabled": false
   }
 ]

@@ -1,32 +1,26 @@
 {
-  "Spirits": [{
-      "class" : "Spirits",
-      "type" : "Shade",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Kerrim",
-        "Thames",
-        "Kedron",
-        "Sidero",
-        "Kshipa",
-        "Marduk"
-      ],
+  "Spirits": [
+    {
+      "class": "Spirits",
+      "type": "Shade",
+      "difficultyLevel": "medium",
+      "foe": ["Kerrim", "Thames", "Kedron", "Sidero", "Kshipa", "Marduk"],
       "ability": {
-        "name" : "From the Shadows",
-        "effect" : "Bonus Power",
-        "type" : "prebattle"
+        "name": "From the Shadows",
+        "effect": "Bonus Power",
+        "type": "prebattle"
       },
       "color": "#000000",
-      "pba" : ["Grant Shade"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Shade Tint"
+      "pba": ["Grant Shade"],
+      "reward": {
+        "type": "skin",
+        "name": "Shade Tint"
       }
     },
     {
-      "class" : "Spirits",
+      "class": "Spirits",
       "type": "Apparition",
-      "difficultyLevel" : "medium",
+      "difficultyLevel": "medium",
       "foe": [
         "Githinji",
         "Mardochaios",
@@ -36,502 +30,405 @@
         "Colvin"
       ],
       "ability": {
-        "name" : "Intimidation",
-        "effect" : "Power Reduction",
-        "type" : "prebattle"
+        "name": "Intimidation",
+        "effect": "Power Reduction",
+        "type": "prebattle"
       },
       "color": "#0D0D0D",
-      "pba" : ["Grant Apparition"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Apparition Tint"
+      "pba": ["Grant Apparition"],
+      "reward": {
+        "type": "skin",
+        "name": "Apparition Tint"
       }
     },
     {
-      "class" : "Spirits",
+      "class": "Spirits",
       "type": "Phantasm",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Fridtjof",
-        "Nyx",
-        "Megedagik",
-        "Qarinah",
-        "Mrithun",
-        "Lailah"
-      ],
+      "difficultyLevel": "medium",
+      "foe": ["Fridtjof", "Nyx", "Megedagik", "Qarinah", "Mrithun", "Lailah"],
       "ability": {
-        "name" : "Unholy Armor",
-        "effect" : "High Defense",
-        "type" : "prebattle"
+        "name": "Unholy Armor",
+        "effect": "High Defense",
+        "type": "prebattle"
       },
       "color": "#080808",
-      "pba" : ["Grant Phantasm"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Phantasm Tint"
+      "pba": ["Grant Phantasm"],
+      "reward": {
+        "type": "skin",
+        "name": "Phantasm Tint"
       }
     },
     {
-      "class" : "Spirits",
-      "type" : "Phantom",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Seth",
-        "Ambrosia",
-        "Laren",
-        "Keres",
-        "Chax",
-        "Damian"
-      ],
+      "class": "Spirits",
+      "type": "Phantom",
+      "difficultyLevel": "medium",
+      "foe": ["Seth", "Ambrosia", "Laren", "Keres", "Chax", "Damian"],
       "ability": {
-        "name" : "Shadowy Influx",
-        "effect" : "Bonus Health",
-        "type" : "prebattle"
+        "name": "Shadowy Influx",
+        "effect": "Bonus Health",
+        "type": "prebattle"
       },
       "color": "#232323",
-      "pba" : ["Grant Phantom"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Phantom Tint"
+      "pba": ["Grant Phantom"],
+      "reward": {
+        "type": "skin",
+        "name": "Phantom Tint"
       }
     },
     {
-      "class" : "Spirits",
+      "class": "Spirits",
       "type": "Wraith",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Methuselah",
-        "Vlasta",
-        "Mohandas",
-        "Azrail",
-        "Fia",
-        "Mercurius"
-      ],
+      "difficultyLevel": "medium",
+      "foe": ["Methuselah", "Vlasta", "Mohandas", "Azrail", "Fia", "Mercurius"],
       "ability": {
-        "name" : "Can't Hide from Me",
-        "effect" : "Armor Break",
-        "type" : "prebattle"
+        "name": "Can't Hide from Me",
+        "effect": "Armor Break",
+        "type": "prebattle"
       },
       "color": "#383838",
-      "pba" : ["Grant Wraith"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Wraith Tint"
+      "pba": ["Grant Wraith"],
+      "reward": {
+        "type": "skin",
+        "name": "Wraith Tint"
       }
     },
     {
-      "class" : "Spirits",
+      "class": "Spirits",
       "type": "Poltergeist",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Phobus",
-        "Herod",
-        "Alastor",
-        "Abaddon",
-        "Hraefn",
-        "Keiran"
-    ],
-    "ability": {
-      "name" : "Paranormal Pandemonium",
-      "effect" : "Stat Scramble",
-      "type" : "prebattle"
-    },
+      "difficultyLevel": "medium",
+      "foe": ["Phobus", "Herod", "Alastor", "Abaddon", "Hraefn", "Keiran"],
+      "ability": {
+        "name": "Paranormal Pandemonium",
+        "effect": "Stat Scramble",
+        "type": "prebattle"
+      },
       "color": "#676767",
-      "pba" : ["Grant Poltergeist"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Poltergeist Tint"
+      "pba": ["Grant Poltergeist"],
+      "reward": {
+        "type": "skin",
+        "name": "Poltergeist Tint"
       }
     },
     {
-      "class" : "Spirits",
-      "type" : "Specter",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Brody",
-        "Raven",
-        "Zilla",
-        "Blagden",
-        "Quella",
-        "Busiris"
-      ],
+      "class": "Spirits",
+      "type": "Specter",
+      "difficultyLevel": "medium",
+      "foe": ["Brody", "Raven", "Zilla", "Blagden", "Quella", "Busiris"],
       "ability": {
-        "name" : "Breath Bane",
-        "effect" : "Health Reduction",
-        "type" : "prebattle"
+        "name": "Breath Bane",
+        "effect": "Health Reduction",
+        "type": "prebattle"
       },
       "color": "#4f4f4f",
-      "pba" : ["Grant Specter"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Specter Tint"
+      "pba": ["Grant Specter"],
+      "reward": {
+        "type": "skin",
+        "name": "Specter Tint"
       }
     },
     {
-      "class" : "Spirits",
+      "class": "Spirits",
       "type": "Banshee",
-      "difficultyLevel" : "medium",
-      "foe": [
-        "Laverna",
-        "Melania",
-        "Aerona",
-        "Gwyn",
-        "Mallory",
-        "Lamia"
-      ],
+      "difficultyLevel": "medium",
+      "foe": ["Laverna", "Melania", "Aerona", "Gwyn", "Mallory", "Lamia"],
       "ability": {
-        "name" : "Sadistic Siphon",
-        "effect" : "Health Steal",
-        "type" : "prebattle"
+        "name": "Sadistic Siphon",
+        "effect": "Health Steal",
+        "type": "prebattle"
       },
       "color": "#000000",
-      "pba" : ["Grant Banshee"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Banshee Tint"
+      "pba": ["Grant Banshee"],
+      "reward": {
+        "type": "skin",
+        "name": "Banshee Tint"
       }
-    },{
-      "class" : "Spirits",
+    },
+    {
+      "class": "Spirits",
       "type": "Shadow-Self",
-      "difficultyLevel" : "high",
+      "difficultyLevel": "high",
       "foe": ["Shadow-Self"],
       "ability": {
-        "name" : "Self-Awareness",
-        "effect" : "Mirrored Stats",
-        "type" : "prebattle"
+        "name": "Self-Awareness",
+        "effect": "Mirrored Stats",
+        "type": "prebattle"
       },
       "color": "#0D0D0D",
       "bonusXpBase": 10,
       "bonusPtBase": 30,
-      "pba" : ["Grant Shadow-Self"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Shadow Self"
+      "pba": ["Grant Shadow-Self"],
+      "reward": {
+        "type": "skin",
+        "name": "Shadow Self"
       },
-      "levelRequirement" : 10
+      "levelRequirement": 10
     }
   ],
   "Titans": [
     {
-      "class" : "Titans",
+      "class": "Titans",
       "type": "Plaguebringer",
-      "difficultyLevel" : "high",
+      "difficultyLevel": "high",
       "foe": ["The Plaguebringer"],
       "ability": {
-        "name" : "Infect",
-        "effect" : "Damage After Battle",
-        "type" : "postbattle"
+        "name": "Infect",
+        "effect": "Damage After Battle",
+        "type": "postbattle"
       },
       "color": null,
       "bonusXpBase": 20,
       "bonusPtBase": 40,
-      "pba" : ["Grant Plaguebringer"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Plagueling"
+      "pba": ["Grant Plaguebringer"],
+      "reward": {
+        "type": "pet",
+        "name": "Plagueling"
       },
-      "levelRequirement" : 20
+      "levelRequirement": 20
     },
     {
-      "class" : "Titans",
+      "class": "Titans",
       "type": "Guardian of the Depths",
-      "difficultyLevel" : "high",
+      "difficultyLevel": "high",
       "foe": ["Guardian of the Depths"],
       "ability": {
-        "name" : "-20% Health Afterburn",
-        "effect" : "If Hero wins or draws, deal an additional 20% of target's health as damage to hero, potentially changing the outcome",
-        "type" : "postbattle"
+        "name": "-20% Health Afterburn",
+        "effect": "If Hero wins or draws, deal an additional 20% of target's health as damage to hero, potentially changing the outcome",
+        "type": "postbattle"
       },
       "color": null,
       "bonusXpBase": 30,
       "bonusPtBase": 50,
-      
-      "pba" : ["Grant GotD"],
-      "reward" : {
-        "type" : "title",
-        "name" : "Hellhound Whisperer"
+
+      "pba": ["Grant GotD"],
+      "reward": {
+        "type": "title",
+        "name": "Hellhound Whisperer"
       },
-      "levelRequirement" : 40
+      "levelRequirement": 40
     }
   ],
   "Elementals": [
     {
-      "class" : "Elementals",
-      "type" : "Flame Fiend",
-      "difficultyLevel" : "low",
-      "foe" : [
-        "Azar",
-        "Fajra",
-        "Keahi",
-        "Iskra",
-        "Or",
-        "Zora"
-      ],
+      "class": "Elementals",
+      "type": "Flame Fiend",
+      "difficultyLevel": "low",
+      "foe": ["Azar", "Fajra", "Keahi", "Iskra", "Or", "Zora"],
       "ability": {
-        "name" : "Fire Attuned",
-        "effect" : "Minor Fire Threat",
-        "type" : "prebattle"
+        "name": "Fire Attuned",
+        "effect": "Minor Fire Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Flame Fiend"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Flame Fiend"
+      "color": null,
+      "pba": ["Grant Flame Fiend"],
+      "reward": {
+        "type": "pet",
+        "name": "Flame Fiend"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Burning Jinn",
-      "difficultyLevel" : "medium",
-      "foe" : [
-        "Agni",
-        "Helene",
-        "Heliodoro",
-        "Ravi",
-        "Sorin",
-        "Vulcan"
-      ],
+      "class": "Elementals",
+      "type": "Burning Jinn",
+      "difficultyLevel": "medium",
+      "foe": ["Agni", "Helene", "Heliodoro", "Ravi", "Sorin", "Vulcan"],
       "ability": {
-        "name" : "Fire Proficiency",
-        "effect" : "Major Fire Threat",
-        "type" : "prebattle"
+        "name": "Fire Proficiency",
+        "effect": "Major Fire Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Fire Hunter"],
-      "reward" : {
-        "type" : "title",
-        "name" : "Fire Hunter"
+      "color": null,
+      "pba": ["Grant Fire Hunter"],
+      "reward": {
+        "type": "title",
+        "name": "Fire Hunter"
       }
     },
-    
+
     {
-      "class" : "Elementals",
-      "type" : "Scorching Archfiend",
-      "difficultyLevel" : "high",
-      "foe" : ["Helios"],
+      "class": "Elementals",
+      "type": "Scorching Archfiend",
+      "difficultyLevel": "high",
+      "foe": ["Helios"],
       "ability": {
-        "name" : "Fire Mastery",
-        "effect" : "Profound Fire Threat",
-        "type" : "prebattle"
+        "name": "Fire Mastery",
+        "effect": "Profound Fire Threat",
+        "type": "prebattle"
       },
-      "color" : null,
+      "color": null,
       "bonusXpBase": 15,
       "bonusPtBase": 30,
-      "pba" : ["Grant Fire Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Fire Tint"
+      "pba": ["Grant Fire Tint"],
+      "reward": {
+        "type": "skin",
+        "name": "Fire Tint"
       },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Smoldering Skull Torch"
+      "itemSummonOnly": true,
+      "itemSummon": "Smoldering Skull Torch"
     },
-    
+
     {
-      "class" : "Elementals",
-      "type" : "Rock Skipper",
-      "difficultyLevel" : "low",
-      "foe" : [
-        "Avani",
-        "Demeter",
-        "Ki",
-        "Sten",
-        "Thea",
-        "Tor"
-      ],
+      "class": "Elementals",
+      "type": "Rock Skipper",
+      "difficultyLevel": "low",
+      "foe": ["Avani", "Demeter", "Ki", "Sten", "Thea", "Tor"],
       "ability": {
-        "name" : "Earth Attuned",
-        "effect" : "Minor Earth Threat",
-        "type" : "prebattle"
+        "name": "Earth Attuned",
+        "effect": "Minor Earth Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Rock Skipper"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Rock Skipper"
+      "color": null,
+      "pba": ["Grant Rock Skipper"],
+      "reward": {
+        "type": "pet",
+        "name": "Rock Skipper"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Granite Golem",
-      "difficultyLevel" : "medium",
-      "foe" : [
-        "Bhumi",
-        "Eardwulf",
-        "Lambert",
-        "Terran",
-        "Roland",
-        "Tlalli"
-      ],
+      "class": "Elementals",
+      "type": "Granite Golem",
+      "difficultyLevel": "medium",
+      "foe": ["Bhumi", "Eardwulf", "Lambert", "Terran", "Roland", "Tlalli"],
       "ability": {
-        "name" : "Earth Proficiency",
-        "effect" : "Major Earth Threat",
-        "type" : "prebattle"
+        "name": "Earth Proficiency",
+        "effect": "Major Earth Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Earth Trapper"],
-      "reward" : {
-        "type" : "title",
-        "name" : "Earth Trapper"
+      "color": null,
+      "pba": ["Grant Earth Trapper"],
+      "reward": {
+        "type": "title",
+        "name": "Earth Trapper"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Hulking Aggro Crag",
-      "difficultyLevel" : "high",
-      "foe" : ["Jötnar"],
+      "class": "Elementals",
+      "type": "Hulking Aggro Crag",
+      "difficultyLevel": "high",
+      "foe": ["Jötnar"],
       "ability": {
-        "name" : "Earth Mastery",
-        "effect" : "Profound Earth Threat",
-        "type" : "prebattle"
+        "name": "Earth Mastery",
+        "effect": "Profound Earth Threat",
+        "type": "prebattle"
       },
-      "color" : null,
+      "color": null,
       "bonusXpBase": 15,
       "bonusPtBase": 30,
-      "pba" : ["Grant Earth Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Earth Tint"
+      "pba": ["Grant Earth Tint"],
+      "reward": {
+        "type": "skin",
+        "name": "Earth Tint"
       },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Petrified Power Totem"
+      "itemSummonOnly": true,
+      "itemSummon": "Petrified Power Totem"
     },
     {
-      "class" : "Elementals",
-      "type" : "Splash Artist",
-      "difficultyLevel" : "low",
-      "foe" : [
-        "Aalto",
-        "Hai",
-        "Kai",
-        "Naia",
-        "Rio",
-        "Tasi"
-      ],
+      "class": "Elementals",
+      "type": "Splash Artist",
+      "difficultyLevel": "low",
+      "foe": ["Aalto", "Hai", "Kai", "Naia", "Rio", "Tasi"],
       "ability": {
-        "name" : "Water Attuned",
-        "effect" : "Minor Water Threat",
-        "type" : "prebattle"
+        "name": "Water Attuned",
+        "effect": "Minor Water Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Splash Artist"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Splash Artist"
+      "color": null,
+      "pba": ["Grant Splash Artist"],
+      "reward": {
+        "type": "pet",
+        "name": "Splash Artist"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Cyclonic Siren",
-      "difficultyLevel" : "medium",
-      "foe" : [
-        "Asherah",
-        "Llyr",
-        "Nereus",
-        "Sarasvati",
-        "Undine",
-        "Yam"
-      ],
+      "class": "Elementals",
+      "type": "Cyclonic Siren",
+      "difficultyLevel": "medium",
+      "foe": ["Asherah", "Llyr", "Nereus", "Sarasvati", "Undine", "Yam"],
       "ability": {
-        "name" : "Water Proficiency",
-        "effect" : "Major Water Threat",
-        "type" : "prebattle"
+        "name": "Water Proficiency",
+        "effect": "Major Water Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Water Predator"],
-      "reward" : {
-        "type" : "title",
-        "name" : "Water Predator"
+      "color": null,
+      "pba": ["Grant Water Predator"],
+      "reward": {
+        "type": "title",
+        "name": "Water Predator"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "High Priestess of the Tides",
-      "difficultyLevel" : "high",
-      "foe" : ["Maya"],
+      "class": "Elementals",
+      "type": "High Priestess of the Tides",
+      "difficultyLevel": "high",
+      "foe": ["Maya"],
       "ability": {
-        "name" : "Water Mastery",
-        "effect" : "Profound Water Threat",
-        "type" : "prebattle"
+        "name": "Water Mastery",
+        "effect": "Profound Water Threat",
+        "type": "prebattle"
       },
-      "color" : null,
+      "color": null,
       "bonusXpBase": 15,
       "bonusPtBase": 30,
-      "pba" : ["Grant Water Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Water Tint"
+      "pba": ["Grant Water Tint"],
+      "reward": {
+        "type": "skin",
+        "name": "Water Tint"
       },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Wave-Swept Battle Conch"
+      "itemSummonOnly": true,
+      "itemSummon": "Wave-Swept Battle Conch"
     },
     {
-      "class" : "Elementals",
-      "type" : "Gusty Rascal",
-      "difficultyLevel" : "low",
-      "foe" : [
-        "Alya",
-        "Eteri",
-        "Pilvi",
-        "Tsisia",
-        "Tuuli",
-        "Yun"
-      ],
+      "class": "Elementals",
+      "type": "Gusty Rascal",
+      "difficultyLevel": "low",
+      "foe": ["Alya", "Eteri", "Pilvi", "Tsisia", "Tuuli", "Yun"],
       "ability": {
-        "name" : "Air Attuned",
-        "effect" : "Minor Air Threat",
-        "type" : "prebattle"
+        "name": "Air Attuned",
+        "effect": "Minor Air Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Gusty Rascal"],
-      "reward" : {
-        "type" : "pet",
-        "name" : "Gusty Rascal"
+      "color": null,
+      "pba": ["Grant Gusty Rascal"],
+      "reward": {
+        "type": "pet",
+        "name": "Gusty Rascal"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Wheezing Jinn",
-      "difficultyLevel" : "medium",
-      "foe" : [
-        "Amaterasu",
-        "Anemone",
-        "Caelestis",
-        "Houa",
-        "Tempest",
-        "Zephyr"
-      ],
+      "class": "Elementals",
+      "type": "Wheezing Jinn",
+      "difficultyLevel": "medium",
+      "foe": ["Amaterasu", "Anemone", "Caelestis", "Houa", "Tempest", "Zephyr"],
       "ability": {
-        "name" : "Air Proficiency",
-        "effect" : "Major Air Threat",
-        "type" : "prebattle"
+        "name": "Air Proficiency",
+        "effect": "Major Air Threat",
+        "type": "prebattle"
       },
-      "color" : null,
-      "pba" : ["Grant Air Stalker"],
-      "reward" : {
-        "type" : "title",
-        "name" : "Air Stalker"
+      "color": null,
+      "pba": ["Grant Air Stalker"],
+      "reward": {
+        "type": "title",
+        "name": "Air Stalker"
       }
     },
     {
-      "class" : "Elementals",
-      "type" : "Storming Oni",
-      "difficultyLevel" : "high",
-      "foe" : ["Fūjin"],
+      "class": "Elementals",
+      "type": "Storming Oni",
+      "difficultyLevel": "high",
+      "foe": ["Fūjin"],
       "ability": {
-        "name" : "Air Mastery",
-        "effect" : "Profound Air Threat",
-        "type" : "prebattle"
+        "name": "Air Mastery",
+        "effect": "Profound Air Threat",
+        "type": "prebattle"
       },
-      "color" : null,
+      "color": null,
       "bonusXpBase": 15,
       "bonusPtBase": 30,
-      "pba" : ["Grant Air Tint"],
-      "reward" : {
-        "type" : "skin",
-        "name" : "Air Tint"
+      "pba": ["Grant Air Tint"],
+      "reward": {
+        "type": "skin",
+        "name": "Air Tint"
       },
-      "itemSummonOnly" : true,
-      "itemSummon" : "Storm Crow Bone Chimes"
+      "itemSummonOnly": true,
+      "itemSummon": "Storm Crow Bone Chimes"
     }
   ]
 }

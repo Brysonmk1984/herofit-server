@@ -1,21 +1,25 @@
-
-const { Avatar } = require('../config/db');
-const { REVIVE_AMOUNT } = require('../game/CONSTANTS');
-const { sendCronErrorEmail } = require('../mail');
-console.log('*** RUNNING CRON REVIVE ***');
+const { Avatar } = require("../config/db");
+const { REVIVE_AMOUNT } = require("../game/CONSTANTS");
+const { sendCronErrorEmail } = require("../mail");
+console.log("*** RUNNING CRON REVIVE ***");
 
 return Avatar.update(
-    { health : REVIVE_AMOUNT, status : 'Recovering', goToBattle : false },
-    { where: { status: 'Knocked Out' }}
-).then(()=>{
-  console.log('REVIVED ALL KOED');
-  process.exit();
-}).catch((error) =>{
-
-  new Promise((resolve, reject) =>{
-    return sendCronErrorEmail({ message : error.message, status : error.status, debug : error.debug },resolve, reject)
-  }).catch((error) =>{
-    console.log('couldn\'t send error email for REVIVE AVATARS - ', error);
+  { health: REVIVE_AMOUNT, status: "Recovering", goToBattle: false },
+  { where: { status: "Knocked Out" } }
+)
+  .then(() => {
+    console.log("REVIVED ALL KOED");
     process.exit();
+  })
+  .catch((error) => {
+    new Promise((resolve, reject) => {
+      return sendCronErrorEmail(
+        { message: error.message, status: error.status, debug: error.debug },
+        resolve,
+        reject
+      );
+    }).catch((error) => {
+      console.log("couldn't send error email for REVIVE AVATARS - ", error);
+      process.exit();
+    });
   });
-});

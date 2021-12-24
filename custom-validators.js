@@ -1,6 +1,5 @@
-
-function isArray(val){
-   return Array.isArray(val);
+function isArray(val) {
+  return Array.isArray(val);
 }
 
-module.exports = { isArray }
+module.exports = { isArray };

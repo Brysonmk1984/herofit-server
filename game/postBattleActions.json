@@ -1,291 +1,310 @@
 {
-  "DEFEATEDFOE" : [
+  "DEFEATEDFOE": [
     {
-      "action" : "Grant Shadow-Self",
-      "name" : "Shadow Self",
-      "type" : "Award Skin",
+      "action": "Grant Shadow-Self",
+      "name": "Shadow Self",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Shade",
-      "name" : "Shade Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Shade",
+      "name": "Shade Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Apparition",
-      "name" : "Apparition Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Apparition",
+      "name": "Apparition Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Phantasm",
-      "name" : "Phantasm Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Phantasm",
+      "name": "Phantasm Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Phantom",
-      "name" : "Phantom Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Phantom",
+      "name": "Phantom Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Wraith",
-      "name" : "Wraith Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Wraith",
+      "name": "Wraith Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Poltergeist",
-      "name" : "Poltergeist Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Poltergeist",
+      "name": "Poltergeist Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Specter",
-      "name" : "Specter Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Specter",
+      "name": "Specter Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Banshee",
-      "name" : "Banshee Tint",
-      "type" : "Award Skin",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Banshee",
+      "name": "Banshee Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant Plaguebringer",
-      "name" : "Plagueling",
-      "type" : "Award Pet",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Plaguebringer",
+      "name": "Plagueling",
+      "type": "Award Pet",
       "itemCategory": "pets",
-      "outcome" : ["Avatar Wins", "Double KO"]
-    },{
-      "action" : "Grant GotD",
-      "name" : "Hellhound Whisperer",
-      "type" : "Award Title",
-      "itemCategory": "titles",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Gusty Rascal",
-      "name" : "Gusty Rascal",
-      "type" : "Award Pet",
+      "action": "Grant GotD",
+      "name": "Hellhound Whisperer",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins", "Double KO"]
+    },
+    {
+      "action": "Grant Gusty Rascal",
+      "name": "Gusty Rascal",
+      "type": "Award Pet",
       "itemCategory": "pets",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Rock Skipper",
-      "name" : "Rock Skipper",
-      "type" : "Award Pet",
+      "action": "Grant Rock Skipper",
+      "name": "Rock Skipper",
+      "type": "Award Pet",
       "itemCategory": "pets",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Flame Fiend",
-      "name" : "Flame Fiend",
-      "type" : "Award Pet",
+      "action": "Grant Flame Fiend",
+      "name": "Flame Fiend",
+      "type": "Award Pet",
       "itemCategory": "pets",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Splash Artist",
-      "name" : "Splash Artist",
-      "type" : "Award Pet",
+      "action": "Grant Splash Artist",
+      "name": "Splash Artist",
+      "type": "Award Pet",
       "itemCategory": "pets",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Fire Hunter",
-      "name" : "Fire Hunter",
-      "type" : "Award Title",
+      "action": "Grant Fire Hunter",
+      "name": "Fire Hunter",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Earth Trapper",
-      "name" : "Earth Trapper",
-      "type" : "Award Title",
+      "action": "Grant Earth Trapper",
+      "name": "Earth Trapper",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Water Predator",
-      "name" : "Water Predator",
-      "type" : "Award Title",
+      "action": "Grant Water Predator",
+      "name": "Water Predator",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Air Stalker",
-      "name" : "Air Stalker",
-      "type" : "Award Title",
+      "action": "Grant Air Stalker",
+      "name": "Air Stalker",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
 
     {
-      "action" : "Grant Fire Tint",
-      "name" : "Fire Tint",
-      "type" : "Award Skin",
+      "action": "Grant Fire Tint",
+      "name": "Fire Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Earth Tint",
-      "name" : "Earth Tint",
-      "type" : "Award Skin",
+      "action": "Grant Earth Tint",
+      "name": "Earth Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Water Tint",
-      "name" : "Water Tint",
-      "type" : "Award Skin",
+      "action": "Grant Water Tint",
+      "name": "Water Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     },
     {
-      "action" : "Grant Air Tint",
-      "name" : "Air Tint",
-      "type" : "Award Skin",
+      "action": "Grant Air Tint",
+      "name": "Air Tint",
+      "type": "Award Skin",
       "itemCategory": "skins",
-      "outcome" : ["Avatar Wins", "Double KO"]
+      "outcome": ["Avatar Wins", "Double KO"]
     }
   ],
 
-  "WINSTREAK" : [
+  "WINSTREAK": [
     {
-      "requirement" : 3,
-      "action" : "Grant Win Streak 3",
-      "name" : "The Renowned",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },
-    {
-      "requirement" : 5,
-      "action" : "Grant Win Streak 5",
-      "name" : "The Acclaimed",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },
-    {
-      "requirement" : 10,
-      "action" : "Grant Win Streak 10",
-      "name" : "The Untouchable",
-      "type" : "Award Title",
+      "requirement": 3,
+      "action": "Grant Win Streak 3",
+      "name": "The Renowned",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins"]
+      "outcome": ["Avatar Wins"]
     },
     {
-      "requirement" : 15,
-      "action" : "Grant Win Streak 15",
-      "name" : "The Valorous",
-      "type" : "Award Title",
+      "requirement": 5,
+      "action": "Grant Win Streak 5",
+      "name": "The Acclaimed",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins"]
+      "outcome": ["Avatar Wins"]
     },
     {
-      "requirement" : 25,
-      "action" : "Grant Win Streak 25",
-      "name" : "The Legendary",
-      "type" : "Award Title",
+      "requirement": 10,
+      "action": "Grant Win Streak 10",
+      "name": "The Untouchable",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins"]
+      "outcome": ["Avatar Wins"]
     },
     {
-      "requirement" : 50,
-      "action" : "Grant Win Streak 50",
-      "name" : "The Mythical",
-      "type" : "Award Title",
+      "requirement": 15,
+      "action": "Grant Win Streak 15",
+      "name": "The Valorous",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : ["Avatar Wins"]
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 25,
+      "action": "Grant Win Streak 25",
+      "name": "The Legendary",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 50,
+      "action": "Grant Win Streak 50",
+      "name": "The Mythical",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
     }
   ],
 
-  "WINTOTAL" : [
+  "WINTOTAL": [
     {
-      "requirement" : 5,
-      "action" : "Grant Win Total 5",
-      "name" : "White Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 10,
-      "action" : "Grant Win Total 10",
-      "name" : "Yellow Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 25,
-      "action" : "Grant Win Total 25",
-      "name" : "Orange Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 50,
-      "action" : "Grant Win Total 50",
-      "name" : "Blue Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 75,
-      "action" : "Grant Win Total 75",
-      "name" : "Purple Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 100,
-      "action" : "Grant Win Total 100",
-      "name" : "Green Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 150,
-      "action" : "Grant Win Total 150",
-      "name" : "Red Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 250,
-      "action" : "Grant Win Total 250",
-      "name" : "Brown Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 500,
-      "action" : "Grant Win Total 500",
-      "name" : "Black Belt",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
-    },{
-      "requirement" : 1000,
-      "action" : "Grant Win Total 1000",
-      "name" : "Black Belt Sensei",
-      "type" : "Award Title",
-      "itemCategory" : "titles",
-      "outcome" : ["Avatar Wins"]
+      "requirement": 5,
+      "action": "Grant Win Total 5",
+      "name": "White Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 10,
+      "action": "Grant Win Total 10",
+      "name": "Yellow Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 25,
+      "action": "Grant Win Total 25",
+      "name": "Orange Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 50,
+      "action": "Grant Win Total 50",
+      "name": "Blue Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 75,
+      "action": "Grant Win Total 75",
+      "name": "Purple Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 100,
+      "action": "Grant Win Total 100",
+      "name": "Green Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 150,
+      "action": "Grant Win Total 150",
+      "name": "Red Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 250,
+      "action": "Grant Win Total 250",
+      "name": "Brown Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 500,
+      "action": "Grant Win Total 500",
+      "name": "Black Belt",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
+    },
+    {
+      "requirement": 1000,
+      "action": "Grant Win Total 1000",
+      "name": "Black Belt Sensei",
+      "type": "Award Title",
+      "itemCategory": "titles",
+      "outcome": ["Avatar Wins"]
     }
   ],
-  "HELPER" : [
+  "HELPER": [
     {
-      "requirement" : null,
-      "action" : null,
-      "name" : "White Light Warrior",
-      "type" : "Award Title",
+      "requirement": null,
+      "action": null,
+      "name": "White Light Warrior",
+      "type": "Award Title",
       "itemCategory": "titles",
-      "outcome" : null
+      "outcome": null
     }
   ]
 }
