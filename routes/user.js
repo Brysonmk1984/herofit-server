@@ -62,7 +62,8 @@ router.post('/instantiate-user-totals', body('email').isEmail(), body('avatarId'
       avatarId
     },
     raw : true
-  }).then((result) =>{console.log('INSTANTIATION RESULT - ', result);
+  }).then((result) =>{
+    console.log('INSTANTIATION RESULT - ', result);
     const created = result[1];
     const results = result[0].dataValues;
 

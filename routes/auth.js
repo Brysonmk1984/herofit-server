@@ -9,7 +9,7 @@ const { config } = require('../appConfig');
 const latestPatchDetails = require('../patchDetails/latest.json');
 const { genPassword, validatePassword } = require('../lib/passwordUtils');
 const { randomEmailString, usePasswordHashToMakeToken } = require('../lib/passwordUtils');
-const { sendVerificationEmail, sendResetPasswordEmail, sendCronErrorEmail } = require('../mail');
+const { sendVerificationEmail, sendResetPasswordEmail, sendCronErrorEmail, sendBackendOnlyEmail } = require('../mail');
 const axios = require('axios');
 
 // mobile app only
@@ -58,9 +58,11 @@ router.post('/login', body('email').isEmail(), body('password').isString({ min: 
 
 // captchaValue is optional since App isn't using it
 // * TURNS OUT, passing null to something optional will still trigger an error unless "{nullable: true, checkFalsy: true}" is passed in
-router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('captchaValue').isString().optional({nullable: true, checkFalsy: true}), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional(), body('referredBy').isString().optional({nullable: true, checkFalsy: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
+router.post('/register', body('email').isEmail(), body('firstName').isString(), body('username').isString({ min: 3, max: 25 }), body('password').isString({ min: 8, max: 25 }), body('emailMarketingOptIn').isBoolean(), body('isMetric').isBoolean().optional(), body('foundOutBy').isString().optional({nullable: true}), body('referredBy').isString().optional({nullable: true}), body('isMobileApp').isBoolean().optional({nullable: true, checkFalsy: true}), (req, res)=>{
   const errors = validationResult(req);
-  if(!errors.isEmpty()){console.log('VALIDATION ERRS ON REGISTER:', errors);
+  if(!errors.isEmpty()){
+    console.log('VALIDATION ERRS ON REGISTER:', errors);
+    sendBackendOnlyEmail("Couldn't Register - validation error!", errors.toString());
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
 
@@ -68,12 +70,6 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
     return res.formatter.serviceUnavailable('Server is down for maintenance, please try again later...');
   }
 
-
-  // Skip Recaptcha if development mode
-  const successfulRecaptcha =  process.env.NODE_ENV === 'development' ? true : verifyRecaptcha(req.body.captchaValue);
-  if(!successfulRecaptcha){
-    return res.formatter.badRequest(null, "The captcha deemed you are a bot; If you're a human, please try again.");
-  }
 
   let { email, username, password, firstName, lastName, emailMarketingOptIn, isMetric, foundOutBy, referredBy, isMobileApp } = req.body;
   fistName = firstName || null;
@@ -128,6 +124,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
       const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
       return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
     }
+    sendBackendOnlyEmail("Couldn't Register!", error.toString());
     res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
   });
 
@@ -141,6 +138,7 @@ router.post('/register', body('email').isEmail(), body('firstName').isString(), 
 router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMobileApp').isBoolean().optional(), (req, res)=>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
+    sendBackendOnlyEmail("Couldn't send reset password email - validation error!", errors.toString());
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
   const { email, isMobileApp } = req.body;
@@ -156,6 +154,7 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMo
         return res.formatter.ok({ result });
       }).catch((error) =>{
         console.log('Error', error);
+        sendBackendOnlyEmail("Couldn't send reset password email - inner server error!", error.toString());
         res.formatter.serverError(error.toString(), "Server Error Sending Email - for POST /reset-password-confirm-email");
       });
     }else{
@@ -163,6 +162,7 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMo
     }
     
   }).catch((error) =>{
+    sendBackendOnlyEmail("Couldn't send reset password email - server error!", error.toString());
     res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
   });
 
@@ -170,10 +170,10 @@ router.post('/reset-password-confirm-email', body('email').isEmail(), body('isMo
 
 router.post('/reset-password', body('email').isEmail(), body('token').isString(), body('password').isString({ min: 8, max: 25 }), (req, res)=>{
   const errors = validationResult(req);
-  console.log('RESET PASSWORD TEST');
-  console.log(req.body.email, req.body.token, req.body.password);
+
   if(!errors.isEmpty()){
     console.log('INVALIDATION ERROR');
+    sendBackendOnlyEmail("Couldn't Reset Password - validation error!", errors.toString());
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
   const { email, token, password } = req.body;
@@ -196,6 +196,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
         return res.formatter.ok({ message : "Successfully updated password" });
       }).catch((error) =>{
         console.log('ERROR', error);
+        sendBackendOnlyEmail("Couldn't Reset Password - user update error!", error.toString());
         return res.formatter.serverError(error.toString(), 'Unable to update Password');
       });
     }else{
@@ -209,6 +210,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
     }).catch((error) =>{
       console.log('email error', error);
     }).finally(() =>{
+      sendBackendOnlyEmail("Couldn't Reset Password - error finding user!", error.toString());
       return res.formatter.serverError(error.toString());
     });
  
@@ -221,6 +223,7 @@ router.post('/reset-password', body('email').isEmail(), body('token').isString()
 router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCode').isString().optional(), body('isMobileApp').isBoolean().optional(), (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
+    sendBackendOnlyEmail("Couldn't Resend email confirmation - validation error!", errors.toString());
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
   }
   
@@ -250,6 +253,7 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
     return res.formatter.ok({});
   }).catch((error) => {
     console.log('THE ERROR', error);
+    sendBackendOnlyEmail("Couldn't Resend email confirmation - Error sending verification email!", error.toString());
     return res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
   });
 
@@ -262,6 +266,7 @@ router.post('/resend-email-confirmation', body('email').isEmail(), body('emailCo
 router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
   const errors = validationResult(req);
   if(!errors.isEmpty()){
+    sendBackendOnlyEmail("Couldn't update user after they clicked the email link and web site sent the email code - validation error!", errors.toString());
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /validated-email");
   }
 
@@ -276,6 +281,7 @@ router.post('/validated-email', body('emailCode').isString(), (req, res) =>{
     return res.formatter.ok({ user : data[1] });
   }).catch((error) => {
     console.log('ERROR WITH EMAIL CODE', error);
+    sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code", error.toString());
     return res.formatter.serverError(error.toString(), "SERVER Error - for POST /validated-email");
   });
 

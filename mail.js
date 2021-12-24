@@ -182,7 +182,7 @@ const sendCronErrorEmail = function({status, message, debug, meta, version, erro
 
 
 // ERRORS are always sent from frontend
-// Backend errors are using the sendCronErrorEmail for now
+// Backend errors are using the sendBackendOnlyEmail
 const sendAppErrorEmail = function(formData, resolve, reject){
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
