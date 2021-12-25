@@ -72,10 +72,5 @@
   },
   "engines": {
     "node": "16.x"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "prettier --write . && git add -A ."
-    }
   }
 }

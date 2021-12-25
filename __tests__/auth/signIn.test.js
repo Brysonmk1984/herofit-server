@@ -7,12 +7,6 @@ const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
 //   await loadDb();
 // });
 
-
-
-
-
-
-
 // LOGIN ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/login", () => {
   it("should respond with a user object, where all properties are the correct type and email matches the passed in email", async () => {
