@@ -2,4 +2,3 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npm run test:precommit auth
-prettier --write . && git add -A .

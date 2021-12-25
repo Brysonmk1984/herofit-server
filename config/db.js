@@ -10,6 +10,7 @@ let db;
 let dbUrl;
 let sequelizeSettings;
 
+
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   // PRODUCTION or Locally running backend through PROXY
   sequelizeSettings = {
