@@ -3,7 +3,7 @@ const app = require("../../index.js");
 const { User } = require("../../config/db");
 const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
 
-// LOGIN ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
+// REGISTER ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/register", () => {
   it("Should fail to register user because email already exists", done => {
     request(app)

@@ -60,7 +60,6 @@ router.post("/register", body("email").isEmail(), body("firstName").isString(), 
   if (!errors.isEmpty()) {
     console.log("VALIDATION ERRS ON REGISTER:", errors);
     sendBackendOnlyEmail("Couldn't Register - validation error!", JSON.stringify(errors));
-    console.log("sending bad request");
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
 
