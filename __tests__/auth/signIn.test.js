@@ -1,9 +1,11 @@
 const request = require("supertest");
 const app = require("../../index.js");
+const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
+const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
 
-function doneAfterTimeout(done, timeout = 1000) {
-  setTimeout(() => done(), timeout);
-}
+// beforeAll(async () => {
+//   await loadDb();
+// });
 
 // LOGIN ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/login", () => {
@@ -48,7 +50,7 @@ describe("POST /auth/login", () => {
     );
   });
 
-  it("respond with json", done => {
+  it("Should respond with 400 and an error indicating the password is wrong", done => {
     request(app)
       .post("/auth/login")
       .send({
@@ -70,7 +72,7 @@ describe("POST /auth/login", () => {
       });
   });
 
-  it("respond with json", done => {
+  it("Should respond with 401 and an error indicating we couldn't find a user with that email", done => {
     request(app)
       .post("/auth/login")
       .send({
@@ -90,3 +92,7 @@ describe("POST /auth/login", () => {
       });
   });
 });
+
+// afterAll(async () => {
+//   await closeDb();
+// });
