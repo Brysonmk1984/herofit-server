@@ -139,7 +139,7 @@ describe("Battle all generated foes against av profiles", () => {
       dkos: 0,
       total: 0,
     },
-    // 15 - 60
+    // 15 - 100
     midLevel: {
       wins: 0,
       losses: 0,
@@ -147,7 +147,7 @@ describe("Battle all generated foes against av profiles", () => {
       dkos: 0,
       total: 0,
     },
-    // Over 60
+    // Over 100
     highLevel: {
       wins: 0,
       losses: 0,
@@ -175,7 +175,7 @@ describe("Battle all generated foes against av profiles", () => {
         if (level < 15) {
           totals.lowLevel.wins++;
           totals.lowLevel.total++;
-        } else if (level >= 15 && level < 60) {
+        } else if (level >= 15 && level < 100) {
           totals.midLevel.wins++;
           totals.midLevel.total++;
           // Start of extra difficulty curve
@@ -183,7 +183,7 @@ describe("Battle all generated foes against av profiles", () => {
             totals.lowMidLevel.wins++;
             totals.lowMidLevel.total++;
           }
-        } else if (level >= 60) {
+        } else if (level >= 100) {
           totals.highLevel.wins++;
           totals.highLevel.total++;
         }
@@ -194,7 +194,7 @@ describe("Battle all generated foes against av profiles", () => {
         if (level < 15) {
           totals.lowLevel.losses++;
           totals.lowLevel.total++;
-        } else if (level >= 15 && level < 60) {
+        } else if (level >= 15 && level < 100) {
           totals.midLevel.losses++;
           totals.midLevel.total++;
           // Start of extra difficulty curve
@@ -202,7 +202,7 @@ describe("Battle all generated foes against av profiles", () => {
             totals.lowMidLevel.losses++;
             totals.lowMidLevel.total++;
           }
-        } else if (level >= 60) {
+        } else if (level >= 100) {
           totals.highLevel.losses++;
           totals.highLevel.total++;
         }
@@ -212,7 +212,7 @@ describe("Battle all generated foes against av profiles", () => {
         if (level < 15) {
           totals.lowLevel.draws++;
           totals.lowLevel.total++;
-        } else if (level >= 15 && level < 60) {
+        } else if (level >= 15 && level < 100) {
           totals.midLevel.draws++;
           totals.midLevel.total++;
           // Start of extra difficulty curve
@@ -220,7 +220,7 @@ describe("Battle all generated foes against av profiles", () => {
             totals.lowMidLevel.draws++;
             totals.lowMidLevel.total++;
           }
-        } else if (level >= 60) {
+        } else if (level >= 100) {
           totals.highLevel.draws++;
           totals.highLevel.total++;
         }
@@ -230,7 +230,7 @@ describe("Battle all generated foes against av profiles", () => {
         if (level < 15) {
           totals.lowLevel.dkos++;
           totals.lowLevel.total++;
-        } else if (level >= 15 && level < 60) {
+        } else if (level >= 15 && level < 100) {
           totals.midLevel.dkos++;
           totals.midLevel.total++;
           // Start of extra difficulty curve
@@ -238,7 +238,7 @@ describe("Battle all generated foes against av profiles", () => {
             totals.lowMidLevel.dkos++;
             totals.lowMidLevel.total++;
           }
-        } else if (level >= 60) {
+        } else if (level >= 100) {
           totals.highLevel.dkos++;
           totals.highLevel.total++;
         }
