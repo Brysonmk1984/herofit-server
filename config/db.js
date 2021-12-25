@@ -15,8 +15,10 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   sequelizeSettings = {
     dialect: "postgres",
     dialectOptions: {
-      ssl: true,
-      rejectUnauthorized: false, // Might be needed for This is due to an (accidental) breaking change in node-postgres version 8
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
     },
     protocol: "postgres",
     timezone: "utc",
