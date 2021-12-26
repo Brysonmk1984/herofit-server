@@ -313,6 +313,7 @@ const sendBackendOnlyEmail = function (message, error) {
 // VERIFICATION EMAIL For Verifying Account
 const sendVerificationEmail = function (email, code, isMobileApp) {
   const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
+  // No longer using this on frontend, so no longer need isMobileApp
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verify=${code}`;
 

@@ -58,7 +58,7 @@ router.post("/login", body("email").isEmail(), body("password").isString({ min: 
 router.post("/register", body("email").isEmail(), body("firstName").isString(), body("username").isString({ min: 3, max: 25 }), body("password").isString({ min: 8, max: 25 }), body("emailMarketingOptIn").isBoolean(), body("isMetric").isBoolean().optional(), body("foundOutBy").isString().optional({ nullable: true }), body("referredBy").isString().optional({ nullable: true }), body("isMobileApp").isBoolean().optional({ nullable: true, checkFalsy: true }), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log("VALIDATION ERRS ON REGISTER:", errors);
+    //console.log("VALIDATION ERRS ON REGISTER:", errors);
     sendBackendOnlyEmail("Couldn't Register - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
@@ -130,7 +130,7 @@ router.post("/register", body("email").isEmail(), body("firstName").isString(), 
 router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMobileApp").isBoolean().optional(), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    sendBackendOnlyEmail("Couldn't send reset password email - validation error!", JSON.stringify(error));
+    sendBackendOnlyEmail("Couldn't send reset password email - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password-confirm-email");
   }
   const { email, isMobileApp } = req.body;
@@ -145,7 +145,7 @@ router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMo
         const token = usePasswordHashToMakeToken(result);
         sendResetPasswordEmail(email, token, isMobileApp)
           .then(result => {
-            //console.log('RESET PASS RESult=', result);
+            console.log("RESET PASS RESult=", result);
             return res.formatter.ok({ result });
           })
           .catch(error => {
@@ -168,7 +168,7 @@ router.post("/reset-password", body("email").isEmail(), body("token").isString()
 
   if (!errors.isEmpty()) {
     console.log("INVALIDATION ERROR");
-    sendBackendOnlyEmail("Couldn't Reset Password - validation error!", JSON.stringify(error));
+    sendBackendOnlyEmail("Couldn't Reset Password - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /reset-password");
   }
   const { email, token, password } = req.body;
@@ -238,40 +238,54 @@ router.post("/reset-password", body("email").isEmail(), body("token").isString()
 router.post("/resend-email-confirmation", body("email").isEmail(), body("emailCode").isString().optional(), body("isMobileApp").isBoolean().optional(), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    sendBackendOnlyEmail("Couldn't Resend email confirmation - validation error!", JSON.stringify(error));
+    console.log(errors);
+    sendBackendOnlyEmail("Couldn't Resend email confirmation - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
   }
 
   let { email, emailCode, isMobileApp } = req.body;
+
+  function _handleSendEmailCode() {
+    console.log("/resend-email-confirmation", email, emailCode);
+    sendVerificationEmail(email, emailCode, isMobileApp)
+      .then(data => {
+        if (data.error) {
+          return res.formatter.serverError(error.toString());
+        }
+        // emailCode returned for testing purposes only
+        return res.formatter.ok({ emailCode });
+      })
+      .catch(error => {
+        console.log("THE ERROR", error);
+        sendBackendOnlyEmail("Couldn't Resend email confirmation - Error sending verification email!", JSON.stringify(error));
+        return res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
+      });
+  }
 
   // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
   if (!emailCode) {
     emailCode = randomEmailString();
     console.log("UPDATING EMAIL CODE", emailCode);
 
-    User.update({ emailCode }, { where: { email } })
-      .then(data => {
-        console.log("DDD", data);
-      })
-      .catch(error => {
-        console.log("ERRRR", error);
-      });
+    try {
+      User.update({ emailCode }, { where: { email }, returning: true })
+        .then(data => {
+          if (data[0] === 0) {
+            throw new Error("No Matching Email");
+          }
+          console.log("DDD", data);
+          _handleSendEmailCode();
+        })
+        .catch(error => {
+          console.log("email doesn't exist", error.toString());
+          return res.formatter.badRequest(error.toString(), "CLIENT Error - for POST /resend-email-confirmation");
+        });
+    } catch (error) {
+      return res.formatter.badRequest(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
+    }
+  } else {
+    _handleSendEmailCode();
   }
-
-  console.log("/resend-email-confirmation", email, emailCode);
-  sendVerificationEmail(email, emailCode, isMobileApp)
-    .then(data => {
-      if (data.error) {
-        return res.formatter.serverError(error.toString());
-      }
-
-      return res.formatter.ok({});
-    })
-    .catch(error => {
-      console.log("THE ERROR", error);
-      sendBackendOnlyEmail("Couldn't Resend email confirmation - Error sending verification email!", JSON.stringify(error));
-      return res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
-    });
 });
 
 // VALIDATE EMAIL - User clicked a link in their email and were redirected to either the
@@ -280,22 +294,26 @@ router.post("/resend-email-confirmation", body("email").isEmail(), body("emailCo
 router.post("/validated-email", body("emailCode").isString(), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    sendBackendOnlyEmail("Couldn't update user after they clicked the email link and web site sent the email code - validation error!", JSON.stringify(error));
+    sendBackendOnlyEmail("Couldn't update user after they clicked the email link and web site sent the email code - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /validated-email");
   }
 
   const { emailCode } = req.body;
-  console.log("EC = ", emailCode);
+  //console.log("EC = ", emailCode);
 
   User.update({ active: true }, { where: { emailCode }, returning: true, plain: true })
     .then(data => {
-      console.log("USER DATA", data);
       return res.formatter.ok({ user: data[1] });
     })
     .catch(error => {
+      const errorString = error.toString();
+      if (errorString === "TypeError: Cannot read properties of null (reading 'length')") {
+        sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code - no matching user", JSON.stringify(error));
+        return res.formatter.badRequest(errorString, "CLIENT Error - for POST /validated-email");
+      }
       console.log("ERROR WITH EMAIL CODE", error);
       sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code", JSON.stringify(error));
-      return res.formatter.serverError(error.toString(), "SERVER Error - for POST /validated-email");
+      return res.formatter.serverError(errorString, "SERVER Error - for POST /validated-email");
     });
 });
 
