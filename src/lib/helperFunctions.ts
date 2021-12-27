@@ -1,6 +1,9 @@
 interface ObjectWithAnyProperties {
   [key: string]: any;
 }
+function myNewFunct(){
+  
+}
 function cloneObj(obj: ObjectWithAnyProperties, deep = false) {
   var result: ObjectWithAnyProperties = {};
   for (let key in obj) {
