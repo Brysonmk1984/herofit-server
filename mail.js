@@ -24,7 +24,7 @@ function determineVerificationUrl(env, isMobileApp) {
 
 //create reusable transporter object using the default SMTP transport
 let transporter =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
     ? nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,

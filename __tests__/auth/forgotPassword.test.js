@@ -86,7 +86,7 @@ describe("POST /auth/reset-password-confirm-email", () => {
       .expect(200)
       .expect(res => {
         const { response } = res.body.data.result;
-        expect(response).toBe("250 Great success");
+        expect(response).toContain("250");
       });
   });
 
