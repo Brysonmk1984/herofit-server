@@ -3,3 +3,4 @@
 
 npm run test:precommit auth
 prettier --write . && git add -A .
+tsc -b -v 

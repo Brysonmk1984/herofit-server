@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "outDir": "build",
+    "rootDir": "/",
+    "strict": true,
+    "strictNullChecks": true,
+    "checkJs": false,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "incremental": true,
+    "types": ["node"],
+    "lib": ["es6"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowUnreachableCode": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js"]
+}

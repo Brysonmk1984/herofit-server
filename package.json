@@ -10,7 +10,8 @@
     "start": "NODE_ENV=production node start.js",
     "dev": "NODE_ENV=development nodemon start.js",
     "prepare": "husky install",
-    "lint": "prettier --check ."
+    "prettier": "prettier --check .",
+    "lint": "eslint ./**/*.ts"
   },
   "jest": {
     "watchPathIgnorePatterns": [
@@ -42,7 +43,8 @@
     "jest-extended": "^0.11.5",
     "nodemon": "^2.0.6",
     "prettier": "^2.5.1",
-    "supertest": "^3.4.2"
+    "supertest": "^3.4.2",
+    "ts-node": "^10.4.0"
   },
   "dependencies": {
     "axios": "^0.21.4",
