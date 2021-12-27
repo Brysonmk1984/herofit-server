@@ -63,8 +63,6 @@ function parseActivityData(act) {
   return act;
 }
 
-
-
 function arrayChunker(inputArray, perChunk) {
   return inputArray.reduce((resultArray, item, index) => {
     const chunkIndex = Math.floor(index / perChunk);
