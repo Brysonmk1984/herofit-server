@@ -3,4 +3,4 @@
 
 #npm run test:precommit auth
 #prettier --write . && git add -A .
-ts-node --transpile-only
+ts-node
