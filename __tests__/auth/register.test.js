@@ -1,6 +1,6 @@
 const request = require("supertest");
-const app = require("../../index.js");
-const { User } = require("../../config/db");
+const app = require("../../src/index.js");
+const { User } = require("../../src/config/db");
 const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
 
 // REGISTER ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP

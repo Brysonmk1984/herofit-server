@@ -1,6 +1,6 @@
 const request = require("supertest");
-const app = require("../../index.js");
-const { User } = require("../../config/db");
+const app = require("../../src/index.js");
+const { User } = require("../../src/config/db");
 
 // FORGOT PASSWORD ROUTES - ACCESSED THROUGH "FORGOT PASSWORD" SCREEN ON MOBILE APP
 //Set emailCode for test email in case it's missing

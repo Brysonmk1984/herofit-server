@@ -3,7 +3,7 @@
     "target": "esnext",
     "module": "commonjs",
     "outDir": "build",
-    "rootDir": "/",
+    "rootDir": "src",
     "strict": true,
     "strictNullChecks": true,
     "checkJs": false,
@@ -19,5 +19,5 @@
     "useUnknownInCatchVariables": false
   },
   "include": ["**/*.ts", "**/*.js"],
-  "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js"]
+  "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js", "./build/**/*", "./__tests__/**/*"]
 }

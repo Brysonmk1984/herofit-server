@@ -1,6 +1,6 @@
 const request = require("supertest");
-const app = require("../../index.js");
-const { User } = require("../../config/db");
+const app = require("../../src/index.js");
+const { User } = require("../../src/config/db");
 
 // VALIDATE EMAIL (trigger by user hitting website, which then does a POST sending emailCode )
 describe("POST /auth/validated-email", () => {

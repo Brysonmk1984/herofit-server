@@ -1,10 +1,10 @@
 const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate, generateFoeStats } = require("../../game/prebattle/foeFunctions");
-const { calcScenarioBonuses, determineScenario } = require("../../game/battle/scenario");
-const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../game/battle/doBattlePrep");
-const doBattle = require("../../game/battle/doBattle");
-const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../game/CONSTANTS");
-const avCalc = require("../../game/upgrades/avCalc");
+const { selectFoeTemplate, generateFoeStats } = require("../../src/game/prebattle/foeFunctions");
+const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
+const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../src/game/battle/doBattlePrep");
+const doBattle = require("../../src/game/battle/doBattle");
+const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../src/game/CONSTANTS");
+const avCalc = require("../../src/game/upgrades/avCalc");
 const chance = require("chance")();
 
 // Use toEqual for objects and arrays

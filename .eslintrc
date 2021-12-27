@@ -1,0 +1,45 @@
+{
+  "extends": ["plugin:import/errors", "plugin:import/warnings", "plugin:import/typescript"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {}
+  },
+  "plugins": ["import", "@typescript-eslint"],
+  "env": {
+    "react-native/react-native": true
+  },
+  "rules": {
+    "react-native/no-unused-styles": 2,
+    "react-native/split-platform-components": 2,
+    "react-native/no-raw-text": "off",
+    "react-native/no-single-element-style-arrays": 2,
+    //"react-native/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+    //These don't work
+    //"react-native/jsx-first-prop-new-line": [6, "never"],
+    // "react-native/jsx-max-props-per-line": ["error", {
+    //   "maximum": {
+    //     "single": 6,
+    //     "multi": 7
+    //   },
+    //   "when": "always"
+    // }],
+    //
+    "prefer-destructuring": "off",
+    "object-curly-newline": "off",
+    "no-unused-vars": "off",
+    "no-use-before-define": "off",
+    "no-multiple-empty-lines": "off",
+    "import/namespace": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "quotes": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "ts": "never"
+      }
+    ]
+  }
+}
