@@ -18,6 +18,6 @@
     "allowUnreachableCode": true,
     "useUnknownInCatchVariables": false
   },
-  "include": ["**/*.ts", "**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js", "./build/**/*", "./__tests__/**/*"]
 }
