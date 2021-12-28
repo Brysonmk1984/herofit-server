@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Avatar, Battle, Items } = require("../../../config/db");
+const { Avatar, Battle, Items } = require("../../config/db");
 const { determineItemEffects, determinePostBattleActions } = require("./onGoToBattle");
 const ALLPBAs = require("../postBattleActions.json");
 

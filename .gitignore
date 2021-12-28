@@ -9,3 +9,4 @@ pg_upgrade_utility.log
 
 /dbBackups
 /mockData
+build

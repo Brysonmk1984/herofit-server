@@ -1,6 +1,6 @@
-const db = require("../../../config/db").db;
+const db = require("../../config/db").db;
 const { Op } = require("sequelize");
-const { Items } = require("../../../config/db");
+const { Items } = require("../../config/db");
 const xpCalc = require("../upgrades/xpCalc");
 const insertBattle = require("./insertBattle");
 const { findFoeTemplateByType, selectFoeTemplate, determineFoeWithStats } = require("./foeFunctions");

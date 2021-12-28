@@ -1,6 +1,6 @@
 const { arrayChunker, roundNumber, parseAvatarProperties } = require("../../lib/helperFunctions");
 const battleProcess = require("./battleProcess");
-const { sendBattleReportEmail } = require("../../../mail");
+const { sendBattleReportEmail } = require("../../mail");
 
 const BATCH_CHUNK = 12;
 const BATCH_TIMEOUT = 2000;

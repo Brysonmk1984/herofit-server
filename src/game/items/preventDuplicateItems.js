@@ -1,4 +1,4 @@
-const { AvatarItems, Items } = require("../../../config/db");
+const { AvatarItems, Items } = require("../../config/db");
 const { Op } = require("sequelize");
 
 // Check if a particular avatar already has items passed in itemsToCheck array (of item names)

@@ -8,10 +8,11 @@
     "test:precommit": "jest --verbose --ci --forceExit",
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node start.js",
-    "dev": "NODE_ENV=development nodemon start.js",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/start.js",
     "prepare": "husky install",
     "prettier": "prettier --check .",
-    "lint": "eslint ./**/*.ts"
+    "lint": "eslint ./**/*.ts",
+    "build": "tsc -p tsconfig.json"
   },
   "jest": {
     "watchPathIgnorePatterns": [
@@ -28,8 +29,14 @@
       "<rootDir>__tests__/itemFind",
       "<rootDir>__tests__/itemRewards"
     ],
-    "transform": {
-      ".(ts)": "ts-jest"
+    "preset": "ts-jest",
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.test.js"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
     }
   },
   "author": "Bryson Kruk",
@@ -50,6 +57,7 @@
     "supertest": "^3.4.2",
     "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.4"
   },
   "dependencies": {
@@ -80,8 +88,5 @@
   },
   "engines": {
     "node": "16.x"
-  },
-  "imports": {
-    "#src/*": "./src/*"
   }
 }

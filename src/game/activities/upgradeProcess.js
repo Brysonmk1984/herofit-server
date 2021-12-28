@@ -1,5 +1,5 @@
-const { User, UserActivity, UserTotal, Avatar, Items } = require("../../../config/db");
-const db = require("../../../config/db").db;
+const { User, UserActivity, UserTotal, Avatar, Items } = require("../../config/db");
+const db = require("../../config/db").db;
 const { Op } = require("sequelize");
 const moment = require("moment");
 const crypto = require("crypto");
@@ -11,7 +11,7 @@ const xpCalc = require("../upgrades/xpCalc");
 const { activityItemFind, insertItemsFromItemFind } = require("./activityItemFind");
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("./activityRewards");
 const activityHeal = require("./activityHeal");
-const { sendCronErrorEmail } = require("../../../mail");
+const { sendCronErrorEmail } = require("../../mail");
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
 function _determineActivityId(id, source) {

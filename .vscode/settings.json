@@ -8,5 +8,11 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/build": true,
+    "**/tmp": true
   }
 }

@@ -99,9 +99,9 @@ describe("POST /auth/reset-password-confirm-email", () => {
 });
 
 // RESET PASSWORD
-describe("POST /auth/reset-password", async () => {
+describe("POST /auth/reset-password", () => {
   it("Should reset the password of the passed in email to the passed in password", async () => {
-    const response = await request(app)
+    request(app)
       .post("/auth/reset-password")
       .send({
         email: process.env.TEST_FORGOT_PASSWORD_EMAIL,

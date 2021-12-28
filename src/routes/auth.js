@@ -55,7 +55,7 @@ router.post("/login", body("email").isEmail(), body("password").isString({ min: 
 
 // captchaValue is optional since App isn't using it
 // * TURNS OUT, passing null to something optional will still trigger an error unless "{nullable: true, checkFalsy: true}" is passed in
-router.post("/register", body("email").isEmail(), body("firstName").isString(), body("username").isString({ min: 3, max: 25 }), body("password").isString({ min: 8, max: 25 }), body("emailMarketingOptIn").isBoolean(), body("isMetric").isBoolean().optional(), body("foundOutBy").isString().optional({ nullable: true }), body("referredBy").isString().optional({ nullable: true }), body("isMobileApp").isBoolean().optional({ nullable: true, checkFalsy: true }), (req, res) => {
+router.post("/register", body("email").isEmail(), body("firstName").isString(), body("username").isString({ min: 3, max: 25 }), body("password").isString({ min: 8, max: 25 }), body("emailMarketingOptIn").isBoolean(), body("isMetric").isBoolean(), body("foundOutBy").isString().optional({ nullable: true }), body("referredBy").isString().optional({ nullable: true }), body("isMobileApp").isBoolean().optional({ nullable: true, checkFalsy: true }), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     //console.log("VALIDATION ERRS ON REGISTER:", errors);
@@ -307,7 +307,7 @@ router.post("/validated-email", body("emailCode").isString(), (req, res) => {
     })
     .catch(error => {
       const errorString = error.toString();
-      if (errorString === "TypeError: Cannot read properties of null (reading 'length')") {
+      if (errorString === "TypeError: Cannot read properties of null (reading 'length')" || errorString === "TypeError: Cannot read property 'length' of null") {
         sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code - no matching user", JSON.stringify(error));
         return res.formatter.badRequest(errorString, "CLIENT Error - for POST /validated-email");
       }

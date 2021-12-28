@@ -6,7 +6,7 @@ function xpCalc(activityXP, battleXP) {
     bXP = battleXP,
     tXP = aXP + bXP;
 
-  return (xpReturn = {
+  const xpReturn = {
     // GIVES XP REQUIRED FOR NEXT LEVEL BASED ON DB VALUES
     getNextLevel: function (levelsAway = 0) {
       const exponent = LEVEL_CURVE;
@@ -160,7 +160,8 @@ function xpCalc(activityXP, battleXP) {
 
       return { leveledUp, levels: levelsGained };
     },
-  });
+  };
+  return xpReturn;
 }
 
 module.exports = xpCalc;

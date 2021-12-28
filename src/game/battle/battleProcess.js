@@ -1,4 +1,4 @@
-const { Avatar, AvatarItems, Items, Battle } = require("../../../config/db");
+const { Avatar, AvatarItems, Items, Battle } = require("../../config/db");
 const doBattle = require("./doBattle");
 const preBattleSetup = require("./preBattleSetup");
 const postBattleProcess = require("./postBattleProcess");

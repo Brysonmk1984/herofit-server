@@ -1,4 +1,4 @@
-const { Avatar, Battle, AvatarItems, Items } = require("../../../config/db");
+const { Avatar, Battle, AvatarItems, Items } = require("../../config/db");
 const { Op } = require("sequelize");
 const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require("../postBattleActions.json");
 const VILLAINS = require("../villains.json");

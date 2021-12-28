@@ -1,6 +1,5 @@
-//const { Avatar, AvatarItems, User, UserTotal, Items } = require('../../config/db');
 const { Op } = require("sequelize");
-const { Items, AvatarItems } = require("../../../config/db");
+const { Items, AvatarItems } = require("../../config/db");
 const { range } = require("../../lib/helperFunctions");
 const upgradeActions = require("./upgradeHeroActions.json");
 const preventDuplicateItems = require("../items/preventDuplicateItems");

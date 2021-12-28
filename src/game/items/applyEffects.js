@@ -1,5 +1,5 @@
 const { col, literal } = require("sequelize");
-const { Avatar, UserTotal } = require("../../../config/db");
+const { Avatar, UserTotal } = require("../../config/db");
 const xpCalc = require("../upgrades/xpCalc");
 const avCalc = require("../upgrades/avCalc");
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } = require("../CONSTANTS");
