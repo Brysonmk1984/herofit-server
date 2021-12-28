@@ -7,7 +7,7 @@
     "test": "jest --verbose --ci",
     "test:precommit": "jest --verbose --ci --forceExit",
     "test:watch": "jest --watch --verbose ",
-    "start": "NODE_ENV=production node start.js",
+    "start": "NODE_ENV=production node build/start.js",
     "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/start.js",
     "prepare": "husky install",
     "prettier": "prettier --check .",
