@@ -12,4 +12,4 @@ jwt/id_rsa_pub.pem
 
 /dbBackups
 /mockData
-build
+build/
