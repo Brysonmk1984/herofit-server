@@ -44,6 +44,7 @@ const shuffleArray = function (array: any[]) {
   return array;
 };
 
+
 function parseAvatarProperties(avatar, wholeNumbers = false) {
   const attrsToBeParsed = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
 
