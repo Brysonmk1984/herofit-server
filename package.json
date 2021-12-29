@@ -13,7 +13,7 @@
     "prettier": "prettier --check .",
     "lint": "eslint ./**/*.ts",
     "build": "tsc -p tsconfig.json",
-    "heroku-postbuild": "tsc -p tsconfig.json node build/jwt/generateKeyPair.js"
+    "heroku-postbuild": "tsc -p tsconfig.json && node app/build/jwt/generateKeyPair.js"
   },
   "jest": {
     "watchPathIgnorePatterns": [
