@@ -16,7 +16,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js", "./build/**/*", "./__tests__/**/*"]
