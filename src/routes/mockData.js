@@ -9,8 +9,8 @@ const { shuffleArray, parseAvatarProperties, getRandomNumber } = require("../lib
 const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require("../config/db");
 const db = require("../config/db").db;
 // MOCK DATA
-const mockAvatarNames = require("../mockData/mockAvatarNames");
-const mockActivities = require("../mockData/mockActivities");
+const mockAvatarNames = require("../mockData/mockAvatarNames.json");
+const mockActivities = require("../mockData/mockActivities.json");
 const heroList = require("../heroList");
 const { authenticateJWT } = require("../jwt/validateJWT");
 
