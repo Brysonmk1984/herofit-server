@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
-const pathToKey = path.join(__dirname, "id_rsa_pub.pem");
+const pathToKey = path.join(__dirname, "build", "id_rsa_pub.pem");
 //const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 const passport = require("passport");
 
