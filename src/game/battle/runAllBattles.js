@@ -7,6 +7,7 @@ const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard) {
+  console.log('SHARD', shard);
   const allAvatars = shard.map(battle => battle.avatar);
 
   let battlePromises = [];
@@ -22,7 +23,7 @@ async function runAllBattles(battles, sendReport) {
   let i = 0;
 
   // Need to divide records into groups of 9
-  battleShards = arrayChunker(battles, BATCH_CHUNK);
+  const battleShards = arrayChunker(battles, BATCH_CHUNK);
 
   // Delay each shard by 6 seconds
   // Currently needed to work around the connection limit error on Heroku Postgres

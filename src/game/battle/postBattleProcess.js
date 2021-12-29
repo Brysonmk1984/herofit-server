@@ -15,7 +15,8 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
   let o = outcomeData.outcome;
   let xpGain = 0;
   let ptGain = 0;
-
+  let effectProcs;
+  
   return {
     doPostBattleEffects: effects => {
       // assign 'a' variable above the value of avatar, same with 'o'

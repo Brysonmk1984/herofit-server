@@ -7,7 +7,7 @@ const moment = require("moment");
 const utCalc = function (userTotals) {
   const actMap = ACTIVITY_MAP;
   let ut = userTotals;
-  return (utReturn = {
+  const utReturn = {
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
     update: function (activities) {
@@ -68,7 +68,8 @@ const utCalc = function (userTotals) {
       ut = newBlankUt;
       return ut;
     },
-  });
+  };
+  return utReturn;
 };
 
 module.exports = utCalc;

@@ -256,7 +256,7 @@ function _calcProgress(avatar, ut) {
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
 function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
-
+  console.log(aXPDiff);
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
   // Items & PT found during activity
@@ -348,6 +348,10 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
 
       // Determine all progress made with XP, levels, etc.
       let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
+      // Shouldn't happen but throw error if negative xp from activity
+      if(levelInfo.aXPDiff < 0){
+        throw new Error('Negative XP');
+      }
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
       let improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
@@ -367,7 +371,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
 
       // Returns all promise results from itemFind, activityStatRewards, activityLevelRewards
       // Destructures into itemsFromItemFind, rewards, and a possible levelReward (will be undefined unless a user earned a level up)
-      [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] = await _handleAllItemAwarding(avatar.id, improvements, avStatSnapshot, levelInfo, foundItems, t);
+      const [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] = await _handleAllItemAwarding(avatar.id, improvements, avStatSnapshot, levelInfo, foundItems, t);
 
       if (levelRewards) {
         rewards.push(...levelRewards.value);

@@ -5,7 +5,7 @@ const avatarList = require("../../heroList.json");
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
 function avCalc(userTotals) {
-  return (avReturn = {
+  const avReturn = {
     updatePower: function (level, qpPower) {
       // 5 Power per level, plus base, plus how much QP has been spent
       const totalPower = (level - 1) * 5 + qpPower + BASE_POWER;
@@ -194,7 +194,8 @@ function avCalc(userTotals) {
           return { sign: "Capricorn", element: "Earth" };
       }
     },
-  });
+  };
+  return avReturn;
 }
 
 module.exports = avCalc;

@@ -111,7 +111,7 @@ function determineStatImprovements(improvements, snapshot) {
   const statObj = { fire: [], earth: [], water: [], air: [] };
   const statsToCheck = ["fire", "earth", "water", "air"];
 
-  for (stat in improvements) {
+  for (let stat in improvements) {
     if (statsToCheck.includes(stat) && improvements[stat] > 0) {
       statObj[stat] = range(Math.floor(snapshot[stat] + 1), Math.floor(snapshot[stat] + improvements[stat]));
     }
