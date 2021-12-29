@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
-const pathToKey = "./id_rsa_pub.pem";
-const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
+const pathToKey = path.join(__dirname, "id_rsa_pub.pem");
+//const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 const passport = require("passport");
 
 // REPLACES OLD FUNC OF SAME NAME TO WORK WITH THE NEW PASSPORT SETUP
