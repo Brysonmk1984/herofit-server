@@ -7,6 +7,9 @@ pg_upgrade_internal.log
 pg_upgrade_server.log
 pg_upgrade_utility.log
 
+jwt/id_rsa_priv.pem
+jwt/id_rsa_pub.pem
+
 /dbBackups
 /mockData
 build
