@@ -13,7 +13,7 @@
     "prettier": "prettier --check .",
     "lint": "eslint ./**/*.ts",
     "build": "tsc -p tsconfig.json",
-    "heroku-postbuild": "tsc -p tsconfig.json && node build/jwt/generateKeyPair.js && mv -i -v src/patchDetails build/patchDetails && mv -i -v src/heroList.json && rm -v -rf src"
+    "heroku-postbuild": "tsc -p tsconfig.json && node build/jwt/generateKeyPair.js && mv -i -v src/patchDetails build/patchDetails && mv -i -v src/heroList.json build/ && rm -v -rf src"
   },
   "jest": {
     "watchPathIgnorePatterns": [
