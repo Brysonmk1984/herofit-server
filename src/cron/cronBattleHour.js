@@ -1,5 +1,5 @@
 const { Battle } = require("../config/db");
-const { sendCronErrorEmail } = require("../../mail");
+const { sendCronErrorEmail } = require("../mail");
 const runAllBattles = require("../game/battle/runAllBattles");
 
 console.log("*** RUNNING CRON AVATAR BATTLES ***");
