@@ -349,8 +349,8 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
       // Determine all progress made with XP, levels, etc.
       let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
       // Shouldn't happen but throw error if negative xp from activity
-      if(levelInfo.aXPDiff < 0){
-        throw new Error('Negative XP');
+      if (levelInfo.aXPDiff < 0) {
+        throw new Error("Negative XP");
       }
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend

@@ -68,7 +68,7 @@ router.post("/register", body("email").isEmail(), body("firstName").isString(), 
   }
 
   let { email, username, password, firstName, lastName, emailMarketingOptIn, isMetric, foundOutBy, referredBy, isMobileApp } = req.body;
-  fistName = firstName || null;
+  firstName = firstName || null;
   lastName = lastName || null;
   const saltHash = genPassword(password);
   const { salt, hash } = saltHash;

@@ -25,7 +25,7 @@ function cloneObj(obj: ObjectWithAnyProperties, deep = false) {
 }
 
 const shuffleArray = function (array: any[]) {
-  var currentIndex: number = array.length,
+  let currentIndex: number = array.length,
     temporaryValue: number,
     randomIndex: number;
 
@@ -43,7 +43,6 @@ const shuffleArray = function (array: any[]) {
 
   return array;
 };
-
 
 function parseAvatarProperties(avatar, wholeNumbers = false) {
   const attrsToBeParsed = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];

@@ -515,7 +515,8 @@ function doBattle(avatar, foe, goesFirst) {
   let winnerString = null;
   let i;
   let nextRoundIDS = false;
-  let winner, loser = null;
+  let winner,
+    loser = null;
   for (i = 0; i < battleTurns.length; i++) {
     if (winnerString) {
       break;

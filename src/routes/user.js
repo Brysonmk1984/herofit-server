@@ -118,7 +118,7 @@ router.post("/get-user-activities", body("email").isEmail(), body("count").isNum
         const allActDateArray = activities.map(act => moment(act.activityDate));
         // Use latest non manual herofit date for maxDate, or if there are no non-manual activitities, use the OLDEST manual date
         // This way, we're most likely to not miss any activities fetched from dataSrc without doing a more complicated query to look up older non manual activities
-       
+
         const maxDate = nonHerofitDatesArray.length ? moment.utc(moment.max(nonHerofitDatesArray), "YYYY-MM-DD HH:mm:ss") : moment.utc(moment.min(allActDateArray), "YYYY-MM-DD HH:mm:ss");
         res.formatter.ok({ activities, latestActivityDate: maxDate });
       } else {

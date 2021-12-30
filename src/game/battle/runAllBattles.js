@@ -7,7 +7,7 @@ const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard) {
-  console.log('SHARD', shard);
+  console.log("SHARD", shard);
   const allAvatars = shard.map(battle => battle.avatar);
 
   let battlePromises = [];
