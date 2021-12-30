@@ -1,3 +1,6 @@
+import HF from "../types/herofit";
+import { includes } from "../types/typeguards";
+
 interface ObjectWithAnyProperties {
   [key: string]: any;
 }
@@ -44,29 +47,33 @@ const shuffleArray = function (array: any[]) {
   return array;
 };
 
-function parseAvatarProperties(avatar, wholeNumbers = false) {
-  const attrsToBeParsed = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
+// Converts some Hero Properties strom strings to floating point numbers
+function parseAvatarProperties(avatar: ObjectWithAnyProperties, wholeNumbers = false) {
+  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
 
   for (let attr in avatar) {
-    let toBeParsed = attrsToBeParsed.includes(attr);
+    let toBeParsed = attrsToBeParsed.includes(attr as Lowercase<HF.Stat>);
     if (toBeParsed) {
-      avatar[attr] = wholeNumbers ? Math.floor(JSON.parse(avatar[attr]).toFixed(0)) : JSON.parse(avatar[attr]);
+      avatar[attr] = wholeNumbers ? Math.floor(avatar[attr]) : parseFloat(avatar[attr]);
     }
   }
-  return avatar;
+  return avatar as HF.Hero;
 }
 
-function parseActivityData(act) {
-  const propertiesToBeParsed = ["elevationGain", "maxSpeed", "averageSpeed", "duration", "distance"];
+// Convert activity properties which come from the DB as strings to floating point numbers
+function parseActivityData(act: ObjectWithAnyProperties) {
+  const propertiesToBeParsed = ["elevationGain", "maxSpeed", "averageSpeed", "duration", "distance"] as const;
   for (let property in act) {
-    if (propertiesToBeParsed.includes(property) && typeof act[property] !== null) {
-      act[property] = parseFloat(act[property]);
+    type ActDataToBeParsed = typeof propertiesToBeParsed[number];
+    const actProperty = property as ActDataToBeParsed;
+    if (propertiesToBeParsed.includes(actProperty) && typeof act[actProperty] !== null) {
+      act[actProperty] = parseFloat(act[actProperty]);
     }
   }
-  return act;
+  return act as HF.Activity;
 }
 
-function arrayChunker(inputArray, perChunk) {
+function arrayChunker(inputArray: any[], perChunk: number) {
   return inputArray.reduce((resultArray, item, index) => {
     const chunkIndex = Math.floor(index / perChunk);
     if (!resultArray[chunkIndex]) {
@@ -77,41 +84,42 @@ function arrayChunker(inputArray, perChunk) {
   }, []);
 }
 
-function getRandomNumber(length) {
+function getRandomNumber(length: number) {
   return Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1));
 }
 
-const paginate = (query, { page, pageSize }) => {
+const paginate = (query: ObjectWithAnyProperties, { page, pageSize }: { page: number; pageSize: number }) => {
   const offset = page * pageSize;
   const limit = pageSize;
   return { ...query, limit, offset };
 };
 
-function adjustActivityMinutes(minutes, activityType, timeAndHalfActivities) {
-  const isTimeAndHalf = timeAndHalfActivities.includes(activityType);
-  if (isTimeAndHalf) {
+type TimeAndHalfActs = "stairStepper" | "elliptical" | "swim" | "crossfit" | "run";
+function adjustActivityMinutes(minutes: number, activityType: string, timeAndHalfActivities: TimeAndHalfActs[]) {
+  if (includes(timeAndHalfActivities, activityType)) {
     return minutes * 1.5;
   }
+
   return minutes;
 }
 
-function stackItems(allItems) {
-  const stackedItems = [];
+function stackItems(allItems: HF.Item[]) {
+  const stackedItems: HF.Item[] = [];
   allItems.forEach(item => {
     const alreadyIncluded = stackedItems.find(stackedItem => item.name === stackedItem.name);
+
     if (alreadyIncluded) {
       alreadyIncluded.count++;
-    } else {
-      item.count = 1;
-      stackedItems.push(item);
     }
+    item.count = 1;
+    stackedItems.push(item);
   });
 
   return stackedItems;
 }
 
 // Used by The Poltergeist and Octopus to mix up all non zero stats of a hero or foe
-function scrambleStats(possibleStats, objectWithStats) {
+function scrambleStats(possibleStats: Lowercase<HF.Stat>[], objectWithStats: ObjectWithAnyProperties) {
   const stats = possibleStats.filter(stat => {
     if (objectWithStats[stat] > 0) {
       return true;
@@ -119,7 +127,7 @@ function scrambleStats(possibleStats, objectWithStats) {
     return false;
   });
   let modifiedObjectWithStats = { ...objectWithStats };
-  const scrambledStats = {};
+  const scrambledStats: ObjectWithAnyProperties = {};
 
   stats.forEach(stat => {
     const isGreaterThanZero = objectWithStats[stat] > 0;
@@ -137,15 +145,16 @@ function scrambleStats(possibleStats, objectWithStats) {
   return Object.assign({}, modifiedObjectWithStats, scrambledStats);
 }
 
-//to round to n decimal places
-function roundNumber(num, places) {
+// To round to n decimal places
+function roundNumber(num: number, places: number) {
   var multiplier = Math.pow(10, places);
   return Math.round(num * multiplier) / multiplier;
 }
 
-function range(start, end) {
+// Fill out an array that's a range of the passed in start and end numbers
+function range(start: number, end: number) {
   return Array(end - start + 1)
-    .fill()
+    .fill(0)
     .map((_, idx) => start + idx);
 }
 

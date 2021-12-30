@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["herofit", "Procs", "Recaptcha"],
+  "cSpell.words": ["herofit", "Procs", "Recaptcha", "typeguards"],
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

@@ -1,31 +1,32 @@
 {
   "root": true,
-  "extends": ["plugin:import/errors", "plugin:import/warnings", "plugin:import/typescript"],
+  "extends": ["plugin:import/errors", "plugin:import/warnings", "plugin:import/typescript", "airbnb", "airbnb-typescript"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["import", "@typescript-eslint"],
   "env": {
     "node": true,
-    "es2020": true
+    "es2021": true
   },
   "rules": {
     "prefer-destructuring": "off",
     "object-curly-newline": "off",
-    "no-unused-vars": "off",
-    "no-use-before-define": "off",
+    //"no-unused-vars": "off",
+    //"no-use-before-define": "off",
     "no-multiple-empty-lines": "off",
     "no-implicit-globals": 2,
-    "@typescript-eslint/no-explicit-any": "off",
+    //"@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "quotes": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
       {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
+        "js": "always",
+        "ts": "never"
       }
     ]
+  },
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
   }
 }

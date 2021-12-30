@@ -1,7 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run lint
+
 npm run test:precommit auth
 prettier --write . && git add -A .
+#npm run lint
 npm run build
