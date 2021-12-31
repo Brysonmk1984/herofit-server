@@ -15,5 +15,6 @@
     "**/build": true,
     "**/tmp": true
   },
-  "eslint.nodePath": "./node_modules/.bin/eslint"
+  "eslint.nodePath": "./node_modules/.bin/eslint",
+  "eslint.enable": false
 }

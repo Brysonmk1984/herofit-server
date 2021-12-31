@@ -16,12 +16,12 @@
     "no-implicit-globals": 2,
     //"@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "quotes": "off",
+    "quotes": [1, "double"],
     "import/extensions": [
       "error",
       "ignorePackages",
       {
-        "js": "always",
+        "js": "never",
         "ts": "never"
       }
     ]

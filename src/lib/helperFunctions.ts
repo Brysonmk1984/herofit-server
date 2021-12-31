@@ -49,7 +49,7 @@ const shuffleArray = function (array: any[]) {
 
 // Converts some Hero Properties strom strings to floating point numbers
 function parseAvatarProperties(avatar: ObjectWithAnyProperties, wholeNumbers = false) {
-  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
+  const attrsToBeParsed: Lowercase<HFF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
 
   for (let attr in avatar) {
     let toBeParsed = attrsToBeParsed.includes(attr as Lowercase<HF.Stat>);

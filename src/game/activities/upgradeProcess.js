@@ -318,7 +318,6 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
     try {
       // Before inserting activities, do separate db check to remove duplicates
       // This is needed since Sequelize's 'ignoreDuplicates' sucks and doesn't behave as expected
-
       const activityPromiseResults = await _insertActivityData(email, activities, t);
       const promiseStatuses = [activityPromiseResults[0].status, activityPromiseResults[1].status, activityPromiseResults[2].status];
       //console.log('PS=', activityPromiseResults[1]);
