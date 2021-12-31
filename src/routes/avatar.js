@@ -327,10 +327,9 @@ router.post("/fetch-avatars-by-page", body("page").isNumeric(), body("searchInpu
         return r.dataValues;
       });
       const { currentLevelByInput } = xpCalc();
-      //console.log('AR - ', actualRows);
       // Sequelize requires us to loop over the returned data when 'raw : false'
       const avatars = actualRows.map((result, i) => {
-        avatar = parseAvatarProperties(result);
+        const avatar = parseAvatarProperties(result);
         const { level, albedo } = currentLevelByInput(avatar.totalXP);
         avatar.level = level;
         avatar.albedo = albedo;
@@ -425,7 +424,7 @@ router.post("/fetch-avatars-by-page-and-ranking-type", body("rankingType").isIn(
           const pageCount = Math.ceil(avatarCount / AVATAR_COUNT_PER_PAGE);
 
           const avatarsWithRank = avatarsOrderedByActivityDuration.map((result, i) => {
-            avatar = parseAvatarProperties(result);
+            const avatar = parseAvatarProperties(result);
             const { level, albedo } = currentLevelByInput(avatar.totalXP);
             avatar.level = level;
             avatar.albedo = albedo;
@@ -504,7 +503,7 @@ router.post("/fetch-avatars-by-page-and-ranking-type-battle", body("rankingType"
 
       // Sequelize requires us to loop over the returned data when 'raw : false'
       const avatars = actualRows.map((result, i) => {
-        avatar = parseAvatarProperties(result);
+        const avatar = parseAvatarProperties(result);
         const { level, albedo } = currentLevelByInput(avatar.totalXP);
         avatar.level = level;
         avatar.albedo = albedo;

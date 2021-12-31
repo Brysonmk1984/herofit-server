@@ -41,7 +41,7 @@ function preventDuplicateItems(itemsToCheck, avatarId) {
       //console.log('ALL TUP', allAvItemTuple);
       // array of booleans that specify whether the hero already has a particular item
       const arrayOfBooleans = allAvItemTuple.map(tuple => (tuple.length ? true : false));
-
+      //console.log(arrayOfBooleans, itemsToCheck.filter((itemName, i) => arrayOfBooleans[i] === false));
       // Returning valid items to insert that haven't already been earned / found
       return itemsToCheck.filter((itemName, i) => arrayOfBooleans[i] === false);
     })

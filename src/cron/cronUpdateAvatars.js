@@ -16,7 +16,7 @@ Avatar.findAll({
     const allPromises = [];
     // Loop over each avatar and either regen health if recovering or other status effects
     results.forEach(avatar => {
-      avatar = parseAvatarProperties(avatar);
+      const avatar = parseAvatarProperties(avatar);
       let avatarHealth = avatar.health;
       const maxHealth = avatar.maxHealth;
       const recovery = avatar.recovery;

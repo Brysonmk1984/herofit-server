@@ -1,4 +1,4 @@
-const activityHeal = require("../../game/activities/activityHeal");
+const activityHeal = require("../../src/game/activities/activityHeal");
 
 it("Should Heal 180 health up to 480", () => {
   const health = 300;

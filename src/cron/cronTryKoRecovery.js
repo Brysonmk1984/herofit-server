@@ -19,7 +19,7 @@ Avatar.findAll({
     if (results.length) {
       // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
       results.forEach((result, i) => {
-        avatar = parseAvatarProperties(result);
+        const avatar = parseAvatarProperties(result);
         const recovery = avatar.recovery;
         const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
         const recoveredEarly = chance.bool({ likelihood: recoverEarlyChance });
