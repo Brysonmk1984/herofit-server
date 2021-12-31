@@ -1,8 +1,8 @@
 const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate, generateFoeStats } = require("../../game/prebattle/foeFunctions");
-const { calcScenarioBonuses, determineScenario } = require("../../game/battle/scenario");
-const { doAvatarBattlePrep } = require("../../game/battle/doBattlePrep");
-const xpCalc = require("../../game/upgrades/xpCalc");
+const { selectFoeTemplate, generateFoeStats } = require("../../src/game/prebattle/foeFunctions");
+const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
+const { doAvatarBattlePrep } = require("../../src/game/battle/doBattlePrep");
+const xpCalc = require("../../src/game/upgrades/xpCalc");
 
 let randomAv;
 let foeTemplate;

@@ -67,26 +67,24 @@ describe("Load profiles and generate foes from random Profile", () => {
     // MATCH PARTIAL
     expect(foeTemplate).toBeObject();
 
-    // expect(foeWithStats).toMatchObject({
-    //   id: expect.any(Number),
-    //   type: expect.any(String),
-    //   name: expect.any(String),
-    //   ability: expect.objectContaining({
-    //     effect: expect.any(String),
-    //     name: expect.any(String),
-    //     type: expect.any(String)
-    //   }),
-    //   class: expect.any(String),
-    //   health: expect.any(Number),
-    //   power: expect.any(Number),
-    //   armor: expect.any(Number),
-    //   fire: expect.any(Number),
-    //   earth: expect.any(Number),
-    //   water: expect.any(Number),
-    //   air: expect.any(Number),
-    //   difficulty: expect.any(Number),
-    //   level: expect.nullOrAny(Number),
-    // });
+    expect(foeWithStats).toMatchObject({
+      type: expect.any(String),
+      name: expect.any(String),
+      ability: expect.objectContaining({
+        effect: expect.any(String),
+        name: expect.any(String),
+        type: expect.any(String),
+      }),
+      class: expect.any(String),
+      health: expect.any(Number),
+      power: expect.any(Number),
+      armor: expect.any(Number),
+      fire: expect.any(Number),
+      earth: expect.any(Number),
+      water: expect.any(Number),
+      air: expect.any(Number),
+      difficulty: expect.any(Number),
+    });
   });
 });
 
@@ -158,51 +156,20 @@ describe("Do battle setup with random av and generated foe template", () => {
   it("Should run battle with first profile and generated foe", () => {
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-
+    console.log("BB", b);
     // Battle results should look a specific way
     expect(b).toEqual({
       // Make sure totals add up
-      aElmDamage: expect.objectContaining({
-        fire: expect.any(Number),
-        earth: expect.any(Number),
-        water: expect.any(Number),
-        air: expect.any(Number),
-        total: b.aElmDamage.fire + b.aElmDamage.air + b.aElmDamage.water + b.aElmDamage.earth,
-      }),
-      fElmReduction: expect.objectContaining({
-        fire: expect.any(Number),
-        earth: expect.any(Number),
-        water: expect.any(Number),
-        air: expect.any(Number),
-        total: b.fElmReduction.fire + b.fElmReduction.air + b.fElmReduction.water + b.fElmReduction.earth,
-      }),
-      fElmDamage: expect.objectContaining({
-        fire: expect.any(Number),
-        earth: expect.any(Number),
-        water: expect.any(Number),
-        air: expect.any(Number),
-        total: b.fElmDamage.fire + b.fElmDamage.air + b.fElmDamage.water + b.fElmDamage.earth,
-      }),
-      aElmReduction: expect.objectContaining({
-        fire: expect.any(Number),
-        earth: expect.any(Number),
-        water: expect.any(Number),
-        air: expect.any(Number),
-        total: b.aElmReduction.fire + b.aElmReduction.air + b.aElmReduction.water + b.aElmReduction.earth,
-      }),
-      aPhyDamage: expect.any(Number),
-      fPhyReduction: expect.any(Number),
-      fPhyDamage: expect.any(Number),
-      aPhyReduction: expect.any(Number),
+
       aHealthRemaining: expect.any(Number),
       fHealthRemaining: expect.any(Number),
+      level: expect.nullOrAny(Number),
       outcomeData: expect.objectContaining({
         outcome: expect.any(String),
         avatarStatus: expect.any(String),
         foeStatus: expect.any(String),
       }),
       roundBreakdown: expect.any(Array),
-      level: expect.nullOrAny(Number),
     });
   });
 });
