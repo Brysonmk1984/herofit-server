@@ -3,7 +3,7 @@ const { body, validationResult } = require("express-validator");
 const { authenticateJWT } = require("../jwt/validateJWT");
 const router = express.Router();
 const { User } = require("../config/db");
-const { sendDataCollectionEmail, sendSurveyEmail, sendContactEmail, sendAppErrorEmail } = require("../mail.js");
+const { sendDataCollectionEmail, sendSurveyEmail, sendContactEmail, sendAppErrorEmail } = require("../mail");
 
 router.post("/feedback-data", body("email").isEmail(), body("username").isString(), body("title").isString(), body("accountInfo").isObject().optional({ checkFalsy: true }), body("opinion").isString(), body("openResponse").isString(), authenticateJWT, (req, res) => {
   const errors = validationResult(req);

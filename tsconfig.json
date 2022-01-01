@@ -11,7 +11,7 @@
     "strictNullChecks": false,
     "incremental": false,
     "types": ["node"],
-    "lib": ["es6"],
+    "lib": ["es2020"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

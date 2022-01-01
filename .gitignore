@@ -10,6 +10,7 @@ pg_upgrade_utility.log
 jwt/id_rsa_priv.pem
 jwt/id_rsa_pub.pem
 
-/dbBackups
-/mockData
+dbBackups/
+mockData/
+coverage/
 build/

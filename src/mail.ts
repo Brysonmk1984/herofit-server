@@ -1,4 +1,5 @@
-const nodemailer = require("nodemailer");
+import { ObjectWithAnyProperties } from "./types/BackendOnlyTypes";
+import nodemailer from "nodemailer";
 
 // Determines which email to send to, based on environment and whether or not it's coming from the mobile app
 function determineVerificationUrl(env, isMobileApp) {
@@ -129,10 +130,17 @@ const sendSurveyEmail = function (formData, resolve, reject) {
     resolve(nodemailer.getTestMessageUrl(info));
   });
 };
-
-const sendCronErrorEmail = function ({ status, message, debug, meta, version, errorLocation }, resolve, reject) {
+interface SendCronErrorEmailParams {
+  status: number;
+  message: string;
+  version: string;
+  errorLocation: string;
+  meta?: string;
+  debug?: { msg: string; location: string; value: any; param: any }[];
+}
+const sendCronErrorEmail = function ({ status, message, debug, meta, errorLocation }: SendCronErrorEmailParams, resolve: (value: unknown) => void, reject: (reason?: any) => void) {
   const location = errorLocation;
-  let html = `<div>An Error occured in a HeroFit Production CRON JOB- `;
+  let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
   // error status and message
   html += `${status}:  ${message}`;
   let textDebug;
@@ -155,7 +163,7 @@ const sendCronErrorEmail = function ({ status, message, debug, meta, version, er
   }
 
   html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/><div>APP VERSION: ${version}</div>`;
+  html += `<br/><br/><div>BACKEND APP VERSION: ${version}</div>`;
 
   // setup email data with unicode symbols
   let mailOptions = {
@@ -167,7 +175,7 @@ const sendCronErrorEmail = function ({ status, message, debug, meta, version, er
   };
 
   // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
+  return transporter.sendMail(mailOptions, (error: Error, info: ObjectWithAnyProperties) => {
     if (error) {
       reject(error);
     }
@@ -373,14 +381,4 @@ const sendResetPasswordEmail = function (email, code, isMobileApp) {
   });
 };
 
-module.exports = {
-  sendContactEmail,
-  sendDataCollectionEmail,
-  sendSurveyEmail,
-  sendCronErrorEmail,
-  sendAppErrorEmail,
-  sendBattleReportEmail,
-  sendBackendOnlyEmail,
-  sendVerificationEmail,
-  sendResetPasswordEmail,
-};
+export { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendBackendOnlyEmail, sendVerificationEmail, sendResetPasswordEmail };

@@ -66,7 +66,7 @@ describe("Load profiles and generate foes from random Profile", () => {
   it("Should Create a foe from the random avatar", () => {
     // MATCH PARTIAL
     expect(foeTemplate).toBeObject();
-
+    console.log("DIFF", foeTemplate);
     expect(foeWithStats).toMatchObject({
       type: expect.any(String),
       name: expect.any(String),
@@ -163,7 +163,6 @@ describe("Do battle setup with random av and generated foe template", () => {
 
       aHealthRemaining: expect.any(Number),
       fHealthRemaining: expect.any(Number),
-      level: expect.nullOrAny(Number),
       outcomeData: expect.objectContaining({
         outcome: expect.any(String),
         avatarStatus: expect.any(String),

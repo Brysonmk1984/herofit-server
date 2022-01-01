@@ -1,9 +1,7 @@
+import { ObjectWithAnyProperties } from "../types/BackendOnlyTypes";
 import HF from "../types/herofit";
 import { includes } from "../types/typeguards";
 
-interface ObjectWithAnyProperties {
-  [key: string]: any;
-}
 function cloneObj(obj: ObjectWithAnyProperties, deep = false) {
   var result: ObjectWithAnyProperties = {};
   for (let key in obj) {
@@ -158,16 +156,4 @@ function range(start: number, end: number) {
     .map((_, idx) => start + idx);
 }
 
-module.exports = {
-  cloneObj,
-  parseAvatarProperties,
-  parseActivityData,
-  arrayChunker,
-  getRandomNumber,
-  paginate,
-  adjustActivityMinutes,
-  stackItems,
-  scrambleStats,
-  roundNumber,
-  range,
-};
+export { cloneObj, parseAvatarProperties, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range };
