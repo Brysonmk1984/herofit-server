@@ -26,26 +26,26 @@ function resetHero(avatarID, email) {
       const { getCurrentLevel } = xpCalc(activityXP, battleXP);
       const { total: heroLevel } = getCurrentLevel();
 
-      // CALCULATE ATTRIBUTES BASED ON (what should be) the updated XP curve.
-      const { updatePower, updateHealth, updateElements } = avCalc(userTotals);
-      const { fire, earth, water, air } = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
-      const power = updatePower(heroLevel, 0);
+      // CALCULATE ATTRIBUTES BASED ON XP CURVE.
+      const { updatePower, updateHealth, updateAether, updateElements } = avCalc(userTotals);
+      const { fire: updatedFire, earth: updatedEarth, water: updatedWater, air: updatedAir } = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
+      const updatedPower = updatePower(heroLevel, 0);
+      const updatedAether = updateAether(heroLevel, 0);
       const { updatedMaxHealth, updatedHealth } = updateHealth(heroLevel, 0, health, maxHealth, "rested", false, true);
 
       return {
-        power,
+        power: updatedPower,
         health: updatedHealth,
         maxHealth: updatedMaxHealth,
-        fire,
-        earth,
-        water,
-        air,
+        fire: updatedFire,
+        earth: updatedEarth,
+        water: updatedWater,
+        air: updatedAir,
+        aether: updatedAether,
         heroLevel,
       };
     })
-    .then(({ power, health, maxHealth, fire, earth, water, air, heroLevel }) => {
-      //const theGoods = {power, health,  maxHealth,  fire, earth, water, air};
-      //console.log('THE GS', theGoods);
+    .then(({ power, health, maxHealth, fire, earth, water, air, aether, heroLevel }) => {
       const updatedAttributes = {
         /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */
         /* +5 Signup bonus, +5 Strava Bonus */
@@ -58,6 +58,7 @@ function resetHero(avatarID, email) {
         earth,
         air,
         water,
+        aether,
         qpPower: 0,
         qpHealth: 0,
         qpArmor: 0,
@@ -66,6 +67,7 @@ function resetHero(avatarID, email) {
         qpEarth: 0,
         qpAir: 0,
         qpWater: 0,
+        qpAether: 0,
         // Need to change health of avatar if it's over the amount of the new maxHealth
         health: health > maxHealth ? maxHealth : health,
       };

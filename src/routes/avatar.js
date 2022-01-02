@@ -135,6 +135,7 @@ router.post("/update-avatar-stats", body("avatar").isObject(), body("email").isE
         earth: [Math.floor(avatar.earth)],
         water: [Math.floor(avatar.water)],
         air: [Math.floor(avatar.air)],
+        aether: [Math.floor(avatar.aether)],
       };
 
       // if player hits a certain award based on stat level, award them the item
