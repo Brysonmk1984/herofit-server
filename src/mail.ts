@@ -138,7 +138,7 @@ interface SendCronErrorEmailParams {
   meta?: string;
   debug?: { msg: string; location: string; value: any; param: any }[];
 }
-const sendCronErrorEmail = function ({ status, message, debug, meta, errorLocation }: SendCronErrorEmailParams, resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+const sendCronErrorEmail = async function ({ status, message, debug, meta, errorLocation }: SendCronErrorEmailParams) {
   const location = errorLocation;
   let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
   // error status and message
@@ -163,24 +163,22 @@ const sendCronErrorEmail = function ({ status, message, debug, meta, errorLocati
   }
 
   html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/><div>BACKEND APP VERSION: ${version}</div>`;
+  html += `<br/><br/><div>BACKEND APP VERSION: ${process.env.VERSION}</div>`;
 
   // setup email data with unicode symbols
   let mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
-    subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`,
-    text: `An Error occured in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ""} \n \n ${meta ? meta : ""} Error Location: ${location} \n\n APP VERSION: ${version}`,
+    subject: `HEROFIT - ${status} APPLICATION ERROR - version ${process.env.VERSION}`,
+    text: `An Error occurred in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ""} \n \n ${meta ? meta : ""} Error Location: ${location} \n\n APP VERSION: ${process.env.VERSION}`,
     html,
   };
-
-  // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error: Error, info: ObjectWithAnyProperties) => {
-    if (error) {
-      reject(error);
-    }
-    resolve(nodemailer.getTestMessageUrl(info));
-  });
+  try {
+    // send mail with defined transport object
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
 };
 
 // ERRORS are always sent from frontend

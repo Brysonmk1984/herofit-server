@@ -7,14 +7,12 @@ import { parseAvatarProperties } from "../lib/helperFunctions";
 
 console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
-// Update all heroes who aren't at full health and aren't Knocked Out
-Avatar.findAll({
-  where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } },
-  raw: true,
-  attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"],
-})
-  .then((results: HF.Hero[]) => {
+(async () => {
+  try {
+    // Update all heroes who aren't at full health and aren't Knocked Out
+    const results: HF.Hero[] = await Avatar.findAll({ where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } }, raw: true, attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"] });
     const allPromises: Promise<any>[] = [];
+
     // Loop over each hero and either regen health if recovering or other status effects
     results.forEach((hero: HF.Hero) => {
       hero = parseAvatarProperties(hero);
@@ -83,27 +81,18 @@ Avatar.findAll({
         ),
       );
     });
-    return Promise.allSettled(allPromises);
-  })
-  .then(() => {
-    return process.exit();
-  })
-  .catch((error: Error) => {
+    await Promise.allSettled(allPromises);
+    process.exit();
+  } catch (error) {
     console.log("ERROR DOING BULK HEALTH UPDATE", error);
-    return new Promise((resolve, reject) => {
-      return sendCronErrorEmail(
-        {
-          status: 500,
-          message: error.message,
-          meta: "Error running Cron Update Avatar Script",
-          errorLocation: "Cron Script",
-          version: process.env.VERSION,
-        },
-        resolve,
-        reject,
-      );
-    }).catch(error => {
-      console.log("couldn't send error email for UPDATE AVATAR CRON - ", error);
-      process.exit();
+
+    await sendCronErrorEmail({
+      status: 500,
+      message: error.message,
+      meta: "Error running Cron Update Avatar Script",
+      errorLocation: "Cron Script",
+      version: process.env.VERSION,
     });
-  });
+    process.exit();
+  }
+})();
