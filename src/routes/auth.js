@@ -9,7 +9,7 @@ const { config } = require("../appConfig");
 const latestPatchDetails = require("../patchDetails/latest.json");
 const { genPassword, validatePassword } = require("../lib/passwordUtils");
 const { randomEmailString, usePasswordHashToMakeToken } = require("../lib/passwordUtils");
-const { sendVerificationEmail, sendResetPasswordEmail, sendCronErrorEmail, sendBackendOnlyEmail } = require("../mail");
+const { sendVerificationEmail, sendResetPasswordEmail, sendBackendOnlyEmail } = require("../mail");
 const axios = require("axios");
 
 // mobile app only
@@ -211,7 +211,7 @@ router.post("/reset-password", body("email").isEmail(), body("token").isString()
     .catch(error => {
       console.log("ERRROR", error);
       return new Promise((resolve, reject) => {
-        return sendCronErrorEmail(
+        return sendBackendOnlyEmail(
           {
             status: 777,
             message: `USER = ${email} Couldn't reset password`,

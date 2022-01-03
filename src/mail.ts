@@ -292,7 +292,7 @@ const sendBattleReportEmail = function (tally) {
 };
 
 // BACKEND ONLY ERRORS
-const sendBackendOnlyEmail = function (message, error) {
+const sendBackendOnlyEmail = function (message : string, error : string | Error) {
   return new Promise((resolve, reject) => {
     // setup email data with unicode symbols
     let mailOptions = {

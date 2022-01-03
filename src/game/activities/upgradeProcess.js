@@ -11,7 +11,7 @@ const xpCalc = require("../upgrades/xpCalc");
 const { activityItemFind, insertItemsFromItemFind } = require("./activityItemFind");
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("./activityRewards");
 const activityHeal = require("./activityHeal");
-const { sendCronErrorEmail } = require("../../mail");
+const { sendBackendOnlyEmail } = require("../../mail");
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
 function _determineActivityId(id, source) {
@@ -323,15 +323,12 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
       //console.log('PS=', activityPromiseResults[1]);
 
       if (promiseStatuses.includes("rejected")) {
-        sendCronErrorEmail({
-          status: 888,
+        const activityInsertionError = new Error("Activity Insertion Failed");
+        sendBackendOnlyEmail({
           message: `USER = ${email} failed an upgrade`,
-          debug: [],
-          meta: JSON.stringify(activityPromiseResults[1]),
-          version: "888",
-          errorLocation: "backend - upgradeProcess",
+          error: activityInsertionError
         });
-        throw new Error("Activity Insertion Failed");
+        throw activityInsertionError;
       }
 
       const updatedActivities = activityPromiseResults[1].value.map(actResult => {

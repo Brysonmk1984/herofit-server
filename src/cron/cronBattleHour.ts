@@ -8,7 +8,7 @@ console.log("*** RUNNING CRON AVATAR BATTLES ***");
 // RUN ALL BATTLES VIA HEROKU CRON
 
 (async () => {
-  try {
+  try {  
     const battles: PreBattleObject[] = await Battle.findAll({ where: { outcome: "TBD" }, raw: true });
     await runAllBattles(battles, true);
     console.log("cronBattleHour successfully ran");

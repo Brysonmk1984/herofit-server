@@ -6,7 +6,7 @@ const config = {
   specialEvent: appWelcome,
 
   globalMessage: [
-    //{ type : 'success', persist : false, message : "The HeroFit mobile app is available in the App & Play store! Try it out if you haven't already!" },
+    { type : 'info', persist : false, message : "Refer a friend, earn a Phoenix! Learn more here.", link:"https://herofit.io/signup-rewards" },
     //{ type : 'info', persist : false, message : "You can now donate CAKE :)", persist : true }
   ],
 };
