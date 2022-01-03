@@ -326,7 +326,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
         const activityInsertionError = new Error("Activity Insertion Failed");
         sendBackendOnlyEmail({
           message: `USER = ${email} failed an upgrade`,
-          error: activityInsertionError
+          error: activityInsertionError,
         });
         throw activityInsertionError;
       }

@@ -146,6 +146,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
         });
         break;
       case "Foe -10|-3% Health":
+      case "Foe -10|3% Health":
         const threePercentHealth = Math.floor(eFoe.health * 0.03);
         eFoe.health -= threePercentHealth > 10 ? threePercentHealth : 10;
         effectProcs.push({

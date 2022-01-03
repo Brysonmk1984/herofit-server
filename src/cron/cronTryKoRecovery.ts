@@ -10,7 +10,7 @@ const chance = chanceInit();
 console.log("*** RUNNING CRON REVIVE ATTEMPT ***");
 
 (async () => {
-  try {    throw new Error('FAIL!')
+  try {
     // Get all avatars who are KOed
     const results: HF.Hero[] = await Avatar.findAll({ where: { status: "Knocked Out" }, raw: true, attributes: ["health", "recovery", "status", "owner"] });
     console.log("all KO revive results - ", results);

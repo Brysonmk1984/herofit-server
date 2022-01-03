@@ -6,7 +6,7 @@ const config = {
   specialEvent: appWelcome,
 
   globalMessage: [
-    { type : 'info', persist : false, message : "Refer a friend, earn a Phoenix! Learn more here.", link:"https://herofit.io/signup-rewards" },
+    { type: "info", persist: false, message: "Refer a friend, earn a Phoenix! Learn more here.", link: "https://herofit.io/signup-rewards" },
     //{ type : 'info', persist : false, message : "You can now donate CAKE :)", persist : true }
   ],
 };
