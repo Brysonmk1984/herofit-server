@@ -180,8 +180,8 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
         }
 
         if (illOmenProc) {
-          eAvatar.health = Math.floor(avatar.health * 1.25);
-          eAvatar.air = Math.floor(avatar.air * 1.25);
+          eAvatar.health = Math.floor(eAvatar.health * 1.25);
+          eAvatar.air = Math.floor(eAvatar.air * 1.25);
           effectProcs.push({
             effect: "Ill Omen",
             heroStatsEffected: ["health", "air"],

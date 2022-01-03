@@ -7,7 +7,7 @@ const PRIV_KEY = fs.readFileSync(pathToKey, "utf8");
 
 function issueJWT(user) {
   // Frontend expects 'd' for days
-  const expiresIn = "14d";
+  const expiresIn = "21d";
   const payload = {
     sub: user.id,
     email: user.email,

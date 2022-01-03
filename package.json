@@ -13,7 +13,7 @@
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts",
     "build": "tsc-silent -p tsconfig.json --suppress @",
-    "heroku-postbuild": "tsc-silent -p tsconfig.json --suppress @ && node build/jwt/generateKeyPair.js && rm -v -rf src"
+    "heroku-postbuild": "tsc-silent -p tsconfig.json --suppress @ && mv src/jwt/id_rsa_priv.pem build/jwt/id_rsa_priv.pem && mv src/jwt/id_rsa_pub.pem build/jwt/id_rsa_pub.pem && rm -v -rf src"
   },
   "jest": {
     "watchPathIgnorePatterns": [
