@@ -112,35 +112,28 @@ router.post("/contact-form", body("email").isEmail(), body("feedbackType").isStr
 });
 
 // Works for 50x, 40x, and 999 errors... should be everything
-router.post("/app-error", body("status").isNumeric(), body("message").isString(), body("debug").isArray().optional({ checkFalsy: true }), body("version").isString(), body("accountInfo").isObject().optional({ checkFalsy: true }), (req, res) => {
+router.post("/app-error", body("status").isNumeric(), body("message").isString(), body("debug").isArray().optional({ checkFalsy: true }), body("version").isString(), body("accountInfo").isObject().optional({ checkFalsy: true }), async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /app-error");
   }
-
   const { status, message, debug, version, accountInfo, errorLocation, meta } = req.body;
-  console.log(status, message, debug, version, accountInfo, errorLocation, meta);
-  new Promise((resolve, reject) => {
-    sendAppErrorEmail(
-      {
-        status,
-        message,
-        debug,
-        version,
-        errorLocation,
-        meta,
-        accountInfo: accountInfo || "User not logged in.",
-      },
-      resolve,
-      reject,
-    );
-  })
-    .then(data => {
-      res.formatter.ok(data);
-    })
-    .catch(error => {
-      res.formatter.serverError(error.toString(), `Email could not be sent - /app-error endpoint`);
+
+  try {
+    await sendAppErrorEmail({
+      status,
+      message,
+      debug,
+      version,
+      errorLocation,
+      meta,
+      accountInfo,
     });
+    res.formatter.ok();
+  } catch (error) {
+    console.log("Error sending App Error Email - ", error);
+    res.formatter.serverError(error.toString(), `Email could not be sent - /app-error endpoint`);
+  }
 });
 
 module.exports = router;

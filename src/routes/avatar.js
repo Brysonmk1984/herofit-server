@@ -111,7 +111,7 @@ router.post("/insert-avatar", body("avatar").isObject(), body("userId").isNumeri
           });
         }
       } catch (error) {
-        sendBackendOnlyEmail("Major Error in user signup, and User didnt get destroryed", error.toString());
+        sendBackendOnlyEmail("Major Error in user signup, and User didnt get destroryed", error);
         return res.formatter.serverError(error.toString(), `There was a problem creating your account, try again later.`);
       }
     })();

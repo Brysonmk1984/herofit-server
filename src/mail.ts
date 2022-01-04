@@ -181,14 +181,28 @@ const sendCronErrorEmail = async function ({ status, message, debug, meta, error
   }
 };
 
+interface FrontEndErrorData {
+  debug: any[] | string;
+  meta: string | null;
+  status: number | null;
+  version: number;
+  location: "frontend";
+  message: "string";
+  accountInfo: {
+    username: string | undefined;
+    email: string | undefined;
+    firstName: string | undefined;
+  };
+}
+
 // ERRORS are always sent from frontend
 // Backend errors are using the sendBackendOnlyEmail
-const sendAppErrorEmail = function (formData, resolve, reject) {
+const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> {
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
-  const status = formData.status || formData.name;
+  const status = formData.status;
   const version = formData.version || "Release";
-  const location = formData.errorLocation;
+  const location = "frontend";
   const message = formData.message;
   const accountInfo = formData.accountInfo;
   let html = `<div>An Error occured in HeroFit Production - `;
@@ -221,11 +235,11 @@ const sendAppErrorEmail = function (formData, resolve, reject) {
   html += `<br/><br/> Error Location: ${location}`;
   html += `<br/><br/> Message to User: ${message}`;
 
-  if (accountInfo) {
-    html += `<br/><br/>`;
-    html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`;
-  } else {
+  if (!accountInfo.email) {
     html += `<br/><br/><p>User not logged in.</p>`;
+  } else {
+    html += `<br/><br/>`;
+    html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo?.firstName} </div></div>`;
   }
   html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
@@ -234,17 +248,19 @@ const sendAppErrorEmail = function (formData, resolve, reject) {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
     subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`,
-    text: `An Error occured in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
+    text: `An Error occurred in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
     html,
   };
 
   // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log("mail error - ", error);
-      reject(error);
-    }
-    resolve(nodemailer.getTestMessageUrl(info));
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("mail error - ", error);
+        reject(error);
+      }
+      resolve();
+    });
   });
 };
 
@@ -292,7 +308,7 @@ const sendBattleReportEmail = function (tally) {
 };
 
 // BACKEND ONLY ERRORS
-const sendBackendOnlyEmail = function (message: string, error: string | Error) {
+const sendBackendOnlyEmail = function (message: string, error: string | Error): Promise<void> {
   return new Promise((resolve, reject) => {
     // setup email data with unicode symbols
     let mailOptions = {
@@ -311,7 +327,7 @@ const sendBackendOnlyEmail = function (message: string, error: string | Error) {
       if (error) {
         reject(error);
       }
-      resolve(nodemailer.getTestMessageUrl(info));
+      resolve();
     });
   });
 };
