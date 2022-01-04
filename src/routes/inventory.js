@@ -57,7 +57,6 @@ router.post("/fetch-avatar-inventory", body("avatarID").isNumeric(), authenticat
         }
       });
       inventoryObj.consumables = stackItems(inventoryObj.consumables);
-
       res.formatter.ok(inventoryObj, "Successfully ran /fetch-avatar-inventory");
     })
     .catch(error => {

@@ -104,13 +104,14 @@ function adjustActivityMinutes(minutes: number, activityType: string, timeAndHal
 function stackItems(allItems: HF.Item[]) {
   const stackedItems: HF.Item[] = [];
   allItems.forEach(item => {
-    const alreadyIncluded = stackedItems.find(stackedItem => item.name === stackedItem.name);
+    const alreadyIncludedItem = stackedItems.find(stackedItem => item.name === stackedItem.name);
 
-    if (alreadyIncluded) {
-      alreadyIncluded.count++;
+    if (alreadyIncludedItem) {
+      alreadyIncludedItem.count++;
+    } else {
+      item.count = 1;
+      stackedItems.push(item);
     }
-    item.count = 1;
-    stackedItems.push(item);
   });
 
   return stackedItems;
