@@ -127,7 +127,7 @@ describe("Snake effects should correctly modify stats", () => {
       console.log("LETHAL SURPRISE PROC", foe.health, sFoe.health);
       expect(foe.health).toBe(1);
     } else {
-      expect(foe.health).toBeOneOf([sFoe.health * 0.97, sFoe.health - 10]);
+      expect(foe.health).toBeOneOf([sFoe.health - Math.floor(sFoe.health * 0.03), sFoe.health - 10]);
     }
   });
 });
