@@ -15,6 +15,7 @@ const axios = require("axios");
 // mobile app only
 const heroList = require("../heroList.json");
 const crypto = require("crypto");
+const { Op } = require("sequelize");
 
 router.post("/login", body("email").isEmail(), body("password").isString({ min: 8, max: 25 }), (req, res) => {
   const errors = validationResult(req);
@@ -27,7 +28,7 @@ router.post("/login", body("email").isEmail(), body("password").isString({ min: 
   }
   const { email, password } = req.body;
 
-  User.findOne({ where: { email }, raw: true })
+  User.findOne({ where: { email: { [Op.iLike]: email } }, raw: true })
     .then(user => {
       if (!user) {
         return res.formatter.unauthorized(`Couldn't find a user with that email.`);
