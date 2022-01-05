@@ -1,6 +1,6 @@
 {
   "root": true,
-  "extends": ["plugin:import/errors", "plugin:import/warnings", "plugin:import/typescript", "airbnb", "airbnb-typescript"],
+  "extends": ["plugin:import/errors", "plugin:import/warnings", "plugin:import/typescript", "airbnb", "airbnb-typescript", "prettier"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["import", "@typescript-eslint"],
   "env": {
