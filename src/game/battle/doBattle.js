@@ -69,10 +69,11 @@ function _determineElmMatchups(elm) {
 }
 
 function _calcElementDamage(attacker, receiver, evaded) {
-  console.log(attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log("FULL RECEIVER", receiver);
+  // console.log(attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  // console.log(attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  // console.log(attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  // console.log(attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
   // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms = {
     fire: Math.ceil(
@@ -104,7 +105,7 @@ function _calcElementDamage(attacker, receiver, evaded) {
       }),
     ),
   };
-  console.log("receiver");
+  console.log("receiver", "receiverAIR", receiver.air);
   console.log(receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
   console.log(receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
   console.log(receiver.water * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
