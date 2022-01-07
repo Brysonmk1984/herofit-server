@@ -3,6 +3,6 @@
 
 
 npm run test:precommit **/{auth,activityTraits,itemFind,itemRewards,battles}/*.test.js
-#prettier --write . && git add -A .
+prettier --write . && git add -A .
 #npm run lint
 npm run build

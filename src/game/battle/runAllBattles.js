@@ -40,7 +40,7 @@ async function runAllBattles(battles, sendReport) {
 
   try {
     const battlesResults = await new Promise(resolve => staggerBattleBatches(resolve));
-    console.log("BATTLES RAN!", battlesResults);
+    console.log("BATTLES RAN!", battlesResults.length);
 
     // If there's an error in the battle processing, throw error before trying to calculate totals
     if (battlesResults.length && battlesResults[0].value instanceof Error) {

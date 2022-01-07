@@ -69,11 +69,6 @@ function _determineElmMatchups(elm) {
 }
 
 function _calcElementDamage(attacker, receiver, evaded) {
-  console.log("FULL RECEIVER", receiver);
-  // console.log(attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  // console.log(attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  // console.log(attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  // console.log(attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
   // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms = {
     fire: Math.ceil(
@@ -105,11 +100,7 @@ function _calcElementDamage(attacker, receiver, evaded) {
       }),
     ),
   };
-  console.log("receiver", "receiverAIR", receiver.air);
-  console.log(receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(receiver.water * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
-  console.log(receiver.air * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
+
   const receiverElms = {
     fire: Math.ceil(
       chance.floating({
@@ -237,7 +228,6 @@ function _calcElementDamage(attacker, receiver, evaded) {
 
 // Calculates damage done against an element's counter element (F on E)
 function _calcArmorDR(aPower, rArmor) {
-  console.log("aPower", aPower, "rArmor", rArmor);
   let d = aPower;
   let r = rArmor;
   if (r === 0) {
@@ -257,16 +247,12 @@ function _calcDamage(aPower, rArmor, evaded) {
   }
   const lowEnd = aPower * DAMAGE_VARIANCE_RANGE[0];
   const highEnd = aPower * DAMAGE_VARIANCE_RANGE[1];
-  console.log("POwer-", { min: lowEnd, max: highEnd, fixed: 2 });
+
   const power = chance.floating({ min: lowEnd, max: highEnd, fixed: 2 });
 
   const lowEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[0];
   const highEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[1];
-  console.log("armor-", {
-    min: lowEndArmor,
-    max: highEndArmor,
-    fixed: 2,
-  });
+
   const armor = chance.floating({
     min: lowEndArmor,
     max: highEndArmor,
@@ -328,7 +314,7 @@ function _calcHealthLoss(health, damage) {
 function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals) {
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
-  console.log('AGG=', aggressor, 'DEF', defender)
+
   // IF AVATAR ROUND
   if (aggressorString === "Avatar") {
     // Calc physical damage, get back damage done and how much was prevented
@@ -509,8 +495,8 @@ function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesF
 }
 
 function doBattle(avatar, foe, goesFirst) {
-  console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
-  console.log(avatar);
+  //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
+
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
