@@ -328,7 +328,7 @@ function _calcHealthLoss(health, damage) {
 function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals) {
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
-
+  console.log('AGG=', aggressor, 'DEF', defender)
   // IF AVATAR ROUND
   if (aggressorString === "Avatar") {
     // Calc physical damage, get back damage done and how much was prevented
@@ -510,7 +510,7 @@ function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesF
 
 function doBattle(avatar, foe, goesFirst) {
   console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
-
+  console.log(avatar);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
