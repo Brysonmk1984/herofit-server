@@ -237,6 +237,7 @@ function _calcElementDamage(attacker, receiver, evaded) {
 
 // Calculates damage done against an element's counter element (F on E)
 function _calcArmorDR(aPower, rArmor) {
+  console.log("aPower", aPower, "rArmor", rArmor);
   let d = aPower;
   let r = rArmor;
   if (r === 0) {
@@ -508,7 +509,7 @@ function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesF
 }
 
 function doBattle(avatar, foe, goesFirst) {
-  //console.log('AV IN BATTLE=', avatar.name, 'GF=', goesFirst);
+  console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
 
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
