@@ -1,4 +1,4 @@
-let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, POWER_PER_LEVEL, MAX_HEALTH_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD, MAX_LEVEL } = require("../CONSTANTS.js");
+let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, POWER_PER_LEVEL, MAX_HEALTH_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD, MAX_LEVEL, AETHER_PER_ALBEDO_LEVEL } = require("../CONSTANTS.js");
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
 function xpCalc(activityXP, battleXP) {
@@ -57,6 +57,7 @@ function xpCalc(activityXP, battleXP) {
       const qpEarned = levelsGained * QP_PER_LEVEL;
       const maxHealthEarned = levelsGained * MAX_HEALTH_PER_LEVEL;
       const powerEarned = levelsGained * POWER_PER_LEVEL;
+      const aetherEarned = endingLevel > 100 ? levelsGained * AETHER_PER_ALBEDO_LEVEL : 0;
 
       //console.log('XPSTUFF - ', xpGained, startingLevel, endingLevel, levelsGained, leveledUp, qpEarned);
       return {
@@ -66,6 +67,7 @@ function xpCalc(activityXP, battleXP) {
         qpEarned,
         maxHealthEarned,
         powerEarned,
+        aetherEarned,
         startingLevel,
       };
     },

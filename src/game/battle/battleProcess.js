@@ -93,7 +93,7 @@ function battleProcess(battleInstance, avatarInstance) {
         //console.log('in here', latestSavedAv);
         const { checkLevelUp } = xpCalc(latestSavedAv.activityXP, latestSavedAv.battleXP);
         // Check if level up from xp gain, adjust qp, maxHealth, power
-        const { leveledUp, qpEarned, maxHealthEarned, powerEarned } = checkLevelUp(xpGain);
+        const { leveledUp, qpEarned, maxHealthEarned, powerEarned, aetherEarned } = checkLevelUp(xpGain);
 
         // Combine latest saved av with the updates from the latest battle. If avatar earned level up during battle, those values will be saved
         const combinedAv = leveledUp
@@ -106,6 +106,7 @@ function battleProcess(battleInstance, avatarInstance) {
                 qp: latestSavedAv.qp + qpEarned,
                 power: latestSavedAv.power + powerEarned,
                 maxHealth: latestSavedAv.maxHealth + maxHealthEarned,
+                aether: latestSavedAv.aether + aetherEarned,
               },
               {
                 health: avatarBattleUpdates.status === "Infected" ? avatarBattleUpdates.health : latestSavedAv.maxHealth + maxHealthEarned,

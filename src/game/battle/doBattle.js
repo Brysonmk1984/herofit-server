@@ -69,6 +69,10 @@ function _determineElmMatchups(elm) {
 }
 
 function _calcElementDamage(attacker, receiver, evaded) {
+  console.log(attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(attacker.water * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(attacker.air * ELM_DAMAGE_VARIANCE_RANGE[0], attacker.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
   // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms = {
     fire: Math.ceil(
@@ -100,6 +104,11 @@ function _calcElementDamage(attacker, receiver, evaded) {
       }),
     ),
   };
+  console.log("receiver");
+  console.log(receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.fire * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.earth * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(receiver.water * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.water * ELM_DAMAGE_VARIANCE_RANGE[1]);
+  console.log(receiver.air * ELM_DAMAGE_VARIANCE_RANGE[0], receiver.air * ELM_DAMAGE_VARIANCE_RANGE[1]);
   const receiverElms = {
     fire: Math.ceil(
       chance.floating({
@@ -246,10 +255,16 @@ function _calcDamage(aPower, rArmor, evaded) {
   }
   const lowEnd = aPower * DAMAGE_VARIANCE_RANGE[0];
   const highEnd = aPower * DAMAGE_VARIANCE_RANGE[1];
+  console.log("POwer-", { min: lowEnd, max: highEnd, fixed: 2 });
   const power = chance.floating({ min: lowEnd, max: highEnd, fixed: 2 });
 
   const lowEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[0];
   const highEndArmor = rArmor * DAMAGE_VARIANCE_RANGE[1];
+  console.log("armor-", {
+    min: lowEndArmor,
+    max: highEndArmor,
+    fixed: 2,
+  });
   const armor = chance.floating({
     min: lowEndArmor,
     max: highEndArmor,
@@ -591,7 +606,7 @@ function doBattle(avatar, foe, goesFirst) {
 
   const outcomeData = _determineOutcome(winnerString);
   //console.log('RB=', roundBreakdown, outcomeData);
-  console.log("AV LEVEL", avatar.level);
+  //console.log("AV LEVEL", avatar.level);
   const results = {
     aHealthRemaining: grandTotals.avHealthRemaining,
     fHealthRemaining: grandTotals.foeHealthRemaining,
