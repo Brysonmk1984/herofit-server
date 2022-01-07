@@ -295,8 +295,10 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
         const naturalLogOfLevel = Math.log(avatarLevel);
         const RABBIT_TACTICS_MODIFIER = (naturalLogOfLevel * avatarLevel) / 10;
 
-        eAvatar.power = Math.floor(eAvatar.power + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER) || eAvatar.power;
-        eAvatar.air = Math.floor(eAvatar.air + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER) || eAvatar.air;
+        const powerBeforeFiniteCheck = Math.floor(eAvatar.power + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER);
+        eAvatar.power = isFinite(powerBeforeFiniteCheck) ? powerBeforeFiniteCheck : eAvatar.power;
+        const airBeforeFiniteCheck = Math.floor(eAvatar.air + (conversionBonus * avatarLevel) / RABBIT_TACTICS_MODIFIER);
+        eAvatar.air = isFinite(airBeforeFiniteCheck) ?  airBeforeFiniteCheck : eAvatar.air;
 
         effectProcs.push({
           effect: "Rabbit Tactics",
