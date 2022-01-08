@@ -106,7 +106,7 @@ function healCompletely(avatarID) {
 
 // Antidote Potion
 function removeInfected(avatarID) {
-  return Avatar.update({ status: "Recovering" }, { where: { id: avatarID }, returning: true })
+  return Avatar.update({ status: "Recovering", statusFade: 0 }, { where: { id: avatarID }, returning: true })
     .then(data => {
       //RETURN UPDATED AVATAR
       return data[1][0];

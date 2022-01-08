@@ -27,19 +27,25 @@ async function runAllBattles(battles, sendReport) {
 
   // Delay each shard by 6 seconds
   // Currently needed to work around the connection limit error on Heroku Postgres
-  function staggerBattleBatches(resolve) {
-    setTimeout(() => {
-      allBattleShardPromises.push(_runBattlesOnBatch(battleShards[i]));
-      i++;
-      if (i < battleShards.length) {
-        return staggerBattleBatches(resolve);
-      }
-      resolve(Promise.allSettled(allBattleShardPromises));
-    }, BATCH_TIMEOUT);
+  function staggerBattleBatches() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          allBattleShardPromises.push(_runBattlesOnBatch(battleShards[i]));
+          i++;
+          if (i < battleShards.length) {
+            staggerBattleBatches();
+          }
+          resolve(Promise.allSettled(allBattleShardPromises));
+        } catch (error) {
+          reject(error);
+        }
+      }, BATCH_TIMEOUT);
+    });
   }
 
   try {
-    const battlesResults = await new Promise(resolve => staggerBattleBatches(resolve));
+    const battlesResults = await staggerBattleBatches();
     console.log("BATTLES RAN!", battlesResults.length);
 
     // If there's an error in the battle processing, throw error before trying to calculate totals

@@ -60,6 +60,7 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
           } else if (hero.status !== "Infected") {
             heroStatus = "Recovering";
           }
+
           break;
         default:
           break;
