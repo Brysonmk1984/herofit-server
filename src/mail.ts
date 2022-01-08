@@ -138,7 +138,7 @@ interface SendCronErrorEmailParams {
   meta?: string;
   debug?: { msg: string; location: string; value: any; param: any }[];
 }
-const sendCronErrorEmail = async function ({ status, message, debug, meta, errorLocation }: SendCronErrorEmailParams) {
+const sendCronErrorEmail = async function ({ status, message, errorLocation, debug, meta }: SendCronErrorEmailParams) {
   const location = errorLocation;
   let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
   // error status and message

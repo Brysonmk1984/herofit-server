@@ -10,6 +10,7 @@ const { selectFoeTemplate, generateFoeStats } = require("../game/prebattle/foeFu
 const { determinePostBattleActions } = require("../game/prebattle/onGoToBattle");
 const runAllBattles = require("../game/battle/runAllBattles");
 const ALLPBAs = require("../game/postBattleActions.json");
+const { sendCronErrorEmail } = require("../mail");
 const chance = require("chance")();
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
@@ -273,6 +274,13 @@ router.get("/run-all-battles", authenticateAdminJWT, (req, res) => {
     })
     .catch(error => {
       console.log("ERROR - GET /run-all-battles", error);
+      sendCronErrorEmail({
+        status: 500,
+        message: error.message,
+        meta: "Error running Cron Battle Hour Script",
+        errorLocation: "mockCronEndpoints simulating Cron Script",
+        version: process.env.VERSION,
+      });
     });
 });
 
