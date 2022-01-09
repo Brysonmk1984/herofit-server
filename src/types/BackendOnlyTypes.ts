@@ -1,5 +1,7 @@
 import HF from "./herofit";
 
+type NodeEnvironments = "development" | "staging" | "production" | "test";
+
 interface ObjectWithAnyProperties {
   [key: string]: any;
 }
@@ -38,4 +40,10 @@ interface GeneratedFoe {
   difficulty: number;
 }
 
-export { ObjectWithAnyProperties, PreBattleObject };
+interface BasicUserContactInfo {
+  username: string;
+  firstName: string | undefined;
+  email: string;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo };

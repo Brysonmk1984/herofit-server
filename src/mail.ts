@@ -1,11 +1,9 @@
-import { ObjectWithAnyProperties } from "./types/BackendOnlyTypes";
 import nodemailer from "nodemailer";
+import { BasicUserContactInfo, NodeEnvironments } from "./types/BackendOnlyTypes";
+import { includesBasicUserInfo } from "./types/typeguards";
 
 // Determines which email to send to, based on environment and whether or not it's coming from the mobile app
-function determineVerificationUrl(env, isMobileApp) {
-  console.log("determineVerificationUrl", env, isMobileApp);
-  //TEST=
-  //env="production";
+function determineVerificationUrl(env: NodeEnvironments, isMobileApp: boolean) {
   let environment = isMobileApp && env === "development" ? "app-development" : isMobileApp && env === "production" ? "app-production" : env;
   switch (environment) {
     case "production":
@@ -23,139 +21,98 @@ function determineVerificationUrl(env, isMobileApp) {
   }
 }
 
-//create reusable transporter object using the default SMTP transport
-let transporter =
-  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
-    ? nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-          user: "vhrks3qs5lf6x3rg@ethereal.email",
-          pass: "1AAZg6Z86MYFBPPYwu",
-        },
-      })
-    : nodemailer.createTransport({
-        host: "smtp.mailgun.org",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.MAIL_PROVIDER,
-          pass: process.env.MAIL_PROVIDER_PASSWORD,
-        },
-      });
-
-// // TESTING NEW MAILGUN SETUP LOCALLY
-// let transporter = nodemailer.createTransport({
-//   host: "smtp.mailgun.org",
-//   port: 587,
-//   secure: false,
-//   auth: {
-//       user: "postmaster@mail.herofit.io",
-//       pass: "bcc7e86ac8a81862a4f6660d98cd5a5f-7005f37e-cc374f17"
-//   }
-// });
-
-const sendContactEmail = function (formData, resolve, reject) {
-  const accountInfo = formData.accountInfo;
-
-  // setup email data with unicode symbols
-  let mailOptions = {
-    from: `${process.env.INFO_EMAIL}`,
-    to: `${process.env.INFO_EMAIL}`,
-    subject: `HEROFIT - ${formData.email} submitted a form message.`,
-    text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.feedbackType}: \n\n ${formData.message} \n \n ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
-    html: `<div><strong>${formData.feedbackType}:</strong></div><div>${formData.message}</div><br /> ACCOUNT DATA: <br />${accountInfo.username} (${accountInfo.email}) <br /> First Name: ${accountInfo.firstName}<br />`,
-  };
-
-  // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log("ERROR sending contact form email", error);
-      reject(error);
-    }
-    //console.log('Message sent: %s', info.messageId);
-    // Preview only available when sending through an Ethereal account
-    //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    resolve(nodemailer.getTestMessageUrl(info));
-  });
-};
-
-const sendDataCollectionEmail = function (formData, resolve, reject) {
-  console.log("HERERE");
-  const { opinion, openResponse, accountInfo } = formData;
-  console.log(opinion, openResponse, accountInfo);
-  // setup email data with unicode symbols
-  let mailOptions = {
-    from: `${process.env.INFO_EMAIL}`,
-    to: `${process.env.INFO_EMAIL}`,
-    subject: "HEROFIT - A user submitted Feedback from the Marketing Modal!",
-    text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
-    html: `<div>${formData.username} submitted the ${formData.title}<br /><br/> <div>OPINION : ${opinion}</div> <br /><br/><div>TEXT RESPONSE : ${openResponse}</div> <br /><br/> <div>ACCOUNT DATA:<br /> ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`,
-  };
-  console.log("MO - ", mailOptions);
-  // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      reject(console.log(error));
-    }
-
-    // console.log('Message sent: %s', info.messageId);
-    // // Preview only available when sending through an Ethereal account
-    // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    resolve(nodemailer.getTestMessageUrl(info));
-  });
-};
-
-const sendSurveyEmail = function (formData, resolve, reject) {
-  const accountInfo = formData.accountInfo;
-  // setup email data with unicode symbols
-  let mailOptions = {
-    from: `${process.env.INFO_EMAIL}`,
-    to: `${process.env.INFO_EMAIL}`,
-    subject: "HEROFIT - A user submitted a survey!",
-    text: `${formData.username} submitted the ${formData.surveyTitle} \n \n ${formData.surveyData} \n \n ACCOUNT DATA: \n ${accountInfo}`,
-    html: `<div>${formData.username} submitted the ${formData.surveyTitle}, the message is as follows: <br /><br/> <div>${formData.surveyData.map(item => `${item} <br/>`)}</div> <br /><br/> <div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo.firstName} </div></div>`,
-  };
-
-  // send mail with defined transport object
-  return transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      reject(console.log(error));
-    }
-
-    // console.log('Message sent: %s', info.messageId);
-    // // Preview only available when sending through an Ethereal account
-    // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    resolve(nodemailer.getTestMessageUrl(info));
-  });
-};
-interface SendCronErrorEmailParams {
-  status: number;
-  message: string;
-  version: string;
-  errorLocation: string;
-  meta?: string;
-  debug?: { msg: string; location: string; value: any; param: any }[];
-}
-const sendCronErrorEmail = async function ({ status, message, errorLocation, debug, meta }: SendCronErrorEmailParams) {
-  const location = errorLocation;
-  let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
-  // error status and message
-  html += `${status}:  ${message}`;
-  let textDebug;
-  if (debug) {
-    console.log("DEBUG - ", debug);
-    html += `<br/><br/>`;
-    debug.forEach((err, i) => {
-      html += `<p>ERROR #${i + 1}`;
-      html += `<p>msg: ` + err.msg + `</p>`;
-      html += `<p>location: ` + err.location + `</p>`;
-      html += `<p>value: ` + err.value + `</p>`;
-      html += `<p>param: ` + err.param + `</p>`;
-      textDebug = `msg : ${err.msg}, location: ${err.location}, value: ${err.value}, param: ${err.param}`;
+// Determine if Emails should be sent to HeroFit inbox or ethereal mail
+function determineTransporter(env: NodeEnvironments) {
+  if (env === "development" || env === "test") {
+    return nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "vhrks3qs5lf6x3rg@ethereal.email",
+        pass: "1AAZg6Z86MYFBPPYwu",
+      },
+    });
+  } else {
+    return nodemailer.createTransport({
+      host: "smtp.mailgun.org",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_PROVIDER,
+        pass: process.env.MAIL_PROVIDER_PASSWORD,
+      },
     });
   }
+}
+
+// Create reusable transporter object using the default SMTP transport
+const env = process.env.NODE_ENV as NodeEnvironments;
+let transporter = determineTransporter(env);
+
+interface ContactEmailFormData {
+  email: string;
+  username: string;
+  firstName: string | null;
+  feedbackType: string;
+  message: string;
+  accountInfo: BasicUserContactInfo | "User not logged in.";
+}
+
+// CONTACT FORM - A user sends a  message rom the 'Feedback' screen
+const sendContactEmail = async function (formData: ContactEmailFormData) {
+  try {
+    const accountInfo = formData.accountInfo;
+    const accountText = includesBasicUserInfo(accountInfo) ? `${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n` : "User Info Unavailable";
+
+    // setup email data with unicode symbols
+    let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HEROFIT - ${formData.email} submitted a form message.`,
+      text: `Someone has a question or comment about HEROFIT, the message is as follows: \n \n ${formData.feedbackType}: \n\n ${formData.message} \n \n ACCOUNT DATA:\n ${accountText}`,
+    };
+
+    // send mail with defined transport object
+    return await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
+};
+
+interface DataCollectionFormData {
+  opinion: string;
+  openResponse: string;
+  username: string;
+  title: string;
+  accountInfo: BasicUserContactInfo | "User not logged in.";
+}
+
+// MARKETING MODAL FEEDBACK -  from the Marketing Modal on the web version, not yet implemented on the app
+const sendDataCollectionEmail = async function (formData: DataCollectionFormData) {
+  try {
+    const { opinion, openResponse, accountInfo } = formData;
+    const accountText = includesBasicUserInfo(accountInfo) ? `${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n` : "User Info Unavailable";
+
+    // setup email data with unicode symbols
+    let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: "HEROFIT - A user submitted Feedback from the Marketing Modal!",
+      text: `${formData.username} submitted the ${formData.title} \n \n OPINION - ${opinion} \n \n TEXT RESPONSE - ${openResponse} \n \n ACCOUNT DATA: ${accountText}`,
+    };
+
+    // send mail with defined transport object
+    return await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// CRON JOB ERROR EMAILS
+const sendCronErrorEmail = async function (message: string, meta?: string) {
+  const location = "Backend";
+  let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
 
   if (meta) {
     html += `<br/><br/>`;
@@ -163,14 +120,14 @@ const sendCronErrorEmail = async function ({ status, message, errorLocation, deb
   }
 
   html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/><div>BACKEND APP VERSION: ${process.env.VERSION}</div>`;
+  html += `<br/><br/><div>CRON SCRIPT</div>`;
 
   // setup email data with unicode symbols
   let mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
-    subject: `HEROFIT - ${status} APPLICATION ERROR - version ${process.env.VERSION}`,
-    text: `An Error occurred in a HeroFit Production CRON JOB - ${status}:  ${message} \n \n ${textDebug ? textDebug : ""} \n \n ${meta ? meta : ""} Error Location: ${location} \n\n APP VERSION: ${process.env.VERSION}`,
+    subject: `HEROFIT - CRON APPLICATION ERROR`,
+    text: `An Error occurred in a HeroFit Production CRON JOB - ${message} \n \n ${meta ? meta : ""}`,
     html,
   };
   try {
@@ -195,8 +152,7 @@ interface FrontEndErrorData {
   };
 }
 
-// ERRORS are always sent from frontend
-// Backend errors are using the sendBackendOnlyEmail
+// FRONTEND MOBILE APP ERRORS - Backend errors are using the sendBackendOnlyEmail
 const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> {
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
@@ -264,7 +220,45 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
   });
 };
 
-const sendBattleReportEmail = function (tally) {
+// BACKEND ERRORS - Server Code Error Reporting
+const sendBackendOnlyEmail = function (message: string, error: string | Error): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // setup email data with unicode symbols
+    let mailOptions = {
+      from: `${process.env.INFO_EMAIL}`,
+      to: `${process.env.INFO_EMAIL}`,
+      subject: `HeroFit - Backend Error`,
+      text: `
+        Backend Error:\n
+        Message: ${message}\n,
+        ERROR: ${error}
+      `,
+    };
+
+    // send mail with defined transport object
+    return transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        reject(error);
+      }
+      resolve();
+    });
+  });
+};
+
+interface BattleTally {
+  total: number;
+  "Avatar Wins": number;
+  "Foe Wins": number;
+  Draw: number;
+  "Double KO": number;
+  avWinPercent: string;
+  avWinPercentOverall: string;
+  tiePercent: string;
+  failedToRun: string;
+}
+
+// BATTLE REPORT EMAILS - Sent Nightly
+const sendBattleReportEmail = function (tally: BattleTally) {
   let dateString = new Date().toLocaleDateString();
   return new Promise((resolve, reject) => {
     // setup email data with unicode symbols
@@ -307,35 +301,10 @@ const sendBattleReportEmail = function (tally) {
   });
 };
 
-// BACKEND ONLY ERRORS
-const sendBackendOnlyEmail = function (message: string, error: string | Error): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // setup email data with unicode symbols
-    let mailOptions = {
-      from: `${process.env.INFO_EMAIL}`,
-      to: `${process.env.INFO_EMAIL}`,
-      subject: `HeroFit - Backend Error`,
-      text: `
-        Backend Error:\n
-        Message: ${message}\n,
-        ERROR: ${error}
-      `,
-    };
-
-    // send mail with defined transport object
-    return transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        reject(error);
-      }
-      resolve();
-    });
-  });
-};
-
-// VERIFICATION EMAIL For Verifying Account
-const sendVerificationEmail = function (email, code, isMobileApp) {
-  const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
-  // No longer using this on frontend, so no longer need isMobileApp
+// VERIFICATION EMAIL - Verifying Accounts
+const sendVerificationEmail = function (email: string, code: string, isMobileApp: boolean) {
+  const env = process.env.NODE_ENV as NodeEnvironments;
+  const baseUrl = determineVerificationUrl(env, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verify=${code}`;
 
@@ -359,22 +328,12 @@ const sendVerificationEmail = function (email, code, isMobileApp) {
   });
 };
 
-// RESET PASSWORD email verification
-const sendResetPasswordEmail = function (email, code, isMobileApp) {
-  const baseUrl = determineVerificationUrl(process.env.NODE_ENV, isMobileApp);
+// RESET PASSWORD - Email Verification
+const sendResetPasswordEmail = function (email: string, code: string, isMobileApp: boolean) {
+  const env = process.env.NODE_ENV as NodeEnvironments;
+  const baseUrl = determineVerificationUrl(env, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
   const url = `${baseUrl}${route}?verifyPassword=${code}`;
-
-  // REAL transporter, delete this after testing:
-  // transporter = nodemailer.createTransport({
-  //   host: process.env.MAIL_PROVIDER,
-  //   port: 465,
-  //   secure: true,
-  //   auth: {
-  //       user: process.env.INFO_EMAIL,
-  //       pass: process.env.EMAIL_PASSWORD
-  //   }
-  // });
 
   const mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
@@ -395,4 +354,4 @@ const sendResetPasswordEmail = function (email, code, isMobileApp) {
   });
 };
 
-export { sendContactEmail, sendDataCollectionEmail, sendSurveyEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendBackendOnlyEmail, sendVerificationEmail, sendResetPasswordEmail };
+export { sendContactEmail, sendDataCollectionEmail, sendCronErrorEmail, sendAppErrorEmail, sendBattleReportEmail, sendBackendOnlyEmail, sendVerificationEmail, sendResetPasswordEmail };

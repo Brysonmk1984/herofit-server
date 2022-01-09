@@ -274,14 +274,7 @@ router.get("/run-all-battles", authenticateAdminJWT, (req, res) => {
     })
     .catch(error => {
       console.log("ERROR - GET /run-all-battles", error);
-      sendCronErrorEmail({
-        status: 500,
-        message: error.message,
-        meta: "Error running Cron Battle Hour Script",
-        errorLocation: "mockCronEndpoints simulating Cron Script",
-        version: process.env.VERSION,
-      });
+      sendCronErrorEmail(error.message, "mockCronEndpoints simulating Cron Script - Error running Cron Battle Hour Script");
     });
 });
-
 module.exports = router;

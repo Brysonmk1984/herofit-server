@@ -41,13 +41,7 @@ console.log("*** RUNNING CRON REVIVE ATTEMPT ***");
     process.exit();
   } catch (error) {
     console.log("ERROR TRYING TO DO KO REVIVES", error);
-    await sendCronErrorEmail({
-      status: 500,
-      message: error.message,
-      meta: "Error running Cron KO Recovery Script",
-      errorLocation: "Cron Script",
-      version: process.env.VERSION,
-    });
+    await sendCronErrorEmail(error.message, "Error running Cron KO Recovery Script");
     process.exit();
   }
 })();

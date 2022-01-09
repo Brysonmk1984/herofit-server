@@ -11,13 +11,7 @@ console.log("*** RUNNING CRON REVIVE ***");
     process.exit();
   } catch (error) {
     console.log("Error reviving avatars: ", error);
-    await sendCronErrorEmail({
-      status: 500,
-      message: error.message,
-      meta: "Error running Cron Revive Avatar Script",
-      errorLocation: "Cron Script",
-      version: process.env.VERSION,
-    });
+    await sendCronErrorEmail(error.message, "Error running Cron Revive Avatar Script");
     process.exit();
   }
 })();
