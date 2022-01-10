@@ -15,7 +15,7 @@ function _runBattlesOnBatch(shard) {
       battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
     }
     return Promise.allSettled(battlePromises);
-  }catch(error){
+  }catch(error){console.log('throwing this from runBattlesOnBatch', error);
     throw error;
   }
 }
@@ -41,6 +41,7 @@ async function runAllBattles(battles, sendReport) {
         }
         resolve(Promise.allSettled(allBattleShardPromises));
       } catch (error) {
+        console.log('rejecting this from staggerBattleBatches', error);
         reject(error);
       }
     }, BATCH_TIMEOUT);
@@ -48,7 +49,7 @@ async function runAllBattles(battles, sendReport) {
 
   try {
     const battlesResults = await new Promise((resolve, reject) => staggerBattleBatches(resolve, reject));
-    //console.log("ALL BATTLE SHARDS RAN!", battlesResults);
+    console.log("ALL BATTLE SHARDS RAN!", battlesResults);
 
     const allOutcomes = battlesResults.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value));
     const outcomeList = [].concat.apply([], allOutcomes);
@@ -93,7 +94,7 @@ async function runAllBattles(battles, sendReport) {
     }
     return tally;
   } catch (error) {
-    console.log("ERROR RUNNING ALL BATTLES", error);
+    console.log("ERROR RUNNING ALL BATTLES - throwing this error from runAllBattles", error);
     throw error;
   }
 }

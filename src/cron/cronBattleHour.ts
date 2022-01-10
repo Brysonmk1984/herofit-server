@@ -18,7 +18,7 @@ console.log("*** RUNNING CRON AVATAR BATTLES ***");
     console.log("cronBattleHour successfully ran");
     process.exit();
   } catch (error) {
-    console.log("Error running cron battle hour: ", error);
+    console.log("CRON BATTLE HOUR ERROR: ", error);
     await sendCronErrorEmail(error, "Error running Cron Battle Hour Script");
     process.exit();
   }
