@@ -111,24 +111,13 @@ const sendDataCollectionEmail = async function (formData: DataCollectionFormData
 
 // CRON JOB ERROR EMAILS
 const sendCronErrorEmail = async function (message: string, meta?: string) {
-  const location = "Backend";
-  let html = `<div>An Error occurred in a HeroFit Production CRON JOB- `;
-
-  if (meta) {
-    html += `<br/><br/>`;
-    html += `<br/><br/><p>` + meta + `</p>`;
-  }
-
-  html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/><div>CRON SCRIPT</div>`;
 
   // setup email data with unicode symbols
   let mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
     subject: `HEROFIT - CRON APPLICATION ERROR`,
-    text: `An Error occurred in a HeroFit Production CRON JOB - ${message} \n \n ${meta ? meta : ""}`,
-    html,
+    text: `An Error occurred in a HeroFit Production CRON JOB - ${message} \n \n ${meta ? meta : ""}`
   };
   try {
     // send mail with defined transport object
