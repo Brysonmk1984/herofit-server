@@ -7,14 +7,17 @@ const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard) {
-  console.log("SHARD", shard);
-  const allAvatars = shard.map(battle => battle.avatar);
+  try{
+    const allAvatars = shard.map(battle => battle.avatar);
 
-  let battlePromises = [];
-  for (let i = 0; i < shard.length; i++) {
-    battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
+    let battlePromises = [];
+    for (let i = 0; i < shard.length; i++) {
+      battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
+    }
+    return Promise.allSettled(battlePromises);
+  }catch(error){
+    throw error;
   }
-  return Promise.allSettled(battlePromises);
 }
 
 // BREAK BATTLES INTO SHARDS, THEN runBattlesOnBatch ON ALL SHARDS
