@@ -150,13 +150,9 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
   const location = "frontend";
   const message = formData.message;
   const accountInfo = formData.accountInfo;
-  let html = `<div>An Error occured in HeroFit Production - `;
-  // error status and message
-  html += `${status}:  ${meta || message}`;
   let textDebug;
-
   if (debug && debug.length && typeof debug !== "string") {
-    html += `<br/><br/>`;
+
 
     debug.forEach((err, i) => {
       const error = err.error || err;
@@ -164,37 +160,18 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
       const location = error.location;
       const value = error.value;
       const param = error.param;
-
-      html += `<p>ERROR #${i + 1}`;
-      html += `<p>msg: <strong>${msg}</strong> </p>`;
-      html += `<p>location: <strong>${location}</strong></p>`;
-      html += `<p>value: <strong>${value}</strong></p>`;
-      html += `<p>param: <strong>${param}</strong></p>`;
-
       textDebug = `msg : ${msg}, location: ${location}, value: ${value}, param: ${param}`;
     });
   } else if (debug) {
-    html += debug;
     textDebug = debug;
   }
-  html += `<br/><br/> Error Location: ${location}`;
-  html += `<br/><br/> Message to User: ${message}`;
-
-  if (!accountInfo.email) {
-    html += `<br/><br/><p>User not logged in.</p>`;
-  } else {
-    html += `<br/><br/>`;
-    html += `<div>ACCOUNT DATA: ${accountInfo.username} (${accountInfo.email}) <br/> First Name: ${accountInfo?.firstName} </div></div>`;
-  }
-  html += `<br/><br/><div>APP VERSION: ${version}</div>`;
 
   // setup email data with unicode symbols
   let mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
     subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`,
-    text: `An Error occurred in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
-    html,
+    text: `An Error occurred in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`
   };
 
   // send mail with defined transport object
@@ -264,17 +241,7 @@ const sendBattleReportEmail = function (tally: BattleTally) {
       Avatar win% overall: ${tally.avWinPercentOverall}\n
       Tie%: ${tally.tiePercent}\n
       FAILED TO RUN: ${tally.failedToRun}\n
-      `,
-      html: `Number of Avatar Battles: ${tally.total}. <br/><br/> Battle Report Tally:\n\n
-      Avatar Wins: ${tally["Avatar Wins"]}<br/>
-      Foe Wins: ${tally["Foe Wins"]}<br/>
-      Draw: ${tally["Draw"]}<br/>
-      Double KO: ${tally["Double KO"]}<br/>
-      Avatar win%: ${tally.avWinPercent}<br/>
-      Avatar win% overall: ${tally.avWinPercentOverall}<br/>
-      Tie%: ${tally.tiePercent}<br/>
-      FAILED TO RUN: ${tally.failedToRun}<br/>
-      `,
+      `
     };
 
     // send mail with defined transport object

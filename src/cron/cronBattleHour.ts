@@ -10,10 +10,11 @@ console.log("*** RUNNING CRON AVATAR BATTLES ***");
 (async () => {
   try {
     const battles: PreBattleObject[] = await Battle.findAll({ where: { outcome: "TBD" }, raw: true });
-    console.log('BATT', battles);
-    if(typeof battles === 'undefined'){
+    if(battles.length === 0){
+      console.log("cronBattleHour - no battles to run");
       return;
     }
+    
     await runAllBattles(battles, true);
     console.log("cronBattleHour successfully ran");
     process.exit();
