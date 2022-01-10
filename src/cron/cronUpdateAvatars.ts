@@ -87,7 +87,7 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
   } catch (error) {
     console.log("ERROR DOING BULK HEALTH UPDATE", error);
 
-    await sendCronErrorEmail(error.message, "Error running Cron Update Avatar Script");
+    await sendCronErrorEmail(error, "Error running Cron Update Avatar Script");
     process.exit();
   }
 })();

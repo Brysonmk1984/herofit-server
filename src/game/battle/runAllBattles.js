@@ -48,12 +48,8 @@ async function runAllBattles(battles, sendReport) {
 
   try {
     const battlesResults = await new Promise((resolve, reject) => staggerBattleBatches(resolve, reject));
-    console.log("ALL BATTLE SHARDS RAN!", battlesResults);
+    //console.log("ALL BATTLE SHARDS RAN!", battlesResults);
 
-    // If there's an error in the battle processing, throw error before trying to calculate totals
-    if (battlesResults.length && battlesResults[0].value instanceof Error) {
-      throw battlesResults[0].value;
-    }
     const allOutcomes = battlesResults.map(promiseResult => promiseResult.value.map(innerPr => innerPr.value));
     const outcomeList = [].concat.apply([], allOutcomes);
     const tally = {
