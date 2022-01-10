@@ -7,7 +7,7 @@ const BATCH_TIMEOUT = 2000;
 
 // TAKES A GROUP OF BATTLES AND RUNS THEM THROUGH THE UNIVERSAL BATTLE PROCESS
 function _runBattlesOnBatch(shard) {
-  try{
+  try {
     const allAvatars = shard.map(battle => battle.avatar);
 
     let battlePromises = [];
@@ -15,7 +15,7 @@ function _runBattlesOnBatch(shard) {
       battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
     }
     return Promise.allSettled(battlePromises);
-  }catch(error){
+  } catch (error) {
     throw error;
   }
 }

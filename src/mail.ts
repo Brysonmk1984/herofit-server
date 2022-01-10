@@ -111,13 +111,12 @@ const sendDataCollectionEmail = async function (formData: DataCollectionFormData
 
 // CRON JOB ERROR EMAILS
 const sendCronErrorEmail = async function (message: string, meta?: string) {
-
   // setup email data with unicode symbols
   let mailOptions = {
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
     subject: `HEROFIT - CRON APPLICATION ERROR`,
-    text: `An Error occurred in a HeroFit Production CRON JOB - ${message} \n \n ${meta ? meta : ""}`
+    text: `An Error occurred in a HeroFit Production CRON JOB - ${message} \n \n ${meta ? meta : ""}`,
   };
   try {
     // send mail with defined transport object
@@ -152,8 +151,6 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
   const accountInfo = formData.accountInfo;
   let textDebug;
   if (debug && debug.length && typeof debug !== "string") {
-
-
     debug.forEach((err, i) => {
       const error = err.error || err;
       const msg = error.msg;
@@ -171,7 +168,7 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
     from: `${process.env.INFO_EMAIL}`,
     to: `${process.env.INFO_EMAIL}`,
     subject: `HEROFIT - ${status} APPLICATION ERROR - version ${version}`,
-    text: `An Error occurred in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`
+    text: `An Error occurred in HeroFit Production - ${location} - ${status}:  ${meta || message} \n \n ${textDebug ? textDebug : ""} \n \n Message to User: ${message} \n\n APP VERSION: ${version} ACCOUNT DATA:\n ${accountInfo.username} (${accountInfo.email}) \n\n First Name: ${accountInfo.firstName} \n\n`,
   };
 
   // send mail with defined transport object
@@ -241,7 +238,7 @@ const sendBattleReportEmail = function (tally: BattleTally) {
       Avatar win% overall: ${tally.avWinPercentOverall}\n
       Tie%: ${tally.tiePercent}\n
       FAILED TO RUN: ${tally.failedToRun}\n
-      `
+      `,
     };
 
     // send mail with defined transport object
