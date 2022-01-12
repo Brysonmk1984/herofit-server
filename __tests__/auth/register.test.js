@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../../src/index.js");
+const app = require("../../src/index.ts");
 const { User } = require("../../src/config/db");
 const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
 

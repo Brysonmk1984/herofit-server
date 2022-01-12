@@ -16,7 +16,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": true,
-    "useUnknownInCatchVariables": false,
+    // Just switched this to true so we have to check if an error is indeed an error before proceeding
+    // Turn off if annoying
+    "useUnknownInCatchVariables": true,
     "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "src/**/*.js"],

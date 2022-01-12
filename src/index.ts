@@ -2,6 +2,9 @@
 const path = require("path");
 require("dotenv").load();
 // LIBRARIES
+const Sentry = require("@sentry/node");
+// Importing @sentry/tracing patches the global hub for tracing to work
+const Tracing = require("@sentry/tracing");
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
@@ -19,6 +22,16 @@ const battleRoutes = require("./routes/battle");
 const calculateRoutes = require("./routes/calculate");
 const mockDataRoutes = require("./routes/mockData");
 const mockCronRoutes = require("./routes/mockCronEndpoints");
+
+// Error Reporting
+Sentry.init({
+  dsn: "https://051e343d956b42e3bb7286f93ffe965d@o1077292.ingest.sentry.io/6080100",
+  enableInExpoDevelopment: false,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+});
 
 // http server
 console.log("Listening on port " + (process.env.PORT || 3001));
@@ -50,5 +63,7 @@ app.use("/battle", battleRoutes);
 app.use("/calculate", calculateRoutes);
 app.use("/mock-data", mockDataRoutes);
 app.use("/mock-cron", mockCronRoutes);
+
+export default app;
 
 module.exports = app;
