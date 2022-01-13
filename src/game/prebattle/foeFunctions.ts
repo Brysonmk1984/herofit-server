@@ -1,18 +1,27 @@
+import { arrayGroupBy, pickRandomArrayItem } from "../../lib/helperFunctions";
+import { FoeTemplate, SpecialEvent, VillainJsonStructure } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
+import { BEGINNERS_LUCK_LIKELIHOOD } from "../CONSTANTS";
+
 const xpCalc = require("../upgrades/xpCalc");
 const { determineXpBounty, determinePtBounty } = require("../battle/determineBounties");
 const { OUTCOME_XP } = require("../CONSTANTS");
 const chance = require("chance")();
-const { FOE_MOD, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD } = require("../CONSTANTS");
-const villains = require("../villains.json");
+const { FOE_MOD, LEVEL_DIFFICULTY_MOD, LOW_LEVEL, HIGH_LEVEL, HIGH_LEVEL_DIFFICULTY_MOD, BEGINNERS_LUCK_MAX_LEVEL } = require("../CONSTANTS");
+const villains: VillainJsonStructure = require("../villains.json");
 const { config } = require("../../appConfig");
 const { handleFoeLikelihood, handleFoeBonusToStats } = require("../specialEvents/foeActionHandlers");
 
 const { currentLevelByInput } = xpCalc();
 
-// Decides which foe template will be chosen for battle before stats are added
-function selectFoeTemplate(level) {
-  //console.log('THE LEVEL = ', level);
-  const event = config.specialEvent;
+// Separate all the foes from the json file into 3 difficulty categories
+function _divideAvailableFoesByDifficulty(foes: FoeTemplate[], level: number) {
+  const availableFoes = foes.filter(foe => !foe.itemSummonOnly && foe.levelRequirement <= level);
+
+  return arrayGroupBy(availableFoes, "difficultyLevel");
+}
+
+function _specialEventFoeChance(level: number, event?: SpecialEvent) {
   // If Special Event is live, run code to attempt any special foe events
   if (event) {
     const foeLikelihoodAts = event.actionTypes.filter(at => at.type === "foeLikelihood" && (at.levelRequirement ? level >= at.levelRequirement : true));
@@ -26,37 +35,48 @@ function selectFoeTemplate(level) {
       }
     }
   }
+}
 
-  // Merge all minor foes into one array, and all bosses in another
-  const minorFoes = [];
-  const levelRequiredFoes = [];
-  // Each class of foes
-  for (let fClass in villains) {
-    // assign foes to two different arrays depending on if there is a level requirement
-    villains[fClass].forEach(foe => {
-      const req = foe.levelRequirement;
-      //console.log(foe.type, req);
-      // If foe is not an item only foe
-      if (!foe.itemSummonOnly) {
-        if (req && req <= level) {
-          levelRequiredFoes.push(foe);
-        } else if (!req) {
-          minorFoes.push(foe);
-        }
-      }
-    });
+function _determineBeginnersLuck(level: number) {
+  if (level < BEGINNERS_LUCK_MAX_LEVEL) {
+    return chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD });
   }
-  //console.log('FCF-', minorFoes, levelRequiredFoes);
+}
 
-  // Decide which array of foes to randomly pick from...
-  let bossEncounter = false;
-  if (levelRequiredFoes.length) {
-    bossEncounter = chance.bool({ likelihood: 5.5 });
+// Select possible return a non-itemSummonOnly, high level foe to be faced, otherwise undefined
+function _randomBossEncounterChance(bossArray: FoeTemplate[]) {
+  const bossFightHappening = chance.bool({ likelihood: 5.5 });
+
+  // If by chance a boss fight is happening, select a random one from the passed in high level foes
+  if (bossFightHappening) {
+    return pickRandomArrayItem(bossArray);
   }
-  let finalFoeArray = bossEncounter ? levelRequiredFoes : minorFoes;
+}
 
-  // Randomly select from finalFoeArray and return it as the selected foe
-  return finalFoeArray[Math.floor(Math.random() * finalFoeArray.length)];
+// Decides which foe template will be chosen for battle before stats are added
+function selectFoeTemplate(level: number) {
+  // Special Event Foe check
+  const possibleSpecialEventFoe = _specialEventFoeChance(level, config.specialEvent);
+  if (possibleSpecialEventFoe) {
+    return possibleSpecialEventFoe;
+  }
+
+  // Combine all Villain templates into one array and groupBy difficulty
+  const mergedVillains = Object.values(villains).flat();
+  const { low, medium, high } = _divideAvailableFoesByDifficulty(mergedVillains, level);
+
+  // Boss fight check
+  const possibleBossFoe = _randomBossEncounterChance(high);
+  if (possibleBossFoe) {
+    return possibleBossFoe;
+  }
+
+  // Give Low level players a higher chance for an easier foe
+  const beginnersLuckHappened = _determineBeginnersLuck(level);
+  const finalFoeArray = beginnersLuckHappened ? low : [...low, ...medium];
+
+  // Randomly select from final list of foes and return one
+  return pickRandomArrayItem(finalFoeArray);
 }
 
 function generateFoeStats(avatar, foe) {
@@ -325,4 +345,12 @@ module.exports = {
   selectFoeTemplate,
   determineFoeWithStats,
   findFoeTemplateByType,
+  unitTestExporter,
 };
+
+function unitTestExporter() {
+  return {
+    _divideAvailableFoesByDifficulty,
+    selectFoeTemplate,
+  };
+}

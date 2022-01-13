@@ -15,7 +15,9 @@
       "reward": {
         "type": "skin",
         "name": "Shade Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -32,7 +34,9 @@
       "reward": {
         "type": "skin",
         "name": "Apparition Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -49,7 +53,9 @@
       "reward": {
         "type": "skin",
         "name": "Phantasm Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -66,7 +72,9 @@
       "reward": {
         "type": "skin",
         "name": "Phantom Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -83,7 +91,9 @@
       "reward": {
         "type": "skin",
         "name": "Wraith Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -100,7 +110,9 @@
       "reward": {
         "type": "skin",
         "name": "Poltergeist Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -117,7 +129,9 @@
       "reward": {
         "type": "skin",
         "name": "Specter Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -134,7 +148,9 @@
       "reward": {
         "type": "skin",
         "name": "Banshee Tint"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Spirits",
@@ -154,6 +170,7 @@
         "type": "skin",
         "name": "Shadow Self"
       },
+      "itemSummonOnly": false,
       "levelRequirement": 10
     }
   ],
@@ -176,6 +193,7 @@
         "type": "pet",
         "name": "Plagueling"
       },
+      "itemSummonOnly": false,
       "levelRequirement": 20
     },
     {
@@ -197,6 +215,7 @@
         "type": "title",
         "name": "Hellhound Whisperer"
       },
+      "itemSummonOnly": false,
       "levelRequirement": 40
     }
   ],
@@ -216,7 +235,9 @@
       "reward": {
         "type": "pet",
         "name": "Flame Fiend"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -233,7 +254,9 @@
       "reward": {
         "type": "title",
         "name": "Fire Hunter"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
 
     {
@@ -255,7 +278,8 @@
         "name": "Fire Tint"
       },
       "itemSummonOnly": true,
-      "itemSummon": "Smoldering Skull Torch"
+      "itemSummon": "Smoldering Skull Torch",
+      "levelRequirement": 30
     },
 
     {
@@ -273,7 +297,9 @@
       "reward": {
         "type": "pet",
         "name": "Rock Skipper"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -290,7 +316,9 @@
       "reward": {
         "type": "title",
         "name": "Earth Trapper"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -311,7 +339,8 @@
         "name": "Earth Tint"
       },
       "itemSummonOnly": true,
-      "itemSummon": "Petrified Power Totem"
+      "itemSummon": "Petrified Power Totem",
+      "levelRequirement": 30
     },
     {
       "class": "Elementals",
@@ -328,7 +357,9 @@
       "reward": {
         "type": "pet",
         "name": "Splash Artist"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -345,7 +376,9 @@
       "reward": {
         "type": "title",
         "name": "Water Predator"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -366,7 +399,8 @@
         "name": "Water Tint"
       },
       "itemSummonOnly": true,
-      "itemSummon": "Wave-Swept Battle Conch"
+      "itemSummon": "Wave-Swept Battle Conch",
+      "levelRequirement": 30
     },
     {
       "class": "Elementals",
@@ -383,7 +417,9 @@
       "reward": {
         "type": "pet",
         "name": "Gusty Rascal"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -400,7 +436,9 @@
       "reward": {
         "type": "title",
         "name": "Air Stalker"
-      }
+      },
+      "itemSummonOnly": false,
+      "levelRequirement": 0
     },
     {
       "class": "Elementals",
@@ -421,7 +459,8 @@
         "name": "Air Tint"
       },
       "itemSummonOnly": true,
-      "itemSummon": "Storm Crow Bone Chimes"
+      "itemSummon": "Storm Crow Bone Chimes",
+      "levelRequirement": 30
     }
   ]
 }

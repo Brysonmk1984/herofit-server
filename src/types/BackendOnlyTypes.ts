@@ -19,6 +19,30 @@ interface PreBattleObject {
 
 type EffectType = "prebattle" | "postbattle";
 
+interface FoeTemplate {
+  class: HF.FoeClass;
+  type: HF.FoeType;
+  difficultyLevel: "low" | "medium" | "high";
+  foe: string[];
+  ability: {
+    name: string;
+    effect: string;
+    type: "prebattle" | "postbattle";
+  };
+  color: string;
+  pba: string[];
+  reward: {
+    type: HF.ServerItemType;
+    name: string;
+  };
+  itemSummonOnly: boolean;
+  levelRequirement: number;
+}
+
+type VillainJsonStructure = {
+  [key in HF.FoeClass]: HF.FoeTemplate[];
+};
+
 interface GeneratedFoe {
   air: number;
   fire: number;
@@ -46,4 +70,18 @@ interface BasicUserContactInfo {
   email: string;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo };
+interface SpecialEventActionType {
+  type: string;
+  action: string;
+  bonusPercent?: number;
+  requirements?: ObjectWithAnyProperties[];
+  levelRequirement?: number;
+}
+
+interface SpecialEvent {
+  eventName: string;
+  description: string;
+  actionTypes: SpecialEventActionType[];
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, FoeTemplate, VillainJsonStructure, SpecialEvent };
