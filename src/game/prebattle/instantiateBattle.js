@@ -31,10 +31,10 @@ function instantiateBattle(avatarID, foeType = null) {
       const { getCurrentLevel } = xpCalc(avatar.activityXP, avatar.battleXP);
       const { total } = getCurrentLevel();
       // Getting Foe Template
-      const foe = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(total);
+      const foeTemplate = foeType ? findFoeTemplateByType(foeType) : selectFoeTemplate(total);
 
       // Adding stats to Foe
-      const foeWithStats = determineFoeWithStats(avatar, foe);
+      const foeWithStats = determineFoeWithStats(avatar, foeTemplate, total);
 
       // Get corresponding items for avatar
       return Items.findAll({

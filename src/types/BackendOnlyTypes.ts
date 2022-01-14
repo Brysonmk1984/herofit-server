@@ -10,7 +10,7 @@ interface PreBattleObject {
   owner: string;
   avatarID: number;
   avatarName: number;
-  foe: GeneratedFoe;
+  foe: HF.Foe;
   foeType: HF.FoeType;
   avatar: HF.Hero;
   outcome: "TBD";
@@ -37,32 +37,24 @@ interface FoeTemplate {
   };
   itemSummonOnly: boolean;
   levelRequirement: number;
+  bonusXpBase?: number;
+  bonusPtBase?: number;
+}
+
+interface FoeStats {
+  health: number;
+  power: number;
+  armor: number;
+  fire: number;
+  earth: number;
+  water: number;
+  air: number;
+  difficulty: number;
 }
 
 type VillainJsonStructure = {
-  [key in HF.FoeClass]: HF.FoeTemplate[];
+  [key in HF.FoeClass]: FoeTemplate[];
 };
-
-interface GeneratedFoe {
-  air: number;
-  fire: number;
-  name: string;
-  type: HF.FoeType;
-  armor: number;
-  class: HF.FoeClass;
-  earth: number;
-  power: number;
-  water: number;
-  health: number;
-  ability: {
-    name: string;
-    type: EffectType;
-    effect: string;
-  };
-  ptBounty: number;
-  xpBounty: number;
-  difficulty: number;
-}
 
 interface BasicUserContactInfo {
   username: string;
@@ -72,10 +64,15 @@ interface BasicUserContactInfo {
 
 interface SpecialEventActionType {
   type: string;
-  action: string;
+  action?: string;
   bonusPercent?: number;
   requirements?: ObjectWithAnyProperties[];
   levelRequirement?: number;
+  odds?: number;
+  foe?: HF.FoeType;
+  foeClass?: HF.FoeClass;
+  stats?: Lowercase<Exclude<HF.Stat, "Recovery" | "Aether">>[];
+  itemID?: number;
 }
 
 interface SpecialEvent {
@@ -84,4 +81,4 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, FoeTemplate, VillainJsonStructure, SpecialEvent };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType };

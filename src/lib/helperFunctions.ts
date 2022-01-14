@@ -166,5 +166,5 @@ const arrayGroupBy = (items: ObjectWithAnyProperties[], key: string) =>
     {},
   );
 
-const pickRandomArrayItem = (array: any[]) => array[Math.floor(Math.random() * array.length)];
+const pickRandomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
 export { cloneObj, parseAvatarProperties, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem };
