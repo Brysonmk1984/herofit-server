@@ -20,6 +20,7 @@ function _divideAvailableFoesByDifficulty(foes: FoeTemplate[], level: number) {
   return arrayGroupBy(availableFoes, "difficultyLevel");
 }
 
+// Special Event Foe Chance
 function _specialEventFoeChance(level: number, event?: SpecialEvent) {
   // If Special Event is live, run code to attempt any special foe events
   if (event) {
@@ -36,6 +37,7 @@ function _specialEventFoeChance(level: number, event?: SpecialEvent) {
   }
 }
 
+// Determine if beginners luck happened - for foe selection only
 function _determineBeginnersLuck(level: number) {
   if (level < BEGINNERS_LUCK_MAX_LEVEL) {
     return chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD });
@@ -99,7 +101,8 @@ function selectFoeTemplate(level: number) {
   return pickRandomArrayItem<FoeTemplate>(finalFoeArray);
 }
 
-function generateFoeStats(avatar: HF.Hero, foe: FoeTemplate): FoeStats {
+// Generate FoeStats based on foeTemplate and Hero
+function _generateFoeStats(avatar: HF.Hero, foe: FoeTemplate): FoeStats {
   const { total: totalLevel } = currentLevelByInput(avatar.activityXP + avatar.battleXP);
 
   // Random modifier within -15% of base stat
@@ -109,22 +112,30 @@ function generateFoeStats(avatar: HF.Hero, foe: FoeTemplate): FoeStats {
     return { stat: Math.floor(modifiedStat), modifier: randomModifierDecimal };
   }
 
-  const isHighLevel = totalLevel >= HIGH_LEVEL ? true : false;
-  const isMidLevel = LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL ? true : false;
+  // Base power, health and qp based on hero level
+  function determineBasePrimaryFoeStats(totalLevel: number) {
+    let baseQP = Math.floor(totalLevel * 5 - 5);
+    let baseFoeHealth = Math.floor((totalLevel * 5 + 100) * FOE_MOD.HEALTH);
+    let baseFoePower = Math.floor((totalLevel * 5 + 100) * FOE_MOD.POWER);
 
-  let baseQP = Math.floor(totalLevel * 5 - 5);
-  let baseFoeHealth = Math.floor((totalLevel * 5 + 100) * FOE_MOD.HEALTH);
-  let baseFoePower = Math.floor((totalLevel * 5 + 100) * FOE_MOD.POWER);
+    const isHighLevel = totalLevel >= HIGH_LEVEL ? true : false;
+    const isMidLevel = LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL ? true : false;
 
-  if (isMidLevel || isHighLevel) {
-    baseQP = Math.floor(baseQP * LEVEL_DIFFICULTY_MOD);
-    baseFoeHealth = Math.floor(baseFoeHealth * LEVEL_DIFFICULTY_MOD);
-    baseFoePower = Math.floor(baseFoePower * LEVEL_DIFFICULTY_MOD);
-    if (isHighLevel) {
-      baseQP = Math.floor(baseQP * HIGH_LEVEL_DIFFICULTY_MOD);
-      baseFoeHealth = Math.floor(baseFoeHealth * HIGH_LEVEL_DIFFICULTY_MOD);
-      baseFoePower = Math.floor(baseFoePower * HIGH_LEVEL_DIFFICULTY_MOD);
+    if (isMidLevel || isHighLevel) {
+      baseQP = Math.floor(baseQP * LEVEL_DIFFICULTY_MOD);
+      baseFoeHealth = Math.floor(baseFoeHealth * LEVEL_DIFFICULTY_MOD);
+      baseFoePower = Math.floor(baseFoePower * LEVEL_DIFFICULTY_MOD);
+      if (isHighLevel) {
+        baseQP = Math.floor(baseQP * HIGH_LEVEL_DIFFICULTY_MOD);
+        baseFoeHealth = Math.floor(baseFoeHealth * HIGH_LEVEL_DIFFICULTY_MOD);
+        baseFoePower = Math.floor(baseFoePower * HIGH_LEVEL_DIFFICULTY_MOD);
+      }
     }
+    return {
+      baseQP,
+      baseFoeHealth,
+      baseFoePower,
+    };
   }
 
   // Different foes adjust QP differently on their stats
@@ -143,6 +154,7 @@ function generateFoeStats(avatar: HF.Hero, foe: FoeTemplate): FoeStats {
     difficulty: 0,
   };
   let randomizedHealth, randomizedPower, randomizedQP;
+  const { baseQP, baseFoeHealth, baseFoePower } = determineBasePrimaryFoeStats(totalLevel);
 
   switch (foe.class) {
     case "Spirits":
@@ -309,7 +321,7 @@ function generateFoeStats(avatar: HF.Hero, foe: FoeTemplate): FoeStats {
 
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar: HF.Hero, foeTemplate: FoeTemplate, totalLevel: number): HF.Foe {
-  const foeStats = generateFoeStats(avatar, foeTemplate);
+  const foeStats = _generateFoeStats(avatar, foeTemplate);
 
   return {
     type: foeTemplate.type,
@@ -330,15 +342,16 @@ function findFoeTemplateByType(foeType: HF.FoeType) {
 }
 
 module.exports = {
-  generateFoeStats,
   selectFoeTemplate,
   determineFoeWithStats,
   findFoeTemplateByType,
   unitTestExporter,
 };
 
+// For testing local functions
 function unitTestExporter() {
   return {
+    _generateFoeStats,
     _determineBonusToStatsSpecialEvent,
     _generateFoeName,
     _randomBossEncounterChance,

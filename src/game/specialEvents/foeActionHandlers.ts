@@ -1,7 +1,6 @@
 import { FoeStats, FoeTemplate, SpecialEventActionType, VillainJsonStructure } from "../../types/BackendOnlyTypes";
 import villainsJson from "../villains.json";
 import chanceInit from "chance";
-import HF from "../../types/herofit";
 const villains = villainsJson as VillainJsonStructure;
 const chance = chanceInit();
 

@@ -1,11 +1,12 @@
 const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate, generateFoeStats } = require("../../src/game/prebattle/foeFunctions");
+const { selectFoeTemplate, unitTestExporter } = require("../../src/game/prebattle/foeFunctions");
 const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
 const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../src/game/battle/doBattlePrep");
 const doBattle = require("../../src/game/battle/doBattle");
 const { OUTCOME_XP, FOE_NON_ACTION, AVATAR_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../src/game/CONSTANTS");
 const avCalc = require("../../src/game/upgrades/avCalc");
 const chance = require("chance")();
+const { _generateFoeStats } = unitTestExporter();
 
 // Use toEqual for objects and arrays
 // Use toBe for scalar (primitive) data types only.
@@ -30,7 +31,7 @@ const generateFoe = function (av) {
     class: foeTemplate.class,
   };
 
-  foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
+  foeWithStats = Object.assign({}, foe, _generateFoeStats(randomAv, foe));
 };
 
 describe("Load profiles and generate foes from random Profile", () => {

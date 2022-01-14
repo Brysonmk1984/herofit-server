@@ -6,12 +6,13 @@ const { Avatar, AvatarItems, Items, Battle } = require("../config/db");
 const { Op, col } = require("sequelize");
 const { parseAvatarProperties } = require("../lib/helperFunctions");
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD } = require("../game/CONSTANTS");
-const { selectFoeTemplate, generateFoeStats } = require("../game/prebattle/foeFunctions");
+const { selectFoeTemplate, unitTestExporter } = require("../game/prebattle/foeFunctions");
 const { determinePostBattleActions } = require("../game/prebattle/onGoToBattle");
 const runAllBattles = require("../game/battle/runAllBattles");
 const ALLPBAs = require("../game/postBattleActions.json");
 const { sendCronErrorEmail } = require("../mail");
 const chance = require("chance")();
+const { _generateFoeStats } = unitTestExporter();
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
 router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
@@ -168,7 +169,7 @@ router.post("/generate-foe", body("avatar").isObject(), authenticateAdminJWT, (r
     return res.formatter.badRequest(errors.array(), "Validation Error - for /generate-foe endpoint");
   }
   const foe = selectFoeTemplate(req.body.avatar.level);
-  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
+  const foeWithStats = Object.assign({}, foe, _generateFoeStats(req.body.avatar, foe));
   if (foeWithStats) {
     res.formatter.ok(foeWithStats);
   } else {
@@ -184,7 +185,7 @@ router.post("/mock-determine-pbas", body("avatar").isObject(), authenticateAdmin
     return res.formatter.badRequest(errors.array(), "Validation Error - for /mock-determine-pbas");
   }
   const foe = selectFoeTemplate(req.body.avatar.level);
-  const foeWithStats = Object.assign({}, foe, generateFoeStats(req.body.avatar, foe));
+  const foeWithStats = Object.assign({}, foe, _generateFoeStats(req.body.avatar, foe));
 
   new Promise((resolve, reject) => {
     return determinePostBattleActions(req.body.avatar, foeWithStats, resolve, reject);
