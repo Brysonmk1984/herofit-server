@@ -277,11 +277,10 @@ function generateFoeStats(hero: HF.Hero, foe: FoeTemplate): FoeStats {
   return foeStatsWithSpecialEventBonus;
 }
 
-module.exports = generateFoeStats;
-exports = module.exports;
-// For testing local functions
-exports.unitTestExporter = () => {
+module.exports = { generateFoeStats, unitTestExporter };
+
+function unitTestExporter() {
   return {
     _determineBonusToStatsSpecialEvent,
   };
-};
+}

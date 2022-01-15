@@ -7,7 +7,7 @@ import { handleFoeLikelihood } from "../specialEvents/foeActionHandlers";
 import villainsJson from "../villains.json";
 import chanceInit from "chance";
 import { config } from "../../appConfig";
-const generateFoeStats = require("./generateFoeStats");
+const { generateFoeStats } = require("./generateFoeStats");
 const villains = villainsJson as VillainJsonStructure;
 const chance = chanceInit();
 
