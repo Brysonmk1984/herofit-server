@@ -1,9 +1,11 @@
 const { unitTestExporter, selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
+const { unitTestExporter: unitTestExporter2 } = require("../../src/game/prebattle/generateFoeStats");
 const villains = require("../../src/game/villains.json");
 const { testSpecificFoe } = require("../../src/game/specialEvents/specialEventList");
 
 describe("Foe Generation", () => {
-  const { _determineBonusToStatsSpecialEvent, _generateFoeName, _randomBossEncounterChance, _determineBeginnersLuck, _specialEventFoeChance, _divideAvailableFoesByDifficulty } = unitTestExporter();
+  const { _generateFoeName, _randomBossEncounterChance, _determineBeginnersLuck, _specialEventFoeChance, _divideAvailableFoesByDifficulty } = unitTestExporter();
+  const { _determineBonusToStatsSpecialEvent } = unitTestExporter2();
   const mergedVillains = Object.values(villains).flat();
   const { low, medium, high } = _divideAvailableFoesByDifficulty(mergedVillains, 20);
 
@@ -30,7 +32,7 @@ describe("Foe Generation", () => {
   });
 
   it("Should return Storming Oni, since he has a 100% chance to receieve in testSpecificFoe event", () => {
-    const specialEventFoe = _specialEventFoeChance(10, testSpecificFoe);
+    const specialEventFoe = _specialEventFoeChance(60, testSpecificFoe);
     expect(specialEventFoe.type).toEqual("Storming Oni");
   });
 

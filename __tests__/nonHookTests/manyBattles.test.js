@@ -1,6 +1,7 @@
 const avatarProfiles = require("../battles/heroProfiles.json");
 const avatarPowerSpecProfiles = require("../battles/powerProfiles.json");
-const { selectFoeTemplate, unitTestExporter } = require("../../src/game/prebattle/foeFunctions");
+const { selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
+const generateFoeStats = require("../../src/game/prebattle/generateFoeStats");
 const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
 const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../src/game/battle/doBattlePrep");
 const doBattle = require("../../src/game/battle/doBattle");
@@ -8,7 +9,6 @@ const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = req
 const avCalc = require("../../src/game/upgrades/avCalc");
 const xpCalc = require("../../src/game/upgrades/xpCalc");
 const chance = require("chance")();
-const { _generateFoeStats } = unitTestExporter();
 
 // Use toEqual for objects and arrays
 // Use toBe for scalar (primitive) data types only.
@@ -18,13 +18,15 @@ const generateFoes = function (avatars) {
     const foeTemplate = selectFoeTemplate(av.level);
 
     const foe = {
-      id: foeTemplate.id,
       type: foeTemplate.type,
       name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
       ability: foeTemplate.ability,
       class: foeTemplate.class,
     };
-    return Object.assign({}, foe, _generateFoeStats(av, foe));
+
+    const f = Object.assign({}, foe, generateFoeStats(av, foe));
+
+    return f;
   });
 };
 
@@ -98,17 +100,18 @@ describe("Battle all generated foes against av profiles", () => {
     multipliedAvatars.push(...avatars);
   }
 
-  console.log("MULT AV - ", multipliedAvatars.length);
+  //console.log("Totals avatars for battle = ", multipliedAvatars.length);
 
   let foesWithStats = generateFoes(multipliedAvatars);
   let preBattles = generateBrs(multipliedAvatars, foesWithStats);
-
+  //console.log(foesWithStats);
   // BATTLE STEP 5 - EXCHANGE DAMAGE
 
   const allBattles = preBattles.map(b => {
     return Object.assign({}, doBattle(b.BRA, b.BRF, b.goesFirst), {
       foeType: b.BRF.type,
       foeClass: b.BRF.class,
+      avatarLevel: b.BRA.level,
     });
   });
 
@@ -168,8 +171,9 @@ describe("Battle all generated foes against av profiles", () => {
     },
   };
 
+  // Adjust totals
   allBattles.forEach((b, i) => {
-    const level = b.level;
+    const level = b.avatarLevel;
 
     switch (b.outcomeData.outcome) {
       case "Avatar Wins":
@@ -250,15 +254,6 @@ describe("Battle all generated foes against av profiles", () => {
     totals.count++;
     totals.totalsVs[b.foeClass.toLowerCase()]++;
   });
-
-  console.log("Battle Totals - ", totals);
-
-  const lowLevelPreBattles = preBattles.filter(battle => battle.BRA.level < 15);
-  const lowLevelBattles = allBattles.slice(0, lowLevelPreBattles.length);
-
-  //console.log('Low level prebattles -',lowLevelPreBattles.length, lowLevelPreBattles);
-
-  //console.log('Low level battles -',lowLevelBattles.length, lowLevelBattles);
 
   // WIN RATES
   const lowLevelWinRate = totals.lowLevel.wins / totals.lowLevel.total;

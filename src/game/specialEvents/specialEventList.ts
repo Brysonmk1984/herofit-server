@@ -1,14 +1,27 @@
-const testSpecificFoe = {
+import { SpecialEvent } from "../../types/BackendOnlyTypes";
+
+const appWelcome: SpecialEvent = {
+  eventName: "App Welcome",
+  description: "For the first month after launch, users who install the app will receive the white rabbit for free.",
+  actionTypes: [
+    {
+      type: "onAuth",
+      itemID: 111,
+    },
+  ],
+};
+
+const testSpecificFoe: SpecialEvent = {
   eventName: "Test Specific Foe",
   description: "Used for selecting a specific foe",
   actionTypes: [
-    {
-      type: "foeLikelihood",
-      action: "Increased Likelihood Foe",
-      odds: 0,
-      foe: "Specter",
-      foeClass: "Spirits",
-    },
+    // {
+    //   type: "foeLikelihood",
+    //   action: "Increased Likelihood Foe",
+    //   odds: 100,
+    //   foe: "Plaguebringer",
+    //   foeClass: "Titans",
+    // },
     {
       type: "foeLikelihood",
       action: "Increased Likelihood Foe",
@@ -25,7 +38,7 @@ const testSpecificFoe = {
   ],
 };
 
-const attackOfTheElements = {
+const attackOfTheElements: SpecialEvent = {
   eventName: "Attack of the Elements",
   description: "For twelve weeks, a new Elemental foe will be released in the game! During this time, there will be an increased chance to battle the new foe, as well as bonus Photon Tokens and XP for winning!",
   actionTypes: [
@@ -50,7 +63,7 @@ const attackOfTheElements = {
   ],
 };
 
-const helloween = {
+const helloween: SpecialEvent = {
   eventName: "Helloween",
   description: "Until Halloween, bonus chance to face the Guardian of the Depths",
   actionTypes: [
@@ -65,20 +78,4 @@ const helloween = {
   ],
 };
 
-const appWelcome = {
-  eventName: "App Welcome",
-  description: "For the first month after launch, users who install the app will receive the white rabbit for free.",
-  actionTypes: [
-    {
-      type: "onAuth",
-      itemID: 111,
-    },
-  ],
-};
-
-module.exports = {
-  testSpecificFoe,
-  attackOfTheElements,
-  helloween,
-  appWelcome,
-};
+export { testSpecificFoe, attackOfTheElements, helloween, appWelcome };

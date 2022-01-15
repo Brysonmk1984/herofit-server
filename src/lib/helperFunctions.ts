@@ -157,14 +157,16 @@ function range(start: number, end: number) {
     .map((_, idx) => start + idx);
 }
 
-const arrayGroupBy = (items: ObjectWithAnyProperties[], key: string) =>
-  items.reduce(
+const arrayGroupBy = (items: ObjectWithAnyProperties[], key: string) => {
+  return items.reduce(
     (result, item) => ({
       ...result,
       [item[key]]: [...(result[item[key]] || []), item],
     }),
     {},
   );
+};
 
 const pickRandomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
+
 export { cloneObj, parseAvatarProperties, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem };

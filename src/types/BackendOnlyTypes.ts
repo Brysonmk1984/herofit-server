@@ -49,6 +49,7 @@ interface FoeStats {
   earth: number;
   water: number;
   air: number;
+  qp: number;
   difficulty: number;
 }
 
@@ -62,6 +63,8 @@ interface BasicUserContactInfo {
   email: string;
 }
 
+type PossibleFoeStat = Lowercase<Exclude<HF.Stat, "Recovery" | "Aether">>;
+
 interface SpecialEventActionType {
   type: string;
   action?: string;
@@ -71,8 +74,9 @@ interface SpecialEventActionType {
   odds?: number;
   foe?: HF.FoeType;
   foeClass?: HF.FoeClass;
-  stats?: Lowercase<Exclude<HF.Stat, "Recovery" | "Aether">>[];
+  stats?: PossibleFoeStat[];
   itemID?: number;
+  items?: string[];
 }
 
 interface SpecialEvent {
@@ -81,4 +85,4 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType };

@@ -1,10 +1,10 @@
 const postBattleProcess = require("../../src/game/battle/postBattleProcess");
 const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate, unitTestExporter } = require("../../src/game/prebattle/foeFunctions");
+const { selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
+const generateFoeStats = require("../../src/game/prebattle/generateFoeStats");
 const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
 const { doFoeBattlePrep } = require("../../src/game/battle/doBattlePrep");
 const doBattle = require("../../src/game/battle/doBattle");
-const { _generateFoeStats } = unitTestExporter();
 
 const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../src/game/CONSTANTS");
 const avCalc = require("../../src/game/upgrades/avCalc");
@@ -38,7 +38,7 @@ const generateFoe = function (av) {
     class: foeTemplate.class,
   };
 
-  foeWithStats = Object.assign({}, foe, _generateFoeStats(randomAv, foe));
+  foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
 };
 
 beforeAll(() => generateBraBrf());

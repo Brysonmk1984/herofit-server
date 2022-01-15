@@ -1,9 +1,9 @@
 const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate, unitTestExporter } = require("../../src/game/prebattle/foeFunctions");
+const { selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
+const generateFoeStats = require("../../src/game/prebattle/generateFoeStats");
 const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
 const { doAvatarBattlePrep } = require("../../src/game/battle/doBattlePrep");
 const xpCalc = require("../../src/game/upgrades/xpCalc");
-const { _generateFoeStats } = unitTestExporter();
 
 let randomAv;
 let foeTemplate;
@@ -23,7 +23,7 @@ const generateFoe = function (av) {
     class: foeTemplate.class,
   };
 
-  foeWithStats = Object.assign({}, foe, _generateFoeStats(randomAv, foe));
+  foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
 
   // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   scenario = determineScenario(beginnersLuck);

@@ -378,7 +378,7 @@ declare namespace HF {
   };
   type SpiritFoe = "Wraith" | "Specter" | "Apparition" | "Banshee" | "Poltergeist" | "Phantasm" | "Shade" | "Phantom" | "Shadow-Self";
   type ElementalFoe = "Gusty Rascal" | "Rock Skipper" | "Flame Fiend" | "Splash Artist" | "Wheezing Jinn" | "Granite Golem" | "Burning Jinn" | "Cyclonic Siren" | "Storming Oni" | "Hulking Aggro Crag" | "Scorching Archfiend" | "High Priestess of the Tides";
-  type TitanFoe = "Plaguebringer";
+  type TitanFoe = "Guardian of the Depths" | "Plaguebringer";
   type FoeType = SpiritFoe | ElementalFoe | TitanFoe;
   interface FoeAbility {
     effect: string;
