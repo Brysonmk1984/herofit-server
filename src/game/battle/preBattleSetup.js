@@ -1,6 +1,7 @@
 const { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../CONSTANTS");
 const { determineScenario, calcScenarioBonuses } = require("./scenario");
 const { doAvatarBattlePrep, doFoeBattlePrep } = require("./doBattlePrep");
+const { parseStats } = require("../../lib/helperFunctions");
 const avCalc = require("../upgrades/avCalc");
 const chance = require("chance")();
 
@@ -75,8 +76,8 @@ const preBattleSetup = function (avatar, foe) {
       f.earth = foeEarthBoost;
     },
     getPreBattlePackage: () => ({
-      BRA: a,
-      BRF: f,
+      BRA: parseStats(a, true),
+      BRF: parseStats(f, true),
       goesFirst,
       scenario,
       effectProcs,

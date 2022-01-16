@@ -1,6 +1,6 @@
 import { Avatar } from "../config/db";
 import { Op } from "sequelize";
-import { parseAvatarProperties } from "../lib/helperFunctions";
+import { parseStats } from "../lib/helperFunctions";
 import { REVIVE_AMOUNT, RECOVER_EARLY_MOD } from "../game/CONSTANTS";
 import { sendCronErrorEmail } from "../mail";
 import chanceInit from "chance";
@@ -20,7 +20,7 @@ console.log("*** RUNNING CRON REVIVE ATTEMPT ***");
     if (results.length) {
       // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
       results.forEach((result, i) => {
-        const avatar = parseAvatarProperties(result);
+        const avatar = parseStats(result);
         const recovery = avatar.recovery;
         const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
         const recoveredEarly = chance.bool({ likelihood: recoverEarlyChance });

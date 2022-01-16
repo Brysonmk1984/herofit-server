@@ -3,7 +3,7 @@ const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THOR
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire, d) {
-  let critChance = Number((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100;
+  let critChance = Math.floor(Number((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
   if (critChance > 60) {
     critChance = 60;
   }
@@ -16,7 +16,7 @@ function determineFireCrit(fire, d) {
 
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
 function determineAirEvade(air) {
-  let evadeChance = Number((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100;
+  let evadeChance = Math.floor(Number((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100);
   //console.log(air, evadeChance);
   if (evadeChance > 60) {
     evadeChance = 60;
@@ -50,7 +50,7 @@ function determineEarthThorns(earth, d) {
 
 // Aether - late game offensive trait - takes in attacker's aether amount and calculates a chance for taking an extra battle turn
 function determineIDS(aether, goesFirst) {
-  let idsChance = Number((aether * 3) / (aether * 3 + AETHER_IDS_CHANCE_MOD)).toFixed(2) * 100;
+  let idsChance = Math.floor(Number((aether * 3) / (aether * 3 + AETHER_IDS_CHANCE_MOD)).toFixed(2) * 100);
   if (idsChance > 60) {
     idsChance = 60;
   }

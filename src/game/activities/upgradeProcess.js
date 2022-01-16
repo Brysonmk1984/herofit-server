@@ -3,7 +3,7 @@ const db = require("../../config/db").db;
 const { Op } = require("sequelize");
 const moment = require("moment");
 const crypto = require("crypto");
-const { parseAvatarProperties, range } = require("../../lib/helperFunctions");
+const { parseStats, range } = require("../../lib/helperFunctions");
 const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require("../CONSTANTS");
 const utCalc = require("../upgrades/utCalc");
 const avCalc = require("../upgrades/avCalc");
@@ -178,7 +178,7 @@ function _calcWeightedElms({ air, water, fire, earth }) {
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
 function _calcProgress(avatar, ut) {
-  const avStatSnapshot = parseAvatarProperties(
+  const avStatSnapshot = parseStats(
     Object.assign(
       {},
       {
@@ -376,8 +376,8 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
       // Return package to be used on the frontend
       return {
         activities,
-        avatar: parseAvatarProperties(updatedAvatar, true),
-        improvements: parseAvatarProperties(improvements, true),
+        avatar: parseStats(updatedAvatar, true),
+        improvements: parseStats(improvements, true),
         reachedLevel: levelInfo.lvlUp ? levelInfo.lvlAfterBuff : null,
         qpEarned: levelInfo.qpEarned,
         xpGain: levelInfo.aXPDiff,

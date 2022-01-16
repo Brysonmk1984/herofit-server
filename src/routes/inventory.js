@@ -3,7 +3,7 @@ const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const { Avatar, AvatarItems, Items, db } = require("../config/db");
 const { Op, literal } = require("sequelize");
-const { stackItems, parseAvatarProperties, arrayChunker } = require("../lib/helperFunctions");
+const { stackItems, parseStats, arrayChunker } = require("../lib/helperFunctions");
 const { itemEffects } = require("../game/items/applyEffects");
 const { authenticateJWT } = require("../jwt/validateJWT");
 
@@ -397,7 +397,7 @@ router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEm
         }
       });
 
-      let avatar = parseAvatarProperties(data[0], true);
+      let avatar = parseStats(data[0], true);
       AvatarItems.destroy({
         where: { id },
       })

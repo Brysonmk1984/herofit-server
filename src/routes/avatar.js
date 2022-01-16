@@ -6,7 +6,7 @@ const { authenticateJWT } = require("../jwt/validateJWT");
 const { Avatar, AvatarItems, User, UserTotal } = require("../config/db");
 
 const { literal, Op } = require("sequelize");
-const { parseAvatarProperties, paginate, range } = require("../lib/helperFunctions");
+const { parseStats, paginate, range } = require("../lib/helperFunctions");
 const xpCalc = require("../game/upgrades/xpCalc");
 const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("../game/activities/activityRewards");
 const { sendBackendOnlyEmail } = require("../mail");
@@ -60,7 +60,7 @@ router.post("/insert-avatar", body("avatar").isObject(), body("userId").isNumeri
 
     const created = result[1];
     // Avatar from results, parse properties that are strings that need to be numbers
-    avatar = parseAvatarProperties(result[0].dataValues);
+    avatar = parseStats(result[0].dataValues);
     avatar.restedEnough = avatar.maxHealth * 0.8 <= avatar.health;
     avatar.equipped = [];
     const { colors, alias } = heroList.find(av => av.character === avatar.character);
@@ -226,7 +226,7 @@ router.post("/get-avatar", body("email").isEmail(), body("isMobileApp").isBoolea
     }
 
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-    const avatar = parseAvatarProperties(results[0], true);
+    const avatar = parseStats(results[0], true);
 
     const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { level, albedo } = getCurrentLevel();
@@ -330,7 +330,7 @@ router.post("/fetch-avatars-by-page", body("page").isNumeric(), body("searchInpu
       const { currentLevelByInput } = xpCalc();
       // Sequelize requires us to loop over the returned data when 'raw : false'
       const avatars = actualRows.map((result, i) => {
-        const avatar = parseAvatarProperties(result);
+        const avatar = parseStats(result);
         const { level, albedo } = currentLevelByInput(avatar.totalXP);
         avatar.level = level;
         avatar.albedo = albedo;
@@ -425,7 +425,7 @@ router.post("/fetch-avatars-by-page-and-ranking-type", body("rankingType").isIn(
           const pageCount = Math.ceil(avatarCount / AVATAR_COUNT_PER_PAGE);
 
           const avatarsWithRank = avatarsOrderedByActivityDuration.map((result, i) => {
-            const avatar = parseAvatarProperties(result);
+            const avatar = parseStats(result);
             const { level, albedo } = currentLevelByInput(avatar.totalXP);
             avatar.level = level;
             avatar.albedo = albedo;
@@ -504,7 +504,7 @@ router.post("/fetch-avatars-by-page-and-ranking-type-battle", body("rankingType"
 
       // Sequelize requires us to loop over the returned data when 'raw : false'
       const avatars = actualRows.map((result, i) => {
-        const avatar = parseAvatarProperties(result);
+        const avatar = parseStats(result);
         const { level, albedo } = currentLevelByInput(avatar.totalXP);
         avatar.level = level;
         avatar.albedo = albedo;

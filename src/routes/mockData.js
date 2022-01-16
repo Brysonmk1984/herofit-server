@@ -5,7 +5,7 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const moment = require("moment");
-const { shuffleArray, parseAvatarProperties, getRandomNumber } = require("../lib/helperFunctions");
+const { shuffleArray, parseStats, getRandomNumber } = require("../lib/helperFunctions");
 const { User, Avatar, AvatarItems, Battle, UserActivity, UserTotal } = require("../config/db");
 const db = require("../config/db").db;
 // MOCK DATA
@@ -180,7 +180,7 @@ router.post("/insert-random-avatar", body("owner").isEmail(), authenticateAdminJ
       const created = result[1];
       let avatar = result[0].dataValues;
       // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
-      avatar = parseAvatarProperties(avatar);
+      avatar = parseStats(avatar);
       // New Avatar Created
       if (created) {
         // Need to remove name used for avatar

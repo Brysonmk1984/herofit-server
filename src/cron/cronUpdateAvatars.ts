@@ -3,7 +3,7 @@ import { Avatar } from "../config/db";
 import { Op } from "sequelize";
 import { RECOVERY_EFFECTIVENESS_MOD } from "../game/CONSTANTS";
 import { sendCronErrorEmail } from "../mail";
-import { parseAvatarProperties } from "../lib/helperFunctions";
+import { parseStats } from "../lib/helperFunctions";
 
 console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
@@ -15,7 +15,7 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
     // Loop over each hero and either regen health if recovering or other status effects
     results.forEach((hero: HF.Hero) => {
-      hero = parseAvatarProperties(hero);
+      hero = parseStats(hero);
       let heroHealth = hero.health;
       const maxHealth = hero.maxHealth;
       const recovery = hero.recovery;

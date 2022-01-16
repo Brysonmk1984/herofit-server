@@ -45,17 +45,16 @@ const shuffleArray = function (array: any[]) {
   return array;
 };
 
-// Converts some Hero Properties strom strings to floating point numbers
-function parseAvatarProperties(avatar: ObjectWithAnyProperties, wholeNumbers = false) {
-  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether"];
-
-  for (let attr in avatar) {
+// Converts some Hero Properties from strings to floating point numbers
+function parseStats(obj: ObjectWithAnyProperties, wholeNumbers = false) {
+  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether", "health", "power"];
+  for (let attr in obj) {
     let toBeParsed = attrsToBeParsed.includes(attr as Lowercase<HF.Stat>);
-    if (toBeParsed) {
-      avatar[attr] = wholeNumbers ? Math.floor(avatar[attr]) : parseFloat(avatar[attr]);
+    if (typeof attr === "string" && toBeParsed) {
+      obj[attr] = wholeNumbers ? Math.floor(obj[attr]) : parseFloat(obj[attr]);
     }
   }
-  return avatar as HF.Hero;
+  return obj;
 }
 
 // Convert activity properties which come from the DB as strings to floating point numbers
@@ -169,4 +168,4 @@ const arrayGroupBy = (items: ObjectWithAnyProperties[], key: string) => {
 
 const pickRandomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
 
-export { cloneObj, parseAvatarProperties, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem };
+export { cloneObj, parseStats, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem };

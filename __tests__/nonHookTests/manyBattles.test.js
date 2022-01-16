@@ -8,6 +8,7 @@ const doBattle = require("../../src/game/battle/doBattle");
 const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../src/game/CONSTANTS");
 const avCalc = require("../../src/game/upgrades/avCalc");
 const xpCalc = require("../../src/game/upgrades/xpCalc");
+const { parseStats } = require("../../src/lib/helperFunctions");
 const chance = require("chance")();
 
 // Use toEqual for objects and arrays
@@ -24,13 +25,12 @@ const generateFoes = function (avatars) {
       class: foeTemplate.class,
     };
 
-    const f = Object.assign({}, foe, generateFoeStats(av, foe));
-
-    return f;
+    return Object.assign({}, foe, parseStats(generateFoeStats(av, foe), true));
   });
 };
 
-function generateBrs(avatars, foesWithStats) {
+function generateBrs(avatars, fws) {
+  const foesWithStats = [...fws];
   const { determineAstrologySeason } = avCalc();
   const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
   return avatars.map((av, i) => {
@@ -84,7 +84,7 @@ function generateBrs(avatars, foesWithStats) {
         goesFirst = randDecider === 0 ? "Avatar" : "Foe";
       }
     }
-    return { BRA, BRF, goesFirst };
+    return { BRA: parseStats(BRA, true), BRF: parseStats(BRF, true), goesFirst };
   });
 }
 
@@ -95,7 +95,7 @@ describe("Battle all generated foes against av profiles", () => {
   });
   let multipliedAvatars = [];
   // Multiplies the instances of avatar profiles to create more battles
-  const battleMultiplier = 5;
+  const battleMultiplier = 1;
   for (let i = 0; i < battleMultiplier; i++) {
     multipliedAvatars.push(...avatars);
   }
@@ -104,7 +104,7 @@ describe("Battle all generated foes against av profiles", () => {
 
   let foesWithStats = generateFoes(multipliedAvatars);
   let preBattles = generateBrs(multipliedAvatars, foesWithStats);
-  //console.log(foesWithStats);
+
   // BATTLE STEP 5 - EXCHANGE DAMAGE
 
   const allBattles = preBattles.map(b => {

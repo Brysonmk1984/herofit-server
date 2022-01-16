@@ -1,5 +1,5 @@
-import { arrayGroupBy, pickRandomArrayItem } from "../../lib/helperFunctions";
-import { FoeTemplate, SpecialEvent, VillainJsonStructure } from "../../types/BackendOnlyTypes";
+import { arrayGroupBy, parseStats, pickRandomArrayItem } from "../../lib/helperFunctions";
+import { FoeStats, FoeTemplate, SpecialEvent, VillainJsonStructure } from "../../types/BackendOnlyTypes";
 import { determineXpBounty, determinePtBounty } from "../battle/determineBounties";
 import HF from "../../types/herofit";
 import { BEGINNERS_LUCK_LIKELIHOOD, OUTCOME_XP, BEGINNERS_LUCK_MAX_LEVEL } from "../CONSTANTS";
@@ -59,7 +59,6 @@ function _generateFoeName(foeTemplate: FoeTemplate, avatarName: string) {
 
 // Decides which foe template will be chosen for battle before stats are added
 function selectFoeTemplate(level: number) {
-  console.log("the lev", level);
   // Special Event Foe check
   const possibleSpecialEventFoe = <FoeTemplate>_specialEventFoeChance(level, config.specialEvent);
   if (possibleSpecialEventFoe) {
@@ -95,8 +94,8 @@ function findFoeTemplateByType(foeType: HF.FoeType) {
 
 // Foe param is usually null, unless an item created the battle
 function determineFoeWithStats(avatar: HF.Hero, foeTemplate: FoeTemplate, totalLevel: number): HF.Foe {
-  // If it's the shadow self, just return a mirror image of the Hero stats, otherwise generateFoeStatsBased on template
-  const foeStats = generateFoeStats(avatar, foeTemplate);
+  // GenerateFoeStatsBased on template, or for shadow self, copy of hero will stats will be returned
+  const foeStats = parseStats(generateFoeStats(avatar, foeTemplate), true) as FoeStats;
 
   return {
     type: foeTemplate.type,

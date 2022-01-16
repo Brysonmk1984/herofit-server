@@ -4,7 +4,7 @@ const { authenticateAdminJWT } = require("../jwt/validateJWT");
 const router = express.Router();
 const { Avatar, AvatarItems, Items, Battle } = require("../config/db");
 const { Op, col } = require("sequelize");
-const { parseAvatarProperties } = require("../lib/helperFunctions");
+const { parseStats } = require("../lib/helperFunctions");
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD } = require("../game/CONSTANTS");
 const { selectFoeTemplate } = require("../game/prebattle/foeFunctions");
 const { generateFoeStats } = require("../game/prebattle/generateFoeStats");
@@ -32,7 +32,7 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
       const allPromises = [];
       // Loop over each avatar and either regen health if recovering or other status effects
       results.forEach(avatar => {
-        avatar = parseAvatarProperties(avatar);
+        avatar = parseStats(avatar);
         console.log("AVV", avatar);
         let avatarHealth = avatar.health;
         const maxHealth = avatar.maxHealth;
@@ -132,7 +132,7 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
       if (results.length) {
         // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
         results.forEach((result, i) => {
-          const avatar = parseAvatarProperties(result);
+          const avatar = parseStats(result);
 
           const recovery = avatar.recovery;
           const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;

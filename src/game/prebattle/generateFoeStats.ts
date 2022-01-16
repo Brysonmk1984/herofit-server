@@ -23,27 +23,26 @@ function _determineBonusToStatsSpecialEvent(event: SpecialEvent, foeStats: FoeSt
 // Random modifier within -15% of base stat
 function _randomizer(statVal: number, modifierInteger = -15) {
   let randomModifierDecimal = Math.floor(Math.random() * modifierInteger) * 0.01;
-  const modifiedStat = statVal + randomModifierDecimal * statVal;
-  return { stat: Math.floor(modifiedStat), modifier: randomModifierDecimal };
+  const modifiedStat = Math.floor(statVal + randomModifierDecimal * statVal);
+  return { stat: modifiedStat, modifier: randomModifierDecimal };
 }
 
 // Determine Foe's Base power, health and qp based on hero level
 function _determineBasePrimaryFoeStats(totalLevel: number) {
-  let baseQP = Math.floor(totalLevel * 5 - 5);
-  let baseFoeHealth = Math.floor((totalLevel * 5 + 100) * FOE_MOD.HEALTH);
-  let baseFoePower = Math.floor((totalLevel * 5 + 100) * FOE_MOD.POWER);
-
+  let baseQP = totalLevel * 5 - 5;
+  let baseFoePower = (totalLevel * 5 + 100) * FOE_MOD.POWER;
+  let baseFoeHealth = (totalLevel * 5 + 100) * FOE_MOD.HEALTH;
   const isHighLevel = totalLevel >= HIGH_LEVEL ? true : false;
   const isMidLevel = LOW_LEVEL < totalLevel && totalLevel < HIGH_LEVEL ? true : false;
 
   if (isMidLevel || isHighLevel) {
-    baseQP = Math.floor(baseQP * LEVEL_DIFFICULTY_MOD);
-    baseFoeHealth = Math.floor(baseFoeHealth * LEVEL_DIFFICULTY_MOD);
-    baseFoePower = Math.floor(baseFoePower * LEVEL_DIFFICULTY_MOD);
+    baseQP = baseQP * LEVEL_DIFFICULTY_MOD;
+    baseFoeHealth = baseFoeHealth * LEVEL_DIFFICULTY_MOD;
+    baseFoePower = baseFoePower * LEVEL_DIFFICULTY_MOD;
     if (isHighLevel) {
-      baseQP = Math.floor(baseQP * HIGH_LEVEL_DIFFICULTY_MOD);
-      baseFoeHealth = Math.floor(baseFoeHealth * HIGH_LEVEL_DIFFICULTY_MOD);
-      baseFoePower = Math.floor(baseFoePower * HIGH_LEVEL_DIFFICULTY_MOD);
+      baseQP = baseQP * HIGH_LEVEL_DIFFICULTY_MOD;
+      baseFoeHealth = baseFoeHealth * HIGH_LEVEL_DIFFICULTY_MOD;
+      baseFoePower = baseFoePower * HIGH_LEVEL_DIFFICULTY_MOD;
     }
   }
   return {
@@ -82,9 +81,9 @@ function _determineSpiritStats(baseQP: number, baseFoeHealth: number, baseFoePow
   return {
     foeStats: {
       ...foe,
-      health: Math.floor(randomizedHealth.stat),
-      power: Math.floor(randomizedPower.stat),
-      qp: Math.floor(randomizedQP.stat),
+      health: randomizedHealth.stat,
+      power: randomizedPower.stat,
+      qp: randomizedQP.stat,
       // Calculates the overall difficulty modification after randomization. Used for pt and xp after battles
       difficulty: -((randomizedHealth.modifier + randomizedPower.modifier + randomizedQP.modifier) / 3).toFixed(3),
     },
@@ -128,19 +127,19 @@ function _determineElementalStats(baseQP: number, baseFoeHealth: number, baseFoe
       qpAdjustedStats = ["water", "armor", "power", "health"];
       break;
     case "Wheezing Jinn":
-      foe.air = 100 + totalLevel + Math.floor(totalLevel * 0.75);
+      foe.air = 100 + totalLevel + totalLevel * 0.75;
       qpAdjustedStats = ["air", "armor", "power", "health"];
       break;
     case "Granite Golem":
-      foe.earth = 100 + totalLevel + Math.floor(totalLevel * 0.75);
+      foe.earth = 100 + totalLevel + totalLevel * 0.75;
       qpAdjustedStats = ["earth", "armor", "power", "health"];
       break;
     case "Burning Jinn":
-      foe.fire = 175 + totalLevel + Math.floor(totalLevel * 0.75);
+      foe.fire = 175 + totalLevel + totalLevel * 0.75;
       qpAdjustedStats = ["fire", "armor", "power", "health"];
       break;
     case "Cyclonic Siren":
-      foe.water = 175 + totalLevel + Math.floor(totalLevel * 0.75);
+      foe.water = 175 + totalLevel + totalLevel * 0.75;
       qpAdjustedStats = ["water", "armor", "power", "health"];
       break;
     case "Storming Oni":
@@ -174,9 +173,9 @@ function _determineElementalStats(baseQP: number, baseFoeHealth: number, baseFoe
   return {
     foeStats: {
       ...foe,
-      health: Math.floor(randomizedHealth.stat),
-      power: Math.floor(randomizedPower.stat),
-      qp: Math.floor(randomizedQP.stat),
+      health: randomizedHealth.stat,
+      power: randomizedPower.stat,
+      qp: randomizedQP.stat,
       // Calculates the overall difficulty modification after randomization. Used for pt and xp after battles
       difficulty: -((randomizedHealth.modifier + randomizedPower.modifier + randomizedQP.modifier) / 3).toFixed(3),
     },
@@ -192,26 +191,26 @@ function _determineTitanStats(baseQP: number, baseFoeHealth: number, baseFoePowe
   let qpAdjustedStats: PossibleFoeStat[] = [];
 
   if (foe.type === "Plaguebringer") {
-    foe.health = randomizedHealth.stat < 300 ? 300 : Math.floor(randomizedHealth.stat);
-    foe.power = Math.floor(randomizedPower.stat);
-    foe.earth = Math.floor(50 + 2.15 * totalLevel);
-    foe.water = Math.floor(50 + 2.15 * totalLevel);
+    foe.health = randomizedHealth.stat < 300 ? 300 : randomizedHealth.stat;
+    foe.power = randomizedPower.stat;
+    foe.earth = 50 + 2.15 * totalLevel;
+    foe.water = 50 + 2.15 * totalLevel;
     qpAdjustedStats = ["health", "power", "armor", "earth", "water"];
   } else if ("Guardian of the Depths") {
-    const baseHealth = randomizedHealth.stat < 400 ? 400 : Math.floor(randomizedHealth.stat);
-    foe.health = Math.floor(baseHealth * 1.1);
-    foe.power = Math.floor(randomizedPower.stat);
-    foe.earth = Math.floor(50 + 2.3 * totalLevel);
-    foe.fire = Math.floor(50 + 2.3 * totalLevel);
+    const baseHealth = randomizedHealth.stat < 400 ? 400 : randomizedHealth.stat;
+    foe.health = baseHealth * 1.1;
+    foe.power = randomizedPower.stat;
+    foe.earth = 50 + 2.3 * totalLevel;
+    foe.fire = 50 + 2.3 * totalLevel;
     qpAdjustedStats = ["health", "power", "armor", "earth", "fire"];
   }
 
   return {
     foeStats: {
       ...foe,
-      health: Math.floor(randomizedHealth.stat),
-      power: Math.floor(randomizedPower.stat),
-      qp: Math.floor(randomizedQP.stat),
+      health: randomizedHealth.stat,
+      power: randomizedPower.stat,
+      qp: randomizedQP.stat,
       // Calculates the overall difficulty modification after randomization. Used for pt and xp after battles
       difficulty: -((randomizedHealth.modifier + randomizedPower.modifier + randomizedQP.modifier) / 3).toFixed(3),
     },

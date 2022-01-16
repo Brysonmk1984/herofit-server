@@ -1,4 +1,4 @@
-const { arrayChunker, roundNumber, parseAvatarProperties } = require("../../lib/helperFunctions");
+const { arrayChunker, roundNumber, parseStats } = require("../../lib/helperFunctions");
 const battleProcess = require("./battleProcess");
 const { sendBattleReportEmail } = require("../../mail");
 
@@ -12,7 +12,7 @@ function _runBattlesOnBatch(shard) {
 
     let battlePromises = [];
     for (let i = 0; i < shard.length; i++) {
-      battlePromises.push(battleProcess(shard[i], parseAvatarProperties(allAvatars[i])));
+      battlePromises.push(battleProcess(shard[i], parseStats(allAvatars[i])));
     }
     return Promise.allSettled(battlePromises);
   } catch (error) {
