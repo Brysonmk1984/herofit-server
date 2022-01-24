@@ -18,7 +18,7 @@ describe("POST /auth/login", () => {
       })
       .set("Accept", "application/json")
       .expect(200);
-    console.log("VAL", response.body.data.user);
+
     const { email } = response.body.data.user;
     expect(email).toBe(process.env.TEST_SIGN_IN_EMAIL);
     expect(response.body.data.user).toEqual(
