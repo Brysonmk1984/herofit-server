@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    // Using TypeScript, node.js and the TypeScript compiler option "module": "esnext" together is next to impossible. So if you're building code that should be ran with node.js, in 2020, you should still choose "module": "commonjs".
     "module": "commonjs",
     "outDir": "./build",
     "rootDir": "./src",

@@ -44,9 +44,21 @@ function insertBattle(avatar, foe) {
         battleObj.effects = itemBattleEffects;
       }
 
-      return Battle.create(battleObj, { raw: true });
+      // Using findOrCreate now to prevent multiple battles
+      return Battle.findOrCreate({
+        where: {
+          outcome: "TBD",
+          avatarID: battleObj.avatarID,
+        },
+        defaults: battleObj,
+        raw: true,
+      });
     })
-    .then(() => {
+    .then(([battleInstance, wasCreated]) => {
+      if (!wasCreated) {
+        console.log("Battle already exists");
+        throw new Error("Battle already in queue for hero");
+      }
       return Avatar.update(
         {
           goToBattle: true,

@@ -372,7 +372,7 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
       if (levelRewards) {
         rewards.push(...levelRewards.value);
       }
-      console.log("IMPROVEMENTS-", improvements);
+      //console.log("IMPROVEMENTS-", improvements);
       // Return package to be used on the frontend
       return {
         activities,
