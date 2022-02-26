@@ -130,9 +130,8 @@ interface FrontEndErrorData {
   debug: any[] | string;
   meta: string | null;
   status: number | null;
-  version: number;
-  location: "frontend";
-  message: "string";
+  version: string;
+  message: string;
   accountInfo: {
     username: string | undefined;
     email: string | undefined;

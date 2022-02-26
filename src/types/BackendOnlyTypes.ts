@@ -1,4 +1,5 @@
 import HF from "./herofit";
+import { Request, Response } from "express";
 
 type NodeEnvironments = "development" | "staging" | "production" | "test";
 
@@ -85,4 +86,10 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType };
+type FormatterResponse = (value: any, meta: any) => { data?: any; error?: any };
+
+interface TypedRequestBody<T> extends Request {
+  body: T;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, FormatterResponse, TypedRequestBody };
