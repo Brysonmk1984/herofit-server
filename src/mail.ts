@@ -52,8 +52,6 @@ let transporter = determineTransporter(env);
 
 interface ContactEmailFormData {
   email: string;
-  username: string;
-  firstName: string | null;
   feedbackType: string;
   message: string;
   accountInfo: BasicUserContactInfo | "User not logged in.";

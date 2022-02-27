@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { BasicUserContactInfo, TypedRequestBody } from "../types/BackendOnlyTypes";
 import { body, validationResult } from "express-validator";
 import { sendDataCollectionEmail, sendContactEmail, sendAppErrorEmail } from "../mail";
@@ -25,7 +25,7 @@ router.post("/feedback-data", body("email").isEmail(), body("username").isString
 
   try {
     // Send feedback data to info@herofit.io
-    await sendDataCollectionEmail({ email, username, title, opinion, openResponse, accountInfo: accountInfo || "User not logged in." });
+    await sendDataCollectionEmail({ username, title, opinion, openResponse, accountInfo: accountInfo || "User not logged in." });
     // Set featurePreferenceSubmitted to true in DB for user
     await User.update({ featurePreferenceSubmitted: true }, { where: { email } });
 
@@ -82,7 +82,7 @@ router.post("/app-error", body("status").isNumeric(), body("message").isString()
       meta,
       accountInfo,
     });
-    res.formatter.ok();
+    res.formatter.ok(null);
   } catch (error) {
     console.log("Error sending App Error Email - ", error);
     res.formatter.serverError(error, `Email could not be sent - /app-error endpoint`);

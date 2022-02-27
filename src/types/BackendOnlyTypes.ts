@@ -86,8 +86,6 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
-type FormatterResponse = (value: any, meta: any) => { data?: any; error?: any };
-
 interface TypedRequestBody<T> extends Request {
   body: T;
 }

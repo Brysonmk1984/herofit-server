@@ -1,2 +1,11 @@
-// Enter any modules here with the following declare statement to make the module 'any'
-//declare module 'excel4node';
+import "express";
+import type { responseEnhancer } from "express-response-formatter";
+
+declare module "express" {
+  interface AnyFormatterMethod {
+    [key: string]: (data: any, meta?: any) => void;
+  }
+  interface Response {
+    formatter: AnyFormatterMethod;
+  }
+}
