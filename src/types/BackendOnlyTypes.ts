@@ -86,8 +86,14 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
+interface PassportUser {
+  id: string;
+  email: string;
+}
+
 interface TypedRequestBody<T> extends Request {
   body: T;
+  // user? : Express.User;
 }
 
 export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, FormatterResponse, TypedRequestBody };

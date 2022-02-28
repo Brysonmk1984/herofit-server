@@ -1,11 +1,14 @@
 import "express";
+// Needed for res.formatter, using express with express-response-formatter
 import type { responseEnhancer } from "express-response-formatter";
 
-declare module "express" {
-  interface AnyFormatterMethod {
-    [key: string]: (data: any, meta?: any) => void;
-  }
-  interface Response {
-    formatter: AnyFormatterMethod;
+// Needed to make user object typesafe, using passport-jwt with express
+interface JWTUser {
+  id: number;
+  email: string;
+}
+declare global {
+  namespace Express {
+    interface User extends JWTUser {}
   }
 }
