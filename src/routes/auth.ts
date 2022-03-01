@@ -1,65 +1,81 @@
-const router = require("express").Router();
-const { body, validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const verifyRecaptcha = require("../lib/verifyRecaptcha");
-const { authenticateJWT } = require("../jwt/validateJWT");
-const issueJWT = require("../jwt/issueJWT");
-const { User } = require("../config/db");
-const { config } = require("../appConfig");
-const latestPatchDetails = require("../patchDetails/latest.json");
-const { genPassword, validatePassword } = require("../lib/passwordUtils");
-const { randomEmailString, usePasswordHashToMakeToken } = require("../lib/passwordUtils");
-const { sendVerificationEmail, sendResetPasswordEmail, sendBackendOnlyEmail } = require("../mail");
-const axios = require("axios");
-
+import express, { Response } from "express";
+import { body, validationResult } from "express-validator";
+import { authenticateJWT } from "../jwt/validateJWT";
+import issueJWT from "../jwt/issueJWT";
+import { User } from "../config/db";
+import { config } from "../appConfig";
+import latestPatchDetails from "../patchDetails/latest.json";
+import { genPassword, validatePassword } from "../lib/passwordUtils";
+import { randomEmailString, usePasswordHashToMakeToken } from "../lib/passwordUtils";
+import { sendVerificationEmail, sendResetPasswordEmail, sendBackendOnlyEmail } from "../mail";
+import axios from "axios";
 // mobile app only
-const heroList = require("../heroList.json");
-const crypto = require("crypto");
-const { Op } = require("sequelize");
+import heroList from "../heroList.json";
+import crypto from "crypto";
+import { Op } from "sequelize";
+import { TypedRequestBody } from "../types/BackendOnlyTypes";
+import HF from "../types/herofit";
 
-router.post("/login", body("email").isEmail(), body("password").isString({ min: 8, max: 25 }), (req, res) => {
+const router = express.Router();
+
+interface LoginBody {
+  email: string;
+  password: string;
+}
+router.post("/login", body("email").isEmail(), body("password").isString().isLength({ min: 8, max: 25 }), async (req: TypedRequestBody<LoginBody>, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /login");
   }
-
   if (config.mode === "maintenance") {
     return res.formatter.serviceUnavailable("Server is down for maintenance, please try again later...");
   }
   const { email, password } = req.body;
 
-  User.findOne({ where: { email: { [Op.iLike]: email } }, raw: true })
-    .then(user => {
-      if (!user) {
-        return res.formatter.unauthorized(`Couldn't find a user with that email.`);
-      } else if (!user.hash) {
-        return res.formatter.unauthorized({
-          oldUserMigration: true,
-          message: "HeroFit has upgraded to a new login system. Please verify your account.",
-        });
-      }
+  try {
+    const user = await User.findOne({ where: { email: { [Op.iLike]: email } }, raw: true });
+    if (!user) {
+      return res.formatter.unauthorized(`Couldn't find a user with that email.`);
+    } else if (!user.hash) {
+      return res.formatter.unauthorized({
+        oldUserMigration: true,
+        message: "HeroFit has upgraded to a new login system. Please verify your account.",
+      });
+    }
 
-      const isValid = validatePassword(password, user.hash, user.salt);
-      if (isValid) {
-        const tokenObject = issueJWT(user);
-        console.log(tokenObject);
-        return res.formatter.ok({ user, tokenObject });
-      } else {
-        return res.formatter.unauthorized(`Incorrect password, please try again.`);
-      }
-    })
-    .catch(error => {
-      console.log("Passport Auth error - ", error);
-      res.formatter.serverError(error.toString(), `Error Logging in User - for POST /login`);
-    });
+    const isValid = validatePassword(password, user.hash, user.salt);
+    if (isValid) {
+      const tokenObject = issueJWT(user);
+      return res.formatter.ok({ user, tokenObject });
+    } else {
+      return res.formatter.unauthorized(`Incorrect password, please try again.`);
+    }
+  } catch (error) {
+    console.log("Passport Auth error - ", error);
+    res.formatter.serverError(error.toString(), `Error Logging in User - for POST /login`);
+  }
 });
 
+interface RegisterBody {
+  email: string;
+  username: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  hash: string;
+  salt: string;
+  emailCode: string;
+  emailMarketingOptIn: boolean;
+  isMetric: boolean;
+  foundOutBy: string | null;
+  referredBy?: string;
+  isMobileApp: boolean;
+}
 // captchaValue is optional since App isn't using it
 // * TURNS OUT, passing null to something optional will still trigger an error unless "{nullable: true, checkFalsy: true}" is passed in
-router.post("/register", body("email").isEmail(), body("firstName").isString(), body("username").isString({ min: 3, max: 25 }), body("password").isString({ min: 8, max: 25 }), body("emailMarketingOptIn").isBoolean(), body("isMetric").isBoolean(), body("foundOutBy").isString().optional({ nullable: true }), body("referredBy").isString().optional({ nullable: true }), body("isMobileApp").isBoolean().optional({ nullable: true, checkFalsy: true }), (req, res) => {
+router.post("/register", body("email").isEmail(), body("firstName").isString(), body("username").isString().isLength({ min: 3, max: 25 }), body("password").isString().isLength({ min: 8, max: 25 }), body("emailMarketingOptIn").isBoolean(), body("isMetric").isBoolean(), body("foundOutBy").isString().optional({ nullable: true }), body("referredBy").isString().optional({ nullable: true }), body("isMobileApp").isBoolean().optional({ nullable: true, checkFalsy: true }), async (req: TypedRequestBody<RegisterBody>, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    //console.log("VALIDATION ERRS ON REGISTER:", errors);
     sendBackendOnlyEmail("Couldn't Register - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /register");
   }
@@ -89,46 +105,48 @@ router.post("/register", body("email").isEmail(), body("firstName").isString(), 
     referredBy,
   };
 
-  User.create(newUser)
-    .then(result => {
-      // Not sure why sequelize can't do raw : true, so we need this:
-      const user = result.get({ plain: true });
+  try {
+    const result = await User.create(newUser);
 
-      const tokenObject = issueJWT(user);
-      const response = { user, tokenObject };
+    // Not sure why sequelize can't do raw : true, so we need this:
+    const user = result.get({ plain: true });
+    const tokenObject = issueJWT(user);
 
-      if (config.globalMessage && config.globalMessage.length) {
-        response.globalMessage = config.globalMessage;
-      }
-      sendVerificationEmail(email, emailCode, isMobileApp)
-        .then(data => {
-          if (data.error) {
-            return res.formatter.serverError(error.toString());
-          }
+    interface ResponseData {
+      user: RegisterBody;
+      tokenObject: {
+        token: string;
+        expiresIn: string;
+      };
+      globalMessage?: HF.GlobalMessage[];
+    }
 
-          //console.log('sending OK RESPONSE');
-          return res.formatter.ok(response);
-        })
-        .catch(error => {
-          console.log("THE ERROR", error);
-        });
-    })
-    .catch(error => {
-      console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
-      const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
-      if (error.toString() === uniqueConstraint) {
-        console.log("YEP, UNIQUE EMAIL VIOLATION");
-        const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
-        return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
-      }
-      sendBackendOnlyEmail("Couldn't Register!", JSON.stringify(error));
-      res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
-    });
+    const response: ResponseData = { user, tokenObject };
+    if (config.globalMessage && config.globalMessage.length) {
+      response.globalMessage = config.globalMessage;
+    }
+
+    await sendVerificationEmail(email, emailCode, isMobileApp);
+    return res.formatter.ok(response);
+  } catch (error) {
+    console.log(`Couldn't create user ${email}, DEBUG: ${error}`);
+    const uniqueConstraint = `SequelizeUniqueConstraintError: Validation error`;
+    if (error.toString() === uniqueConstraint) {
+      const emailTakenMessage = "That email is already in use. Have you already registered? Try logging in instead.";
+      return res.formatter.badRequest(emailTakenMessage, `Email already in use ${email} - for POST /register`);
+    }
+    sendBackendOnlyEmail("Couldn't Register!", JSON.stringify(error));
+    res.formatter.serverError(error.toString(), `Couldn't create user ${email} - for POST /register`);
+  }
 });
 
-// FOR BOTH PASSWORD RESET AND LEGACY ACCOUNTS CONFIRMING EMAIL
+interface ResetPasswordConfirmEmailBody {
+  email: string;
+  isMobileApp: boolean;
+}
 
-router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMobileApp").isBoolean().optional(), (req, res) => {
+// FOR BOTH PASSWORD RESET AND LEGACY ACCOUNTS CONFIRMING EMAIL
+router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMobileApp").isBoolean().optional(), async (req: TypedRequestBody<ResetPasswordConfirmEmailBody>, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     sendBackendOnlyEmail("Couldn't send reset password email - validation error!", JSON.stringify(errors));
@@ -136,32 +154,19 @@ router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMo
   }
   const { email, isMobileApp } = req.body;
 
-  User.findOne({
-    where: { email },
-    attributes: ["email", "hash", "createdAt"],
-    raw: true,
-  })
-    .then(result => {
-      if (result) {
-        const token = usePasswordHashToMakeToken(result);
-        sendResetPasswordEmail(email, token, isMobileApp)
-          .then(result => {
-            console.log("RESET PASS RESult=", result);
-            return res.formatter.ok({ result });
-          })
-          .catch(error => {
-            console.log("Error", error);
-            sendBackendOnlyEmail("Couldn't send reset password email - inner server error!", JSON.stringify(error));
-            res.formatter.serverError(error.toString(), "Server Error Sending Email - for POST /reset-password-confirm-email");
-          });
-      } else {
-        return res.formatter.badRequest("No matching email.");
-      }
-    })
-    .catch(error => {
-      sendBackendOnlyEmail("Couldn't send reset password email - server error!", JSON.stringify(error));
-      res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
-    });
+  try {
+    const user = User.findOne({ where: { email }, attributes: ["email", "hash", "createdAt"], raw: true });
+    if (user) {
+      const token = usePasswordHashToMakeToken(user);
+      const result = await sendResetPasswordEmail(email, token, isMobileApp);
+      return res.formatter.ok({ result });
+    } else {
+      return res.formatter.badRequest("No matching email.");
+    }
+  } catch (error) {
+    sendBackendOnlyEmail("Couldn't send reset password email - server error!", JSON.stringify(error));
+    res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");
+  }
 });
 
 router.post("/reset-password", body("email").isEmail(), body("token").isString(), body("password").isString({ min: 8, max: 25 }), (req, res) => {

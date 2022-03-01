@@ -80,8 +80,14 @@ router.delete("/:username", body("username").isString(), body("email").isEmail()
   }
 });
 
+interface DeleteAccountByEmailBody {
+  id: number;
+  username: string;
+  email: string;
+  avatarID: number;
+}
 // DELETE ACCOUNT
-router.delete("/:email", body("id").isNumeric().optional({ nullable: true, checkFalsy: true }), body("username").isString(), body("email").isEmail(), body("avatarID").isNumeric(), authenticateJWT, async (req, res) => {
+router.delete("/:email", body("id").isNumeric().optional({ nullable: true, checkFalsy: true }), body("username").isString(), body("email").isEmail(), body("avatarID").isNumeric(), authenticateJWT, async (req: TypedRequestBody<DeleteAccountByEmailBody>, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /:username");
@@ -110,7 +116,12 @@ router.delete("/:email", body("id").isNumeric().optional({ nullable: true, check
   MOBILE APP ONLY
 */
 
-router.put("/toggle-metric-system", body("isMetric").isBoolean(), body("email").isEmail(), authenticateJWT, async (req, res) => {
+interface ToggleMetricSystemBody {
+  isMetric: boolean;
+  email: string;
+}
+
+router.put("/toggle-metric-system", body("isMetric").isBoolean(), body("email").isEmail(), authenticateJWT, async (req: TypedRequestBody<ToggleMetricSystemBody>, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /toggle-metric-system");
