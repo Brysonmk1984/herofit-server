@@ -86,6 +86,13 @@ interface SpecialEvent {
   actionTypes: SpecialEventActionType[];
 }
 
+interface StravaUpdateObj {
+  stravaAccessToken: string;
+  stravaAccessTokenExpiration: number;
+  stravaRefreshToken: string;
+  dataSrcId?: string;
+}
+
 interface PassportUser {
   id: string;
   email: string;
@@ -96,4 +103,4 @@ interface TypedRequestBody<T> extends Request {
   // user? : Express.User;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, FormatterResponse, TypedRequestBody };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody };
