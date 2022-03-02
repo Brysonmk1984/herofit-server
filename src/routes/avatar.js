@@ -30,7 +30,7 @@ async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null) {
       }
     }
     const result = await AvatarItems.create(item, t ? { transaction: t } : null);
-    return "Received the Snowshoe Hare pet, check your inventory!";
+    return "Received the Snowshoe Hare pet as a reward for signing up!";
   } catch (error) {
     sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
     throw error;
