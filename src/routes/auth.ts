@@ -233,50 +233,39 @@ interface ResendEmailConfirmationBody {
 router.post("/resend-email-confirmation", body("email").isEmail(), body("emailCode").isString().optional(), body("isMobileApp").isBoolean().optional(), async (req: TypedRequestBody<ResendEmailConfirmationBody>, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     sendBackendOnlyEmail("Couldn't Resend email confirmation - validation error!", JSON.stringify(errors));
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /resend-email-confirmation");
   }
 
   let { email, emailCode, isMobileApp } = req.body;
 
-  function _handleSendEmailCode() {
-    console.log("/resend-email-confirmation", email, emailCode);
-    sendVerificationEmail(email, emailCode, isMobileApp)
-      .then(data => {
-        if (data.error) {
-          return res.formatter.serverError(error.toString());
-        }
-        // emailCode returned for testing purposes only
-        return res.formatter.ok({ emailCode });
-      })
-      .catch(error => {
-        console.log("THE ERROR", error);
-        sendBackendOnlyEmail("Couldn't Resend email confirmation - Error sending verification email!", JSON.stringify(error));
-        return res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
-      });
+  async function _handleSendEmailCode() {
+    try {
+      const result = await sendVerificationEmail(email, emailCode, isMobileApp);
+      if (result instanceof Error) {
+        throw result;
+      }
+      // emailCode returned for testing purposes only
+      res.formatter.ok({ emailCode });
+    } catch (error) {
+      sendBackendOnlyEmail("Couldn't Resend email confirmation - Error sending verification email!", JSON.stringify(error));
+      res.formatter.serverError(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
+    }
   }
 
   // If no emailCode, it means the user is trying to activate their account at a later date. In this case, generate a new emailCode since they don't have an emailCode saved in a JWT
   if (!emailCode) {
     emailCode = randomEmailString();
-    console.log("UPDATING EMAIL CODE", emailCode);
 
     try {
-      User.update({ emailCode }, { where: { email }, returning: true })
-        .then(data => {
-          if (data[0] === 0) {
-            throw new Error("No Matching Email");
-          }
-          console.log("DDD", data);
-          _handleSendEmailCode();
-        })
-        .catch(error => {
-          console.log("email doesn't exist", error.toString());
-          return res.formatter.badRequest(error.toString(), "CLIENT Error - for POST /resend-email-confirmation");
-        });
+      const data = await User.update({ emailCode }, { where: { email }, returning: true });
+      if (data[0] === 0) {
+        throw new Error("No Matching Email");
+      }
+
+      _handleSendEmailCode();
     } catch (error) {
-      return res.formatter.badRequest(error.toString(), "SERVER Error - for POST /resend-email-confirmation");
+      return res.formatter.badRequest(error.toString(), "Error - for POST /resend-email-confirmation");
     }
   } else {
     _handleSendEmailCode();
@@ -284,7 +273,7 @@ router.post("/resend-email-confirmation", body("email").isEmail(), body("emailCo
 });
 
 // VALIDATE EMAIL - User clicked a link in their email and were redirected to either the
-// Oauth page or welcome page along with a 'verify' parameter containing a JWT of their password
+// Oauth page along with a 'verify' parameter containing a JWT of their password
 // NOTE! - not used for forgot password or updating legacy accounts
 router.post("/validated-email", body("emailCode").isString(), async (req: TypedRequestBody<{ emailCode: string }>, res: Response) => {
   const errors = validationResult(req);

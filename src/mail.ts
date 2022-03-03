@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { BasicUserContactInfo, NodeEnvironments } from "./types/BackendOnlyTypes";
 import { includesBasicUserInfo } from "./types/typeguards";
 
@@ -252,7 +253,7 @@ const sendBattleReportEmail = function (tally: BattleTally) {
 };
 
 // VERIFICATION EMAIL - Verifying Accounts
-const sendVerificationEmail = function (email: string, code: string, isMobileApp: boolean) {
+const sendVerificationEmail = function (email: string, code: string, isMobileApp: boolean): Promise<SMTPTransport.SentMessageInfo | Error> {
   const env = process.env.NODE_ENV as NodeEnvironments;
   const baseUrl = determineVerificationUrl(env, isMobileApp);
   const route = isMobileApp ? "" : "/welcome";
