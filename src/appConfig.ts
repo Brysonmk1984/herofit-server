@@ -11,7 +11,7 @@ interface Config {
 }
 
 const config: Config = {
-  mode: appState[0],
+  mode: appState[1],
   specialEvent: appWelcome,
 
   // globalMessage: [

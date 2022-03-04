@@ -30,8 +30,8 @@ function determineTransporter(env: NodeEnvironments) {
       port: 587,
       secure: false,
       auth: {
-        user: "vhrks3qs5lf6x3rg@ethereal.email",
-        pass: "1AAZg6Z86MYFBPPYwu",
+        user: process.env.TEST_MAIL_PROVIDER,
+        pass: process.env.TEST_MAIL_PROVIDER_PASSWORD,
       },
     });
   } else {
