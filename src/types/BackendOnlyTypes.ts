@@ -1,5 +1,6 @@
 import HF from "./herofit";
 import { Request, Response } from "express";
+import { Express } from "@sentry/tracing/dist/integrations";
 
 type NodeEnvironments = "development" | "staging" | "production" | "test";
 
@@ -93,14 +94,38 @@ interface StravaUpdateObj {
   dataSrcId?: string;
 }
 
-interface PassportUser {
-  id: string;
-  email: string;
-}
-
 interface TypedRequestBody<T> extends Request {
   body: T;
-  // user? : Express.User;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody };
+interface ActivityTotal {
+  duration: number;
+  instance: number;
+}
+type ActivityTotalOrNull = ActivityTotal | null;
+
+interface UserTotals {
+  id: number;
+  user: string;
+  avatarId: string;
+  lastUpdate: string;
+  run: ActivityTotalOrNull;
+  hike: ActivityTotalOrNull;
+  walk: ActivityTotalOrNull;
+  ride: ActivityTotalOrNull;
+  swim: ActivityTotalOrNull;
+  yoga: ActivityTotalOrNull;
+  weightTraining: ActivityTotalOrNull;
+  stairStepper: ActivityTotalOrNull;
+  elliptical: ActivityTotalOrNull;
+  standUpPaddling: ActivityTotalOrNull;
+  crossfit: ActivityTotalOrNull;
+  rowing: ActivityTotalOrNull;
+  ski: ActivityTotalOrNull;
+  snowboard: ActivityTotalOrNull;
+  snowshoe: ActivityTotalOrNull;
+  kayaking: ActivityTotalOrNull;
+  workout: ActivityTotalOrNull;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals };
