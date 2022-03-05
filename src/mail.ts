@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { config } from "./appConfig";
 import { BasicUserContactInfo, NodeEnvironments } from "./types/BackendOnlyTypes";
 import { includesBasicUserInfo } from "./types/typeguards";
 
@@ -140,6 +141,9 @@ interface FrontEndErrorData {
 
 // FRONTEND MOBILE APP ERRORS - Backend errors are using the sendBackendOnlyEmail
 const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> {
+  if (config.disableErrorEmailReporting) {
+    return new Promise(resolve => resolve());
+  }
   const debug = formData.debug || formData.message;
   const meta = formData.meta || null;
   const status = formData.status;
