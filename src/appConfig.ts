@@ -14,7 +14,7 @@ interface Config {
 const config: Config = {
   mode: appState[0],
   specialEvent: appWelcome,
-  disableErrorEmailReporting: true,
+  disableErrorEmailReporting: false,
   // globalMessage: [
   //   { type: "info", persist: false, message: "HeroFit needs reviews, especially on iOS. Click here to leave one in the app store.", link: "https://apps.apple.com/app/id1592847717" },
   //   //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }

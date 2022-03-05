@@ -26,12 +26,12 @@ router.post("/user-details", body("email").isEmail().optional({ nullable: true, 
   const requestUser = req.user;
 
   try {
-    const user: HF.User = User.findOne({ where: email ? { email } : { id: requestUser.id }, raw: true });
+    const user: HF.User = await User.findOne({ where: email ? { email } : { id: requestUser.id }, raw: true });
 
     if (!user) {
       return res.formatter.unauthorized(`Couldn't find a user with that email.`);
     }
-
+    console.log("USSS", user);
     interface UserDetailsResponse {
       user: HF.User;
       globalMessage?: HF.GlobalMessage[];
