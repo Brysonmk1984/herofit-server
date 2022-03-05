@@ -146,6 +146,7 @@ function avCalc(userTotals) {
       return defaultelms;
     },
 
+    // TODO: When refactoring to TS, make sure to return type of element is HF.PrimaryElement
     determineAstrologySeason: function (dateOfCreation = null) {
       const date = dateOfCreation ? moment(dateOfCreation) : moment();
 

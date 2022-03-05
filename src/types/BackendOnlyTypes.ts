@@ -1,6 +1,5 @@
 import HF from "./herofit";
 import { Request, Response } from "express";
-import { Express } from "@sentry/tracing/dist/integrations";
 
 type NodeEnvironments = "development" | "staging" | "production" | "test";
 
@@ -128,4 +127,51 @@ interface UserTotals {
   workout: ActivityTotalOrNull;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals };
+type PBAType = "Award Skin" | "Award Title" | "Award Pet";
+type PBAItemCategory = HF.Pluralize<HF.ServerItemType>;
+
+interface DefeateFoePBA {
+  action: string;
+  name: string;
+  type: PBAType;
+  itemCategory: PBAItemCategory;
+  outcome: "Avatar Wins" | "Double KO"[];
+}
+
+interface WinStreakPBA {
+  requirement: number;
+  action: string;
+  name: string;
+  type: PBAType;
+  itemCategory: PBAItemCategory;
+  outcome: "Avatar Wins"[];
+}
+
+interface WinTotalPBA {
+  requirement: number;
+  action: string;
+  name: string;
+  type: PBAType;
+  itemCategory: PBAItemCategory;
+  outcome: "Avatar Wins"[];
+}
+
+interface HelperPBA {
+  requirement: null;
+  action: null;
+  name: string;
+  type: PBAType;
+  itemCategory: PBAItemCategory;
+  outcome: null;
+}
+
+interface PostBattleActions {
+  DEFEATEDFOE: DefeateFoePBA[];
+  WINSTREAK: WinStreakPBA[];
+  WINTOTAL: WinTotalPBA[];
+  HELPER: HelperPBA[];
+}
+
+type AllPbaTypes = DefeateFoePBA | WinStreakPBA | WinTotalPBA | HelperPBA;
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes };

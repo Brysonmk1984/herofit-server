@@ -4,8 +4,15 @@ const { determineItemEffects, determinePostBattleActions } = require("./onGoToBa
 const ALLPBAs = require("../postBattleActions.json");
 const { parseStats } = require("../../lib/helperFunctions");
 
+/* 
+
+ TODO: finish integrating transaction when I refactor insertBattle module
+
+*/
+
 // Used for inserting a battle for an individual user
-function insertBattle(avatar, foe) {
+
+function insertBattle(avatar, foe, t) {
   let postBattleActions;
   // PROMISE - need to determine previous battles.
   return new Promise((resolve, reject) => {
@@ -126,9 +133,7 @@ function insertBattle(avatar, foe) {
         .catch(error => reject(error));
     })
     .catch(error => {
-      error = error.toString();
-      console.log(`Couldn't Send Avatar to battle: ${error}`);
-      return { error };
+      throw error;
     });
 }
 
