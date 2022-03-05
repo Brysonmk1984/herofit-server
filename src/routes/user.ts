@@ -19,7 +19,6 @@ router.post("/user-details", body("email").isEmail().optional({ nullable: true, 
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     return res.formatter.badRequest(errors.array(), "Validation Error - for GET /user");
   }
   const { email } = req.body;
@@ -31,7 +30,7 @@ router.post("/user-details", body("email").isEmail().optional({ nullable: true, 
     if (!user) {
       return res.formatter.unauthorized(`Couldn't find a user with that email.`);
     }
-    console.log("USSS", user);
+
     interface UserDetailsResponse {
       user: HF.User;
       globalMessage?: HF.GlobalMessage[];
