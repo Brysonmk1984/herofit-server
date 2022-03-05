@@ -221,7 +221,7 @@ router.post("/fetch-battles-won-or-dko", body("avatarID").isNumeric(), authentic
   }
 
   try {
-    const battles: HF.Battle[] = await Battle.findAll({ where: { avatarID: 99999, [Op.or]: [{ outcome: "Avatar Wins" }, { outcome: "Double KO" }] }, raw: true, attributes: ["outcome", "foe"] });
+    const battles: HF.Battle[] = await Battle.findAll({ where: { avatarID: req.body.avatarID, [Op.or]: [{ outcome: "Avatar Wins" }, { outcome: "Double KO" }] }, raw: true, attributes: ["outcome", "foe"] });
 
     res.formatter.ok({ battles });
   } catch (error) {
