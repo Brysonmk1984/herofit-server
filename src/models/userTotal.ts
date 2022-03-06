@@ -1,4 +1,6 @@
-const UserTotalModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const UserTotalModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const UserTotal = db.define(
     "user_totals",
     {
@@ -18,7 +20,7 @@ const UserTotalModel = function (db, DataTypes) {
       },
       lastUpdate: {
         type: DataTypes.TIME,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
       run: {
@@ -96,4 +98,4 @@ const UserTotalModel = function (db, DataTypes) {
   return UserTotal;
 };
 
-module.exports = UserTotalModel;
+export default UserTotalModel;

@@ -1,4 +1,6 @@
-const UserActivityModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const UserActivityModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const UserActivity = db.define("user_activities", {
     id: {
       type: DataTypes.INTEGER,
@@ -15,7 +17,7 @@ const UserActivityModel = function (db, DataTypes) {
     },
     createdAt: {
       type: DataTypes.TIME,
-      defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       allowNull: false,
     },
     activityId: {
@@ -55,4 +57,4 @@ const UserActivityModel = function (db, DataTypes) {
   return UserActivity;
 };
 
-module.exports = UserActivityModel;
+export default UserActivityModel;

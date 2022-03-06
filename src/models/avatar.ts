@@ -1,4 +1,6 @@
-const AvatarModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const AvatarModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const Avatar = db.define("avatars", {
     id: {
       type: DataTypes.INTEGER,
@@ -7,7 +9,7 @@ const AvatarModel = function (db, DataTypes) {
     },
     createdAt: {
       type: DataTypes.TIME,
-      defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       allowNull: false,
     },
     isFake: {
@@ -211,4 +213,4 @@ const AvatarModel = function (db, DataTypes) {
   return Avatar;
 };
 
-module.exports = AvatarModel;
+export default AvatarModel;

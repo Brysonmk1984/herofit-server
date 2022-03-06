@@ -1,4 +1,6 @@
-const AvatarItemsModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const AvatarItemsModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const AvatarItems = db.define(
     "avatar_items",
     {
@@ -9,12 +11,12 @@ const AvatarItemsModel = function (db, DataTypes) {
       },
       createdAt: {
         type: DataTypes.TIME,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
       updatedAt: {
         type: DataTypes.TIME,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
       avatarID: {
@@ -37,4 +39,4 @@ const AvatarItemsModel = function (db, DataTypes) {
   return AvatarItems;
 };
 
-module.exports = AvatarItemsModel;
+export default AvatarItemsModel;

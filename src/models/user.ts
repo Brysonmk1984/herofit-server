@@ -1,4 +1,6 @@
-const UserModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const UserModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const User = db.define("users", {
     id: {
       type: DataTypes.INTEGER,
@@ -7,7 +9,7 @@ const UserModel = function (db, DataTypes) {
     },
     createdAt: {
       type: DataTypes.TIME,
-      defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       allowNull: false,
     },
     username: {
@@ -104,4 +106,4 @@ const UserModel = function (db, DataTypes) {
   return User;
 };
 
-module.exports = UserModel;
+export default UserModel;

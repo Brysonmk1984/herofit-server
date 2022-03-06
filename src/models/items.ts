@@ -1,4 +1,6 @@
-const ItemsModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const ItemsModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const Items = db.define(
     "items",
     {
@@ -9,7 +11,7 @@ const ItemsModel = function (db, DataTypes) {
       },
       createdAt: {
         type: DataTypes.TIME,
-        defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
       type: {
@@ -74,4 +76,4 @@ const ItemsModel = function (db, DataTypes) {
   return Items;
 };
 
-module.exports = ItemsModel;
+export default ItemsModel;

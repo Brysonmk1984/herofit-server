@@ -1,4 +1,6 @@
-const BattleModel = function (db, DataTypes) {
+import Sequelize, { DataTypes } from "sequelize";
+
+const BattleModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
   const Battle = db.define("battles", {
     id: {
       type: DataTypes.INTEGER,
@@ -59,12 +61,12 @@ const BattleModel = function (db, DataTypes) {
     },
     createdAt: {
       type: DataTypes.TIME,
-      defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       allowNull: false,
     },
     updatedAt: {
       type: DataTypes.TIME,
-      defaultValue: DataTypes.literal("CURRENT_TIMESTAMP"),
+      defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       allowNull: false,
     },
     seenReport: {
@@ -92,4 +94,4 @@ const BattleModel = function (db, DataTypes) {
   return Battle;
 };
 
-module.exports = BattleModel;
+export default BattleModel;

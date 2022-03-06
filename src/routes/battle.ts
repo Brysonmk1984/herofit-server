@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { body, validationResult, oneOf } from "express-validator";
 import { authenticateJWT } from "../jwt/validateJWT";
 import { Op, Sequelize } from "sequelize";
-import { Avatar, AvatarItems, Battle, Items, db as sequelizeInstance } from "../config/db";
+import { Avatar, AvatarItems, Battle, Items, db } from "../config/db";
 import villains from "../game/villains.json";
 import avCalc from "../game/upgrades/avCalc";
 import moment from "moment";
@@ -36,15 +36,12 @@ router.post(
     const avatar = req.body.avatar;
 
     try {
-      // Once db.js is refactored to TS, this should no longer be a TS error
-      const db = sequelizeInstance as Sequelize;
-
       db.transaction(async t => {
         // Instantiate battle instance
         const battleObj = await instantiateBattle(avatar.id, null, t);
 
         // Update Hero to reflect goToBattle status change
-        await Avatar.update({ goToBattle: true }, { where: { owner: req.body.email }, raw: true, transaction: t });
+        await Avatar.update({ goToBattle: true }, { where: { owner: req.body.email }, transaction: t });
 
         res.formatter.ok(battleObj);
       });
