@@ -15,32 +15,6 @@
     "build": "tsc-silent -p tsconfig.json --suppress @",
     "heroku-postbuild": "tsc-silent -p tsconfig.json --suppress @ && mv -f src/jwt/id_rsa_priv.pem build/jwt/id_rsa_priv.pem && mv -f src/jwt/id_rsa_pub.pem build/jwt/id_rsa_pub.pem && rm -v -rf src"
   },
-  "jest": {
-    "watchPathIgnorePatterns": [
-      "node_modules"
-    ],
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "<rootDir>__tests__/setup/nullOrAny.setup.js",
-      "jest-extended"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>__tests__/setup",
-      "<rootDir>__tests__/activityTraits",
-      "<rootDir>__tests__/itemFind",
-      "<rootDir>__tests__/itemRewards"
-    ],
-    "preset": "ts-jest",
-    "testMatch": [
-      "<rootDir>/__tests__/**/*.test.js",
-      "<rootDir>/__tests__/**/*.test.ts"
-    ],
-    "globals": {
-      "ts-jest": {
-        "diagnostics": false
-      }
-    }
-  },
   "author": "Bryson Kruk",
   "license": "MIT",
   "devDependencies": {

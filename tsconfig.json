@@ -20,7 +20,9 @@
     // Just switched this to true so we have to check if an error is indeed an error before proceeding
     // Turn off if annoying
     "useUnknownInCatchVariables": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // Don't think this is needed... using for tests in ts but doesnt seem to do anything
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js", "./build/**/*", "./__tests__/**/*"]
