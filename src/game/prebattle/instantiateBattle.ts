@@ -6,12 +6,6 @@ import { findFoeTemplateByType, selectFoeTemplate, determineFoeWithStats } from 
 import { parseStats } from "../../lib/helperFunctions";
 import HF from "../../types/herofit";
 
-/* 
-
- TODO: finish integrating transaction when I refactor insertBattle module
-
-*/
-
 // Used to insert a battle into the DB for both random midnight battles or item-instantiated battles
 // FoeType is null unless an item created the battle
 async function instantiateBattle(avatarID: number, foeType: HF.FoeType = null, t: Transaction) {
