@@ -19,7 +19,7 @@ it("Should Insert the 2 items earned from reaching level 100", async () => {
 });
 
 it("Should Insert Fire Skin for Grabbler", async () => {
-  statObj = {
+  const statObj = {
     // pt. values earned
     fire: [499, 500],
     earth: [],
