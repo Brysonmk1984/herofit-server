@@ -20,9 +20,7 @@ function determineItemEffects(equipment) {
     return filtered;
   }, []);
 
-  //console.log(reduced);
-
-  return reduced;
+  return reduced.length ? reduced : null;
 }
 
 // Filter item effects down to just battle effects and return only their names

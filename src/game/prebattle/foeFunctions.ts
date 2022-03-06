@@ -125,3 +125,5 @@ function unitTestExporter() {
     _divideAvailableFoesByDifficulty,
   };
 }
+
+export { selectFoeTemplate, findFoeTemplateByType, determineFoeWithStats, unitTestExporter };

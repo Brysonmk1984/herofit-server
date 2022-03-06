@@ -171,7 +171,21 @@ interface PostBattleActions {
   WINTOTAL: WinTotalPBA[];
   HELPER: HelperPBA[];
 }
+type ActionTypeNames = keyof PostBattleActions;
 
 type AllPbaTypes = DefeateFoePBA | WinStreakPBA | WinTotalPBA | HelperPBA;
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes };
+interface BackendBattle {
+  owner: string;
+  avatarID: number;
+  avatarName: string;
+  foe: HF.Foe;
+  foeType: string;
+  avatar: HF.Hero;
+  outcome: HF.BattleOutcome | "TBD";
+  seenReport: boolean;
+  postBattleActions: PBAType[] | null;
+  effects: string[] | null;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames };

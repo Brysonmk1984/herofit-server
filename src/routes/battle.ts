@@ -44,7 +44,7 @@ router.post(
         const battleObj = await instantiateBattle(avatar.id, null, t);
 
         // Update Hero to reflect goToBattle status change
-        await Avatar.update({ goToBattle: true }, { where: { owner: req.body.email }, raw: true }, { transaction: t });
+        await Avatar.update({ goToBattle: true }, { where: { owner: req.body.email }, raw: true, transaction: t });
 
         res.formatter.ok(battleObj);
       });
