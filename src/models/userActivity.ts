@@ -55,5 +55,6 @@ const UserActivityModel = function (db: Sequelize.Sequelize, DataTypes: DataType
   });
 
   return UserActivity as any;
+};
 
 export default UserActivityModel;
