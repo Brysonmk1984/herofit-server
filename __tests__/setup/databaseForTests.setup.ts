@@ -61,5 +61,4 @@ function loadDb() {
   return db;
 }
 
-module.exports = { loadDb };
 export { loadDb };

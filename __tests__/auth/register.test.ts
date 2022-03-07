@@ -1,7 +1,9 @@
-const request = require("supertest");
-const app = require("../../src/index.ts");
-const { User } = require("../../src/config/db");
-const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
+import request from "supertest";
+import app from "../../src/index";
+import { loadDb } from "../setup/databaseForTests.setup";
+
+const db = loadDb();
+const { User } = db.models;
 
 // REGISTER ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/register", () => {
@@ -25,9 +27,9 @@ describe("POST /auth/register", () => {
       })
       .end((err, res) => {
         if (err) {
-          return doneAfterTimeout(() => done(err));
+          return done(err);
         }
-        doneAfterTimeout(done);
+        done();
       });
   });
 
@@ -53,9 +55,9 @@ describe("POST /auth/register", () => {
       })
       .end((err, res) => {
         if (err) {
-          return doneAfterTimeout(() => done(err));
+          return done(err);
         }
-        doneAfterTimeout(done);
+        done();
       });
   });
 
@@ -107,17 +109,17 @@ describe("POST /auth/register", () => {
       })
       .end((err, res) => {
         if (err) {
-          return doneAfterTimeout(() => done(err));
+          return done(err);
         }
-        doneAfterTimeout(done);
+        done();
       });
   });
 });
 
-afterAll(done => {
-  User.destroy({
-    where: { email: process.env.TEST_REGISTER_EMAIL },
-  }).then(() => {
-    doneAfterTimeout(done);
-  });
+afterAll(async () => {
+  // Remove added items
+  await User.destroy({ where: { email: process.env.TEST_REGISTER_EMAIL } });
+
+  // closeDB
+  await db.close();
 });

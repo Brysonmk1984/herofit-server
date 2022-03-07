@@ -1,12 +1,13 @@
-const { unitTestExporter, selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
-const { unitTestExporter: unitTestExporter2 } = require("../../src/game/prebattle/generateFoeStats");
-const villains = require("../../src/game/villains.json");
-const { testSpecificFoe } = require("../../src/game/specialEvents/specialEventList");
+import { unitTestExporter, selectFoeTemplate } from "../../src/game/prebattle/foeFunctions";
+import { unitTestExporter as unitTestExporter2 } from "../../src/game/prebattle/generateFoeStats";
+import villains from "../../src/game/villains.json";
+import { testSpecificFoe } from "../../src/game/specialEvents/specialEventList";
+import { FoeTemplate } from "../../src/types/BackendOnlyTypes";
 
 describe("Foe Generation", () => {
   const { _generateFoeName, _randomBossEncounterChance, _determineBeginnersLuck, _specialEventFoeChance, _divideAvailableFoesByDifficulty } = unitTestExporter();
   const { _determineBonusToStatsSpecialEvent } = unitTestExporter2();
-  const mergedVillains = Object.values(villains).flat();
+  const mergedVillains = Object.values(villains).flat() as FoeTemplate[];
   const { low, medium, high } = _divideAvailableFoesByDifficulty(mergedVillains, 20);
 
   it("Should divide foes by difficulty type", () => {
@@ -31,9 +32,9 @@ describe("Foe Generation", () => {
     expect(beginnersLuckHappened).toEqual(expect.any(Boolean));
   });
 
-  it("Should return Storming Oni, since he has a 100% chance to receieve in testSpecificFoe event", () => {
+  it("Should return Storming Oni, since he has a 100% chance to receive in testSpecificFoe event", () => {
     const specialEventFoe = _specialEventFoeChance(60, testSpecificFoe);
-    expect(specialEventFoe.type).toEqual("Storming Oni");
+    expect(specialEventFoe.type).toBe("Storming Oni");
   });
 
   it("Should return either null or a foe template", () => {

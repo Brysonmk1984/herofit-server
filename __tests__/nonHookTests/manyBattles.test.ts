@@ -1,15 +1,16 @@
-const avatarProfiles = require("../battles/heroProfiles.json");
-const avatarPowerSpecProfiles = require("../battles/powerProfiles.json");
-const { selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
-const { generateFoeStats } = require("../../src/game/prebattle/generateFoeStats");
-const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
-const { doAvatarBattlePrep, doFoeBattlePrep } = require("../../src/game/battle/doBattlePrep");
-const doBattle = require("../../src/game/battle/doBattle");
-const { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../../src/game/CONSTANTS");
-const avCalc = require("../../src/game/upgrades/avCalc");
-const xpCalc = require("../../src/game/upgrades/xpCalc");
-const { parseStats } = require("../../src/lib/helperFunctions");
-const chance = require("chance")();
+import avatarProfiles from "../battles/heroProfiles.json";
+import { selectFoeTemplate } from "../../src/game/prebattle/foeFunctions";
+import { generateFoeStats } from "../../src/game/prebattle/generateFoeStats";
+import { calcScenarioBonuses, determineScenario } from "../../src/game/battle/scenario";
+import { doFoeBattlePrep } from "../../src/game/battle/doBattlePrep";
+import doBattle from "../../src/game/battle/doBattle";
+import { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } from "../../src/game/CONSTANTS";
+import avCalc from "../../src/game/upgrades/avCalc";
+import xpCalc from "../../src/game/upgrades/xpCalc";
+import { parseStats } from "../../src/lib/helperFunctions";
+import Chance from "chance";
+
+const chance = Chance();
 
 // Use toEqual for objects and arrays
 // Use toBe for scalar (primitive) data types only.
@@ -46,7 +47,7 @@ function generateBrs(avatars, fws) {
     }
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    scenario = determineScenario(beginnersLuck);
+    const scenario = determineScenario(beginnersLuck);
     const scenarioBonuses = calcScenarioBonuses(av, foesWithStats[i], scenario);
     const sAvatar = scenarioBonuses.sAvatar;
     const sFoe = scenarioBonuses.sFoe;

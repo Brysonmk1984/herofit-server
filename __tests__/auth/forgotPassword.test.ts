@@ -1,6 +1,9 @@
-const request = require("supertest");
-const app = require("../../src/index.ts");
-const { User } = require("../../src/config/db");
+import request from "supertest";
+import app from "../../src/index";
+import { loadDb } from "../setup/databaseForTests.setup";
+
+const db = loadDb();
+const { User } = db.models;
 
 // FORGOT PASSWORD ROUTES - ACCESSED THROUGH "FORGOT PASSWORD" SCREEN ON MOBILE APP
 //Set emailCode for test email in case it's missing
@@ -22,7 +25,7 @@ describe("POST /auth/resend-email-confirmation", () => {
       .expect(200)
       .expect(res => {
         const { emailCode } = res.body.data;
-        console.log(emailCode);
+
         // deep equal needed for some reason?
         expect(emailCode).toBe(process.env.TEST_EMAIL_CODE);
       });
@@ -40,7 +43,7 @@ describe("POST /auth/resend-email-confirmation", () => {
       .expect(200)
       .expect(res => {
         const { emailCode } = res.body.data;
-        console.log(emailCode);
+
         // deep equal needed for some reason?
         expect(emailCode).toStrictEqual(expect.any(String));
       });

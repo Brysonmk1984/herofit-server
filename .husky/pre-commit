@@ -1,8 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Ethereal mail is having issues, causing tests to fail... disable for now
-#npm run test:precommit **/{auth,activityTraits,itemFind,itemRewards,battles}/*.test.js
+
+npm run test:precommit **/{auth,activityTraits,itemFind,itemRewards,battles}/*.test.ts
 prettier --write . && git add -A .
 #npm run lint
 npm run build

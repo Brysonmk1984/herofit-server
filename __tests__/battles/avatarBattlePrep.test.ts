@@ -1,38 +1,41 @@
-const avatarProfiles = require("./heroProfiles.json");
-const { selectFoeTemplate } = require("../../src/game/prebattle/foeFunctions");
-const { generateFoeStats } = require("../../src/game/prebattle/generateFoeStats");
-const { calcScenarioBonuses, determineScenario } = require("../../src/game/battle/scenario");
-const { doAvatarBattlePrep } = require("../../src/game/battle/doBattlePrep");
-const xpCalc = require("../../src/game/upgrades/xpCalc");
+import avatarProfiles from "./heroProfiles.json";
+import { selectFoeTemplate } from "../../src/game/prebattle/foeFunctions";
+import { generateFoeStats } from "../../src/game/prebattle/generateFoeStats";
+import { calcScenarioBonuses, determineScenario } from "../../src/game/battle/scenario";
+import { doAvatarBattlePrep } from "../../src/game/battle/doBattlePrep";
+import xpCalc from "../../src/game/upgrades/xpCalc";
 
 let randomAv;
 let foeTemplate;
 let foeWithStats;
 let sFoe, sAvatar, scenario;
 let beginnersLuck = false;
-const generateFoe = function (av) {
-  randomAv = av[Math.floor(Math.random() * avatarProfiles.length)];
-  foeTemplate = selectFoeTemplate(randomAv.level);
 
-  const foe = {
-    id: foeTemplate.id,
-    type: foeTemplate.type,
-    difficultyLevel: foeTemplate.difficultyLevel,
-    name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
-    ability: foeTemplate.ability,
-    class: foeTemplate.class,
+beforeAll(() => {
+  const generateFoe = function (av) {
+    randomAv = av[Math.floor(Math.random() * avatarProfiles.length)];
+    foeTemplate = selectFoeTemplate(randomAv.level);
+
+    const foe = {
+      id: foeTemplate.id,
+      type: foeTemplate.type,
+      difficultyLevel: foeTemplate.difficultyLevel,
+      name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+      ability: foeTemplate.ability,
+      class: foeTemplate.class,
+    };
+
+    foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
+
+    // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
+    scenario = determineScenario(beginnersLuck);
+    const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
+    sAvatar = scenarioBonuses.sAvatar;
+    sFoe = scenarioBonuses.sFoe;
   };
 
-  foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
-
-  // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-  scenario = determineScenario(beginnersLuck);
-  const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
-  sAvatar = scenarioBonuses.sAvatar;
-  sFoe = scenarioBonuses.sFoe;
-};
-
-beforeAll(() => generateFoe(avatarProfiles));
+  generateFoe(avatarProfiles);
+});
 
 describe("All EXISTING item effects should correctly modify stats", () => {
   it("Should return an avatar with +10 health", () => {
@@ -64,7 +67,6 @@ describe("All NEW item effects should correctly modify stats", () => {
   it("Should return an avatar with +5 Air & run Ill Omen buff if necessary", () => {
     const effects = ["Ill Omen"];
     const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
-    console.log(sFoe.type, sFoe.difficulty, sFoe.difficultyLevel);
     const isNegativeScenario = scenario.id === 1 || scenario.id === 3 ? true : false;
     let illOmenProc = sFoe.difficultyLevel === "high" ? true : false;
     if (sFoe.difficultyLevel === "medium") {
@@ -72,13 +74,13 @@ describe("All NEW item effects should correctly modify stats", () => {
         illOmenProc = true;
       }
     }
-    console.log(isNegativeScenario, sFoe.difficulty >= 0.075, illOmenProc);
+
     if (illOmenProc) {
-      console.log("RECEIVED ILL OMEN BUFF");
+      //console.log("RECEIVED ILL OMEN BUFF");
       expect(avatar.health).toBe(Math.floor(sAvatar.health * 1.25));
       expect(avatar.air).toBe(Math.floor(sAvatar.air * 1.25));
     } else {
-      console.log("NO ILL OMEN BUFF");
+      //console.log("NO ILL OMEN BUFF");
       expect(avatar.health).toBe(sAvatar.health);
       expect(avatar.air).toBe(sAvatar.air);
     }
@@ -125,7 +127,7 @@ describe("Snake effects should correctly modify stats", () => {
     const adjustedTotalPower = adjustedBasePower + Math.floor(adjustedBasePower * 0.15);
     expect(avatar.power).toBe(adjustedTotalPower);
     if (foe.health === 1) {
-      console.log("LETHAL SURPRISE PROC", foe.health, sFoe.health);
+      //console.log("LETHAL SURPRISE PROC", foe.health, sFoe.health);
       expect(foe.health).toBe(1);
     } else {
       expect(foe.health).toBeOneOf([sFoe.health - Math.floor(sFoe.health * 0.03), sFoe.health - 10]);
@@ -146,9 +148,6 @@ describe("Octopus effects should correctly modify stats", () => {
     const possibleNonZeroStats = ["health", "power", "earth", "water", "fire", "air", "armor"];
     const nonZero = possibleNonZeroStats.map(stat => foe[stat]).filter(Boolean);
 
-    if (foe.armor !== sFoe.armor) {
-      console.log("Eight Leg Proc, armor = ", foe.armor, sFoe.armor);
-    }
     expect(foe).toMatchObject({
       health: expect.toBeOneOf(nonZero),
       power: expect.toBeOneOf(nonZero),
@@ -287,14 +286,12 @@ describe("Rabbit effects should correctly modify stats", () => {
     const avatarLevel = getCurrentLevel().total;
     const naturalLogOfLevel = Math.log(avatarLevel);
     const RABBIT_TACTICS_MODIFIER = (naturalLogOfLevel * avatarLevel) / 10;
-    console.log(avatarLevel);
+
     const expectedArmor = Math.floor(sAvatar.armor * 0.33);
     const expectedPower = Math.floor(sAvatar.power + (sAvatar.armor * 0.66 * avatarLevel) / RABBIT_TACTICS_MODIFIER) || sAvatar.power;
     const expectedAir = Math.floor(sAvatar.air + (sAvatar.armor * 0.66 * avatarLevel) / RABBIT_TACTICS_MODIFIER) || sAvatar.air;
 
-    console.log(avatarLevel, sAvatar.power, expectedPower, sAvatar.air, expectedAir);
-
-    const { avatar, foe } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
+    const { avatar } = doAvatarBattlePrep(sAvatar, sFoe, effects, scenario.id);
 
     expect(avatar.armor).toBe(expectedArmor);
     expect(avatar.power).toBe(expectedPower);

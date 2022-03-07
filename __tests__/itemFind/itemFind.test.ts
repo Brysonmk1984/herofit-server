@@ -1,12 +1,14 @@
 require("dotenv").config();
-const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
-const chance = require("chance")();
-const { _callXTimes, _itemFind, _chancePTFind, activityItemFind } = require("../../src/game/activities/activityItemFind");
-const mockItemDrops = require("./mockItemDrops.json");
-beforeAll(async () => {
-  await loadDb();
-});
+import { loadDb } from "../setup/databaseForTests.setup";
+import Chance from "chance";
+import { _callXTimes, _itemFind, _chancePTFind, activityItemFind } from "../../src/game/activities/activityItemFind";
+import mockItemDrops from "./mockItemDrops.json";
+
+const chance = Chance();
+const db = loadDb();
+
 let weightedElms;
+
 beforeAll(() => {
   const improvements = { air: 0, water: 0, fire: 0.2, earth: 0.8 };
   const totalElmImprove = improvements.air + improvements.water + improvements.fire + improvements.earth;
@@ -89,5 +91,6 @@ it("Should Run Whole Item find sequence, starting with activityItemFind, an obje
 });
 
 afterAll(async () => {
-  await closeDb();
+  // closeDB
+  await db.close();
 });

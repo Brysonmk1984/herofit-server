@@ -108,13 +108,6 @@ function determineFoeWithStats(avatar: HF.Hero, foeTemplate: FoeTemplate, totalL
   };
 }
 
-module.exports = {
-  selectFoeTemplate,
-  findFoeTemplateByType,
-  determineFoeWithStats,
-  unitTestExporter,
-};
-
 // For testing local functions
 function unitTestExporter() {
   return {

@@ -1,11 +1,5 @@
-const request = require("supertest");
-const app = require("../../src/index.ts");
-const { doneAfterTimeout } = require("../setup/utilityFunctions.setup");
-const { loadDb, closeDb } = require("../setup/databaseForTests.setup.js");
-
-// beforeAll(async () => {
-//   await loadDb();
-// });
+import request from "supertest";
+import app from "../../src/index";
 
 // LOGIN ROUTE - ACCESSED THROUGH "SIGN IN" SCREEN ON MOBILE APP
 describe("POST /auth/login", () => {
@@ -21,6 +15,8 @@ describe("POST /auth/login", () => {
 
     const { email } = response.body.data.user;
     expect(email).toBe(process.env.TEST_SIGN_IN_EMAIL);
+
+    console.log(response.body.data.user);
     expect(response.body.data.user).toEqual(
       expect.objectContaining({
         id: expect.any(Number),
@@ -32,7 +28,7 @@ describe("POST /auth/login", () => {
         isFake: expect.any(Boolean),
         latestActivityUpdate: expect.nullOrAny(String),
         stravaAccessToken: expect.nullOrAny(String),
-        stravaAccessTokenExpiration: expect.nullOrAny(Number),
+        stravaAccessTokenExpiration: expect.nullOrAny(String),
         stravaRefreshToken: expect.nullOrAny(String),
         featurePreferenceSubmitted: expect.any(Boolean),
         seenLatestPatch: expect.any(Boolean),
@@ -66,9 +62,9 @@ describe("POST /auth/login", () => {
       })
       .end((err, res) => {
         if (err) {
-          return doneAfterTimeout(() => done(err));
+          return done(err);
         }
-        doneAfterTimeout(done);
+        done();
       });
   });
 
@@ -86,13 +82,9 @@ describe("POST /auth/login", () => {
       })
       .end((err, res) => {
         if (err) {
-          return doneAfterTimeout(() => done(err));
+          return done(err);
         }
-        doneAfterTimeout(done);
+        done();
       });
   });
 });
-
-// afterAll(async () => {
-//   await closeDb();
-// });
