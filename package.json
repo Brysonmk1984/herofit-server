@@ -4,7 +4,7 @@
   "description": "Backend for HeroFit",
   "main": "start.js",
   "scripts": {
-    "test": "jest --verbose --ci",
+    "test": "jest --verbose --ci --runInBand --forceExit",
     "test:precommit": "jest --verbose --ci  --coverage --forceExit",
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node build/start.js",
