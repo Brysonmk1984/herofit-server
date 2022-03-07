@@ -103,7 +103,7 @@ const UserModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
     },
   });
 
-  return User;
+  return User as any;
 };
 
 export default UserModel;

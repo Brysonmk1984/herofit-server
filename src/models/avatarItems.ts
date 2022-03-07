@@ -36,7 +36,7 @@ const AvatarItemsModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes
     { freezeTableName: true },
   );
 
-  return AvatarItems;
+  return AvatarItems as any;
 };
 
 export default AvatarItemsModel;

@@ -73,7 +73,7 @@ const ItemsModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
     { freezeTableName: true },
   );
 
-  return Items;
+  return Items as any;
 };
 
 export default ItemsModel;

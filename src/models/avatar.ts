@@ -210,7 +210,7 @@ const AvatarModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
     },
   });
 
-  return Avatar;
+  return Avatar as any;
 };
 
 export default AvatarModel;

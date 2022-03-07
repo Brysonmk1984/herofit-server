@@ -95,7 +95,7 @@ const UserTotalModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) 
     { timestamps: false },
   );
 
-  return UserTotal;
+  return UserTotal as any;
 };
 
 export default UserTotalModel;

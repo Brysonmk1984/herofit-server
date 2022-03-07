@@ -91,7 +91,7 @@ const BattleModel = function (db: Sequelize.Sequelize, DataTypes: DataTypes) {
     },
   });
 
-  return Battle;
+  return Battle as any;
 };
 
 export default BattleModel;

@@ -11,7 +11,7 @@
     "moduleResolution": "node",
     "strictNullChecks": false,
     "incremental": false,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "lib": ["es2020"],
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -22,7 +22,7 @@
     "useUnknownInCatchVariables": true,
     "resolveJsonModule": true,
     // Don't think this is needed... using for tests in ts but doesnt seem to do anything
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports" : true,
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "<node_internals>/**", "**/*.test.ts", "**/*.test.js", "./build/**/*", "./__tests__/**/*"]
