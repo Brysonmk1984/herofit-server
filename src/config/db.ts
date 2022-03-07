@@ -56,7 +56,7 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
 
 db = new Sequelize(dbUrl, sequelizeSettings);
 
-//db.authenticate();
+db.authenticate();
 
 const User = UserModel(db, Sequelize);
 const Avatar = AvatarModel(db, Sequelize);
