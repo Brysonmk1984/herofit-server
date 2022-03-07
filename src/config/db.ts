@@ -17,7 +17,7 @@ let sequelizeSettings: Options = {
 };
 
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
-  // PRODUCTION, STAGING, or Locally running backend through PROXY
+  // PRODUCTION, STAGING, or PROXY
 
   const envSpecificSettings = {
     dialectOptions: {
