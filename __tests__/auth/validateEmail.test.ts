@@ -11,13 +11,11 @@ describe("POST /auth/validated-email", () => {
   // Testing if User gets correctly updated from hitting the validated-email endpoint
   // MUST HAVE A USER IN THE DB WITH TEST_EMAIL_CODE for emailCode field
   it("Should return user data containing active: true and emailCode matching passed in emailCode", async () => {
-    const response = await request(app)
-      .post("/auth/validated-email")
-      .send({
-        emailCode: process.env.TEST_EMAIL_CODE,
-      })
-      .set("Accept", "application/json")
-      .expect(200);
+    const response = await request(app).post("/auth/validated-email").send({
+      emailCode: process.env.TEST_EMAIL_CODE,
+    });
+
+    expect(response.status).toBe(200);
     expect(response.body.data.user).toEqual(
       expect.objectContaining({
         active: true,

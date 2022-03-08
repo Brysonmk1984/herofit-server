@@ -187,9 +187,10 @@ const sendAppErrorEmail = function (formData: FrontEndErrorData): Promise<void> 
 
 // BACKEND ERRORS - Server Code Error Reporting
 const sendBackendOnlyEmail = function (message: string, error: string | Error): Promise<void> {
-  if (config.disableErrorEmailReporting) {
+  if (process.env.NODE_ENV !== "PRODUCTION" || config.disableErrorEmailReporting) {
     return new Promise(resolve => resolve());
   }
+
   return new Promise((resolve, reject) => {
     // setup email data with unicode symbols
     let mailOptions = {

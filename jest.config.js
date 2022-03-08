@@ -11,4 +11,7 @@ module.exports = {
       diagnostics: false,
     },
   },
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
 };

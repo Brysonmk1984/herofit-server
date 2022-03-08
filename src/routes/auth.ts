@@ -285,15 +285,17 @@ router.post("/validated-email", body("emailCode").isString(), async (req: TypedR
   const { emailCode } = req.body;
 
   try {
-    const data = await User.update({ active: true }, { where: { emailCode }, returning: true, plain: true });
-    return res.formatter.ok({ user: data[1] });
+    const result = await User.update({ active: true }, { where: { emailCode }, returning: true, plain: true });
+    console.log("ICECREAM");
+    return res.formatter.ok({ user: result[1] });
   } catch (error) {
+    console.log("ERROR WITH EMAIL CODE: ", error);
     const errorString = error.toString();
     if (errorString === "TypeError: Cannot read properties of null (reading 'length')" || errorString === "TypeError: Cannot read property 'length' of null") {
       sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code - no matching user", JSON.stringify(error));
       return res.formatter.badRequest(errorString, "CLIENT Error - for POST /validated-email");
     }
-    console.log("ERROR WITH EMAIL CODE", error);
+
     sendBackendOnlyEmail("Couldn't update user, after successfully clicking  the email link and website sent email code", JSON.stringify(error));
     return res.formatter.serverError(errorString, "SERVER Error - for POST /validated-email");
   }
