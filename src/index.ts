@@ -1,27 +1,25 @@
-// NODE
-const path = require("path");
 require("dotenv").load();
-// LIBRARIES
+import path from "path";
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import { responseEnhancer } from "express-response-formatter";
+import passport from "passport";
+import authRoutes from "./routes/auth";
+import avatarRoutes from "./routes/avatar";
+import accountRoutes from "./routes/account";
+import inventoryRoutes from "./routes/inventory";
+import userRoutes from "./routes/user";
+import emailRoutes from "./routes/email";
+import battleRoutes from "./routes/battle";
+import calculateRoutes from "./routes/calculate";
+import mockDataRoutes from "./routes/mockData";
+import mockCronRoutes from "./routes/mockCronEndpoints";
+
 const Sentry = require("@sentry/node");
+const app = express();
 // Importing @sentry/tracing patches the global hub for tracing to work
 const Tracing = require("@sentry/tracing");
-const express = require("express");
-const app = express();
-const morgan = require("morgan");
-const cors = require("cors");
-const responseEnhancer = require("express-response-formatter").responseEnhancer;
-const passport = require("passport");
-// COMMON
-const authRoutes = require("./routes/auth");
-const avatarRoutes = require("./routes/avatar");
-const accountRoutes = require("./routes/account");
-const inventoryRoutes = require("./routes/inventory");
-const userRoutes = require("./routes/user");
-const emailRoutes = require("./routes/email");
-const battleRoutes = require("./routes/battle");
-const calculateRoutes = require("./routes/calculate");
-const mockDataRoutes = require("./routes/mockData");
-const mockCronRoutes = require("./routes/mockCronEndpoints");
 
 // Error Reporting
 Sentry.init({
