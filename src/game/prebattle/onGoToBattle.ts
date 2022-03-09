@@ -12,8 +12,7 @@ function determineItemEffects(equipment: HF.Item[]) {
     if (item.effects && item.effects.length) {
       // Determine if item effects are battle effects
       // AND map only the effect name
-      const battleItemEffects = _filterBattleEffects(item.effects);
-
+      const battleItemEffects = item.effects.filter(effect => effect.type === "prebattle" || effect.type === "postbattle").map(effect => effect.name);
       //console.log('', battleItemEffects);
       filtered.push(...battleItemEffects);
     }
@@ -21,19 +20,6 @@ function determineItemEffects(equipment: HF.Item[]) {
   }, []);
 
   return reduced.length ? reduced : null;
-}
-
-// Filter item effects down to just battle effects and return only their names
-function _filterBattleEffects(itemEffects: HF.Effect[]) {
-  const battleItemEffects = itemEffects
-    .filter(effect => {
-      //console.log('EFFECTTT - ', effect);
-      return effect.type === "prebattle" || effect.type === "postbattle";
-    })
-    .map(effect => {
-      return effect.name;
-    });
-  return battleItemEffects;
 }
 
 // ON GOTOBATTLE, DETERMINE POST BATTLE ACTIONS
@@ -95,14 +81,10 @@ async function determinePostBattleActions(avatar: HF.Hero, foe: HF.Foe) {
       }
     }
 
-    const [totalCheck, streakCheck, defeatFoeCheck] = await Promise.all(allPbaCheckPromises);
+    const possibleItemsAwards = await Promise.all<string>(allPbaCheckPromises);
 
-    // results from resolved promises
-    const winTotalAction = totalCheck?.value ?? null;
-    const winStreakAction = streakCheck?.value ?? null;
-    const defeatFoeAction = defeatFoeCheck?.value ?? null;
     // Only return actual award strings and not null values
-    return [winTotalAction, winStreakAction, defeatFoeAction].filter(Boolean);
+    return possibleItemsAwards.filter(Boolean);
   } catch (error) {
     throw error;
   }
@@ -267,15 +249,16 @@ async function _checkWinTotal(avatarId: number, titleNamesArray: string[]) {
     const battleWinsIfWinTonight = battleWins + 1;
     // Check if the potential win total will match a new PBA
     const matchingPBA = WINTOTAL.find(pba => pba.requirement === battleWinsIfWinTonight);
-    //console.log('TOTAL IF WIN -', battleWinsIfWinTonight, 'MAA-',matchingPBA);
+    console.log("TOTAL IF WIN -", battleWinsIfWinTonight, "MAA-", matchingPBA);
     // If this win matches a new PBA
     if (matchingPBA) {
       // Win is critical if it's unearned
       // Should theoretically never be i this array, but just incase to prevent duplicate titles
       const isCriticalWin = !titleNamesArray.includes(matchingPBA.name);
-      //console.log(isCriticalWin, titleNamesArray);
+      console.log(isCriticalWin, titleNamesArray);
       //Add to PBAs if critical
       if (isCriticalWin) {
+        console.log(matchingPBA.action);
         return matchingPBA.action;
       }
     }
