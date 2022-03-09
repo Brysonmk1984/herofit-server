@@ -262,4 +262,4 @@ router.post("/get-hero-name-by-username", body("username").isString(), async (re
   }
 });
 
-module.exports = router;
+export default router;

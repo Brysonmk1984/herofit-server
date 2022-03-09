@@ -89,4 +89,4 @@ router.post("/app-error", body("status").isNumeric(), body("message").isString()
   }
 });
 
-module.exports = router;
+export default router;

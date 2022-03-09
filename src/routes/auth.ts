@@ -574,4 +574,4 @@ router.post("/strava-first-time-auth-code-exchange", body("email").isEmail(), bo
   }
 });
 
-module.exports = router;
+export default router;

@@ -251,4 +251,4 @@ router.post("/run-specific-battle", body("avatarID").isNumeric(), authenticateJW
   }
 });
 
-module.exports = router;
+export default router;

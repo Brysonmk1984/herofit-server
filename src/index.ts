@@ -65,5 +65,3 @@ app.use("/mock-data", mockDataRoutes);
 app.use("/mock-cron", mockCronRoutes);
 
 export default app;
-// Tests are still expecting module.js syntax
-module.exports = app;

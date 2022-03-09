@@ -1,7 +1,7 @@
-const { Avatar, Battle, AvatarItems, Items } = require("../../config/db");
-const { Op } = require("sequelize");
-const { DEFEATEDFOE, WINSTREAK, WINTOTAL } = require("../postBattleActions.json");
-const VILLAINS = require("../villains.json");
+import { Avatar, Battle, AvatarItems, Items } from "../../config/db";
+import { Op } from "sequelize";
+import { DEFEATEDFOE, WINSTREAK, WINTOTAL } from "../postBattleActions.json";
+import VILLAINS from "../villains.json";
 
 // ON GOTOBATTLE, save list of effects from avatar's items
 function determineItemEffects(equipment) {
@@ -362,4 +362,4 @@ function _checkWinTotal(avatarId, titleNamesArray) {
     });
 }
 
-module.exports = { determineItemEffects, determinePostBattleActions };
+export { determineItemEffects, determinePostBattleActions };

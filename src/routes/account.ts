@@ -139,4 +139,4 @@ router.put("/toggle-metric-system", body("isMetric").isBoolean(), body("email").
   }
 });
 
-module.exports = router;
+export default router;

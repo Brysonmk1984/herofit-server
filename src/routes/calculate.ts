@@ -87,4 +87,4 @@ router.post("/check-level-up-by-input", body("startingXP").isNumeric(), body("en
   }
 });
 
-module.exports = router;
+export default router;
