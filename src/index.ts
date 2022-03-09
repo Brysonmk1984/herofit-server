@@ -17,9 +17,9 @@ import mockDataRoutes from "./routes/mockData";
 import mockCronRoutes from "./routes/mockCronEndpoints";
 
 const Sentry = require("@sentry/node");
-const app = express();
 // Importing @sentry/tracing patches the global hub for tracing to work
 const Tracing = require("@sentry/tracing");
+const app = express();
 
 // Error Reporting
 Sentry.init({
