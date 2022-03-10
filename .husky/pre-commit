@@ -2,7 +2,7 @@
 . "$(dirname "$0")/_/husky.sh"
 
 
-#npm run test:precommit **/{auth,activityTraits,itemFind,itemRewards,battles}/*.test.ts
+npm run test:precommit **/{auth,activityTraits,itemFind,itemRewards,battles}/*.test.ts
 prettier --write . && git add -A .
 #npm run lint
 npm run build

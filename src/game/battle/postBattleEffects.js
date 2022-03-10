@@ -123,7 +123,6 @@ function postBattleEffects(a, f, outcomeData, effects) {
           // If Foe won, or Draw, deal 25 more damage to foe and potentially change outcome
           if (outcomeData.outcome === "Foe Wins" || outcomeData.outcome === "Draw") {
             foe.health -= 25;
-
             if (foe.health <= 0) {
               // If foe won, change to DKO since Afterburn killed foe
               if (outcomeData.outcome === "Foe Wins") {

@@ -1,6 +1,6 @@
 require("dotenv").config();
 import postBattleProcess from "../../src/game/battle/postBattleProcess";
-import avatarProfiles from "../battles/heroProfiles.json";
+import avatarProfiles from "./heroProfiles.json";
 import { selectFoeTemplate } from "../../src/game/prebattle/foeFunctions";
 import { generateFoeStats } from "../../src/game/prebattle/generateFoeStats";
 import { calcScenarioBonuses, determineScenario } from "../../src/game/battle/scenario";
@@ -158,11 +158,11 @@ describe("Do battle setup with random av and generated foe template", () => {
 
   // +25 Damage Afterburn - Dragon Whelp
   it("Should run battle, then test +25 Damage Afterburn ability", () => {
-    //BRF.power += 1000;
+    BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
     const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
-    const effects = [{ name: "+25 Damage Afterburn", type: "postbattle" }];
+    const effects = ["+25 Damage Afterburn"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome, postFoe } = getPostBattlePackage();
 
@@ -171,7 +171,7 @@ describe("Do battle setup with random av and generated foe template", () => {
       if (b.fHealthRemaining - 25 <= 0) {
         expect(postOutcome.outcome).toBe("Double KO");
       }
-      console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
+      //console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
       expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
     }
 
@@ -180,7 +180,7 @@ describe("Do battle setup with random av and generated foe template", () => {
       if (b.fHealthRemaining - 25 <= 0) {
         expect(postOutcome.outcome).toBe("Avatar Wins");
       }
-      console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
+      //console.log("Foe Health before and after Afterburn = ", b.fHealthRemaining, postFoe.health);
       expect(postFoe.health).toBeLessThan(b.fHealthRemaining);
     }
   });

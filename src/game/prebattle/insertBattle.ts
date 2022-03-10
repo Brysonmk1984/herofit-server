@@ -10,7 +10,7 @@ import { AllPbaTypes, BackendBattle, PBAType, PostBattleActions } from "../../ty
 async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
   try {
     const postBattleActions: PBAType[] = await determinePostBattleActions(avatar, foe);
-    console.log("COWS", postBattleActions);
+
     const battleObj: BackendBattle = {
       owner: avatar.owner,
       avatarID: avatar.id,
