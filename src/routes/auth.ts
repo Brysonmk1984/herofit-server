@@ -154,15 +154,22 @@ router.post("/reset-password-confirm-email", body("email").isEmail(), body("isMo
   }
   const { email, isMobileApp } = req.body;
 
+  interface ResetPasswordUser {
+    hash: string;
+    email: string;
+    createdAt: string;
+  }
+
   try {
-    const user = User.findOne({ where: { email }, attributes: ["email", "hash", "createdAt"], raw: true });
-    if (user) {
-      const token = usePasswordHashToMakeToken(user);
-      const result = await sendResetPasswordEmail(email, token, isMobileApp);
-      return res.formatter.ok({ result });
-    } else {
+    const user: ResetPasswordUser | null = await User.findOne({ where: { email }, attributes: ["email", "hash", "createdAt"], raw: true });
+
+    if (user === null) {
       return res.formatter.badRequest("No matching email.");
     }
+
+    const token = usePasswordHashToMakeToken(user.hash, user.email, user.createdAt);
+    const result = await sendResetPasswordEmail(email, token, isMobileApp);
+    res.formatter.ok({ result });
   } catch (error) {
     sendBackendOnlyEmail("Couldn't send reset password email - server error!", JSON.stringify(error));
     res.formatter.serverError(error.toString(), "Server Error - for POST /reset-password-confirm-email");

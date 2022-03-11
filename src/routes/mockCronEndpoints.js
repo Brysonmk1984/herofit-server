@@ -140,7 +140,7 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
             likelihood: recoverEarlyChance,
           });
           //console.log('REC - ', recovery, 'REC EARLY CHANCE - ', recoverEarlyChance, recoveredEarly);
-          // Revive avatar to the REVIVE_AMOUNT in constants.js
+          // Revive avatar to the REVIVE_AMOUNT in constants.ts
           if (recoveredEarly) {
             console.log("Recovering!", avatar.owner);
             return recoveredAvatars.push(avatar.owner);
