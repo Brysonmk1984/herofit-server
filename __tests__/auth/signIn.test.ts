@@ -15,8 +15,6 @@ describe("POST /auth/login", () => {
 
     const { email } = response.body.data.user;
     expect(email).toBe(process.env.TEST_SIGN_IN_EMAIL);
-
-    console.log(response.body.data.user);
     expect(response.body.data.user).toEqual(
       expect.objectContaining({
         id: expect.any(Number),
