@@ -188,4 +188,13 @@ interface BackendBattle {
   effects: string[] | null;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames };
+interface BackendAvatarItems {
+  id: number;
+  avatarID: number;
+  itemID: number;
+  equipped: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems };

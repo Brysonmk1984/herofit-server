@@ -10,7 +10,6 @@ import ItemsModel from "../../src/models/items";
 require("dotenv").load();
 
 function loadDb() {
-  const dbUrl = process.env.DATABASE_URL_LOCAL;
   const sequelizeSettings = {
     host: "localhost",
     dialect: "postgres",
@@ -26,7 +25,7 @@ function loadDb() {
     query: { raw: true },
   };
 
-  const db = new Sequelize(dbUrl, sequelizeSettings);
+  const db = new Sequelize(process.env.DATABASE_URL, sequelizeSettings);
 
   const User = UserModel(db, Sequelize);
   const Avatar = AvatarModel(db, Sequelize);

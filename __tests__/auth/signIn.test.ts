@@ -28,7 +28,7 @@ describe("POST /auth/login", () => {
         isFake: expect.any(Boolean),
         latestActivityUpdate: expect.nullOrAny(String),
         stravaAccessToken: expect.nullOrAny(String),
-        stravaAccessTokenExpiration: expect.nullOrAny(String),
+        stravaAccessTokenExpiration: expect.nullOrAny(Number),
         stravaRefreshToken: expect.nullOrAny(String),
         featurePreferenceSubmitted: expect.any(Boolean),
         seenLatestPatch: expect.any(Boolean),
