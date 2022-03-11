@@ -293,7 +293,6 @@ router.post("/validated-email", body("emailCode").isString(), async (req: TypedR
 
   try {
     const result = await User.update({ active: true }, { where: { emailCode }, returning: true, plain: true });
-    console.log("ICECREAM");
     return res.formatter.ok({ user: result[1] });
   } catch (error) {
     console.log("ERROR WITH EMAIL CODE: ", error);
@@ -351,9 +350,9 @@ router.post("/strava-credentials", body("email").isEmail(), body("stravaAccessTo
 
     // Check if record exists in db
     if (!user) {
-      const error = new Error("User not found!");
-      res.formatter.serverError(error.toString());
+      throw new Error("User not found!");
     }
+
     const data = await User.update(updateObj, { where: { email }, returning: true, plain: true });
     res.formatter.ok({ user: data[1] });
   } catch (error) {
