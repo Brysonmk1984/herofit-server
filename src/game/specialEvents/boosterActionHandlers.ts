@@ -1,4 +1,6 @@
-const handleBoostXP = function (xpBoosterAts, xpBounty) {
+import { SpecialEventActionType } from "../../types/BackendOnlyTypes";
+
+function handleBoostXP(xpBoosterAts: SpecialEventActionType[], xpBounty: number) {
   let boostedXpBounty = xpBounty;
   // For each 'foeBonusToStatsAts' action type
   for (let i = 0; i < xpBoosterAts.length; i++) {
@@ -7,9 +9,9 @@ const handleBoostXP = function (xpBoosterAts, xpBounty) {
   }
 
   return Math.floor(boostedXpBounty);
-};
+}
 
-const handleBoostPT = function (ptBoosterAts, ptBounty) {
+function handleBoostPT(ptBoosterAts: SpecialEventActionType[], ptBounty: number) {
   let boostedPtBounty = ptBounty;
   // For each 'foeBonusToStatsAts' action type
   for (let i = 0; i < ptBoosterAts.length; i++) {
@@ -17,6 +19,6 @@ const handleBoostPT = function (ptBoosterAts, ptBounty) {
     boostedPtBounty += boostedPtBounty * at.bonusPercent;
   }
   return Math.floor(boostedPtBounty);
-};
+}
 
-module.exports = { handleBoostXP, handleBoostPT };
+export { handleBoostXP, handleBoostPT };

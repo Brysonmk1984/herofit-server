@@ -13,7 +13,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newbie",
-    "description": "Low Level, Random Stats"
+    "description": "Low Level, Random Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -29,7 +30,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newArmor",
-    "description": "Low Level, ARMOR Stats"
+    "description": "Low Level, ARMOR Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -45,7 +47,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newPower",
-    "description": "Low Level, POWER Stats"
+    "description": "Low Level, POWER Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -61,7 +64,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newHealth",
-    "description": "Low Level, HEALTH Stats"
+    "description": "Low Level, HEALTH Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -77,7 +81,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newRecovery",
-    "description": "Low Level, RECOVERY Stats"
+    "description": "Low Level, RECOVERY Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -93,7 +98,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newAir",
-    "description": "Low Level, AIR Stats"
+    "description": "Low Level, AIR Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -109,7 +115,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newWater",
-    "description": "Low Level, WATER Stats"
+    "description": "Low Level, WATER Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -125,7 +132,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newEarth",
-    "description": "Low Level, EARTH Stats"
+    "description": "Low Level, EARTH Stats",
+    "level": 4
   },
   {
     "activityXP": 200,
@@ -142,7 +150,7 @@
     "equipped": [],
     "name": "newFire",
     "description": "Low Level, FIRE Stats",
-    "level": 3
+    "level": 4
   },
 
   {
@@ -159,7 +167,8 @@
     "character": "RePete",
     "equipped": [],
     "name": "newPower lvl 7",
-    "description": "Low Level, POWER Stats"
+    "description": "Low Level, POWER Stats",
+    "level": 7
   },
 
   {

@@ -14,7 +14,6 @@ const chance = chanceInit();
 // Separate all the foes from the json file into 3 difficulty categories
 function _divideAvailableFoesByDifficulty(foes: FoeTemplate[], level: number) {
   const availableFoes = foes.filter(foe => !foe.itemSummonOnly && foe.levelRequirement <= level);
-
   return arrayGroupBy(availableFoes, "difficultyLevel");
 }
 
@@ -79,6 +78,7 @@ function selectFoeTemplate(level: number) {
 
   // Give Low level players a higher chance for an easier foe
   const beginnersLuckHappened = _determineBeginnersLuck(level);
+  console.log("FOE ARRAYS - (low, medium)", low, medium);
   const finalFoeArray = beginnersLuckHappened ? low : [...low, ...medium];
 
   // Randomly select from final list of foes and return one
