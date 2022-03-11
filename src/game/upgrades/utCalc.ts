@@ -1,16 +1,17 @@
-const defaultTotals = require("../../common/defaultTotals.json");
-const { ACTIVITY_MAP } = require("../CONSTANTS");
-
-const moment = require("moment");
+import moment from "moment";
+import defaultTotals from "../../common/defaultTotals.json";
+import { BackendUserTotals, UserTotals } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
+import { ACTIVITY_MAP } from "../CONSTANTS";
 
 // Only use userTotals data from the DB as parameter
-const utCalc = function (userTotals) {
+function utCalc(userTotals: UserTotals) {
   const actMap = ACTIVITY_MAP;
   let ut = userTotals;
   const utReturn = {
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
-    update: function (activities) {
+    update: function (activities: HF.Activity[]) {
       // loop over each new activity sent from client
       activities.forEach((activity, i) => {
         // Converts Strava formatted activity to camelCase;
@@ -35,15 +36,15 @@ const utCalc = function (userTotals) {
       });
       return ut;
     },
-    initialUpdate: function (activities, accountDate) {
-      accountDate = moment(accountDate);
+    initialUpdate: function (activities: HF.Activity[], accountDate: string) {
+      const accountDateMoment = moment(accountDate);
       let actBeforeAccCounter = 0;
-      let actsToInclude = [];
+      let actsToInclude = [] as HF.Activity[];
       // loop over each new activity sent from client
       activities.forEach((activity, i) => {
-        const activityDate = moment(activity.start_date);
+        const activityDate = moment(activity.activityDate);
         // Load 5 that happened before Account creation
-        if (activityDate.isBefore(accountDate)) {
+        if (activityDate.isBefore(accountDateMoment)) {
           if (actBeforeAccCounter < 5) {
             actsToInclude.push(activity);
             ++actBeforeAccCounter;
@@ -70,6 +71,5 @@ const utCalc = function (userTotals) {
     },
   };
   return utReturn;
-};
-
-module.exports = utCalc;
+}
+export default utCalc;

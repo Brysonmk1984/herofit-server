@@ -7,7 +7,7 @@ import xpCalc from "../game/upgrades/xpCalc";
 import { Op } from "sequelize";
 import { config } from "../appConfig";
 import { parseActivityData } from "../lib/helperFunctions";
-import { ObjectWithAnyProperties, TypedRequestBody, UserTotals } from "../types/BackendOnlyTypes";
+import { ObjectWithAnyProperties, TypedRequestBody, BackendUserTotals } from "../types/BackendOnlyTypes";
 import HF from "../types/herofit";
 const router = express.Router();
 
@@ -64,7 +64,7 @@ router.post("/instantiate-user-totals", body("email").isEmail(), body("avatarId"
 
   try {
     const [resultObj, created]: [ObjectWithAnyProperties, boolean] = await UserTotal.findOrCreate({ where: { user: email }, defaults: { user: email, avatarId }, raw: true });
-    const results: UserTotals = resultObj.dataValues;
+    const results: BackendUserTotals = resultObj.dataValues;
 
     // New user_total Created
     if (created) {
@@ -155,7 +155,7 @@ router.post("/get-profile-info-by-email", body("heroName").isString(), async (re
     avatar = hero;
 
     // First, exchange the username for the email
-    type PromiseReturnTuple = [Promise<UserTotals>, Promise<HF.Activity[]>, Promise<HF.Battle[]>, Promise<HF.User>];
+    type PromiseReturnTuple = [Promise<BackendUserTotals>, Promise<HF.Activity[]>, Promise<HF.Battle[]>, Promise<HF.User>];
     const allPromises: PromiseReturnTuple = [
       UserTotal.findOne({
         where: { user: email },

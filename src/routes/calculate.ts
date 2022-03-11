@@ -2,7 +2,7 @@ import express, { Response } from "express";
 import { body, validationResult } from "express-validator";
 import { authenticateJWT } from "../jwt/validateJWT";
 import avCalc from "../game/upgrades/avCalc";
-import xpCalc from "../game/upgrades/xpCalc";
+import { currentLevelByInput } from "../game/upgrades/xpCalc";
 import { TypedRequestBody } from "../types/BackendOnlyTypes";
 import { sendBackendOnlyEmail } from "../mail";
 const router = express.Router();
@@ -32,7 +32,6 @@ router.post("/fetch-current-level-by-input", body("xp").isNumeric(), authenticat
   }
 
   const xp = req.body.xp;
-  const { currentLevelByInput } = xpCalc();
   const levelObj = currentLevelByInput(xp);
 
   if (levelObj) {

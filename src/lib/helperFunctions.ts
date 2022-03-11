@@ -168,4 +168,9 @@ const arrayGroupBy = (items: ObjectWithAnyProperties[], key: string) => {
 
 const pickRandomArrayItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
 
-export { cloneObj, parseStats, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem };
+// Useful for checking if an array includes a certain value while el being a subset of arr
+function includes<T extends U, U>(arr: ReadonlyArray<T>, el: U): el is T {
+  return arr.includes(el as T);
+}
+
+export { cloneObj, parseStats, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem, includes };

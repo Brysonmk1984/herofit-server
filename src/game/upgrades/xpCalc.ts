@@ -1,7 +1,15 @@
-let { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, POWER_PER_LEVEL, MAX_HEALTH_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD, MAX_LEVEL, AETHER_PER_ALBEDO_LEVEL } = require("../CONSTANTS");
+import { includes } from "../../lib/helperFunctions";
+import { ActivityType, UserTotals } from "../../types/BackendOnlyTypes";
+import { LEVEL_CURVE, XP_BASE_LEVEL, QP_PER_LEVEL, POWER_PER_LEVEL, MAX_HEALTH_PER_LEVEL, TIME_AND_HALF_ACTIVITIES, RECOVERY_EFFECTIVENESS_MOD, MAX_LEVEL, AETHER_PER_ALBEDO_LEVEL } from "../CONSTANTS";
+
+interface LevelObj {
+  level: number;
+  total: number;
+  albedo?: number;
+}
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
-function xpCalc(activityXP, battleXP) {
+function xpCalc(activityXP: number, battleXP: number) {
   const aXP = activityXP,
     bXP = battleXP,
     tXP = aXP + bXP;
@@ -29,7 +37,7 @@ function xpCalc(activityXP, battleXP) {
         currentLevel = MAX_LEVEL;
       }
 
-      const levelObj = {
+      const levelObj: LevelObj = {
         level: currentLevel,
         total: currentLevel + albedoLevel,
       };
@@ -82,18 +90,18 @@ function xpCalc(activityXP, battleXP) {
     },
 
     // Calculate aXP from existing User Totals - The only function used to update activity XP
-    calcNewActivityXPFromUt: function (userTotals) {
+    calcNewActivityXPFromUt: function (userTotals: UserTotals) {
       // Standard = all activities except the activities that earn 50% bonus (running, crossFit, stairStepper, swimming, elliptical)
       let standardDuration = 0;
       let timeAndHalfDuration = 0;
-      for (const activity in userTotals) {
-        if (userTotals[activity]) {
+      for (let activity in userTotals) {
+        if (userTotals[activity as ActivityType]) {
           // Check if the activity is an intense activity, if so give user 50% more xp
-          if (TIME_AND_HALF_ACTIVITIES.includes(activity)) {
+          if (includes(TIME_AND_HALF_ACTIVITIES, activity)) {
             timeAndHalfDuration += userTotals[activity].duration;
-            // Otherwise, just give thestandard 1xp for 1 minute
+            // Otherwise, just give the standard 1xp for 1 minute
           } else {
-            standardDuration += userTotals[activity].duration;
+            standardDuration += userTotals[activity as ActivityType].duration;
           }
         }
       }
@@ -114,14 +122,14 @@ function xpCalc(activityXP, battleXP) {
     },
 
     // DETERMINE HOW MUCH HEALTH IS RECOVERED PER HOUR
-    determineRecoveryPerHour: function (recovery) {
+    determineRecoveryPerHour: function (recovery: number) {
       const recoveryRetarder = recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
       const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
       return adjRegenRate;
     },
 
     // GIVES XP REQUIRED FOR NEXT LEVEL, based on level input
-    nextLevelByInput: function (level) {
+    nextLevelByInput: function (level: number) {
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
 
@@ -129,7 +137,7 @@ function xpCalc(activityXP, battleXP) {
     },
 
     // GIVES CURRENT LEVEL based on XP input, and POSSIBLY LATE GAME LEVELS if user is over 100
-    currentLevelByInput: function (xp) {
+    currentLevelByInput: function (xp: number) {
       const exponent = LEVEL_CURVE;
       const baseXP = XP_BASE_LEVEL;
 
@@ -142,7 +150,7 @@ function xpCalc(activityXP, battleXP) {
         currentLevel = MAX_LEVEL;
       }
 
-      const levelObj = {
+      const levelObj: LevelObj = {
         level: currentLevel,
         total: currentLevel + albedoLevel,
       };
@@ -154,7 +162,7 @@ function xpCalc(activityXP, battleXP) {
     },
 
     // Calculate whether a user leveled up, and how many times based on XP input
-    checkLevelUpByInput: function (startingXP, endingXP) {
+    checkLevelUpByInput: function (startingXP: number, endingXP: number) {
       const startingLevel = xpReturn.currentLevelByInput(startingXP).total;
       const endingLevel = xpReturn.currentLevelByInput(endingXP).total;
       const levelsGained = endingLevel - startingLevel;
@@ -166,4 +174,7 @@ function xpCalc(activityXP, battleXP) {
   return xpReturn;
 }
 
+export default xpCalc;
+
+// Not sure why avatarBattlePrep.test.ts is still requiring the commonJS syntax
 module.exports = xpCalc;

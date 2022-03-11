@@ -5,12 +5,12 @@ import avCalc from "../upgrades/avCalc";
 import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } from "../CONSTANTS";
 import instantiateBattle from "../prebattle/instantiateBattle";
 import HF from "../../types/herofit";
-import { UserTotals } from "../../types/BackendOnlyTypes";
+import { BackendUserTotals } from "../../types/BackendOnlyTypes";
 
 // Retrocausal Capsule
 async function resetHero(avatarID: number, email: string) {
   try {
-    const userTotals: UserTotals = await UserTotal.findOne({ where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw: true });
+    const userTotals: BackendUserTotals = await UserTotal.findOne({ where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw: true });
 
     interface AvatarAttrs {
       health: number;

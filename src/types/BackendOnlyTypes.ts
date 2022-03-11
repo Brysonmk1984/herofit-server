@@ -104,10 +104,6 @@ interface ActivityTotal {
 type ActivityTotalOrNull = ActivityTotal | null;
 
 interface UserTotals {
-  id: number;
-  user: string;
-  avatarId: string;
-  lastUpdate: string;
   run: ActivityTotalOrNull;
   hike: ActivityTotalOrNull;
   walk: ActivityTotalOrNull;
@@ -126,6 +122,15 @@ interface UserTotals {
   kayaking: ActivityTotalOrNull;
   workout: ActivityTotalOrNull;
 }
+
+interface BackendUserTotals extends UserTotals {
+  id: number;
+  user: string;
+  avatarId: string;
+  lastUpdate: string;
+}
+
+type ActivityType = "run" | "hike" | "walk" | "ride" | "swim" | "yoga" | "weightTraining" | "stairStepper" | "elliptical" | "standUpPaddling" | "crossfit" | "rowing" | "ski" | "snowboard" | "snowshoe" | "kayaking" | "workout";
 
 type PBAType = "Award Skin" | "Award Title" | "Award Pet";
 type PBAItemCategory = HF.Pluralize<HF.ServerItemType>;
@@ -197,4 +202,4 @@ interface BackendAvatarItems {
   updatedAt: string;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems };
