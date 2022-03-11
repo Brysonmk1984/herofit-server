@@ -8,7 +8,6 @@ import AvatarItemsModel from "../models/avatarItems";
 import ItemsModel from "../models/items";
 
 let db: Sequelize.Sequelize;
-let dbUrl: string;
 let sequelizeSettings: Options = {
   dialect: "postgres",
   protocol: "postgres",
@@ -37,7 +36,6 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   };
 
   sequelizeSettings = { ...sequelizeSettings, ...envSpecificSettings };
-  dbUrl = process.env.DATABASE_URL;
 } else {
   // DEVELOPMENT
   const envSpecificSettings = {
@@ -51,10 +49,9 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   };
 
   sequelizeSettings = { ...sequelizeSettings, ...envSpecificSettings };
-  dbUrl = process.env.DATABASE_URL_LOCAL;
 }
 
-db = new Sequelize(dbUrl, sequelizeSettings);
+db = new Sequelize(process.env.DATABASE_URL, sequelizeSettings);
 
 db.authenticate();
 
