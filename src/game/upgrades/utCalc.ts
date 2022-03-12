@@ -1,7 +1,6 @@
 import moment from "moment";
 import defaultTotals from "../../common/defaultTotals.json";
-import { BackendUserTotals, UserTotals } from "../../types/BackendOnlyTypes";
-import HF from "../../types/herofit";
+import { BackendActivity, UserTotals } from "../../types/BackendOnlyTypes";
 import { ACTIVITY_MAP } from "../CONSTANTS";
 
 // Only use userTotals data from the DB as parameter
@@ -11,23 +10,15 @@ function utCalc(userTotals: UserTotals) {
   const utReturn = {
     // Updates existing user totals from DB with data from the new activities passed in
     // Returns the updated userTotals
-    update: function (activities: HF.Activity[]) {
+    update: function (activities: BackendActivity[]) {
       // loop over each new activity sent from client
       activities.forEach((activity, i) => {
         // Converts Strava formatted activity to camelCase;
-        let a;
-        //console.log(activity.type);
-        if (actMap[activity.type]) {
-          a = actMap[activity.type];
-        } else {
-          a = "workout";
-        }
+        let a = actMap[activity.type] ? actMap[activity.type] : "workout";
 
         if (ut[a] === null) {
           ut[a] = defaultTotals[a];
         }
-        //console.log('UT - ', ut);
-        //console.log('A! - ', a, ut[a]);
         // All activities track instance count, duration, and average heart rate
         ut[a] = {
           instance: ++ut[a].instance,
@@ -36,10 +27,10 @@ function utCalc(userTotals: UserTotals) {
       });
       return ut;
     },
-    initialUpdate: function (activities: HF.Activity[], accountDate: string) {
+    initialUpdate: function (activities: BackendActivity[], accountDate: string) {
       const accountDateMoment = moment(accountDate);
       let actBeforeAccCounter = 0;
-      let actsToInclude = [] as HF.Activity[];
+      let actsToInclude = [] as BackendActivity[];
       // loop over each new activity sent from client
       activities.forEach((activity, i) => {
         const activityDate = moment(activity.activityDate);
@@ -51,7 +42,7 @@ function utCalc(userTotals: UserTotals) {
           }
         } else {
           // All activities after account creation are valid
-          // This happends when a new user registers, but doesn't upgrade right away
+          // This happens when a new user registers, but doesn't upgrade right away
           // They come back later with new activities. We want to count these new
           // Activities in addition to the 5 before they signed up
           actsToInclude.push(activity);
@@ -62,9 +53,10 @@ function utCalc(userTotals: UserTotals) {
     },
     // used for onetime reset and sync function '/recalculate-user-totals' in user.js routes
     reset: function () {
-      const newBlankUt = {};
-      for (let act in ACTIVITY_MAP) {
-        newBlankUt[ACTIVITY_MAP[act]] = null;
+      const newBlankUt = {} as UserTotals;
+      let act: keyof typeof actMap;
+      for (act in actMap) {
+        newBlankUt[actMap[act]] = null;
       }
       ut = newBlankUt;
       return ut;

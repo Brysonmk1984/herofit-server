@@ -1,5 +1,6 @@
 import HF from "./herofit";
 import { Request, Response } from "express";
+import { ACTIVITY_MAP } from "../game/CONSTANTS";
 
 type NodeEnvironments = "development" | "staging" | "production" | "test";
 
@@ -202,4 +203,8 @@ interface BackendAvatarItems {
   updatedAt: string;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems };
+// Uses the specific strava activities rather than the converted names
+interface BackendActivity extends HF.Activity {
+  type: keyof typeof ACTIVITY_MAP;
+}
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity };

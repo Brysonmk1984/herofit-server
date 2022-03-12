@@ -174,7 +174,7 @@ function xpCalc(activityXP: number, battleXP: number) {
   return xpReturn;
 }
 
-export default xpCalc;
-
 // Not sure why avatarBattlePrep.test.ts is still requiring the commonJS syntax
 module.exports = xpCalc;
+
+export default xpCalc;
