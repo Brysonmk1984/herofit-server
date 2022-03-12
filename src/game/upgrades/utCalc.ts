@@ -64,4 +64,5 @@ function utCalc(userTotals: UserTotals) {
   };
   return utReturn;
 }
+module.exports = utCalc;
 export default utCalc;
