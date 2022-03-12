@@ -32,7 +32,7 @@ async function resetHero(avatarID: number, email: string) {
     const { fire: updatedFire, earth: updatedEarth, water: updatedWater, air: updatedAir } = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
     const updatedPower = updatePower(heroLevel, 0);
     const updatedAether = updateAether(heroLevel, 0);
-    const { updatedMaxHealth, updatedHealth } = updateHealth(heroLevel, 0, health, maxHealth, "rested", false, true);
+    const { updatedMaxHealth, updatedHealth } = updateHealth(heroLevel, 0, health, maxHealth, "Rested", false, true);
 
     const updatedAttributes = {
       /* Hero Level minus one since level 1 doesn't count, * 5 for QP each level */

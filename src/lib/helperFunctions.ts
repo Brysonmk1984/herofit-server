@@ -1,4 +1,5 @@
-import { ObjectWithAnyProperties } from "../types/BackendOnlyTypes";
+import { TIME_AND_HALF_ACTIVITIES } from "../game/CONSTANTS";
+import { ObjectWithAnyProperties, TimeAndHalfActs } from "../types/BackendOnlyTypes";
 import HF from "../types/herofit";
 import { includes } from "../types/typeguards";
 
@@ -91,8 +92,7 @@ const paginate = (query: ObjectWithAnyProperties, { page, pageSize }: { page: nu
   return { ...query, limit, offset };
 };
 
-type TimeAndHalfActs = "stairStepper" | "elliptical" | "swim" | "crossfit" | "run";
-function adjustActivityMinutes(minutes: number, activityType: string, timeAndHalfActivities: TimeAndHalfActs[]) {
+function adjustActivityMinutes(minutes: number, activityType: string, timeAndHalfActivities: typeof TIME_AND_HALF_ACTIVITIES) {
   if (includes(timeAndHalfActivities, activityType)) {
     return minutes * 1.5;
   }

@@ -1,17 +1,26 @@
-const { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } = require("../CONSTANTS");
-const moment = require("moment");
-const { cloneObj, adjustActivityMinutes } = require("../../lib/helperFunctions");
-const avatarList = require("../../heroList.json");
+import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } from "../CONSTANTS";
+import moment from "moment";
+import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
+import avatarList from "../../heroList.json";
+import { QpSpentStats, UserTotals } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
+
+interface ElementObject {
+  fire: number;
+  water: number;
+  air: number;
+  earth: number;
+}
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
-function avCalc(userTotals) {
+function avCalc(userTotals?: UserTotals) {
   const avReturn = {
-    updatePower: function (level, qpPower) {
+    updatePower: function (level: number, qpPower: number) {
       // 5 Power per level, plus base, plus how much QP has been spent
       const totalPower = (level - 1) * 5 + qpPower + BASE_POWER;
       return totalPower;
     },
-    updateAether: function (totalLevel, qpAether) {
+    updateAether: function (totalLevel: number, qpAether: number) {
       if (totalLevel <= MAX_LEVEL) {
         return 0;
       }
@@ -21,7 +30,7 @@ function avCalc(userTotals) {
       const totalAether = albedoLevel * 5 + qpAether;
       return totalAether;
     },
-    updateHealth: function (level, qpHealth, oldHealth, oldMaxHealth, oldStatus, lvlUp, reset) {
+    updateHealth: function (level: number, qpHealth: number, oldHealth: number, oldMaxHealth: number, oldStatus: HF.HeroStatus, lvlUp: boolean, reset?: boolean) {
       let updatedHealth = oldHealth;
       let updatedMaxHealth = oldMaxHealth;
 
@@ -54,7 +63,7 @@ function avCalc(userTotals) {
         updatedMaxHealth,
       };
     },
-    updateElements: function (character, qpSpent, dateOfCreation) {
+    updateElements: function (character: HF.CharacterName, qpSpent: QpSpentStats, dateOfCreation: string) {
       // Need to calculate the default elms each time the avatar is buffed, otherwise it will reset the original values are not accounted for
       const avatarBasics = cloneObj(
         avatarList.find(av => {
@@ -62,15 +71,13 @@ function avCalc(userTotals) {
         }),
         true,
       );
-      //console.log('CB elms - ', avatarBasics.elms);
       const e = avReturn._determineAstrologyBonus(avatarBasics.elms, dateOfCreation);
 
-      //console.log('CB elms AND astro bonus - ', e);
       // Loop over each activity saved in userTotals and do a fresh calculation of what the element values are
-      // Then they get added to the defaultElement congifuration above
+      // Then they get added to the defaultElement configuration above
       for (const activityType in userTotals) {
-        let activityMinutes = userTotals[activityType] ? userTotals[activityType].duration / 60 : 0;
-        // If activity is a time and a half extivity, adjust the minutes appropriatesly so the avatar gets the right amount of element
+        let activityMinutes = userTotals[activityType as keyof UserTotals] ? userTotals[activityType as keyof UserTotals].duration / 60 : 0;
+        // If activity is a time and a half activity, adjust the minutes appropriately so the avatar gets the right amount of element
         // Currently, not tracking timeAndHalf exercises with a constant. Instead, using the adjustedActivity minutes above. Consider changing this in the future
         let adjustedActivityMinutes = adjustActivityMinutes(activityMinutes, activityType, TIME_AND_HALF_ACTIVITIES);
         //console.log(`ACTIVITY MINS for ${activityType} = `, activityMinutes, 'adjusted - ', adjustedActivityMinutes);
@@ -109,19 +116,18 @@ function avCalc(userTotals) {
             break;
         }
       }
-      //console.log('E after activities - ', e);
-      //console.log('qp spent on elms - ', qpSpent);
+
       // round the elements down to nearest hundreth and add back in the qp points spent on each element
-      const updatedElms = {
+      const updatedElms: ElementObject = {
         earth: parseFloat(e.earth.toFixed(2)) + qpSpent.qpEarth,
         air: parseFloat(e.air.toFixed(2)) + qpSpent.qpAir,
         fire: parseFloat(e.fire.toFixed(2)) + qpSpent.qpFire,
         water: parseFloat(e.water.toFixed(2)) + qpSpent.qpWater,
       };
-      //console.log('combined, updated elms - ', updatedElms);
+
       return updatedElms;
     },
-    updateStatus: function (oldStatus, lvlUp) {
+    updateStatus: function (oldStatus: HF.HeroStatus, lvlUp: boolean) {
       if (lvlUp) {
         switch (oldStatus) {
           case "Knocked Out":
@@ -139,15 +145,15 @@ function avCalc(userTotals) {
     },
 
     // ADDS 5 TO WHICHEVER ELEMENT OF THE SIGN OF THE SEASON WHEN ACCOUNT WAS CREATED
-    _determineAstrologyBonus: function (defaultelms, dateOfCreation) {
-      const bonusElement = avReturn.determineAstrologySeason(dateOfCreation).element.toLowerCase();
+    _determineAstrologyBonus: function (defaultElms: ElementObject, dateOfCreation: string) {
+      const bonusElement = avReturn.determineAstrologySeason(dateOfCreation).element.toLowerCase() as Lowercase<HF.PrimaryElement>;
 
-      defaultelms[bonusElement] += 5;
-      return defaultelms;
+      defaultElms[bonusElement] += 5;
+      return defaultElms;
     },
 
     // TODO: When refactoring to TS, make sure to return type of element is HF.PrimaryElement
-    determineAstrologySeason: function (dateOfCreation = null) {
+    determineAstrologySeason: function (dateOfCreation: string = null) {
       const date = dateOfCreation ? moment(dateOfCreation) : moment();
 
       const thisYear = date.year();
@@ -199,4 +205,4 @@ function avCalc(userTotals) {
   return avReturn;
 }
 
-module.exports = avCalc;
+export default avCalc;

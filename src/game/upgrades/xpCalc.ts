@@ -9,7 +9,7 @@ interface LevelObj {
 }
 
 // PRIMARY FUNCTIONS FOR HANDLING EXPERIENCE POINTS AND LEVEL UPS
-function xpCalc(activityXP: number, battleXP: number) {
+function xpCalc(activityXP?: number, battleXP?: number) {
   const aXP = activityXP,
     bXP = battleXP,
     tXP = aXP + bXP;
