@@ -204,5 +204,5 @@ function avCalc(userTotals?: UserTotals) {
   };
   return avReturn;
 }
-
+module.exports = avCalc;
 export default avCalc;
