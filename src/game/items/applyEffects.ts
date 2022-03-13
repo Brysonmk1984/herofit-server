@@ -1,4 +1,4 @@
-import { col, literal } from "sequelize";
+import { col, literal, Transaction } from "sequelize";
 import { Avatar, UserTotal } from "../../config/db";
 import xpCalc from "../upgrades/xpCalc";
 import avCalc from "../upgrades/avCalc";
@@ -8,7 +8,7 @@ import HF from "../../types/herofit";
 import { BackendUserTotals } from "../../types/BackendOnlyTypes";
 
 // Retrocausal Capsule
-async function resetHero(avatarID: number, email: string) {
+async function resetHero(avatarID: number, email: string): Promise<HF.Hero> {
   try {
     const userTotals: BackendUserTotals = await UserTotal.findOne({ where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw: true });
 
@@ -70,7 +70,7 @@ async function resetHero(avatarID: number, email: string) {
 }
 
 // Health Potion
-async function healCompletely(avatarID: number) {
+async function healCompletely(avatarID: number): Promise<HF.Hero> {
   try {
     const data = await Avatar.update({ health: col("maxHealth"), status: "Rested" }, { where: { id: avatarID }, returning: true });
     const avatar = data[1][0];
@@ -83,7 +83,7 @@ async function healCompletely(avatarID: number) {
 }
 
 // Antidote Potion
-async function removeInfected(avatarID: number) {
+async function removeInfected(avatarID: number): Promise<HF.Hero> {
   try {
     const data = await Avatar.update({ status: "Recovering", statusFade: 0 }, { where: { id: avatarID }, returning: true });
     //RETURN UPDATED AVATAR
@@ -94,7 +94,7 @@ async function removeInfected(avatarID: number) {
 }
 
 // Birthday Cake
-async function setToHalfHealth(avatarID: number) {
+async function setToHalfHealth(avatarID: number): Promise<HF.Hero> {
   try {
     const data = await Avatar.update({ health: literal(`"maxHealth" / 2`), status: "Recovering" }, { where: { id: avatarID }, returning: true });
     //RETURN UPDATED AVATAR
@@ -104,12 +104,12 @@ async function setToHalfHealth(avatarID: number) {
   }
 }
 
-async function itemEffects(effects: HF.Effect[], avatarID: number, email: string) {
+async function itemEffects(effects: HF.Effect[], avatarID: number, email: string, t: Transaction): Promise<HF.Hero> {
   /* 
     Still need to pass a transaction here after I refactor inventory.js
   */
   try {
-    const effectPromises: Promise<HF.Hero>[] = [];
+    const effectPromises: Promise<any>[] = [];
     effects.forEach((effect: HF.Effect) => {
       switch (effect.name) {
         case "Reset Hero":
@@ -124,32 +124,34 @@ async function itemEffects(effects: HF.Effect[], avatarID: number, email: string
           effectPromises.push(setToHalfHealth(avatarID));
           break;
         case "Summon Storming Oni":
-          effectPromises.push(instantiateBattle(avatarID, "Storming Oni"));
+          effectPromises.push(instantiateBattle(avatarID, "Storming Oni", t));
           break;
         case "Summon Hulking Aggro Crag":
-          effectPromises.push(instantiateBattle(avatarID, "Hulking Aggro Crag"));
+          effectPromises.push(instantiateBattle(avatarID, "Hulking Aggro Crag", t));
           break;
         case "Summon Scorching Archfiend":
-          effectPromises.push(instantiateBattle(avatarID, "Scorching Archfiend"));
+          effectPromises.push(instantiateBattle(avatarID, "Scorching Archfiend", t));
           break;
         case "Summon High Priestess of the Tides":
-          effectPromises.push(instantiateBattle(avatarID, "High Priestess of the Tides"));
+          effectPromises.push(instantiateBattle(avatarID, "High Priestess of the Tides", t));
           break;
         case "Summon Plaguebringer":
-          effectPromises.push(instantiateBattle(avatarID, "Plaguebringer"));
+          effectPromises.push(instantiateBattle(avatarID, "Plaguebringer", t));
           break;
         case "Summon Shadow-Self":
-          effectPromises.push(instantiateBattle(avatarID, "Shadow-Self"));
+          effectPromises.push(instantiateBattle(avatarID, "Shadow-Self", t));
           break;
         default:
           break;
       }
     });
 
-    return await Promise.all<HF.Hero>(effectPromises);
+    // All promises return the Hero, so just return the first one since they're all the same
+    const promiseData = await Promise.all<HF.Hero>(effectPromises);
+    return promiseData[0];
   } catch (error) {
     throw error;
   }
 }
-
 module.exports = { itemEffects };
+export { itemEffects };

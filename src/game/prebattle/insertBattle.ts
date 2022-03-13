@@ -9,7 +9,7 @@ import { AllPbaTypes, BackendBattle, PBAType, PostBattleActions } from "../../ty
 // Used for inserting a battle for an individual user when they goToBattle
 async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
   try {
-    const postBattleActions: PBAType[] = await determinePostBattleActions(avatar, foe);
+    const postBattleActions: PBAType[] = await determinePostBattleActions(avatar, foe, t);
 
     const battleObj: BackendBattle = {
       owner: avatar.owner,
@@ -23,7 +23,7 @@ async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
       // If there are PBAs top consider post battle, add them here
       postBattleActions: postBattleActions.length ? postBattleActions : null,
       // If there are item effects that will impact battle, add them to initial battle record
-      effects: determineItemEffects(avatar.equipped),
+      effects: determineItemEffects(avatar.equipped, t),
     };
 
     // Using findOrCreate now to prevent multiple battles

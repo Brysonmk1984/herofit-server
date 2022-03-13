@@ -115,8 +115,8 @@ const OUTCOME_XP = {
 // Used in calculation to increase the deduction of XP for weaker opponents
 const FOE_DIFFICULTY_XP_MOD_FACTOR = 3.5;
 const BXP_LEVEL_CURVE = 2;
-const BONUS_XP_EXPONENT = 0.9;
-const PT_EXPONENT = 1.2;
+const BONUS_XP_EXPONENT = 0.8;
+const PT_EXPONENT = 0.9;
 
 const REVIVE_AMOUNT = 1;
 // higher is less effective

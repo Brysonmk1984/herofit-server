@@ -19,7 +19,7 @@ async function instantiateBattle(avatarID: number, foeType: HF.FoeType = null, t
 
   try {
     // GET AVATAR
-    const results: HF.Hero = await db.query(q, { bind: [avatarID], plain: true });
+    const results: HF.Hero = await db.query(q, { bind: [avatarID], plain: true, transaction: t });
     if (results.goToBattle) {
       throw new Error("Hero is already queued for another battle, please try again later.");
     }

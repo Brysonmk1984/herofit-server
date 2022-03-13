@@ -385,65 +385,52 @@ router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEm
   }
 
   const { id, email, avatarID, effects } = req.body;
-  itemEffects(effects, avatarID, email)
-    .then(data => {
-      if (data.error) {
-        throw data.error;
-      }
-      // If any effect errors out, throw new error
-      data.forEach((result, i) => {
-        if (result instanceof Error) {
-          throw new Error(data.error);
-        }
+
+  try {
+    db.transaction(async t => {
+      const hero = await itemEffects(effects, avatarID, email, t);
+      let avatar = parseStats(hero, true);
+
+      await AvatarItems.destroy({ where: { id }, transaction: t });
+
+      const rows = await AvatarItems.findAll({
+        where: { avatarID },
+        include: [
+          {
+            model: Items,
+            as: "item",
+            where: { type: "consumable" },
+            attributes: ["type", "name", "description", "lore", "effects", "icon", "class", "exhaustible", "ptCost"],
+            // Required is false by default, adding a where clause makes it true by default.
+            // Still, false or true doesn't seem to have an impact here.
+            //required: false,
+          },
+        ],
+        raw: undefined,
+        nest: true,
+        transaction: t,
       });
 
-      let avatar = parseStats(data[0], true);
-      AvatarItems.destroy({
-        where: { id },
-      })
-        .then(data => {
-          return AvatarItems.findAll({
-            where: { avatarID },
-            include: [
-              {
-                model: Items,
-                as: "item",
-                where: { type: "consumable" },
-                attributes: ["type", "name", "description", "lore", "effects", "icon", "class", "exhaustible", "ptCost"],
-                // Required is false by default, adding a where clause makes it true by default.
-                // Still, false or true doesn't seem to have an impact here.
-                //required: false,
-              },
-            ],
-            raw: undefined,
-            nest: true,
-          });
-        })
-        .then(rows => {
-          const consumables = rows.map(row => {
-            return {
-              id: row.id,
-              avatarID: row.avatarID,
-              itemID: row.itemID,
-              equipped: row.equipped,
-              ...row.item.dataValues,
-            };
-          });
-          const stackedItems = stackItems(consumables);
-          console.log("STACKEDITEMS", stackedItems);
-          res.formatter.ok({ consumables: stackedItems, avatar });
-        })
-        .catch(error => {
-          console.log("USE ITEM INNER ERROR - ", error);
-          res.formatter.serverError(error.toString(), `Error destroying item -  DELETE /use-consumable-item`);
-        });
-    })
-    .catch(error => {
-      if (error.toString() === "Error: Hero is already queued for another battle, please try again later.") {
-        res.formatter.badRequest(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
-      }
-      res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+      const consumables = rows.map(row => {
+        return {
+          id: row.id,
+          avatarID: row.avatarID,
+          itemID: row.itemID,
+          equipped: row.equipped,
+          ...row.item.dataValues,
+        };
+      });
+
+      const stackedItems = stackItems(consumables);
+      res.formatter.ok({ consumables: stackedItems, avatar });
     });
+  } catch (error) {
+    console.log("ERROR - ", error);
+    if (error.toString() === "Error: Hero is already queued for another battle, please try again later.") {
+      res.formatter.badRequest(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+    }
+    res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+  }
 });
 
 module.exports = router;
