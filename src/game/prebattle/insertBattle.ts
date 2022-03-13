@@ -5,11 +5,12 @@ import ALLPBAs from "../postBattleActions.json";
 import { parseStats } from "../../lib/helperFunctions";
 import HF from "../../types/herofit";
 import { AllPbaTypes, BackendBattle, PBAType, PostBattleActions } from "../../types/BackendOnlyTypes";
+import { MAX_HEALTH_PER_LEVEL } from "../CONSTANTS";
 
 // Used for inserting a battle for an individual user when they goToBattle
 async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
   try {
-    const postBattleActions: PBAType[] = await determinePostBattleActions(avatar, foe, t);
+    const postBattleActions = await determinePostBattleActions(avatar, foe, t);
 
     const battleObj: BackendBattle = {
       owner: avatar.owner,
@@ -23,7 +24,7 @@ async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
       // If there are PBAs top consider post battle, add them here
       postBattleActions: postBattleActions.length ? postBattleActions : null,
       // If there are item effects that will impact battle, add them to initial battle record
-      effects: determineItemEffects(avatar.equipped, t),
+      effects: determineItemEffects(avatar.equipped),
     };
 
     // Using findOrCreate now to prevent multiple battles
@@ -39,7 +40,8 @@ async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
         let matchingPBA;
 
         for (let actionType in ALLPBAs as PostBattleActions) {
-          const match = ALLPBAs[actionType as keyof PostBattleActions].find((pba: AllPbaTypes) => {
+          let at = actionType as keyof typeof ALLPBAs;
+          const match: AllPbaTypes = ALLPBAs[at].find((pba: AllPbaTypes) => {
             return pba.action === action;
           });
           if (match) {

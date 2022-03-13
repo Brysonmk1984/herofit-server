@@ -1,9 +1,9 @@
 import { Avatar, Battle, AvatarItems, Items } from "../../config/db";
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import { DEFEATEDFOE, WINSTREAK, WINTOTAL } from "../postBattleActions.json";
 import VILLAINS from "../villains.json";
 import HF from "../../types/herofit";
-import { FoeTemplate } from "../../types/BackendOnlyTypes";
+import { FoeTemplate, VillainJsonStructure } from "../../types/BackendOnlyTypes";
 // ON GOTOBATTLE, save list of effects from avatar's items
 function determineItemEffects(equipment: HF.Item[]) {
   const reduced = equipment.reduce((filtered: string[], item: HF.Item) => {
@@ -23,9 +23,9 @@ function determineItemEffects(equipment: HF.Item[]) {
 }
 
 // ON GOTOBATTLE, DETERMINE POST BATTLE ACTIONS
-async function determinePostBattleActions(avatar: HF.Hero, foe: HF.Foe) {
+async function determinePostBattleActions(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
   try {
-    const records = await AvatarItems.findAll({ attributes: ["itemID"], where: { avatarID: avatar.id }, include: [{ model: Items, attributes: ["name", "type"], where: { id: { [Op.col]: "avatar_items.itemID" }, type: { [Op.not]: "consumable" } }, required: false, raw: true }], raw: undefined, nest: true });
+    const records = await AvatarItems.findAll({ attributes: ["itemID"], where: { avatarID: avatar.id }, include: [{ model: Items, attributes: ["name", "type"], where: { id: { [Op.col]: "avatar_items.itemID" }, type: { [Op.not]: "consumable" } }, required: false, raw: true }], raw: undefined, nest: true, transaction: t });
 
     // Filter results by non consumables, and convert dataValues to actual javascript object
     const avatarItems = records
@@ -112,7 +112,7 @@ async function _checkDefeatedParticularFoe(avatarId: number, foeType: HF.FoeType
       // If last foe of type, return matching PBA action
       if (!hasBeenDefeated) {
         // Consider moving the PBA action to the normal PBA JSON file
-        const action = VILLAINS[foeClass].find((f: FoeTemplate) => f.type === foeType).pba[0];
+        const action = (VILLAINS as VillainJsonStructure)[foeClass].find((f: FoeTemplate) => f.type === foeType).pba[0];
         const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
         //console.log('action', action, 'MPBA - ', matchingPBA);
         // Check to make sure the user doesn't already have the item
@@ -186,7 +186,7 @@ async function _checkDefeatedAllOfTypeButCurrent(avatarId: number, foeType: HF.F
         // If last foe of type, return matching PBA action
         if (isLastOfType) {
           // Consider moving the PBA action to the normal PBA JSON file
-          const action: string = VILLAINS[foeClass].find((f: FoeTemplate) => f.type === foeType).pba[0];
+          const action: string = (VILLAINS as VillainJsonStructure)[foeClass].find((f: FoeTemplate) => f.type === foeType).pba[0];
           const matchingPBA = DEFEATEDFOE.find(pba => pba.action === action);
           //console.log('action', action, 'MPBA - ', matchingPBA);
           // Skin should never be owned and make it this far, but check to make sure the user doesn't already have the skin

@@ -136,7 +136,7 @@ type ActivityType = "run" | "hike" | "walk" | "ride" | "swim" | "yoga" | "weight
 type PBAType = "Award Skin" | "Award Title" | "Award Pet";
 type PBAItemCategory = HF.Pluralize<HF.ServerItemType>;
 
-interface DefeateFoePBA {
+interface DefeatFoePBA {
   action: string;
   name: string;
   type: PBAType;
@@ -172,14 +172,14 @@ interface HelperPBA {
 }
 
 interface PostBattleActions {
-  DEFEATEDFOE: DefeateFoePBA[];
+  DEFEATEDFOE: DefeatFoePBA[];
   WINSTREAK: WinStreakPBA[];
   WINTOTAL: WinTotalPBA[];
   HELPER: HelperPBA[];
 }
 type ActionTypeNames = keyof PostBattleActions;
 
-type AllPbaTypes = DefeateFoePBA | WinStreakPBA | WinTotalPBA | HelperPBA;
+type AllPbaTypes = DefeatFoePBA | WinStreakPBA | WinTotalPBA | HelperPBA;
 
 interface BackendBattle {
   owner: string;
@@ -190,7 +190,7 @@ interface BackendBattle {
   avatar: HF.Hero;
   outcome: HF.BattleOutcome | "TBD";
   seenReport: boolean;
-  postBattleActions: PBAType[] | null;
+  postBattleActions: string[] | null;
   effects: string[] | null;
 }
 
