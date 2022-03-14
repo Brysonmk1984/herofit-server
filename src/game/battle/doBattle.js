@@ -591,8 +591,8 @@ function doBattle(avatar, foe, goesFirst) {
   // }));
 
   const outcomeData = _determineOutcome(winnerString);
-  //console.log('RB=', roundBreakdown, outcomeData);
-  //console.log("AV LEVEL", avatar.level);
+  // console.log('RB=', roundBreakdown, outcomeData);
+  // console.log("FOE HEALTH REMAINING", grandTotals.foeHealthRemaining);
   const results = {
     aHealthRemaining: grandTotals.avHealthRemaining,
     fHealthRemaining: grandTotals.foeHealthRemaining,

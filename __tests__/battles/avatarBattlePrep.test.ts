@@ -28,7 +28,7 @@ beforeAll(() => {
     foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    scenario = determineScenario(beginnersLuck);
+    ({ s: scenario } = determineScenario(beginnersLuck));
     const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
     sAvatar = scenarioBonuses.sAvatar;
     sFoe = scenarioBonuses.sFoe;

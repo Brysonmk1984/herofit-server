@@ -1,9 +1,13 @@
-const { FOE_NON_ACTION } = require("../CONSTANTS");
-const chance = require("chance")();
-const xpCalc = require("../upgrades/xpCalc");
-const { scrambleStats } = require("../../lib/helperFunctions");
+import { FOE_NON_ACTION } from "../CONSTANTS";
+import Chance from "chance";
+import xpCalc from "../upgrades/xpCalc";
+import { scrambleStats } from "../../lib/helperFunctions";
+import HF from "../../types/herofit";
+import { BackendEffectProcs, BattleHero, Scenario } from "../../types/BackendOnlyTypes";
+import heroList from "../../heroList.json";
+const chance = Chance();
 
-function doAvatarBattlePrep(avatar, foe, effects, scenario) {
+function doAvatarBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, effects: string[], scenario: Scenario) {
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
   const effectProcs = [];
@@ -310,7 +314,7 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
   return { avatar: eAvatar, foe: eFoe, procs: effectProcs };
 }
 
-function doFoeBattlePrep(avatar, foe, scenarioId) {
+function doFoeBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, scenarioId: number) {
   const ability = foe.ability;
   const effectProcs = [];
   if (ability && ability.type === "prebattle") {
@@ -404,4 +408,40 @@ function doFoeBattlePrep(avatar, foe, scenarioId) {
   return { avatar, foe, procs: effectProcs };
 }
 
-module.exports = { doAvatarBattlePrep, doFoeBattlePrep };
+function doPreBattleHeroAbilities(avatar: BattleHero, possibleAbilityProcs: string[], effectProcs: BackendEffectProcs[]) {
+  const eAvatar = { ...avatar };
+  const ability = heroList.find(h => h.character === avatar.character).passive;
+  const pAbilityProcs = [...possibleAbilityProcs];
+  const eProcs = [...effectProcs];
+  // Only consider abilities that are prebattle
+  if (ability.type === "prebattle") {
+    switch (ability.name) {
+      case "Naturally Stealthy":
+        pAbilityProcs.push("Naturally Stealthy");
+        break;
+      case "Healing Waters":
+        // Adjust Hero's water amount based on their health
+        const healingWatersBonus = Math.floor(avatar.health / 6);
+        const newWaterAmount = avatar.water + healingWatersBonus;
+        eAvatar.water = newWaterAmount;
+
+        // Add to eProcs(effectProcs) array since it always procs
+        eProcs.push({
+          effect: "Healing Waters",
+          heroStatsEffected: ["water"],
+          type: "prebattle",
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {
+    avatar: eAvatar,
+    pAbilityProcs,
+    eProcs,
+  };
+}
+
+export { doAvatarBattlePrep, doFoeBattlePrep, doPreBattleHeroAbilities };

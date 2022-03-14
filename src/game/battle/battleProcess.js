@@ -13,21 +13,24 @@ function battleProcess(battleInstance, avatarInstance) {
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
-  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
+  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassives, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
   determineBeginnersLuck();
 
-  // PREBATTLE STEP 1 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
+  // PREBATTLE STEP 1 - RUN ANY PREBATTLE ABILITIES UNIQUE TO HEROES
+  doPreBattleHeroPassives();
+
+  // PREBATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   doScenarioAndBonus();
 
-  // PREBATTLE STEP 2 APPLY EFFECTS FROM ITEMS
+  // PREBATTLE STEP 3 - APPLY EFFECTS FROM ITEMS
   doPreBattleEffects(battle.effects);
 
-  // PREBATTLE STEP 3 - APPLY FOE PREBATTLE ABILITY
+  // PREBATTLE STEP 4 - APPLY FOE PREBATTLE ABILITY
   prepareFoe();
 
-  // PREBATTLE STEP 4 - ADJUST THE SEASONAL ELEMENT ON BOTH FOE AND AVATAR
+  // PREBATTLE STEP 5 - ADJUST THE SEASONAL ELEMENT ON BOTH FOE AND AVATAR
   applyElementalBonus();
 
   // PREBATTLE STEP 5 - DETERMINE WHO ATTACKS FIRST
@@ -38,7 +41,7 @@ function battleProcess(battleInstance, avatarInstance) {
   //applyCheat(1,1,1,1,10000,10000)
   //applyCheat(1000,50, 448,1)
 
-  // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
+  // PREBATTLE STEP 7 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario, effectProcs } = getPreBattlePackage();
 
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT

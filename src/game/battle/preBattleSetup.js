@@ -1,6 +1,6 @@
 const { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../CONSTANTS");
 const { determineScenario, calcScenarioBonuses } = require("./scenario");
-const { doAvatarBattlePrep, doFoeBattlePrep } = require("./doBattlePrep");
+const { doAvatarBattlePrep, doFoeBattlePrep, doPreBattleHeroAbilities } = require("./doBattlePrep");
 const { parseStats } = require("../../lib/helperFunctions");
 const avCalc = require("../upgrades/avCalc");
 const chance = require("chance")();
@@ -11,6 +11,11 @@ const preBattleSetup = function (avatar, foe) {
   let beginnersLuck;
   let scenario;
   let goesFirst;
+
+  // Only used to help determine Ninja passive
+  let possibleAbilityProcs = [];
+
+  // Only appears on Battle Report, no other uses
   let effectProcs = [];
 
   return {
@@ -21,9 +26,16 @@ const preBattleSetup = function (avatar, foe) {
       }
       beginnersLuck = false;
     },
+    // Only Applies to Natural Ninja and Empath
+    doPreBattleHeroPassives: () => {
+      ({ avatar: a, pAbilityProcs: possibleAbilityProcs, eProcs: effectProcs } = doPreBattleHeroAbilities(a, possibleAbilityProcs, effectProcs));
+    },
     // Choose scenario then apply bonuses to Avatar & Foe. Return Avatar, Foe, and Scenario
     doScenarioAndBonus: () => {
-      scenario = determineScenario(beginnersLuck);
+      const scenarioZeroBoost = possibleAbilityProcs.includes("Naturally Stealthy") ? true : false;
+
+      ({ s: scenario, ep: effectProcs } = determineScenario(beginnersLuck, scenarioZeroBoost, effectProcs));
+
       // assign 'a' variable above the value of sAvatar, same with 'f'
       ({ sAvatar: a, sFoe: f } = calcScenarioBonuses(a, f, scenario));
     },

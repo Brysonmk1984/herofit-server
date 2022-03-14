@@ -5,7 +5,7 @@ module.exports = {
   verbose: true,
   watchPathIgnorePatterns: ["node_modules"],
   setupFilesAfterEnv: ["<rootDir>__tests__/setup/nullOrAny.setup.ts", "jest-extended"],
-  testPathIgnorePatterns: ["<rootDir>__tests__/setup", "<rootDir>__tests__/nonHookTests"],
+  testPathIgnorePatterns: ["__tests__/setup", "__tests__/nonHookTests"],
   globals: {
     "ts-jest": {
       diagnostics: false,

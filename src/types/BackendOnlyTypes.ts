@@ -210,4 +210,44 @@ interface BackendActivity extends HF.Activity {
 
 interface QpSpentStats extends Partial<HF.Stats> {}
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats };
+interface BattleHero {
+  id: number;
+  qp: number;
+  air: number;
+  fire: number;
+  name: string;
+  armor: number;
+  earth: number;
+  owner: string;
+  power: number;
+  water: number;
+  aether: number;
+  health: number;
+  status: string;
+  battleXP: number;
+  equipped: Item[];
+  character: string;
+  maxHealth: number;
+  activityXP: number;
+  battleDkos: number;
+  battleWins: number;
+  statusFade: number;
+  battleDraws: number;
+  battleLosses: number;
+  photonTokens: number;
+}
+
+interface Scenario {
+  id: number;
+  description: string;
+  avatarPowerMod: number;
+  avatarHealthMod: number;
+  foePowerMod: number;
+  foeHealthMod: number;
+}
+
+interface BackendEffectProcs extends Omit<HF.BattleEffectProc, "type"> {
+  type?: "postbattle" | "battle" | "prebattle";
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, Scenario, BackendEffectProcs };

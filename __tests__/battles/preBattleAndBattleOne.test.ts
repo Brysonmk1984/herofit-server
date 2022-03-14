@@ -112,7 +112,7 @@ describe("Do battle setup with random av and generated foe template", () => {
       }
 
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-      const scenario = determineScenario(beginnersLuck);
+      const { s: scenario, ep } = determineScenario(beginnersLuck);
       const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
       const sAvatar = scenarioBonuses.sAvatar;
       const sFoe = scenarioBonuses.sFoe;
