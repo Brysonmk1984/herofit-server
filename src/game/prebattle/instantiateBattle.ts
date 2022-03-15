@@ -15,7 +15,7 @@ async function instantiateBattle(avatarID: number, foeType: HF.FoeType = null, t
   LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
     FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
   WHERE avatars.id = $1
-`;
+  `;
 
   try {
     // GET AVATAR
@@ -45,6 +45,7 @@ async function instantiateBattle(avatarID: number, foeType: HF.FoeType = null, t
     // Insert Battle into DB
     return await insertBattle(avatar, foeWithStats, t);
   } catch (error) {
+    console.log("ERROR INSTANTIATING BATTLE: ", error);
     throw error;
   }
 }

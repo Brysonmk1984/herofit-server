@@ -73,12 +73,12 @@ function determinePtBounty(heroLevel, bonusPt = 0, foeType) {
 
     // If the event contains foeLikelihood actions
     if (ptBoosterAts.length && isAMatchingFoe) {
-      console.log("PTGAIN before event -", finalPtGain);
+      //console.log("PTGAIN before event -", finalPtGain);
       finalPtGain = handleBoostPT(ptBoosterAts, finalPtGain);
-      console.log("PTGAIN after event -", finalPtGain);
+      //console.log("PTGAIN after event -", finalPtGain);
     }
   }
-  console.log("FINAL=", finalPtGain);
+  //console.log("FINAL=", finalPtGain);
   return finalPtGain;
 }
 

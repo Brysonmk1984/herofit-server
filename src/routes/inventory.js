@@ -378,7 +378,7 @@ router.post("/buy-item-by-avatar-id", body("itemID").isNumeric(), body("ptCost")
 });
 
 // CONSUME ITEM - first applies effects of the item, then deletes it from the Hero's inventory
-router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEmail(), body("avatarID").isNumeric(), body("effects").isArray(), authenticateJWT, (req, res) => {
+router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEmail(), body("avatarID").isNumeric(), body("effects").isArray(), authenticateJWT, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for DELETE /use-consumable-item");
@@ -387,12 +387,11 @@ router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEm
   const { id, email, avatarID, effects } = req.body;
 
   try {
-    db.transaction(async t => {
+    await db.transaction(async t => {
       const hero = await itemEffects(effects, avatarID, email, t);
+
       let avatar = parseStats(hero, true);
-
       await AvatarItems.destroy({ where: { id }, transaction: t });
-
       const rows = await AvatarItems.findAll({
         where: { avatarID },
         include: [
@@ -427,9 +426,9 @@ router.delete("/use-consumable-item", body("id").isNumeric(), body("email").isEm
   } catch (error) {
     console.log("ERROR - ", error);
     if (error.toString() === "Error: Hero is already queued for another battle, please try again later.") {
-      res.formatter.badRequest(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+      res.formatter.badRequest(error.toString(), `Error applying item effects - DELETE /use-consumable-item`);
     }
-    res.formatter.serverError(error.toString(), `Error doing applying item effects - DELETE /use-consumable-item`);
+    res.formatter.serverError(error.toString(), `Error applying item effects - DELETE /use-consumable-item`);
   }
 });
 

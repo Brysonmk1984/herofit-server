@@ -39,13 +39,12 @@ router.post(
       db.transaction(async t => {
         // Instantiate battle instance
         const battleObj = await instantiateBattle(avatar.id, null, t);
-
         // Update Hero to reflect goToBattle status change
         await Avatar.update({ goToBattle: true }, { where: { owner: req.body.email }, transaction: t });
-
         res.formatter.ok(battleObj);
       });
     } catch (error) {
+      console.log("ERROR in /insert-battle", error);
       res.formatter.serverError(error.toString(), "Database update or server code error - POST /insert-battle");
     }
   },

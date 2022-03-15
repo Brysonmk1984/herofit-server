@@ -30,6 +30,7 @@ async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
     // Using findOrCreate now to prevent multiple battles
     const [battleInstance, wasCreated] = await Battle.findOrCreate({ where: { outcome: "TBD", avatarID: battleObj.avatarID }, defaults: battleObj, raw: true, transaction: t });
     if (!wasCreated) {
+      console.log("THRRRROWWING");
       throw new Error("Battle already in queue for hero");
     }
 
@@ -70,6 +71,7 @@ async function insertBattle(avatar: HF.Hero, foe: HF.Foe, t: Transaction) {
       rewards: matchingItems,
     };
   } catch (error) {
+    console.log("Error Inserting Battle", error);
     throw error;
   }
 }
