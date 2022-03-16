@@ -246,8 +246,15 @@ interface Scenario {
   foeHealthMod: number;
 }
 
+type GamePhase = "postbattle" | "battle" | "prebattle" | "Hourly" | "Activity Upgrade";
+
 interface BackendEffectProcs extends Omit<HF.BattleEffectProc, "type"> {
-  type?: "postbattle" | "battle" | "prebattle";
+  type?: Exclude<GamePhase, "Hourly" | "Activity Upgrade">;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, Scenario, BackendEffectProcs };
+interface PassiveAbility {
+  name: string;
+  type: GamePhase;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, Scenario, GamePhase, BackendEffectProcs, PassiveAbility };

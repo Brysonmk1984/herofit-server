@@ -162,8 +162,10 @@ describe("Do battle setup with random av and generated foe template", () => {
   });
 
   it("Should run battle with first profile and generated foe", () => {
+    const mockPassive = { name: "not in use", type: "Activity Upgrade" as const };
+
     // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst);
+    const b = doBattle(BRA, BRF, goesFirst, mockPassive);
 
     // Battle results should look a specific way
     expect(b).toEqual({

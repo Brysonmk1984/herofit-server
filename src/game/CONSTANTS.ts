@@ -127,7 +127,10 @@ const RECOVERY_EFFECTIVENESS_MOD = 55;
 // DO BATTLE
 
 // lower is more effective
-const ARMOR_DRF = 1.7;
+const ARMOR_DRF = {
+  default: 1.7,
+  "Corundum-Clast Armor": 1.4,
+};
 
 // variation on the power each attack (one per turn)
 const DAMAGE_PERCENT_PER_TURN = 0.2;

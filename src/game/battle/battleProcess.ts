@@ -1,25 +1,27 @@
-const { Avatar, AvatarItems, Items, Battle } = require("../../config/db");
-const doBattle = require("./doBattle");
-const preBattleSetup = require("./preBattleSetup");
-const postBattleProcess = require("./postBattleProcess");
-const { Op } = require("sequelize");
-const xpCalc = require("../upgrades/xpCalc");
+import { Avatar, AvatarItems, Items, Battle } from "../../config/db";
+import doBattle from "./doBattle";
+import preBattleSetup from "./preBattleSetup";
+import postBattleProcess from "./postBattleProcess";
+import { Op } from "sequelize";
+import xpCalc from "../upgrades/xpCalc";
+import { BattleHero, GamePhase, PassiveAbility } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
 */
 
-function battleProcess(battleInstance, avatarInstance) {
+function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, passiveAbility: PassiveAbility) {
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
-  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassives, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
+  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassiveSetup, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
   determineBeginnersLuck();
 
   // PREBATTLE STEP 1 - RUN ANY PREBATTLE ABILITIES UNIQUE TO HEROES
-  doPreBattleHeroPassives();
+  doPreBattleHeroPassiveSetup(passiveAbility);
 
   // PREBATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   doScenarioAndBonus();
@@ -47,7 +49,8 @@ function battleProcess(battleInstance, avatarInstance) {
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
   try {
-    const b = doBattle(BRA, BRF, goesFirst);
+    const battlePassive = effectProcs.find(e => e.type === "battle");
+    const b = doBattle(BRA, BRF, goesFirst, battlePassive);
 
     const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
 
@@ -159,4 +162,4 @@ function battleProcess(battleInstance, avatarInstance) {
   }
 }
 
-module.exports = battleProcess;
+export default battleProcess;

@@ -10,7 +10,8 @@ import ALLPBAs from "../game/postBattleActions.json";
 import instantiateBattle from "../game/prebattle/instantiateBattle";
 import battleProcess from "../game/battle/battleProcess";
 import HF from "../types/herofit";
-import { AllPbaTypes, PBAType, PostBattleActions, TypedRequestBody } from "../types/BackendOnlyTypes";
+import { AllPbaTypes, BattleHero, PBAType, PostBattleActions, TypedRequestBody } from "../types/BackendOnlyTypes";
+import heroList from "../heroList.json";
 
 const router = express.Router();
 
@@ -241,12 +242,15 @@ router.post("/run-specific-battle", body("avatarID").isNumeric(), authenticateJW
       throw new Error("No Battle");
     }
 
-    const data = await battleProcess(battle, battle.avatar);
+    const passiveAbility = heroList.find((h: BattleHero) => h.character === battle.avatar.character).passive;
+    console.log(passiveAbility);
+    const data = await battleProcess(battle, battle.avatar, passiveAbility);
     res.formatter.ok(data);
   } catch (error) {
     if (error.toString() === "Error: No Battle") {
       return res.formatter.badRequest(errors.array(), `No TBD battle matching avatarID ${avatarID} - POST /run-specific-battle`);
     }
+    console.log("ERROR - ", error);
     res.formatter.serverError(error.toString(), "Retrieved Data Error for /run-specific-battle");
   }
 });

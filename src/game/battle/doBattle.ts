@@ -1,6 +1,8 @@
-const chance = require("chance")();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require("../CONSTANTS");
-const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineIDS } = require("./elementalProcs");
+import Chance from "chance";
+import { PassiveAbility } from "../../types/BackendOnlyTypes";
+import { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } from "../CONSTANTS";
+import { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineIDS } from "./elementalProcs";
+const chance = Chance();
 
 // Calculates damage done against same element (F on F)
 function _calcElmStraightDamage(aDamage) {
@@ -226,21 +228,25 @@ function _calcElementDamage(attacker, receiver, evaded) {
 }
 
 // Calculates damage done against an element's counter element (F on E)
-function _calcArmorDR(aPower, rArmor) {
+function _calcArmorDR(aPower: number, rArmor: number, passiveAbility: PassiveAbility) {
+  console.log("PA", passiveAbility);
+  const armorType = passiveAbility.name === "Corundum-Clast Armor" ? passiveAbility.name : "default";
+  let armorDRF = ARMOR_DRF[armorType];
+
   let d = aPower;
   let r = rArmor;
   if (r === 0) {
     return { reduction: r, netDamage: d };
   }
   // Reduced damage based on amount of resistance
-  const dr = (r * 10) / (r * 10 + ARMOR_DRF * d);
+  const dr = (r * 10) / (r * 10 + armorDRF * d);
   return {
     reduction: parseFloat((d * dr).toFixed(2)),
     netDamage: Math.floor(d - d * dr),
   };
 }
 
-function _calcDamage(aPower, rArmor, evaded) {
+function _calcDamage(aPower, rArmor, evaded, passiveAbility: PassiveAbility) {
   if (evaded) {
     return { physicalDamage: 0, physicalReduction: 0 };
   }
@@ -258,7 +264,7 @@ function _calcDamage(aPower, rArmor, evaded) {
     fixed: 2,
   });
 
-  const { reduction, netDamage } = _calcArmorDR(power, armor);
+  const { reduction, netDamage } = _calcArmorDR(power, armor, passiveAbility);
 
   return {
     physicalDamage: Math.floor(netDamage),
@@ -310,14 +316,14 @@ function _calcHealthLoss(health, damage) {
   return Math.floor(health - damage);
 }
 
-function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals) {
+function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals, passiveAbility: PassiveAbility) {
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
   // IF AVATAR ROUND
   if (aggressorString === "Avatar") {
     // Calc physical damage, get back damage done and how much was prevented
-    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
+    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded, passiveAbility);
     // Calc elm damage, get back damage done and how much was prevented
     const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
 
@@ -376,8 +382,8 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
     // If foe has no elemental power, calc physical damage twice instead of physical + elemental
     if (!foeIsElemental) {
       // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
-      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, passiveAbility);
+      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, passiveAbility);
       physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
 
@@ -413,7 +419,7 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       };
     } else {
       // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
+      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, passiveAbility);
       physicalDamage = damageAndReduction1.physicalDamage;
       physicalReduction = damageAndReduction1.physicalReduction;
       // Calc elm damage, get back damage done and how much was prevented
@@ -493,11 +499,11 @@ function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesF
   return { ids: false, gf: goesFirst };
 }
 
-function doBattle(avatar, foe, goesFirst) {
+function doBattle(avatar, foe, goesFirst, passiveAbility: PassiveAbility) {
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
+  console.log("1pa", passiveAbility);
   const foeIsElemental = _checkIfElemental(foe);
   const roundBreakdown = [];
 
@@ -531,7 +537,7 @@ function doBattle(avatar, foe, goesFirst) {
     ({ ids: nextRoundIDS, gf: goesFirst } = _testForTemporalDistortion(aggressorString, avatar.aether, nextRoundIDS, goesFirst));
 
     // Compute battle turn and add results to total
-    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
+    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals, passiveAbility);
 
     grandTotals = totals;
     roundBreakdown.push({
@@ -604,4 +610,4 @@ function doBattle(avatar, foe, goesFirst) {
   return results;
 }
 
-module.exports = doBattle;
+export default doBattle;

@@ -3,7 +3,7 @@ import Chance from "chance";
 import xpCalc from "../upgrades/xpCalc";
 import { scrambleStats } from "../../lib/helperFunctions";
 import HF from "../../types/herofit";
-import { BackendEffectProcs, BattleHero, Scenario } from "../../types/BackendOnlyTypes";
+import { BackendEffectProcs, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
 import heroList from "../../heroList.json";
 const chance = Chance();
 
@@ -408,14 +408,14 @@ function doFoeBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, scenarioId: numb
   return { avatar, foe, procs: effectProcs };
 }
 
-function doPreBattleHeroAbilities(avatar: BattleHero, possibleAbilityProcs: string[], effectProcs: BackendEffectProcs[]) {
+function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string[], effectProcs: BackendEffectProcs[], passiveAbility: PassiveAbility) {
   const eAvatar = { ...avatar };
-  const ability = heroList.find(h => h.character === avatar.character).passive;
+  const { type, name } = passiveAbility;
   const pAbilityProcs = [...possibleAbilityProcs];
   const eProcs = [...effectProcs];
   // Only consider abilities that are prebattle
-  if (ability.type === "prebattle") {
-    switch (ability.name) {
+  if (type === "prebattle") {
+    switch (name) {
       case "Naturally Stealthy":
         pAbilityProcs.push("Naturally Stealthy");
         break;
@@ -435,6 +435,34 @@ function doPreBattleHeroAbilities(avatar: BattleHero, possibleAbilityProcs: stri
       default:
         break;
     }
+  } else if (type === "battle") {
+    switch (name) {
+      case "Corundum-Clast Armor":
+        eProcs.push({
+          effect: "CC Armor",
+          heroStatsEffected: ["armor"],
+          type: "battle",
+        });
+        break;
+      case "Olfactory Overload":
+        eProcs.push({
+          effect: "Olfactory Overload",
+          type: "battle",
+        });
+      default:
+        break;
+    }
+  } else if (type === "postbattle") {
+    switch (name) {
+      case "Auxiliary Systems":
+        pAbilityProcs.push("Auxiliary Systems");
+        break;
+      case "Rewrite History":
+        pAbilityProcs.push("Rewrite History");
+        break;
+      default:
+        break;
+    }
   }
 
   return {
@@ -444,4 +472,4 @@ function doPreBattleHeroAbilities(avatar: BattleHero, possibleAbilityProcs: stri
   };
 }
 
-export { doAvatarBattlePrep, doFoeBattlePrep, doPreBattleHeroAbilities };
+export { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities };

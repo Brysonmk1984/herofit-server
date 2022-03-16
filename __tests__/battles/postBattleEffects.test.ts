@@ -161,9 +161,10 @@ describe("Do battle setup with random av and generated foe template", () => {
 
   // +25 Damage Afterburn - Dragon Whelp
   it("Should run battle, then test +25 Damage Afterburn ability", () => {
+    const mockPassive = { name: "not in use", type: "Activity Upgrade" as const };
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst);
+    const b = doBattle(BRA, BRF, goesFirst, mockPassive);
     const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
     const effects = ["+25 Damage Afterburn"];
     doPostBattleEffects(effects);

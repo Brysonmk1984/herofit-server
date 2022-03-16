@@ -9,10 +9,11 @@ const BATCH_TIMEOUT = 2000;
 function _runBattlesOnBatch(shard) {
   try {
     const allAvatars = shard.map(battle => battle.avatar);
+    const passiveAbility = heroList.find(h => h.character === allAvatars[i].character).passive.filter();
 
     let battlePromises = [];
     for (let i = 0; i < shard.length; i++) {
-      battlePromises.push(battleProcess(shard[i], parseStats(allAvatars[i])));
+      battlePromises.push(battleProcess(shard[i], parseStats(allAvatars[i]), passiveAbility));
     }
     return Promise.allSettled(battlePromises);
   } catch (error) {
