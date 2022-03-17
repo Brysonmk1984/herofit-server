@@ -237,6 +237,20 @@ interface BattleHero {
   photonTokens: number;
 }
 
+type BattleFoe = HF.BattleFoe;
+type BattleRound = HF.BattleRound;
+
+interface BattleElements {
+  fire: number;
+  earth: number;
+  water: number;
+  air: number;
+}
+
+type BattleOutcome = "Avatar" | "Foe" | "DKO" | "Draw";
+
+type AvatarOrFoeString = "Avatar" | "Foe";
+
 interface Scenario {
   id: number;
   description: string;
@@ -246,10 +260,10 @@ interface Scenario {
   foeHealthMod: number;
 }
 
-type GamePhase = "postbattle" | "battle" | "prebattle" | "Hourly" | "Activity Upgrade";
+type GamePhase = "postbattle" | "battle" | "prebattle" | "hourly" | "activity upgrade";
 
 interface BackendEffectProcs extends Omit<HF.BattleEffectProc, "type"> {
-  type?: Exclude<GamePhase, "Hourly" | "Activity Upgrade">;
+  type?: Exclude<GamePhase, "hourly" | "activity upgrade">;
 }
 
 interface PassiveAbility {
@@ -257,4 +271,4 @@ interface PassiveAbility {
   type: GamePhase;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, Scenario, GamePhase, BackendEffectProcs, PassiveAbility };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility };

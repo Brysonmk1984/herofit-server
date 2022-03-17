@@ -117,7 +117,7 @@ function stackItems(allItems: HF.Item[]) {
 }
 
 // Used by The Poltergeist and Octopus to mix up all non zero stats of a hero or foe
-function scrambleStats(possibleStats: Lowercase<HF.Stat>[], objectWithStats: ObjectWithAnyProperties) {
+function scrambleStats(possibleStats: Partial<Lowercase<HF.Stat>>[], objectWithStats: ObjectWithAnyProperties) {
   const stats = possibleStats.filter(stat => {
     if (objectWithStats[stat] > 0) {
       return true;

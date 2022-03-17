@@ -1,9 +1,11 @@
-const chance = require("chance")();
-const { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD, AETHER_IDS_CHANCE_MOD } = require("../CONSTANTS");
+import { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THORNS_MOD, AETHER_TD_CHANCE_MOD } from "../CONSTANTS";
+import Chance from "chance";
+import { AvatarOrFoeString } from "../../types/BackendOnlyTypes";
+const chance = Chance();
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
-function determineFireCrit(fire, d) {
-  let critChance = Math.floor(Number((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
+function determineFireCrit(fire: number, d: number) {
+  let critChance = Math.floor(+((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
   if (critChance > 60) {
     critChance = 60;
   }
@@ -15,8 +17,8 @@ function determineFireCrit(fire, d) {
 }
 
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
-function determineAirEvade(air) {
-  let evadeChance = Math.floor(Number((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100);
+function determineAirEvade(air: number) {
+  let evadeChance = Math.floor(+((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100);
   //console.log(air, evadeChance);
   if (evadeChance > 60) {
     evadeChance = 60;
@@ -27,8 +29,8 @@ function determineAirEvade(air) {
 }
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)
-function determineWaterHeal(water, d) {
-  let healingFactor = Number((water * 5) / (water * 5 + WATER_HEAL_MOD)).toFixed(2);
+function determineWaterHeal(water: number, d: number) {
+  let healingFactor = +((water * 5) / (water * 5 + WATER_HEAL_MOD)).toFixed(2);
   if (healingFactor > 0.45) {
     healingFactor = 0.45;
   }
@@ -38,8 +40,8 @@ function determineWaterHeal(water, d) {
 }
 
 // EARTH - defensive trait - takes in defender's earth amount, and aggressors damage calculated on aggressors attacking round
-function determineEarthThorns(earth, d) {
-  let thornsFactor = Number((earth * 5) / (earth * 5 + EARTH_THORNS_MOD)).toFixed(2);
+function determineEarthThorns(earth: number, d: number) {
+  let thornsFactor = +((earth * 5) / (earth * 5 + EARTH_THORNS_MOD)).toFixed(2);
   if (thornsFactor > 0.45) {
     thornsFactor = 0.45;
   }
@@ -49,23 +51,17 @@ function determineEarthThorns(earth, d) {
 }
 
 // Aether - late game offensive trait - takes in attacker's aether amount and calculates a chance for taking an extra battle turn
-function determineIDS(aether, goesFirst) {
-  let idsChance = Math.floor(Number((aether * 3) / (aether * 3 + AETHER_IDS_CHANCE_MOD)).toFixed(2) * 100);
-  if (idsChance > 60) {
-    idsChance = 60;
+function determineTD(aether: number, goesFirst: AvatarOrFoeString) {
+  let tdChance = Math.floor(+((aether * 3) / (aether * 3 + AETHER_TD_CHANCE_MOD)).toFixed(2) * 100);
+  if (tdChance > 60) {
+    tdChance = 60;
   }
-  const isIDS = chance.bool({ likelihood: idsChance });
+  const isIDS = chance.bool({ likelihood: tdChance });
   if (isIDS) {
     const gf = goesFirst === "Avatar" ? "Foe" : "Avatar";
-    return { ids: true, gf };
+    return { td: true, gf: gf as AvatarOrFoeString };
   }
-  return { ids: false, gf: goesFirst };
+  return { td: false, gf: goesFirst };
 }
 
-module.exports = {
-  determineFireCrit,
-  determineAirEvade,
-  determineWaterHeal,
-  determineEarthThorns,
-  determineIDS,
-};
+export { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineTD };

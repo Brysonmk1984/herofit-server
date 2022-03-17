@@ -153,7 +153,7 @@ function avCalc(userTotals?: UserTotals) {
     },
 
     // TODO: When refactoring to TS, make sure to return type of element is HF.PrimaryElement
-    determineAstrologySeason: function (dateOfCreation: string = null) {
+    determineAstrologySeason: function (dateOfCreation: string = null): { sign: string; element: "Fire" | "Water" | "Air" | "Earth" } {
       const date = dateOfCreation ? moment(dateOfCreation) : moment();
 
       const thisYear = date.year();

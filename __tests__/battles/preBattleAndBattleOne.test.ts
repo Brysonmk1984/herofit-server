@@ -13,172 +13,197 @@ const chance = Chance();
 // Use toBe for scalar (primitive) data types only.
 // check the response data type use typeof operator
 
-let randomAv;
-let foeTemplate;
-let foeWithStats;
-
-beforeAll(() => {
-  const generateFoe = function (av) {
-    randomAv = av[Math.floor(Math.random() * avatarProfiles.length)];
-    // CHOOSE AVATAR WITH AETHER
-    //randomAv = av[avatarProfiles.length -1];
-
-    foeTemplate = selectFoeTemplate(randomAv.level);
-
-    const foe = {
-      id: foeTemplate.id,
-      type: foeTemplate.type,
-      name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
-      ability: foeTemplate.ability,
-      class: foeTemplate.class,
-    };
-
-    foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
-  };
-
-  generateFoe(avatarProfiles);
-});
-
-describe("Load profiles and generate foes from random Profile", () => {
-  it("Should Load profiles", () => {
-    // make sure there is a profiles array
-    expect(Array.isArray(avatarProfiles)).toBe(true);
-    // Make Sure there are more than zero profiles
-    expect(avatarProfiles.length).toBeGreaterThan(0);
-    // Make Sure all profiles have the right properties
-    expect(avatarProfiles).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          activityXP: expect.any(Number),
-          battleXP: expect.any(Number),
-          air: expect.any(Number),
-          earth: expect.any(Number),
-          fire: expect.any(Number),
-          water: expect.any(Number),
-          power: expect.any(Number),
-          health: expect.any(Number),
-          armor: expect.any(Number),
-          recovery: expect.any(Number),
-          character: expect.any(String),
-          equipped: expect.any(Array),
-          name: expect.any(String),
-          description: expect.any(String),
-          level: expect.any(Number),
-        }),
-      ]),
-    );
-  });
-
-  it("Should Create a foe from the random avatar", () => {
-    // MATCH PARTIAL
-    expect(foeTemplate).toBeObject();
-
-    expect(foeWithStats).toMatchObject({
-      type: expect.any(String),
-      name: expect.any(String),
-      ability: expect.objectContaining({
-        effect: expect.any(String),
-        name: expect.any(String),
-        type: expect.any(String),
-      }),
-      class: expect.any(String),
-      health: expect.any(Number),
-      power: expect.any(Number),
-      armor: expect.any(Number),
-      fire: expect.any(Number),
-      earth: expect.any(Number),
-      water: expect.any(Number),
-      air: expect.any(Number),
-      difficulty: expect.any(Number),
-    });
-  });
-});
-
-describe("Do battle setup with random av and generated foe template", () => {
-  let BRA;
-  let BRF;
-  let goesFirst;
+describe("Random Hero profile battle", () => {
+  let randomAv;
+  let foeTemplate;
+  let foeWithStats;
 
   beforeAll(() => {
-    function generateBraBrf() {
-      const { determineAstrologySeason } = avCalc();
-      const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
+    const generateFoe = function (av) {
+      randomAv = av[Math.floor(Math.random() * avatarProfiles.length)];
+      // CHOOSE AVATAR WITH AETHER
+      //randomAv = av[avatarProfiles.length -1];
 
-      // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
-      let beginnersLuck = false;
-      const avTXP = randomAv.activityXP + randomAv.battleXP;
-      if (avTXP < BEGINNERS_LUCK_MAX_XP) {
-        beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD });
-      }
+      foeTemplate = selectFoeTemplate(randomAv.level);
 
-      // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-      const { s: scenario, ep } = determineScenario(beginnersLuck);
-      const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
-      const sAvatar = scenarioBonuses.sAvatar;
-      const sFoe = scenarioBonuses.sFoe;
+      const foe = {
+        id: foeTemplate.id,
+        type: foeTemplate.type,
+        name: foeTemplate.foe[Math.floor(Math.random() * foeTemplate.foe.length)],
+        ability: foeTemplate.ability,
+        class: foeTemplate.class,
+      };
 
-      // avatar and foe to be used for battle
-      BRA = Object.assign({}, sAvatar);
-      BRF = Object.assign({}, sFoe);
+      foeWithStats = Object.assign({}, foe, generateFoeStats(randomAv, foe));
+    };
 
-      // Element by Seasonal Element Bonus
-      BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
-      BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
+    generateFoe(avatarProfiles);
+  });
 
-      // BATTLE STEP 3 - NOT IN GAME YET
+  describe("Load profiles and generate foes from random Profile", () => {
+    it("Should Load profiles", () => {
+      // make sure there is a profiles array
+      expect(Array.isArray(avatarProfiles)).toBe(true);
+      // Make Sure there are more than zero profiles
+      expect(avatarProfiles.length).toBeGreaterThan(0);
+      // Make Sure all profiles have the right properties
+      expect(avatarProfiles).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            activityXP: expect.any(Number),
+            battleXP: expect.any(Number),
+            air: expect.any(Number),
+            earth: expect.any(Number),
+            fire: expect.any(Number),
+            water: expect.any(Number),
+            power: expect.any(Number),
+            health: expect.any(Number),
+            armor: expect.any(Number),
+            recovery: expect.any(Number),
+            character: expect.any(String),
+            equipped: expect.any(Array),
+            name: expect.any(String),
+            description: expect.any(String),
+            level: expect.any(Number),
+          }),
+        ]),
+      );
+    });
 
-      // BATTLE STEP 4 - FOE USES prebattle ABILITY
-      if (foeWithStats.ability && foeWithStats.ability.type === "prebattle") {
-        if (scenario.id !== FOE_NON_ACTION) {
-          const foeBP = doFoeBattlePrep(BRA, BRF, foeWithStats.ability);
-          BRF = foeBP.foe;
-          BRA = foeBP.avatar;
+    it("Should Create a foe from the random avatar", () => {
+      // MATCH PARTIAL
+      expect(foeTemplate).toBeObject();
+
+      expect(foeWithStats).toMatchObject({
+        type: expect.any(String),
+        name: expect.any(String),
+        ability: expect.objectContaining({
+          effect: expect.any(String),
+          name: expect.any(String),
+          type: expect.any(String),
+        }),
+        class: expect.any(String),
+        health: expect.any(Number),
+        power: expect.any(Number),
+        armor: expect.any(Number),
+        fire: expect.any(Number),
+        earth: expect.any(Number),
+        water: expect.any(Number),
+        air: expect.any(Number),
+        difficulty: expect.any(Number),
+      });
+    });
+  });
+
+  describe("Do battle setup with random av and generated foe template", () => {
+    let BRA;
+    let BRF;
+    let goesFirst;
+
+    beforeAll(() => {
+      function generateBraBrf() {
+        const { determineAstrologySeason } = avCalc();
+        const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
+
+        // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
+        let beginnersLuck = false;
+        const avTXP = randomAv.activityXP + randomAv.battleXP;
+        if (avTXP < BEGINNERS_LUCK_MAX_XP) {
+          beginnersLuck = chance.bool({ likelihood: BEGINNERS_LUCK_LIKELIHOOD });
         }
-      }
 
-      // WHO SWINGS FIRST
-      if (scenario.id === 0) {
-        goesFirst = "Avatar";
-      } else if (scenario.id === 3) {
-        goesFirst = "Foe";
-      } else {
-        // 75% Chance the Avatar will go first if below level 15
-        if (beginnersLuck) {
+        // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
+        const { s: scenario, ep } = determineScenario(beginnersLuck);
+        const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
+        const sAvatar = scenarioBonuses.sAvatar;
+        const sFoe = scenarioBonuses.sFoe;
+
+        // avatar and foe to be used for battle
+        BRA = Object.assign({}, sAvatar);
+        BRF = Object.assign({}, sFoe);
+
+        // Element by Seasonal Element Bonus
+        BRA[seasonalBonusElement] = BRA[seasonalBonusElement] * 1.25;
+        BRF[seasonalBonusElement] = BRF[seasonalBonusElement] * 1.25;
+
+        // BATTLE STEP 3 - NOT IN GAME YET
+
+        // BATTLE STEP 4 - FOE USES prebattle ABILITY
+        if (foeWithStats.ability && foeWithStats.ability.type === "prebattle") {
+          if (scenario.id !== FOE_NON_ACTION) {
+            const foeBP = doFoeBattlePrep(BRA, BRF, foeWithStats.ability);
+            BRF = foeBP.foe;
+            BRA = foeBP.avatar;
+          }
+        }
+
+        // WHO SWINGS FIRST
+        if (scenario.id === 0) {
           goesFirst = "Avatar";
+        } else if (scenario.id === 3) {
+          goesFirst = "Foe";
         } else {
-          const randDecider = Math.floor(Math.random() * 2);
-          goesFirst = randDecider === 0 ? "Avatar" : "Foe";
+          // 75% Chance the Avatar will go first if below level 15
+          if (beginnersLuck) {
+            goesFirst = "Avatar";
+          } else {
+            const randDecider = Math.floor(Math.random() * 2);
+            goesFirst = randDecider === 0 ? "Avatar" : "Foe";
+          }
         }
       }
-    }
 
-    generateBraBrf();
-  });
+      generateBraBrf();
+    });
 
-  it("Should Generate a BRA, BRF, and finish battle setup", () => {
-    expect(BRA).toBeDefined();
-    expect(BRF).toBeDefined();
-    expect(["Avatar", "Foe"]).toContain(goesFirst);
-  });
+    it("Should Generate a BRA, BRF, and finish battle setup", () => {
+      expect(BRA).toBeDefined();
+      expect(BRF).toBeDefined();
+      expect(["Avatar", "Foe"]).toContain(goesFirst);
+    });
 
-  it("Should run battle with first profile and generated foe", () => {
-    const mockPassive = { name: "not in use", type: "Activity Upgrade" as const };
+    it("Should run battle with first profile and generated foe", () => {
+      const fakePassive = { name: "not in use", type: "activity upgrade" as const };
 
-    // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst, mockPassive);
+      // BATTLE STEP 5 - EXCHANGE DAMAGE
+      const b = doBattle(BRA, BRF, goesFirst, fakePassive);
 
-    // Battle results should look a specific way
-    expect(b).toEqual({
-      // Make sure totals add up
+      // Battle results should look a specific way
+      expect(b).toEqual({
+        // Make sure totals add up
 
-      aHealthRemaining: expect.any(Number),
-      fHealthRemaining: expect.any(Number),
-      outcomeData: expect.objectContaining({
-        outcome: expect.any(String),
-        avatarStatus: expect.any(String),
-        foeStatus: expect.any(String),
-      }),
-      roundBreakdown: expect.any(Array),
+        aHealthRemaining: expect.any(Number),
+        fHealthRemaining: expect.any(Number),
+        outcomeData: expect.objectContaining({
+          outcome: expect.any(String),
+          avatarStatus: expect.any(String),
+          foeStatus: expect.any(String),
+        }),
+        roundBreakdown: expect.any(Array),
+      });
+    });
+
+    /* TEST BATTLE PASSIVE ABILITIES HERE */
+    // Note: Other tests for passive abilities are located in __tests/heroAbilities/passiveAbilities.test.ts
+    it("Should run battle using Boulder Bro's passive", () => {
+      const mockPassive = { name: "Corundum-Clast Armor", type: "battle" as const };
+
+      // BATTLE STEP 5 - EXCHANGE DAMAGE
+      const b = doBattle(BRA, BRF, goesFirst, mockPassive);
+
+      // Battle results should look a specific way
+      expect(b).toEqual({
+        // Make sure totals add up
+
+        aHealthRemaining: expect.any(Number),
+        fHealthRemaining: expect.any(Number),
+        outcomeData: expect.objectContaining({
+          outcome: expect.any(String),
+          avatarStatus: expect.any(String),
+          foeStatus: expect.any(String),
+        }),
+        roundBreakdown: expect.any(Array),
+      });
     });
   });
 });

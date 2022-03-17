@@ -3,7 +3,7 @@ const determineItemsToInsert = require("./determineItemsToInsert");
 const preventDuplicateItems = require("../items/preventDuplicateItems");
 const { OUTCOME_XP } = require("../CONSTANTS");
 
-const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining) {
+const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining, passiveAbility) {
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, {
     goToBattle: false,
@@ -22,6 +22,13 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
       // assign 'a' variable above the value of avatar, same with 'o'
       ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleEffects(a, f, outcomeData, effects));
     },
+
+    /*
+
+      ADD postbattle PASSIVES HERE
+
+    */
+
     updateAvatarByOutcome: () => {
       switch (o) {
         case "Avatar Wins":

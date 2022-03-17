@@ -2,15 +2,14 @@ import { FOE_NON_ACTION } from "../CONSTANTS";
 import Chance from "chance";
 import xpCalc from "../upgrades/xpCalc";
 import { scrambleStats } from "../../lib/helperFunctions";
+import { BackendEffectProcs, BattleFoe, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
-import { BackendEffectProcs, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
-import heroList from "../../heroList.json";
 const chance = Chance();
 
-function doAvatarBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, effects: string[], scenario: Scenario) {
+function doAvatarBattlePrep(avatar: BattleHero, foe: BattleFoe, effects: string[], scenario: number) {
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
-  const effectProcs = [];
+  const effectProcs: BackendEffectProcs[] = [];
   effects.forEach(effect => {
     switch (effect) {
       case "Hero +5,+10% Water":
@@ -314,9 +313,9 @@ function doAvatarBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, effects: stri
   return { avatar: eAvatar, foe: eFoe, procs: effectProcs };
 }
 
-function doFoeBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, scenarioId: number) {
+function doFoeBattlePrep(avatar: BattleHero, foe: BattleFoe, scenarioId: number) {
   const ability = foe.ability;
-  const effectProcs = [];
+  const effectProcs: BackendEffectProcs[] = [];
   if (ability && ability.type === "prebattle") {
     if (scenarioId !== FOE_NON_ACTION) {
       let fAvatar = { ...avatar };
@@ -340,9 +339,9 @@ function doFoeBattlePrep(avatar: BattleHero, foe: HF.BattleFoe, scenarioId: numb
           break;
         case "Paranormal Pandemonium":
           // Stat Scramble
-          const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
+          const stats: Partial<Lowercase<HF.Stat>>[] = ["armor", "earth", "fire", "water", "air", "power", "health"];
 
-          fAvatar = { ...scrambleStats(stats, avatar) };
+          fAvatar = { ...scrambleStats(stats, avatar) } as BattleHero;
           effectProcs.push({
             effect: "Paranormal Pandemonium",
             heroStatsEffected: ["armor", "earth", "fire", "water", "air", "power", "health"],

@@ -52,7 +52,7 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
     const battlePassive = effectProcs.find(e => e.type === "battle");
     const b = doBattle(BRA, BRF, goesFirst, battlePassive);
 
-    const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining, passiveAbility);
 
     // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If Any postbattle abilities or item effects exist, use them. These will often change the avatar status, health, and battle outcomes
     doPostBattleEffects(battle.effects);

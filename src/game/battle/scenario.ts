@@ -1,11 +1,10 @@
-import { BackendEffectProcs, BattleHero, Scenario } from "../../types/BackendOnlyTypes";
-import HF from "../../types/herofit";
+import { BackendEffectProcs, BattleFoe, BattleHero, Scenario } from "../../types/BackendOnlyTypes";
 import { BATTLE_SCENARIOS, NATURALLY_STEALTHY_CHANCE } from "../CONSTANTS";
 import Chance from "chance";
 const chance = Chance();
 
 // Calculates the bonus to both Avatar and Foe depending on scenario
-function calcScenarioBonuses(avatar: BattleHero, foe: HF.BattleFoe, scenario: Scenario) {
+function calcScenarioBonuses(avatar: BattleHero, foe: BattleFoe, scenario: Scenario) {
   const ap = avatar.power;
   const ah = avatar.health;
 
@@ -27,7 +26,7 @@ function determineScenario(beginnersLuck: boolean, scenarioZeroBoost?: boolean, 
   if (scenarioZeroBoost) {
     const naturallyStealthy = chance.bool({ likelihood: NATURALLY_STEALTHY_CHANCE });
     if (naturallyStealthy) {
-      return { s: BATTLE_SCENARIOS[0], ep: [...effectProcs, { effect: "Naturally Stealthy", type: "prebattle" }] };
+      return { s: BATTLE_SCENARIOS[0], ep: [...effectProcs, { effect: "Naturally Stealthy", type: "prebattle" }] as BackendEffectProcs[] };
     }
   }
 

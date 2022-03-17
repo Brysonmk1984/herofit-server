@@ -2,6 +2,7 @@ import avatarProfiles from "../battles/heroProfiles.json";
 import { determineScenario } from "../../src/game/battle/scenario";
 import { doPreBattleHeroAbilities } from "../../src/game/battle/doBattlePrep";
 import HF from "../../src/types/herofit";
+import { unitTestExporter } from "../../src/game/battle/doBattle";
 
 describe("Passive Hero Abilities", () => {
   // NATURAL NINJA
@@ -45,5 +46,16 @@ describe("Passive Hero Abilities", () => {
       expect(eProcs).toEqual(expect.arrayContaining([{ effect: "Healing Waters", heroStatsEffected: ["water"], type: "prebattle" }]));
       expect(avatar.water).toBe(heroTemplate.water + Math.floor(heroTemplate.health / 6));
     });
+  });
+
+  // BOULDER BRO
+  describe("Boulder Bro's ability", () => {
+    const placeholderPassive = { name: "not in use", type: "activity upgrade" as const };
+    const mockPassive = { name: "Corundum-Clast Armor", type: "battle" as const };
+
+    const { _calcArmorDR } = unitTestExporter();
+    const withoutArmorPassive = _calcArmorDR(100, 5, placeholderPassive);
+    const withArmorPassive = _calcArmorDR(100, 5, mockPassive);
+    expect(withArmorPassive.netDamage).toBeLessThan(withoutArmorPassive.netDamage);
   });
 });
