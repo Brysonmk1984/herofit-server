@@ -3,7 +3,7 @@ import { FIRE_CRIT_CHANCE_MOD, WATER_HEAL_MOD, AIR_EVASION_CHANCE_MOD, EARTH_THO
 import Chance from "chance";
 
 describe("Elemental Traits for Battles", () => {
-  xdescribe("Fire Trait", () => {
+  describe("Fire Trait", () => {
     it("No fire element power should return zero chance/zero damage", () => {
       const { critChance, critDamage } = determineFireCrit(0, 500);
       expect(critChance).toBe(0);
@@ -17,7 +17,7 @@ describe("Elemental Traits for Battles", () => {
     });
   });
 
-  xdescribe("Air Trait", () => {
+  describe("Air Trait", () => {
     it("No air element power should return true | false", () => {
       const { evaded } = determineAirEvade(0);
       expect(evaded).toEqual(expect.any(Boolean));
@@ -29,7 +29,7 @@ describe("Elemental Traits for Battles", () => {
     });
   });
 
-  xdescribe("Water Trait", () => {
+  describe("Water Trait", () => {
     it("No water element power should return zero factor/zero healed", () => {
       const { healingFactor, amountHealed } = determineWaterHeal(0, 500);
 
@@ -45,7 +45,7 @@ describe("Elemental Traits for Battles", () => {
     });
   });
 
-  xdescribe("Earth Trait", () => {
+  describe("Earth Trait", () => {
     it("No earth element power should return zero factor/zero damage", () => {
       const { thornsFactor, thornsDamageToAttacker } = determineEarthThorns(0, 500);
       console.log({ thornsFactor, thornsDamageToAttacker });
