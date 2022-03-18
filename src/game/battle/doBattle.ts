@@ -372,7 +372,6 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
   }
   // Adjust for hero DOT passive (Compost Creature)
   const bonusDamage = battleAbility.name === "Olfactory Overload" ? Math.floor(physicalDamage * 0.1) : 0;
-  console.log("BONUS DAMAGE", bonusDamage);
   totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total + physicalDamage, bonusDamage);
 
   return {
@@ -431,7 +430,6 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     // Adjust for hero DOT passive (Compost Creature)
     if (battleAbility.name === "Olfactory Overload") {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
-      console.log("BONUS DAMAGE", bonusDamage);
       totals.foeHealthRemaining -= bonusDamage;
     }
 
@@ -485,7 +483,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     // Adjust for hero DOT passive (Compost Creature)
     if (battleAbility.name === "Olfactory Overload") {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
-      console.log("BONUS DAMAGE", bonusDamage);
+      //console.log("BONUS DAMAGE", bonusDamage);
       totals.foeHealthRemaining -= bonusDamage;
     }
 
@@ -548,7 +546,7 @@ function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  console.log("1pa", battleAbility);
+  //console.log("1pa", battleAbility);
   const foeIsElemental = _checkIfElemental(foe);
   const roundBreakdown: BattleRound[] = [];
 
