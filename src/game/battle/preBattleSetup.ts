@@ -90,8 +90,8 @@ const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
       f.earth = foeEarthBoost;
     },
     getPreBattlePackage: () => ({
-      BRA: parseStats(a, true),
-      BRF: parseStats(f, true),
+      BRA: parseStats(a, true) as BattleHero,
+      BRF: parseStats(f, true) as BattleFoe,
       goesFirst,
       scenario,
       effectProcs,

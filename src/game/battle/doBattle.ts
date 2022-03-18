@@ -1,5 +1,5 @@
 import Chance from "chance";
-import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, BattlePassiveAbility } from "../../types/BackendOnlyTypes";
+import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, BattlePassiveAbility, OutcomeData } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 import { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } from "../CONSTANTS";
 import { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineTD } from "./elementalProcs";
@@ -292,7 +292,7 @@ function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbil
   };
 }
 
-function _determineOutcome(winner: BattleOutcome) {
+function _determineOutcome(winner: BattleOutcome) : OutcomeData {
   if (winner === "Avatar") {
     return {
       outcome: "Avatar Wins",
@@ -371,7 +371,7 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
     totals.avHealthRemaining += elementalProcs.water.amountHealed;
   }
   // Adjust for hero DOT passive (Compost Creature)
-  const bonusDamage = battleAbility.name === "Olfactory Overload" ? Math.floor(physicalDamage * 0.1) : 0;
+  const bonusDamage = battleAbility?.name === "Olfactory Overload" ? Math.floor(physicalDamage * 0.1) : 0;
   totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total + physicalDamage, bonusDamage);
 
   return {
@@ -386,7 +386,7 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
   };
 }
 
-function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsElemental: boolean, totals: GrandTotals, battleAbility: BattlePassiveAbility) {
+function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
@@ -428,7 +428,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
 
     // Adjust for hero DOT passive (Compost Creature)
-    if (battleAbility.name === "Olfactory Overload") {
+    if (battleAbility?.name === "Olfactory Overload") {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
       totals.foeHealthRemaining -= bonusDamage;
     }
@@ -481,7 +481,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
 
     // Adjust for hero DOT passive (Compost Creature)
-    if (battleAbility.name === "Olfactory Overload") {
+    if (battleAbility?.name === "Olfactory Overload") {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
       //console.log("BONUS DAMAGE", bonusDamage);
       totals.foeHealthRemaining -= bonusDamage;
@@ -500,7 +500,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
   }
 }
 
-function _computeBattleTurn(aggressor: HeroOrFoe, defender: HeroOrFoe, foeIsElemental: boolean, totals: GrandTotals, battleAbility: BattlePassiveAbility) {
+function _computeBattleTurn(aggressor: HeroOrFoe, defender: HeroOrFoe, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
   // IF HERO ROUND
   if ("character" in aggressor) {
     return _computeHeroRound(aggressor, defender as BattleFoe, totals, battleAbility);
@@ -542,7 +542,7 @@ function _testForTemporalDistortion(aggressorString: AvatarOrFoeString, aether: 
   return { td: false, gf: goesFirst };
 }
 
-function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", battleAbility: BattlePassiveAbility) {
+function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", battleAbility?: BattlePassiveAbility) {
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -642,7 +642,15 @@ function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe
   const outcomeData = _determineOutcome(winnerString);
   // console.log('RB=', roundBreakdown, outcomeData);
   // console.log("FOE HEALTH REMAINING", grandTotals.foeHealthRemaining);
-  const results = {
+  
+  interface BattleResults {
+    aHealthRemaining : number
+    fHealthRemaining : number
+    outcomeData : OutcomeData
+    roundBreakdown : HF.BattleRound[]
+  }
+  
+  const results : BattleResults = {
     aHealthRemaining: grandTotals.avHealthRemaining,
     fHealthRemaining: grandTotals.foeHealthRemaining,
     outcomeData,

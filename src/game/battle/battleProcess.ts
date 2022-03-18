@@ -52,17 +52,20 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
     // In the future, this will need to be able to handle an array of abilities
     const battlePassive = effectProcs.find(e => e.type === "battle");
 
-    const battleAbility = {
+    const battleAbility : BattlePassiveAbility = {
       name: battlePassive.effect,
       aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
     };
 
     const b = doBattle(BRA, BRF, goesFirst, battleAbility);
 
-    const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining, passiveAbility);
+    const { doPostBattleEffects, doPostBattlePassiveAbilities, updateAvatarByOutcome, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
 
-    // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If Any postbattle abilities or item effects exist, use them. These will often change the avatar status, health, and battle outcomes
+    // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If any post battle item effects exist, use them. These will often change the avatar status, health, and battle outcomes
     doPostBattleEffects(battle.effects);
+
+    // POST BATTLE STEP 2 - POST BATTLE PASSIVE ABILITIES - If Any postbattle abilities. These will often change the avatar status, health, and battle outcomes
+    doPostBattlePassiveAbilities(passiveAbility);
 
     // POST BATTLE STEP 2
     updateAvatarByOutcome();

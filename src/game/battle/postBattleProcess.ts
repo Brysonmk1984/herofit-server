@@ -1,34 +1,39 @@
-const postBattleEffects = require("./postBattleEffects");
-const determineItemsToInsert = require("./determineItemsToInsert");
-const preventDuplicateItems = require("../items/preventDuplicateItems");
-const { OUTCOME_XP } = require("../CONSTANTS");
+import { postBattleEffects, postBattleAbilities } from "./postBattleEffectsAndAbilities";
+import determineItemsToInsert from "./determineItemsToInsert";
+import preventDuplicateItems from "../items/preventDuplicateItems";
+import { OUTCOME_XP } from "../CONSTANTS";
+import { BackendEffectProcs, BattleFoe, BattleHero, OutcomeData, PassiveAbility } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
 
-const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, fHealthRemaining, passiveAbility) {
+const postBattleProcess = function (avatar : BattleHero, foe : BattleFoe, outcomeData : OutcomeData, aHealthRemaining : number, fHealthRemaining : number,) {
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, {
     goToBattle: false,
     status: outcomeData.avatarStatus,
     health: aHealthRemaining < 0 ? 0 : aHealthRemaining,
-  });
+  }) as Partial<HF.Hero>;
 
   let f = Object.assign({}, foe, { health: fHealthRemaining });
   let o = outcomeData.outcome;
   let xpGain = 0;
   let ptGain = 0;
-  let effectProcs;
+  let effectProcs : BackendEffectProcs[];
 
   return {
-    doPostBattleEffects: effects => {
+    doPostBattleEffects: (effects : string[]) => {
       // assign 'a' variable above the value of avatar, same with 'o'
       ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleEffects(a, f, outcomeData, effects));
     },
 
     /*
-
       ADD postbattle PASSIVES HERE
-
     */
-
+    doPostBattlePassiveAbilities : (passiveAbility : PassiveAbility) =>{
+      if(passiveAbility.type === 'postbattle'){
+        ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleAbilities(a, f, outcomeData, passiveAbility);
+      }
+    },
+    
     updateAvatarByOutcome: () => {
       switch (o) {
         case "Avatar Wins":
@@ -56,7 +61,7 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
         default:
       }
     },
-    doAllPbas: postBattleActions => {
+    doAllPbas: (postBattleActions) => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);
       const items = determineItemsToInsert(postBattleActions, o);
       //console.log('ATTEMPTING DUP CHECK', items);
@@ -78,4 +83,4 @@ const postBattleProcess = function (avatar, foe, outcomeData, aHealthRemaining, 
   };
 };
 
-module.exports = postBattleProcess;
+export default postBattleProcess;
