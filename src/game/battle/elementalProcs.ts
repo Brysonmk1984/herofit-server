@@ -56,8 +56,8 @@ function determineTD(aether: number, goesFirst: AvatarOrFoeString) {
   if (tdChance > 60) {
     tdChance = 60;
   }
-  const isIDS = chance.bool({ likelihood: tdChance });
-  if (isIDS) {
+  const isTD = chance.bool({ likelihood: tdChance });
+  if (isTD) {
     const gf = goesFirst === "Avatar" ? "Foe" : "Avatar";
     return { td: true, gf: gf as AvatarOrFoeString };
   }

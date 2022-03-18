@@ -270,8 +270,9 @@ interface PassiveAbility {
   name: string;
   type: GamePhase;
 }
-interface BattlePassiveAbility extends PassiveAbility{
-  effect: string;
+interface BattlePassiveAbility {
+  name: string;
+  aggressor: "either" | "hero" | "foe";
 }
 
 interface BattleElementalProcs {

@@ -4,14 +4,14 @@ import preBattleSetup from "./preBattleSetup";
 import postBattleProcess from "./postBattleProcess";
 import { Op } from "sequelize";
 import xpCalc from "../upgrades/xpCalc";
-import { BattleHero, BattlePassiveAbility, GamePhase } from "../../types/BackendOnlyTypes";
+import { BattleHero, BattlePassiveAbility, GamePhase, PassiveAbility } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
 */
 
-function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, passiveAbility: BattlePassiveAbility) {
+function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, passiveAbility: PassiveAbility) {
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
@@ -49,10 +49,15 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
   try {
-    const battlePassive : BattlePassiveAbility = effectProcs.find(e => e.type === "battle") as BattlePassiveAbility;
+    // In the future, this will need to be able to handle an array of abilities
+    const battlePassive = effectProcs.find(e => e.type === "battle");
 
-    console.log('BP=', battlePassive);
-    const b = doBattle(BRA, BRF, goesFirst, battlePassive);
+    const battleAbility = {
+      name: battlePassive.effect,
+      aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
+    };
+
+    const b = doBattle(BRA, BRF, goesFirst, battleAbility);
 
     const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining, passiveAbility);
 

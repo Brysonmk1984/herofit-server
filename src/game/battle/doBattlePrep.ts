@@ -438,7 +438,7 @@ function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string
     switch (name) {
       case "Corundum-Clast Armor":
         eProcs.push({
-          effect: "CC Armor",
+          effect: "Corundum Armor",
           heroStatsEffected: ["armor"],
           type: "battle",
         });

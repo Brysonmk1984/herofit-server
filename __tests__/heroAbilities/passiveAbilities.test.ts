@@ -1,8 +1,9 @@
 import avatarProfiles from "../battles/heroProfiles.json";
 import { determineScenario } from "../../src/game/battle/scenario";
-import { doPreBattleHeroAbilities } from "../../src/game/battle/doBattlePrep";
+import { doHeroPassiveAbilities } from "../../src/game/battle/doBattlePrep";
 import HF from "../../src/types/herofit";
 import { unitTestExporter } from "../../src/game/battle/doBattle";
+import { BattleHero, PassiveAbility } from "../../src/types/BackendOnlyTypes";
 
 describe("Passive Hero Abilities", () => {
   // NATURAL NINJA
@@ -13,9 +14,10 @@ describe("Passive Hero Abilities", () => {
     let scenario, effectProcs;
     let beginnersLuck = false;
     let possibleAbilityProcs = [];
+    const passiveAbility = { name: "Naturally Stealthy", type: "prebattle" } as PassiveAbility;
 
     it("Should be added to possibleAbilityProcs - 'Naturally Stealthy' ", () => {
-      const { avatar, pAbilityProcs, eProcs } = doPreBattleHeroAbilities(heroTemplate as unknown as HF.Hero, ["Naturally Stealthy"], []);
+      const { avatar, pAbilityProcs, eProcs } = doHeroPassiveAbilities(heroTemplate as unknown as BattleHero, ["Naturally Stealthy"], [], passiveAbility);
       possibleAbilityProcs = possibleAbilityProcs.concat(pAbilityProcs);
       expect(pAbilityProcs).toEqual(expect.arrayContaining(["Naturally Stealthy"]));
     });
@@ -42,7 +44,9 @@ describe("Passive Hero Abilities", () => {
     const heroTemplate = heroesOfType[Math.floor(Math.random() * heroesOfType.length)];
 
     it('Should be added to eProcs(effectProcs) - "Healing Waters"', () => {
-      const { avatar, pAbilityProcs, eProcs } = doPreBattleHeroAbilities(heroTemplate as unknown as HF.Hero, [], []);
+      const passiveAbility = { name: "Healing Waters", type: "prebattle" } as PassiveAbility;
+      const { avatar, pAbilityProcs, eProcs } = doHeroPassiveAbilities(heroTemplate as unknown as BattleHero, [], [], passiveAbility);
+
       expect(eProcs).toEqual(expect.arrayContaining([{ effect: "Healing Waters", heroStatsEffected: ["water"], type: "prebattle" }]));
       expect(avatar.water).toBe(heroTemplate.water + Math.floor(heroTemplate.health / 6));
     });
@@ -50,8 +54,8 @@ describe("Passive Hero Abilities", () => {
 
   // BOULDER BRO
   describe("Boulder Bro's ability", () => {
-    const placeholderPassive = { name: "not in use", type: "activity upgrade" as const };
-    const mockPassive = { name: "Corundum-Clast Armor", type: "battle" as const };
+    const placeholderPassive = { name: "not in use", aggressor: "foe" as const };
+    const mockPassive = { name: "Corundum Armor", aggressor: "foe" as const };
 
     const { _calcArmorDR } = unitTestExporter();
     const withoutArmorPassive = _calcArmorDR(100, 5, placeholderPassive);
