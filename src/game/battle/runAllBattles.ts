@@ -1,7 +1,7 @@
-const { arrayChunker, roundNumber, parseStats } = require("../../lib/helperFunctions");
-const battleProcess = require("./battleProcess");
-const { sendBattleReportEmail } = require("../../mail");
-
+import { arrayChunker, roundNumber, parseStats } from "../../lib/helperFunctions";
+import battleProcess from "./battleProcess";
+import { sendBattleReportEmail } from "../../mail";
+import heroList from "../../heroList.json";
 const BATCH_CHUNK = 12;
 const BATCH_TIMEOUT = 2000;
 
@@ -9,10 +9,10 @@ const BATCH_TIMEOUT = 2000;
 function _runBattlesOnBatch(shard) {
   try {
     const allAvatars = shard.map(battle => battle.avatar);
-    const passiveAbility = heroList.find(h => h.character === allAvatars[i].character).passive.filter();
 
     let battlePromises = [];
     for (let i = 0; i < shard.length; i++) {
+      const passiveAbility = heroList.find(h => h.character === allAvatars[i].character).passive;
       battlePromises.push(battleProcess(shard[i], parseStats(allAvatars[i]), passiveAbility));
     }
     return Promise.allSettled(battlePromises);
@@ -99,4 +99,4 @@ async function runAllBattles(battles, sendReport) {
   }
 }
 
-module.exports = runAllBattles;
+export default runAllBattles;

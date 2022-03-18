@@ -4,13 +4,14 @@ import { Op } from "sequelize";
 import { RECOVERY_EFFECTIVENESS_MOD } from "../game/CONSTANTS";
 import { sendCronErrorEmail } from "../mail";
 import { parseStats } from "../lib/helperFunctions";
+import heroList from "../heroList.json";
 
 console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
 (async () => {
   try {
     // Update all heroes who aren't at full health and aren't Knocked Out
-    const results: HF.Hero[] = await Avatar.findAll({ where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } }, raw: true, attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"] });
+    const results: HF.Hero[] = await Avatar.findAll({ where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } }, raw: true, attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade", "character", "photonTokens"] });
     const allPromises: Promise<any>[] = [];
 
     // Loop over each hero and either regen health if recovering or other status effects
@@ -23,7 +24,9 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
       const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
       let heroStatus = hero.status;
       let heroStatusFade = hero.statusFade;
-
+      let photonTokens = hero.photonTokens;
+      const passiveAbility = heroList.find(h => h.character === hero.character).passive;
+      //console.log('PA=',passiveAbility);
       // Check hero status and run appropriate action
       switch (heroStatus) {
         case "Infected":
@@ -52,11 +55,15 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
             heroHealth = maxHealth;
             // Otherwise add one tick of health back to hero's health
           } else {
-            heroHealth += adjRegenRate;
+            heroHealth += passiveAbility.name === "Rampant Regeneration" ? adjRegenRate * 1.33 : adjRegenRate;
           }
           // Update status to 'Rested' if at max health
           if (heroHealth >= maxHealth) {
             heroStatus = "Rested";
+            // If Solar Warrior, forge photon token
+            if (hero.character === "Solar Celeste") {
+              photonTokens += 1;
+            }
           } else if (hero.status !== "Infected") {
             heroStatus = "Recovering";
           }
@@ -72,6 +79,7 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
             health: heroHealth,
             status: heroStatus,
             statusFade: heroStatusFade,
+            photonTokens,
           },
           {
             where: { owner: hero.owner },
@@ -82,6 +90,7 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
         ),
       );
     });
+
     await Promise.allSettled(allPromises);
     process.exit();
   } catch (error) {

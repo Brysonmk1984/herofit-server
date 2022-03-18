@@ -52,10 +52,12 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
     // In the future, this will need to be able to handle an array of abilities
     const battlePassive = effectProcs.find(e => e.type === "battle");
 
-    const battleAbility: BattlePassiveAbility = {
-      name: battlePassive.effect,
-      aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
-    };
+    const battleAbility: BattlePassiveAbility = battlePassive
+      ? {
+          name: battlePassive.effect,
+          aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
+        }
+      : undefined;
 
     const b = doBattle(BRA, BRF, goesFirst, battleAbility);
 

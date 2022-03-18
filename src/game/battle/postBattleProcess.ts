@@ -5,7 +5,7 @@ import { OUTCOME_XP } from "../CONSTANTS";
 import { BackendEffectProcs, BattleFoe, BattleHero, OutcomeData, PassiveAbility } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 
-const postBattleProcess = function (avatar : BattleHero, foe : BattleFoe, outcomeData : OutcomeData, aHealthRemaining : number, fHealthRemaining : number,) {
+const postBattleProcess = function (avatar: BattleHero, foe: BattleFoe, outcomeData: OutcomeData, aHealthRemaining: number, fHealthRemaining: number) {
   // set status and health from battle. Post battle effects may still change this before saving
   let a = Object.assign({}, avatar, {
     goToBattle: false,
@@ -17,20 +17,20 @@ const postBattleProcess = function (avatar : BattleHero, foe : BattleFoe, outcom
   let o = outcomeData.outcome;
   let xpGain = 0;
   let ptGain = 0;
-  let effectProcs : BackendEffectProcs[];
+  let effectProcs: BackendEffectProcs[];
 
   return {
-    doPostBattleEffects: (effects : string[]) => {
+    doPostBattleEffects: (effects: string[]) => {
       // assign 'a' variable above the value of avatar, same with 'o'
       ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleEffects(a, f, outcomeData, effects));
     },
 
-    doPostBattlePassiveAbilities : (passiveAbility : PassiveAbility) =>{
-      if(passiveAbility.type === 'postbattle'){
+    doPostBattlePassiveAbilities: (passiveAbility: PassiveAbility) => {
+      if (passiveAbility.type === "postbattle") {
         ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleAbilities(a, f, outcomeData, passiveAbility));
       }
     },
-    
+
     updateAvatarByOutcome: () => {
       switch (o) {
         case "Avatar Wins":
@@ -58,7 +58,7 @@ const postBattleProcess = function (avatar : BattleHero, foe : BattleFoe, outcom
         default:
       }
     },
-    doAllPbas: (postBattleActions) => {
+    doAllPbas: postBattleActions => {
       //console.log('Running these PBAs - ', postBattleActions, 'for Avatar -', a.id, 'BO - ', o);
       const items = determineItemsToInsert(postBattleActions, o);
       //console.log('ATTEMPTING DUP CHECK', items);

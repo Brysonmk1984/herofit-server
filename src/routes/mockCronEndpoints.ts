@@ -1,3 +1,4 @@
+import runAllBattles from "../game/battle/runAllBattles";
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const { authenticateAdminJWT } = require("../jwt/validateJWT");
@@ -9,7 +10,7 @@ const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD } = require
 const { selectFoeTemplate } = require("../game/prebattle/foeFunctions");
 const { generateFoeStats } = require("../game/prebattle/generateFoeStats");
 const { determinePostBattleActions } = require("../game/prebattle/onGoToBattle");
-const runAllBattles = require("../game/battle/runAllBattles");
+const heroList = require("../heroList.json");
 const ALLPBAs = require("../game/postBattleActions.json");
 const { sendCronErrorEmail } = require("../mail");
 const chance = require("chance")();
@@ -26,14 +27,14 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
     //where: { health : { [Op.lt] : col('maxHealth') } },
     where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } },
     raw: true,
-    attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade"],
+    attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade", "character", "photonTokens"],
   })
     .then(results => {
       const allPromises = [];
       // Loop over each avatar and either regen health if recovering or other status effects
       results.forEach(avatar => {
         avatar = parseStats(avatar);
-        console.log("AVV", avatar);
+        //console.log("AVV", avatar);
         let avatarHealth = avatar.health;
         const maxHealth = avatar.maxHealth;
         const recovery = avatar.recovery;
@@ -41,11 +42,12 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
         const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
         let avatarStatus = avatar.status;
         let avatarStatusFade = avatar.statusFade;
+        let photonTokens = avatar.photonTokens;
+        const passiveAbility = heroList.find(h => h.character === avatar.character).passive;
 
         // Check avatar status and run appropriate action
         switch (avatarStatus) {
           case "Infected":
-            console.log("ASASD");
             const infectAmount = Math.floor(adjRegenRate / 2);
             // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
             if (avatarHealth - infectAmount <= 0) {
@@ -71,11 +73,15 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
               avatarHealth = maxHealth;
               // Otherwise add one tick of health back to avatar's health
             } else {
-              avatarHealth += adjRegenRate;
+              avatarHealth += passiveAbility.name === "Rampant Regeneration" ? adjRegenRate * 1.33 : adjRegenRate;
             }
             // Update status to 'Rested' if at max health
             if (avatarHealth >= maxHealth) {
               avatarStatus = "Rested";
+              // If Solar Warrior, forge photon token
+              if (avatar.character === "Solar Celeste") {
+                photonTokens += 1;
+              }
             } else if (avatar.status !== "Infected") {
               avatarStatus = "Recovering";
             }
@@ -90,6 +96,7 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
               health: avatarHealth,
               status: avatarStatus,
               statusFade: avatarStatusFade,
+              photonTokens,
             },
             {
               where: { owner: avatar.owner },
@@ -103,7 +110,7 @@ router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
       return Promise.allSettled(allPromises);
     })
     .then(results => {
-      results.forEach(result => console.log("All Regenerate Results - ", result.status));
+      //results.forEach(result => console.log("All Regenerate Results - ", result.status));
       res.formatter.ok(null, "Successfully ran /regenerate-health");
     })
     .catch(error => {
@@ -278,4 +285,4 @@ router.get("/run-all-battles", authenticateAdminJWT, (req, res) => {
       sendCronErrorEmail(error.message, "mockCronEndpoints simulating Cron Script - Error running Cron Battle Hour Script");
     });
 });
-module.exports = router;
+export default router;

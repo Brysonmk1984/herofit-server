@@ -3,7 +3,12 @@
     "active": true,
     "character": "Chrono Guy",
     "alias": "Chrono Guy",
-    "elms": { "fire": 0, "water": 0, "air": 10, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 0,
+      "air": 10,
+      "earth": 0
+    },
     "skills": ["Time Freeze", "Quantum Teleportation", "Cognitive Flash Forward", "Entropy Ray", "Slow Speed Field"],
     "ultimate": "Timeline Shift",
     "passive": {
@@ -19,7 +24,12 @@
     "active": true,
     "character": "Compost Creature",
     "alias": "Compost Creature",
-    "elms": { "fire": 2, "water": 2, "air": 2, "earth": 4 },
+    "elms": {
+      "fire": 2,
+      "water": 2,
+      "air": 2,
+      "earth": 4
+    },
     "skills": ["Unsatisfactory Olfactory", "Mulch Munch", "Regenerative Recess", "Coons & Creepy Crawlers", "Decomposing Breath"],
     "ultimate": "Purge, Plant & Propagate",
     "passive": {
@@ -35,7 +45,12 @@
     "active": true,
     "character": "Filtron Five",
     "alias": "Filtron Five",
-    "elms": { "fire": 0, "water": 5, "air": 5, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 5,
+      "air": 5,
+      "earth": 0
+    },
     "skills": ["Alkalize & Purify", "Corrosive Toxicity", "Hot Air Hot Head", "pH Paralysis", "Problematic Plumbing"],
     "ultimate": "Reverse Osmosis Psychosis",
     "passive": {
@@ -51,7 +66,12 @@
     "active": true,
     "character": "Empath Aurelia",
     "alias": "Empath",
-    "elms": { "fire": 0, "water": 10, "air": 0, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 10,
+      "air": 0,
+      "earth": 0
+    },
     "skills": ["Intuitive Teamwork", "Toroidal Force Field", "Reflect Inner Demons", "Hold the Space", "Funnel of Forgiveness"],
     "ultimate": "Gift of Divine Love",
     "passive": {
@@ -67,7 +87,12 @@
     "active": true,
     "character": "Boulder Bro",
     "alias": "Boulder Bro",
-    "elms": { "fire": 0, "water": 0, "air": 0, "earth": 10 },
+    "elms": {
+      "fire": 0,
+      "water": 0,
+      "air": 0,
+      "earth": 10
+    },
     "skills": ["Seismic Slam", "Rubble Rouser", "Party Hardy", "Sentiment of the Sediment", "Muddy Slippery Slide"],
     "ultimate": "The Aggro Crag",
     "passive": {
@@ -83,7 +108,12 @@
     "active": true,
     "character": "Natural Ninja",
     "alias": "Natural Ninja",
-    "elms": { "fire": 4, "water": 2, "air": 2, "earth": 2 },
+    "elms": {
+      "fire": 4,
+      "water": 2,
+      "air": 2,
+      "earth": 2
+    },
     "skills": ["Bamboo Blade", "Hemp Hogtie", "Sneak in Solidarity", "All Natural Nunchaku", "Obsidian Shuriken"],
     "ultimate": "Fermentation Frenzy",
     "passive": {
@@ -99,7 +129,12 @@
     "active": true,
     "character": "RePete",
     "alias": "Scavenger Robot",
-    "elms": { "fire": 5, "water": 0, "air": 5, "earth": 0 },
+    "elms": {
+      "fire": 5,
+      "water": 0,
+      "air": 5,
+      "earth": 0
+    },
     "skills": ["Scrapyard Scavenge", "Reduce, Reuse, Recycle Foe", "Law-Binding Lasso", "Muffler Mortar", "Uncanny Decoy"],
     "ultimate": "Mini RePete Multiplicity",
     "passive": {
@@ -115,11 +150,16 @@
     "active": true,
     "character": "Timber Terror",
     "alias": "Timber Terror",
-    "elms": { "fire": 2, "water": 3, "air": 3, "earth": 2 },
+    "elms": {
+      "fire": 2,
+      "water": 3,
+      "air": 3,
+      "earth": 2
+    },
     "skills": ["Surprise Saprolings", "Ten Ton Stomp", "Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
     "ultimate": "Purify by Chlorophyll",
     "passive": {
-      "name": "Regenerative Roots",
+      "name": "Rampant Regeneration",
       "type": "hourly"
     },
     "colors": ["#3D2A18", "#E8F1E3"],
@@ -131,7 +171,12 @@
     "active": true,
     "character": "Solar Celeste",
     "alias": "Solar Warrior",
-    "elms": { "fire": 10, "water": 0, "air": 0, "earth": 0 },
+    "elms": {
+      "fire": 10,
+      "water": 0,
+      "air": 0,
+      "earth": 0
+    },
     "skills": ["Million-Degree Beam", "Core-Forged Aegis", "Speed of Light Strike", "Photon Flashbang", "Solar Flare EMP"],
     "ultimate": "Avatar of the Sun",
     "passive": {
@@ -147,7 +192,12 @@
     "active": true,
     "character": "Wilhelm the Wild",
     "alias": "Wildspeaker",
-    "elms": { "fire": 3, "water": 3, "air": 2, "earth": 2 },
+    "elms": {
+      "fire": 3,
+      "water": 3,
+      "air": 2,
+      "earth": 2
+    },
     "skills": ["Collude with the Crows", "Wolf Pack Attack", "Beastly Behavior", "Off-the-Grid Offense", "Axecution"],
     "ultimate": "Every Beast Stampede",
     "passive": {
