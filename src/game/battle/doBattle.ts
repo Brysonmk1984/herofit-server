@@ -1,5 +1,5 @@
 import Chance from "chance";
-import { AvatarOrFoeString, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, PassiveAbility } from "../../types/BackendOnlyTypes";
+import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, BattlePassiveAbility } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 import { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } from "../CONSTANTS";
 import { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineTD } from "./elementalProcs";
@@ -249,8 +249,7 @@ function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHe
 }
 
 // Calculates damage done against an element's counter element (F on E)
-function _calcArmorDR(aPower: number, rArmor: number, passiveAbility: PassiveAbility) {
-  console.log("PA", passiveAbility);
+function _calcArmorDR(aPower: number, rArmor: number, passiveAbility: BattlePassiveAbility) {
   const armorType = passiveAbility.name === "Corundum-Clast Armor" ? passiveAbility.name : "default";
   let armorDRF = ARMOR_DRF[armorType];
 
@@ -286,9 +285,15 @@ function _calcDamage(aPower: number, rArmor: number, evaded: boolean, passiveAbi
   });
 
   const { reduction, netDamage } = _calcArmorDR(power, armor, passiveAbility);
+  console.log(passiveAbility);
+  console.log({netDamage});
+  // Adjust for hero DOT passive (Compost Creature)
+  const physicalDamage = passiveAbility.effect === "Olfactory Overload" ? Math.floor(netDamage * .1 + netDamage) : Math.floor(netDamage);
+
+  console.log({physicalDamage});
 
   return {
-    physicalDamage: Math.floor(netDamage),
+    physicalDamage,
     physicalReduction: Math.floor(reduction),
   };
 }
@@ -394,7 +399,7 @@ function _computeBattleTurn(aggressorString: AvatarOrFoeString, aggressor: HeroO
       turnElmDamageDone = { total: 0 } as DamageReductionObj,
       turnElmDamagePrevented = { total: 0 } as DamageReductionObj;
 
-    let elementalProcs: HF.BattleElementalProcs = {
+    let elementalProcs: BattleElementalProcs = {
       fire: null,
       water: null,
       air: null,
@@ -454,7 +459,7 @@ function _computeBattleTurn(aggressorString: AvatarOrFoeString, aggressor: HeroO
         totals.aElmReduction[elm as keyof DamageReductionObj] += turnElmDamagePrevented[elm as keyof DamageReductionObj];
       }
 
-      elementalProcs = {
+      elementalProcs  = {
         fire: fireProc,
         air: airProc,
         earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + physicalDamage),
@@ -516,7 +521,7 @@ function _testForTemporalDistortion(aggressorString: AvatarOrFoeString, aether: 
   return { td: false, gf: goesFirst };
 }
 
-function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", passiveAbility: PassiveAbility) {
+function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", passiveAbility: BattlePassiveAbility) {
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
