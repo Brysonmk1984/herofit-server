@@ -132,7 +132,7 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining,b.fHealthRemaining);
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining, b.fHealthRemaining);
     const effects = ["Unstable Prototype"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
@@ -162,7 +162,7 @@ describe("Do battle setup with random av and generated foe template", () => {
 
   // +25 Damage Afterburn - Dragon Whelp
   it("Should run battle, then test +25 Damage Afterburn ability", () => {
-    const mockPassive = { name: "not in use", aggressor: 'either' as const };
+    const mockPassive = { name: "not in use", aggressor: "either" as const };
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst, mockPassive);

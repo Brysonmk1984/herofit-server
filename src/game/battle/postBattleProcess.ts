@@ -25,12 +25,9 @@ const postBattleProcess = function (avatar : BattleHero, foe : BattleFoe, outcom
       ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleEffects(a, f, outcomeData, effects));
     },
 
-    /*
-      ADD postbattle PASSIVES HERE
-    */
     doPostBattlePassiveAbilities : (passiveAbility : PassiveAbility) =>{
       if(passiveAbility.type === 'postbattle'){
-        ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleAbilities(a, f, outcomeData, passiveAbility);
+        ({ avatar: a, foe: f, outcomeStatus: o, effectProcs } = postBattleAbilities(a, f, outcomeData, passiveAbility));
       }
     },
     

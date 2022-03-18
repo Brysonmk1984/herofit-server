@@ -67,67 +67,62 @@ describe("Passive Hero Abilities", () => {
     expect(withArmorPassive.netDamage).toBeLessThan(withoutArmorPassive.netDamage);
   });
 
-
-
-  describe("Filtron's ability", () =>{
+  describe("Filtron's ability", () => {
     it("Should run battle, then test Auxiliary Systems passive ability", () => {
       BRF.power += 1000;
       // BATTLE STEP 5 - EXCHANGE DAMAGE
-      const b = doBattle(BRAFiltronFive as BattleHero, BRF, 'Foe');
+      const b = doBattle(BRAFiltronFive as BattleHero, BRF, "Foe");
       const passiveAbility = { name: "Auxiliary Systems", type: "postbattle" } as PassiveAbility;
 
       const { avatar, foe, outcomeStatus, effectProcs } = postBattleAbilities(BRAFiltronFive, BRF, b.outcomeData, passiveAbility);
 
       // And Auxiliary Systems happened
-      if(effectProcs.find(e => e.effect === 'Auxiliary Systems')){
+      if (effectProcs.find(e => e.effect === "Auxiliary Systems")) {
         // If foe wins or DKO
-        if(b.outcomeData.outcome === 'Foe Wins' || b.outcomeData.outcome === 'Double KO'){
+        if (b.outcomeData.outcome === "Foe Wins" || b.outcomeData.outcome === "Double KO") {
           // then the health and status should be updated
           const outcomeData = {
             health: Math.floor(BRAFiltronFive.maxHealth / 2),
             status: "Recovering",
-          }
+          };
           expect(avatar).toEqual(expect.objectContaining(outcomeData));
-        }else if(b.outcomeData.outcome === 'Avatar Wins' || b.outcomeData.outcome === 'Draw'){
+        } else if (b.outcomeData.outcome === "Avatar Wins" || b.outcomeData.outcome === "Draw") {
           // then the health and status should be updated
           const outcomeData = {
-            health: Math.floor(BRAFiltronFive.maxHealth * .75),
+            health: Math.floor(BRAFiltronFive.maxHealth * 0.75),
             status: "Recovering",
-          }
+          };
           expect(avatar).toEqual(expect.objectContaining(outcomeData));
         }
-      }
-    });
-  })
-
-  describe('Chrono Guys ability', () =>{
-    it("Should run battle, then test Rewrite History passive ability", () => {
-      BRF.power += 1000;
-      // BATTLE STEP 5 - EXCHANGE DAMAGE
-      const b = doBattle(BRAChronoGuy as BattleHero, BRF, 'Foe');
-      const passiveAbility = { name: "Rewrite History", type: "postbattle" } as PassiveAbility;
-      const { avatar, foe, outcomeStatus, effectProcs } = postBattleAbilities(BRAChronoGuy, BRF, b.outcomeData, passiveAbility);
-
-      // And Rewrite History happened
-      if(effectProcs.find(e => e.effect === 'Rewrite History')){
-        // If foe wins or DKO
-        if(b.outcomeData.outcome === 'Foe Wins'){
-          expect(outcomeStatus).toBe('Draw');
-          expect(avatar.health).toBe(1);
-          expect(avatar.status).toBe('Recovering');
-        }else if(b.outcomeData.outcome === 'Double KO'){
-          expect(outcomeStatus).toBe('Avatar Win');
-          expect(avatar.health).toBe(1);
-          expect(avatar.status).toBeOneOf(['Recovering', 'Infected']);
-        }else if(b.outcomeData.outcome === 'Draw'){
-          expect(outcomeStatus).toBe('Avatar Win');
-        }
-      }else{
-        expect(b.outcomeData.outcome).toBe(outcomeStatus);
       }
     });
   });
 
+  describe("Chrono Guys ability", () => {
+    it("Should run battle, then test Rewrite History passive ability", () => {
+      BRF.power += 1000;
+      // BATTLE STEP 5 - EXCHANGE DAMAGE
+      const b = doBattle(BRAChronoGuy as BattleHero, BRF, "Foe");
+      const passiveAbility = { name: "Rewrite History", type: "postbattle" } as PassiveAbility;
+      const { avatar, foe, outcomeStatus, effectProcs } = postBattleAbilities(BRAChronoGuy, BRF, b.outcomeData, passiveAbility);
 
-
+      // And Rewrite History happened
+      if (effectProcs.find(e => e.effect === "Rewrite History")) {
+        // If foe wins or DKO
+        if (b.outcomeData.outcome === "Foe Wins") {
+          expect(outcomeStatus).toBe("Draw");
+          expect(avatar.health).toBe(1);
+          expect(avatar.status).toBe("Recovering");
+        } else if (b.outcomeData.outcome === "Double KO") {
+          expect(outcomeStatus).toBe("Avatar Win");
+          expect(avatar.health).toBe(1);
+          expect(avatar.status).toBeOneOf(["Recovering", "Infected"]);
+        } else if (b.outcomeData.outcome === "Draw") {
+          expect(outcomeStatus).toBe("Avatar Win");
+        }
+      } else {
+        expect(b.outcomeData.outcome).toBe(outcomeStatus);
+      }
+    });
+  });
 });

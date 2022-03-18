@@ -292,7 +292,7 @@ function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbil
   };
 }
 
-function _determineOutcome(winner: BattleOutcome) : OutcomeData {
+function _determineOutcome(winner: BattleOutcome): OutcomeData {
   if (winner === "Avatar") {
     return {
       outcome: "Avatar Wins",
@@ -642,15 +642,15 @@ function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe
   const outcomeData = _determineOutcome(winnerString);
   // console.log('RB=', roundBreakdown, outcomeData);
   // console.log("FOE HEALTH REMAINING", grandTotals.foeHealthRemaining);
-  
+
   interface BattleResults {
-    aHealthRemaining : number
-    fHealthRemaining : number
-    outcomeData : OutcomeData
-    roundBreakdown : HF.BattleRound[]
+    aHealthRemaining: number;
+    fHealthRemaining: number;
+    outcomeData: OutcomeData;
+    roundBreakdown: HF.BattleRound[];
   }
-  
-  const results : BattleResults = {
+
+  const results: BattleResults = {
     aHealthRemaining: grandTotals.avHealthRemaining,
     fHealthRemaining: grandTotals.foeHealthRemaining,
     outcomeData,

@@ -1,15 +1,15 @@
-import Chance from 'chance';
-import { BackendEffectProcs, BattleFoe, OutcomeData, PassiveAbility } from '../../types/BackendOnlyTypes';
-import HF from '../../types/herofit';
+import Chance from "chance";
+import { BackendEffectProcs, BattleFoe, OutcomeData, PassiveAbility } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
 const chance = Chance();
 
 // Effects passed in here are the ones saved in the 'effects' column'
 // The 'effectProcs' column, which is only used for display purposes, will include both these effects AND 'effects' from avatar & foe abilities
-function postBattleEffects(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : OutcomeData, effects : string[]) {
+function postBattleEffects(a: Partial<HF.Hero>, f: BattleFoe, outcomeData: OutcomeData, effects: string[]) {
   let avatar = { ...a } as Partial<HF.Hero>;
   let foe = { ...f } as BattleFoe;
   let outcomeStatus = outcomeData.outcome;
-  let effectProcs : BackendEffectProcs[] = [];
+  let effectProcs: BackendEffectProcs[] = [];
 
   // FOE POSTBATTLE ABILITIES
   if (f.ability.type === "postbattle") {
@@ -161,7 +161,6 @@ function postBattleEffects(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : Ou
     });
   }
 
-
   return {
     avatar,
     foe,
@@ -171,16 +170,15 @@ function postBattleEffects(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : Ou
 }
 
 // Effects passed in here are the ones saved in the 'effects' column'
-function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : OutcomeData, passiveAbility : PassiveAbility) {
+function postBattleAbilities(a: Partial<HF.Hero>, f: BattleFoe, outcomeData: OutcomeData, passiveAbility: PassiveAbility) {
   let avatar = { ...a } as Partial<HF.Hero>;
   let foe = { ...f } as BattleFoe;
   let outcomeStatus = outcomeData.outcome;
-  let effectProcs : BackendEffectProcs[] = [];
+  let effectProcs: BackendEffectProcs[] = [];
 
   // HERO POSTBATTLE PASSIVE ABILITIES
-  switch(passiveAbility.name){
-    
-    case 'Auxiliary Systems':
+  switch (passiveAbility.name) {
+    case "Auxiliary Systems":
       if (outcomeData.outcome === "Foe Wins" || outcomeData.outcome === "Double KO") {
         // IF successful, revive to 50%
         const abilityWorked = chance.bool({ likelihood: 33 });
@@ -194,12 +192,12 @@ function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : 
             type: "postbattle",
           });
         }
-      }else if(outcomeData.outcome === "Avatar Wins" || outcomeData.outcome === "Draw"){
+      } else if (outcomeData.outcome === "Avatar Wins" || outcomeData.outcome === "Draw") {
         // IF successful, revive to 75% and eliminate infected status by assigning 'Recovering'
         const abilityWorked = chance.bool({ likelihood: 15 });
         if (abilityWorked) {
           avatar = Object.assign({}, a, {
-            health: Math.floor(a.maxHealth * .75),
+            health: Math.floor(a.maxHealth * 0.75),
             status: "Recovering",
           });
           effectProcs.push({
@@ -209,7 +207,7 @@ function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : 
         }
       }
       break;
-    case 'Rewrite History':
+    case "Rewrite History":
       if (outcomeData.outcome === "Foe Wins") {
         const abilityWorked = chance.bool({ likelihood: 33 });
         if (abilityWorked) {
@@ -223,7 +221,7 @@ function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : 
             type: "postbattle",
           });
         }
-      }else if(outcomeData.outcome === "Double KO"){
+      } else if (outcomeData.outcome === "Double KO") {
         const abilityWorked = chance.bool({ likelihood: 33 });
         if (abilityWorked) {
           outcomeStatus = "Avatar Wins";
@@ -236,9 +234,9 @@ function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : 
             type: "postbattle",
           });
         }
-      }else if(outcomeData.outcome === "Draw"){
+      } else if (outcomeData.outcome === "Draw") {
         const abilityWorked = chance.bool({ likelihood: 33 });
-        if(abilityWorked){
+        if (abilityWorked) {
           outcomeStatus = "Avatar Wins";
           effectProcs.push({
             effect: "Rewrite History",
@@ -259,4 +257,4 @@ function postBattleAbilities(a : Partial<HF.Hero>, f : BattleFoe, outcomeData : 
   };
 }
 
-export { postBattleEffects, postBattleAbilities};
+export { postBattleEffects, postBattleAbilities };
