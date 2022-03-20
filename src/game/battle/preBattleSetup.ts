@@ -1,17 +1,24 @@
-const { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } = require("../CONSTANTS");
-const { determineScenario, calcScenarioBonuses } = require("./scenario");
-const { doAvatarBattlePrep, doFoeBattlePrep } = require("./doBattlePrep");
-const { parseStats } = require("../../lib/helperFunctions");
-const avCalc = require("../upgrades/avCalc");
-const chance = require("chance")();
+import { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } from "../CONSTANTS";
+import { determineScenario, calcScenarioBonuses } from "./scenario";
+import { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities } from "./doBattlePrep";
+import { parseStats } from "../../lib/helperFunctions";
+import avCalc from "../upgrades/avCalc";
+import { AvatarOrFoeString, BackendEffectProcs, BattleElements, BattleFoe, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
+import Chance from "chance";
+const chance = Chance();
 
-const preBattleSetup = function (avatar, foe) {
+const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
   let a = Object.assign({}, avatar);
   let f = Object.assign({}, foe);
-  let beginnersLuck;
-  let scenario;
-  let goesFirst;
-  let effectProcs = [];
+  let beginnersLuck: boolean;
+  let scenario: Scenario;
+  let goesFirst: AvatarOrFoeString;
+
+  // Only used to help determine Ninja passive
+  let possibleAbilityProcs: string[] = [];
+
+  // Only appears on Battle Report, no other uses
+  let effectProcs: BackendEffectProcs[] = [];
 
   return {
     determineBeginnersLuck: () => {
@@ -21,16 +28,23 @@ const preBattleSetup = function (avatar, foe) {
       }
       beginnersLuck = false;
     },
+    // Only Applies to Natural Ninja and Empath
+    doPreBattleHeroPassiveSetup: (passiveAbility: PassiveAbility) => {
+      ({ avatar: a, pAbilityProcs: possibleAbilityProcs, eProcs: effectProcs } = doHeroPassiveAbilities(a, possibleAbilityProcs, effectProcs, passiveAbility));
+    },
     // Choose scenario then apply bonuses to Avatar & Foe. Return Avatar, Foe, and Scenario
     doScenarioAndBonus: () => {
-      scenario = determineScenario(beginnersLuck);
+      const scenarioZeroBoost = possibleAbilityProcs.includes("Naturally Stealthy") ? true : false;
+
+      ({ s: scenario, ep: effectProcs } = determineScenario(beginnersLuck, scenarioZeroBoost, effectProcs));
+
       // assign 'a' variable above the value of sAvatar, same with 'f'
       ({ sAvatar: a, sFoe: f } = calcScenarioBonuses(a, f, scenario));
     },
-    doPreBattleEffects: effects => {
+    doPreBattleEffects: (effects: string[]) => {
       // If there are any effects, find 'prebattle' effects and adjust avatar accordingly
       if (effects && effects.length) {
-        let procs = [];
+        let procs: BackendEffectProcs[] = [];
         // Buff or debuff hero and foe based on item effects
         // If new item effects are added, they need to be added in this function:
         ({ avatar: a, foe: f, procs } = doAvatarBattlePrep(a, f, effects, scenario.id));
@@ -38,18 +52,18 @@ const preBattleSetup = function (avatar, foe) {
       }
     },
     prepareFoe: () => {
-      let procs = [];
-      ({ avatar: a, foe: f, procs } = doFoeBattlePrep(a, f));
+      let procs: BackendEffectProcs[] = [];
+      ({ avatar: a, foe: f, procs } = doFoeBattlePrep(a, f, scenario.id));
 
       effectProcs = [...effectProcs, ...procs];
     },
     applyElementalBonus: () => {
       // Figure out which season it is, so a 25% bonus can be given to a & f
       const { determineAstrologySeason } = avCalc();
-      const seasonalBonusElement = determineAstrologySeason(Date.now()).element.toLowerCase();
-
-      a[seasonalBonusElement] *= 1.25;
-      f[seasonalBonusElement] *= 1.25;
+      const { element } = determineAstrologySeason(Date.now().toString());
+      const seasonalBonusElement = element.toLowerCase();
+      a[seasonalBonusElement as keyof BattleElements] *= 1.25;
+      f[seasonalBonusElement as keyof BattleElements] *= 1.25;
     },
     determineAggressor: () => {
       if (scenario.id === 0) {
@@ -76,8 +90,8 @@ const preBattleSetup = function (avatar, foe) {
       f.earth = foeEarthBoost;
     },
     getPreBattlePackage: () => ({
-      BRA: parseStats(a, true),
-      BRF: parseStats(f, true),
+      BRA: parseStats(a, true) as BattleHero,
+      BRF: parseStats(f, true) as BattleFoe,
       goesFirst,
       scenario,
       effectProcs,
@@ -85,4 +99,4 @@ const preBattleSetup = function (avatar, foe) {
   };
 };
 
-module.exports = preBattleSetup;
+export default preBattleSetup;

@@ -47,7 +47,7 @@ function generateBrs(avatars, fws) {
     }
 
     // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-    const scenario = determineScenario(beginnersLuck);
+    const { s: scenario, ep } = determineScenario(beginnersLuck);
     const scenarioBonuses = calcScenarioBonuses(av, foesWithStats[i], scenario);
     const sAvatar = scenarioBonuses.sAvatar;
     const sFoe = scenarioBonuses.sFoe;

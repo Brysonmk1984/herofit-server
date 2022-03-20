@@ -1,33 +1,38 @@
-const { Avatar, AvatarItems, Items, Battle } = require("../../config/db");
-const doBattle = require("./doBattle");
-const preBattleSetup = require("./preBattleSetup");
-const postBattleProcess = require("./postBattleProcess");
-const { Op } = require("sequelize");
-const xpCalc = require("../upgrades/xpCalc");
+import { Avatar, AvatarItems, Items, Battle } from "../../config/db";
+import doBattle from "./doBattle";
+import preBattleSetup from "./preBattleSetup";
+import postBattleProcess from "./postBattleProcess";
+import { Op } from "sequelize";
+import xpCalc from "../upgrades/xpCalc";
+import { BattleHero, BattlePassiveAbility, GamePhase, PassiveAbility } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
 */
 
-function battleProcess(battleInstance, avatarInstance) {
+function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, passiveAbility: PassiveAbility) {
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
-  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
+  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassiveSetup, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
   determineBeginnersLuck();
 
-  // PREBATTLE STEP 1 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
+  // PREBATTLE STEP 1 - RUN ANY PREBATTLE ABILITIES UNIQUE TO HEROES
+  doPreBattleHeroPassiveSetup(passiveAbility);
+
+  // PREBATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
   doScenarioAndBonus();
 
-  // PREBATTLE STEP 2 APPLY EFFECTS FROM ITEMS
+  // PREBATTLE STEP 3 - APPLY EFFECTS FROM ITEMS
   doPreBattleEffects(battle.effects);
 
-  // PREBATTLE STEP 3 - APPLY FOE PREBATTLE ABILITY
+  // PREBATTLE STEP 4 - APPLY FOE PREBATTLE ABILITY
   prepareFoe();
 
-  // PREBATTLE STEP 4 - ADJUST THE SEASONAL ELEMENT ON BOTH FOE AND AVATAR
+  // PREBATTLE STEP 5 - ADJUST THE SEASONAL ELEMENT ON BOTH FOE AND AVATAR
   applyElementalBonus();
 
   // PREBATTLE STEP 5 - DETERMINE WHO ATTACKS FIRST
@@ -38,18 +43,31 @@ function battleProcess(battleInstance, avatarInstance) {
   //applyCheat(1,1,1,1,10000,10000)
   //applyCheat(1000,50, 448,1)
 
-  // PREBATTLE STEP 6 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
+  // PREBATTLE STEP 7 - GET FINAL AVATAR, FOE, AND WHO GOES FIRST FOR BATTLE
   const { BRA, BRF, goesFirst, scenario, effectProcs } = getPreBattlePackage();
 
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
   try {
-    const b = doBattle(BRA, BRF, goesFirst);
+    // In the future, this will need to be able to handle an array of abilities
+    const battlePassive = effectProcs.find(e => e.type === "battle");
 
-    const { doPostBattleEffects, updateAvatarByOutcome, updateAvatarByLevelUp, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const battleAbility: BattlePassiveAbility = battlePassive
+      ? {
+          name: battlePassive.effect,
+          aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
+        }
+      : undefined;
 
-    // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If Any postbattle abilities or item effects exist, use them. These will often change the avatar status, health, and battle outcomes
+    const b = doBattle(BRA, BRF, goesFirst, battleAbility);
+
+    const { doPostBattleEffects, doPostBattlePassiveAbilities, updateAvatarByOutcome, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
+
+    // POST BATTLE STEP 1 - POST BATTLE EFFECTS - If any post battle item effects exist, use them. These will often change the avatar status, health, and battle outcomes
     doPostBattleEffects(battle.effects);
+
+    // POST BATTLE STEP 2 - POST BATTLE PASSIVE ABILITIES - If Any postbattle abilities. These will often change the avatar status, health, and battle outcomes
+    doPostBattlePassiveAbilities(passiveAbility);
 
     // POST BATTLE STEP 2
     updateAvatarByOutcome();
@@ -156,4 +174,4 @@ function battleProcess(battleInstance, avatarInstance) {
   }
 }
 
-module.exports = battleProcess;
+export default battleProcess;

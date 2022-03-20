@@ -158,6 +158,7 @@ declare namespace HF {
     duration: number;
     distance: number;
     elevationGain: number;
+    BackendActivity;
     id: number;
     maxSpeed: number;
     source: string;

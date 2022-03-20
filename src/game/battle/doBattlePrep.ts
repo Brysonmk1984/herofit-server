@@ -1,12 +1,15 @@
-const { FOE_NON_ACTION } = require("../CONSTANTS");
-const chance = require("chance")();
-const xpCalc = require("../upgrades/xpCalc");
-const { scrambleStats } = require("../../lib/helperFunctions");
+import { FOE_NON_ACTION } from "../CONSTANTS";
+import Chance from "chance";
+import xpCalc from "../upgrades/xpCalc";
+import { scrambleStats } from "../../lib/helperFunctions";
+import { BackendEffectProcs, BattleFoe, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
+const chance = Chance();
 
-function doAvatarBattlePrep(avatar, foe, effects, scenario) {
+function doAvatarBattlePrep(avatar: BattleHero, foe: BattleFoe, effects: string[], scenario: number) {
   const eAvatar = { ...avatar };
   let eFoe = { ...foe };
-  const effectProcs = [];
+  const effectProcs: BackendEffectProcs[] = [];
   effects.forEach(effect => {
     switch (effect) {
       case "Hero +5,+10% Water":
@@ -310,9 +313,9 @@ function doAvatarBattlePrep(avatar, foe, effects, scenario) {
   return { avatar: eAvatar, foe: eFoe, procs: effectProcs };
 }
 
-function doFoeBattlePrep(avatar, foe, scenarioId) {
+function doFoeBattlePrep(avatar: BattleHero, foe: BattleFoe, scenarioId: number) {
   const ability = foe.ability;
-  const effectProcs = [];
+  const effectProcs: BackendEffectProcs[] = [];
   if (ability && ability.type === "prebattle") {
     if (scenarioId !== FOE_NON_ACTION) {
       let fAvatar = { ...avatar };
@@ -336,9 +339,9 @@ function doFoeBattlePrep(avatar, foe, scenarioId) {
           break;
         case "Paranormal Pandemonium":
           // Stat Scramble
-          const stats = ["armor", "earth", "fire", "water", "air", "power", "health"];
+          const stats: Partial<Lowercase<HF.Stat>>[] = ["armor", "earth", "fire", "water", "air", "power", "health"];
 
-          fAvatar = { ...scrambleStats(stats, avatar) };
+          fAvatar = { ...scrambleStats(stats, avatar) } as BattleHero;
           effectProcs.push({
             effect: "Paranormal Pandemonium",
             heroStatsEffected: ["armor", "earth", "fire", "water", "air", "power", "health"],
@@ -404,4 +407,68 @@ function doFoeBattlePrep(avatar, foe, scenarioId) {
   return { avatar, foe, procs: effectProcs };
 }
 
-module.exports = { doAvatarBattlePrep, doFoeBattlePrep };
+function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string[], effectProcs: BackendEffectProcs[], passiveAbility: PassiveAbility) {
+  const eAvatar = { ...avatar };
+  const { type, name } = passiveAbility;
+  const pAbilityProcs = [...possibleAbilityProcs];
+  const eProcs = [...effectProcs];
+  // Only consider abilities that are prebattle
+  if (type === "prebattle") {
+    switch (name) {
+      case "Naturally Stealthy":
+        pAbilityProcs.push("Naturally Stealthy");
+        break;
+      case "Healing Waters":
+        // Adjust Hero's water amount based on their health
+        const healingWatersBonus = Math.floor(avatar.health / 6);
+        const newWaterAmount = avatar.water + healingWatersBonus;
+        eAvatar.water = newWaterAmount;
+
+        // Add to eProcs(effectProcs) array since it always procs
+        eProcs.push({
+          effect: "Healing Waters",
+          heroStatsEffected: ["water"],
+          type: "prebattle",
+        });
+        break;
+      default:
+        break;
+    }
+  } else if (type === "battle") {
+    switch (name) {
+      case "Corundum-Clast Armor":
+        eProcs.push({
+          effect: "Corundum Armor",
+          heroStatsEffected: ["armor"],
+          type: "battle",
+        });
+        break;
+      case "Olfactory Overload":
+        eProcs.push({
+          effect: "Olfactory Overload",
+          type: "battle",
+        });
+      default:
+        break;
+    }
+  } else if (type === "postbattle") {
+    switch (name) {
+      case "Auxiliary Systems":
+        pAbilityProcs.push("Auxiliary Systems");
+        break;
+      case "Rewrite History":
+        pAbilityProcs.push("Rewrite History");
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {
+    avatar: eAvatar,
+    pAbilityProcs,
+    eProcs,
+  };
+}
+
+export { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities };

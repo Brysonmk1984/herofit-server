@@ -1,10 +1,10 @@
-const { AETHER_IDS_CHANCE_MOD } = require("../CONSTANTS");
+const { AETHER_TD_CHANCE_MOD } = require("../CONSTANTS");
 
 function activityHeal(health, maxHealth, aether, xpGain) {
   if (!aether) {
     return health;
   }
-  const healPercent = Number((aether * 3) / (aether * 3 + AETHER_IDS_CHANCE_MOD)).toFixed(2) * 100;
+  const healPercent = Number((aether * 3) / (aether * 3 + AETHER_TD_CHANCE_MOD)).toFixed(2) * 100;
   const activityHealSessions = xpGain / 60;
   const modifiedHealPercent = healPercent * activityHealSessions * 0.01;
   let adjustedHealth = Math.floor(health + maxHealth * modifiedHealPercent);

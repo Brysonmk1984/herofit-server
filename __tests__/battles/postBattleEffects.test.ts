@@ -9,6 +9,7 @@ import doBattle from "../../src/game/battle/doBattle";
 import { FOE_NON_ACTION, BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } from "../../src/game/CONSTANTS";
 import avCalc from "../../src/game/upgrades/avCalc";
 import Chance from "chance";
+import { OutcomeData } from "../../src/types/BackendOnlyTypes";
 
 const chance = Chance();
 
@@ -39,6 +40,10 @@ let foeTemplate;
 let foeWithStats;
 
 describe("Do battle setup with random av and generated foe template", () => {
+  let BRA;
+  let BRF;
+  let goesFirst;
+
   beforeAll(() => {
     function generateBraBrf() {
       const { determineAstrologySeason } = avCalc();
@@ -52,11 +57,12 @@ describe("Do battle setup with random av and generated foe template", () => {
       }
 
       // BATTLE STEP 2 - ENCOUNTER SCENARIO IS DECIDED AND BONUSES GIVEN
-      const scenario = determineScenario(beginnersLuck);
+      const { s: scenario, ep } = determineScenario(beginnersLuck);
+      console.log("ECEN", scenario);
       const scenarioBonuses = calcScenarioBonuses(randomAv, foeWithStats, scenario);
       const sAvatar = scenarioBonuses.sAvatar;
       const sFoe = scenarioBonuses.sFoe;
-
+      console.log("S_AV", sAvatar);
       //console.log('sFOE - ', sFoe);
       // avatar and foe to be used for battle
       BRA = Object.assign({}, sAvatar);
@@ -94,11 +100,9 @@ describe("Do battle setup with random av and generated foe template", () => {
     }
 
     generateBraBrf();
-  });
 
-  let BRA;
-  let BRF;
-  let goesFirst;
+    console.log("BRA", BRA);
+  });
 
   it("Should Generate a BRA, BRF, and finish battle setup", () => {
     //console.log('BRA-', BRA, 'BRF', BRF);
@@ -112,8 +116,8 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name: "Adaptive Camouflage", type: "postbattle" }];
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const effects = ["Adaptive Camouflage"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
     if (postAv.health === 1) {
@@ -128,8 +132,8 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name: "Unstable Prototype", type: "postbattle" }];
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const effects = ["Unstable Prototype"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
 
@@ -144,8 +148,8 @@ describe("Do battle setup with random av and generated foe template", () => {
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
     const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining);
-    const effects = [{ name: "Heroes Never Die", type: "postbattle" }];
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const effects = ["Heroes Never Die"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome } = getPostBattlePackage();
 
@@ -158,14 +162,15 @@ describe("Do battle setup with random av and generated foe template", () => {
 
   // +25 Damage Afterburn - Dragon Whelp
   it("Should run battle, then test +25 Damage Afterburn ability", () => {
+    const mockPassive = { name: "not in use", aggressor: "either" as const };
     BRF.power += 1000;
     // BATTLE STEP 5 - EXCHANGE DAMAGE
-    const b = doBattle(BRA, BRF, goesFirst);
-    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
+    const b = doBattle(BRA, BRF, goesFirst, mockPassive);
+    const { doPostBattleEffects, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData as OutcomeData, b.aHealthRemaining, b.fHealthRemaining);
     const effects = ["+25 Damage Afterburn"];
     doPostBattleEffects(effects);
     const { postAv, postOutcome, postFoe } = getPostBattlePackage();
-
+    console.log(b.outcomeData, b.fHealthRemaining);
     // IF Afterburn killed opponent after a Loss
     if (b.outcomeData.outcome === "Foe Wins") {
       if (b.fHealthRemaining - 25 <= 0) {

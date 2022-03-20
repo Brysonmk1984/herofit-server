@@ -3,9 +3,18 @@
     "active": true,
     "character": "Chrono Guy",
     "alias": "Chrono Guy",
-    "elms": { "fire": 0, "water": 0, "air": 10, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 0,
+      "air": 10,
+      "earth": 0
+    },
     "skills": ["Time Freeze", "Quantum Teleportation", "Cognitive Flash Forward", "Entropy Ray", "Slow Speed Field"],
     "ultimate": "Timeline Shift",
+    "passive": {
+      "name": "Rewrite History",
+      "type": "postbattle"
+    },
     "colors": ["#4B4B4B", "#E25926"],
     "image": "../../../assets/images/heroes/chrono_guy/chrono_guy.webp",
     "description": "Time Traveling Renegade",
@@ -15,9 +24,18 @@
     "active": true,
     "character": "Compost Creature",
     "alias": "Compost Creature",
-    "elms": { "fire": 2, "water": 2, "air": 2, "earth": 4 },
+    "elms": {
+      "fire": 2,
+      "water": 2,
+      "air": 2,
+      "earth": 4
+    },
     "skills": ["Unsatisfactory Olfactory", "Mulch Munch", "Regenerative Recess", "Coons & Creepy Crawlers", "Decomposing Breath"],
     "ultimate": "Purge, Plant & Propagate",
+    "passive": {
+      "name": "Olfactory Overload",
+      "type": "battle"
+    },
     "colors": ["#796D20", "#E0E393"],
     "image": "../../../assets/images/heroes/compost_creature/compost_creature.webp",
     "description": "Animated Biodecay",
@@ -27,9 +45,18 @@
     "active": true,
     "character": "Filtron Five",
     "alias": "Filtron Five",
-    "elms": { "fire": 0, "water": 5, "air": 5, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 5,
+      "air": 5,
+      "earth": 0
+    },
     "skills": ["Alkalize & Purify", "Corrosive Toxicity", "Hot Air Hot Head", "pH Paralysis", "Problematic Plumbing"],
     "ultimate": "Reverse Osmosis Psychosis",
+    "passive": {
+      "name": "Auxiliary Systems",
+      "type": "postbattle"
+    },
     "colors": ["#EBEBEB", "#FF0000"],
     "image": "../../../assets/images/heroes/filtron_five/filtron_five.webp",
     "description": "Pathogen Punisher",
@@ -39,9 +66,18 @@
     "active": true,
     "character": "Empath Aurelia",
     "alias": "Empath",
-    "elms": { "fire": 0, "water": 10, "air": 0, "earth": 0 },
+    "elms": {
+      "fire": 0,
+      "water": 10,
+      "air": 0,
+      "earth": 0
+    },
     "skills": ["Intuitive Teamwork", "Toroidal Force Field", "Reflect Inner Demons", "Hold the Space", "Funnel of Forgiveness"],
     "ultimate": "Gift of Divine Love",
+    "passive": {
+      "name": "Healing Waters",
+      "type": "prebattle"
+    },
     "colors": ["#7D0110", "#F9F18E"],
     "image": "../../../assets/images/heroes/the_empath/the_empath.webp",
     "description": "Clairsentient Enchantress",
@@ -51,9 +87,18 @@
     "active": true,
     "character": "Boulder Bro",
     "alias": "Boulder Bro",
-    "elms": { "fire": 0, "water": 0, "air": 0, "earth": 10 },
+    "elms": {
+      "fire": 0,
+      "water": 0,
+      "air": 0,
+      "earth": 10
+    },
     "skills": ["Seismic Slam", "Rubble Rouser", "Party Hardy", "Sentiment of the Sediment", "Muddy Slippery Slide"],
     "ultimate": "The Aggro Crag",
+    "passive": {
+      "name": "Corundum-Clast Armor",
+      "type": "battle"
+    },
     "colors": ["#986634", "#110B05"],
     "image": "../../../assets/images/heroes/boulder_bro/boulder_bro.webp",
     "description": "The Party Rock",
@@ -63,9 +108,18 @@
     "active": true,
     "character": "Natural Ninja",
     "alias": "Natural Ninja",
-    "elms": { "fire": 4, "water": 2, "air": 2, "earth": 2 },
+    "elms": {
+      "fire": 4,
+      "water": 2,
+      "air": 2,
+      "earth": 2
+    },
     "skills": ["Bamboo Blade", "Hemp Hogtie", "Sneak in Solidarity", "All Natural Nunchaku", "Obsidian Shuriken"],
     "ultimate": "Fermentation Frenzy",
+    "passive": {
+      "name": "Naturally Stealthy",
+      "type": "prebattle"
+    },
     "colors": ["#0C2613", "#93C64B"],
     "image": "../../../assets/images/heroes/natural_ninja/natural_ninja.webp",
     "description": "Sentinal of Sustainability",
@@ -75,9 +129,18 @@
     "active": true,
     "character": "RePete",
     "alias": "Scavenger Robot",
-    "elms": { "fire": 5, "water": 0, "air": 5, "earth": 0 },
+    "elms": {
+      "fire": 5,
+      "water": 0,
+      "air": 5,
+      "earth": 0
+    },
     "skills": ["Scrapyard Scavenge", "Reduce, Reuse, Recycle Foe", "Law-Binding Lasso", "Muffler Mortar", "Uncanny Decoy"],
     "ultimate": "Mini RePete Multiplicity",
+    "passive": {
+      "name": "Thrifty Salvage",
+      "type": "activity upgrade"
+    },
     "colors": ["#9B9B9B", "#232323"],
     "image": "../../../assets/images/heroes/repete/repete.webp",
     "description": "Reduce, Reuse, Recycle",
@@ -87,9 +150,18 @@
     "active": true,
     "character": "Timber Terror",
     "alias": "Timber Terror",
-    "elms": { "fire": 2, "water": 3, "air": 3, "earth": 2 },
+    "elms": {
+      "fire": 2,
+      "water": 3,
+      "air": 3,
+      "earth": 2
+    },
     "skills": ["Surprise Saprolings", "Ten Ton Stomp", "Recursive Regeneration", "Rabid Squirrel Stampede", "Perennial Pounding"],
     "ultimate": "Purify by Chlorophyll",
+    "passive": {
+      "name": "Rampant Regeneration",
+      "type": "hourly"
+    },
     "colors": ["#3D2A18", "#E8F1E3"],
     "image": "../../../assets/images/heroes/timber_terror/timber_terror.webp",
     "description": "Indomitable Forest Strider",
@@ -99,9 +171,18 @@
     "active": true,
     "character": "Solar Celeste",
     "alias": "Solar Warrior",
-    "elms": { "fire": 10, "water": 0, "air": 0, "earth": 0 },
+    "elms": {
+      "fire": 10,
+      "water": 0,
+      "air": 0,
+      "earth": 0
+    },
     "skills": ["Million-Degree Beam", "Core-Forged Aegis", "Speed of Light Strike", "Photon Flashbang", "Solar Flare EMP"],
     "ultimate": "Avatar of the Sun",
+    "passive": {
+      "name": "Photon Forge",
+      "type": "hourly"
+    },
     "colors": ["#EBDD49", "#000000"],
     "image": "../../../assets/images/heroes/solar_celeste/solar_celeste.webp",
     "description": "Extra Terrestrial Spirit",
@@ -111,9 +192,18 @@
     "active": true,
     "character": "Wilhelm the Wild",
     "alias": "Wildspeaker",
-    "elms": { "fire": 3, "water": 3, "air": 2, "earth": 2 },
+    "elms": {
+      "fire": 3,
+      "water": 3,
+      "air": 2,
+      "earth": 2
+    },
     "skills": ["Collude with the Crows", "Wolf Pack Attack", "Beastly Behavior", "Off-the-Grid Offense", "Axecution"],
     "ultimate": "Every Beast Stampede",
+    "passive": {
+      "name": "Wildly Resourceful",
+      "type": "activity upgrade"
+    },
     "colors": ["#533B27", "#272920"],
     "image": "../../../assets/images/heroes/wilhelm_the_wild/wilhelm_the_wild.webp",
     "description": "Barbaric Beastmaster",

@@ -1,21 +1,43 @@
-const chance = require("chance")();
-const { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } = require("../CONSTANTS");
-const { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineIDS } = require("./elementalProcs");
+import Chance from "chance";
+import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, BattlePassiveAbility, OutcomeData } from "../../types/BackendOnlyTypes";
+import HF from "../../types/herofit";
+import { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } from "../CONSTANTS";
+import { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineTD } from "./elementalProcs";
+const chance = Chance();
+
+type HeroOrFoe = BattleHero | BattleFoe;
+
+interface DamageReductionObj extends BattleElements {
+  total: number;
+}
+
+interface GrandTotals {
+  aElmDamage: DamageReductionObj;
+  fElmReduction: DamageReductionObj;
+  fElmDamage: DamageReductionObj;
+  aElmReduction: DamageReductionObj;
+  aPhyDamage: number;
+  fPhyReduction: number;
+  fPhyDamage: number;
+  aPhyReduction: number;
+  avHealthRemaining: number;
+  foeHealthRemaining: number;
+}
 
 // Calculates damage done against same element (F on F)
-function _calcElmStraightDamage(aDamage) {
+function _calcElmStraightDamage(aDamage: number) {
   return aDamage;
 }
 
 // Calculates damage done against an element's weaker counterpart element (F on W&A)
-function _calcElmDamageBonus(aDamage) {
+function _calcElmDamageBonus(aDamage: number) {
   // Straight 50% damage increase
   let d = aDamage * 1.5;
   return d;
 }
 
 // Calculates damage done against an element's counter element (F on E)
-function _calcCounterElmDR(aDamage, rResistance) {
+function _calcCounterElmDR(aDamage: number, rResistance: number) {
   // Straight 25% damage reduction
   let d = aDamage * 0.75;
   let r = rResistance;
@@ -28,7 +50,7 @@ function _calcCounterElmDR(aDamage, rResistance) {
 }
 
 // Calculate the total element damage, reducing damage done to each individual elm by it's mirror's resistance vale (F on F)
-function _calcTurnMirrorReduction(aDamage, rResistance) {
+function _calcTurnMirrorReduction(aDamage: number, rResistance: number) {
   let d = aDamage;
   let r = rResistance;
 
@@ -36,10 +58,10 @@ function _calcTurnMirrorReduction(aDamage, rResistance) {
   return { reduction: d * dr, netDamage: d - d * dr };
 }
 
-function _determineElmMatchups(elm) {
+function _determineElmMatchups(elm: Lowercase<HF.PrimaryElement>) {
   const mirror = [elm];
-  let weakVs = [];
-  let strongVs = [];
+  let weakVs: Lowercase<HF.PrimaryElement>[] = [];
+  let strongVs: Lowercase<HF.PrimaryElement>[] = [];
 
   switch (elm) {
     case "fire":
@@ -68,9 +90,9 @@ function _determineElmMatchups(elm) {
   return { mirror, weakVs, strongVs };
 }
 
-function _calcElementDamage(attacker, receiver, evaded) {
+function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHero | BattleFoe, evaded: boolean) {
   // Using Ceil to benefit lower level players not having a single damage in elements
-  const attackerElms = {
+  const attackerElms: BattleElements = {
     fire: Math.ceil(
       chance.floating({
         min: attacker.fire * ELM_DAMAGE_VARIANCE_RANGE[0],
@@ -133,7 +155,7 @@ function _calcElementDamage(attacker, receiver, evaded) {
   // console.log('AE = ', attackerElms);
   // console.log('RE = ', receiverElms);
 
-  let turnElmDamageDone = {
+  let turnElmDamageDone: DamageReductionObj = {
     fire: 0,
     earth: 0,
     water: 0,
@@ -141,7 +163,7 @@ function _calcElementDamage(attacker, receiver, evaded) {
     total: 0,
   };
 
-  let turnElmDamagePrevented = {
+  let turnElmDamagePrevented: DamageReductionObj = {
     fire: 0,
     earth: 0,
     water: 0,
@@ -151,31 +173,32 @@ function _calcElementDamage(attacker, receiver, evaded) {
 
   // EACH ELEMENT GETS CALCULATED AGAINST EACH FOE ELEMENT INDIVIDUALLY
   for (const elm in attackerElms) {
-    const elmDamageDone = {
+    const battleElmProperty = elm as keyof BattleElements;
+    const elmDamageDone: BattleElements = {
       fire: 0,
       earth: 0,
       water: 0,
       air: 0,
     };
 
-    if (attackerElms[elm] > 0) {
+    if (attackerElms[battleElmProperty] > 0) {
       //console.log(`${elm.toUpperCase()}: ${attackerElms[elm]}`);
       const { mirror, weakVs, strongVs } = _determineElmMatchups(elm);
       //console.log('mirror - ', mirror, 'wv - ', weakVs, 'sv - ', strongVs);
 
       // Mirror match elm damage
       mirror.forEach(mirrorMatchup => {
-        elmDamageDone[mirrorMatchup] += _calcElmStraightDamage(attackerElms[elm]);
+        elmDamageDone[mirrorMatchup] += _calcElmStraightDamage(attackerElms[battleElmProperty]);
       });
 
       // WeakVs elements Damage
       weakVs.forEach(weakMatchup => {
-        elmDamageDone[weakMatchup] += _calcCounterElmDR(attackerElms[elm], receiverElms[weakMatchup]);
+        elmDamageDone[weakMatchup] += _calcCounterElmDR(attackerElms[battleElmProperty], receiverElms[weakMatchup]);
       });
 
       // StrongVs elements Damage
       strongVs.forEach(strongMatchup => {
-        elmDamageDone[strongMatchup] += _calcElmDamageBonus(attackerElms[elm]);
+        elmDamageDone[strongMatchup] += _calcElmDamageBonus(attackerElms[battleElmProperty]);
       });
 
       // turn damage reduction from mirror elm; reduces damage to all elm matchups
@@ -183,8 +206,8 @@ function _calcElementDamage(attacker, receiver, evaded) {
       let elmCount = 0;
       for (let e in elmDamageDone) {
         //console.log(`D to ${e}`,elmDamageDone[e]);
-        if (elmDamageDone[e] > 0) {
-          sumElmDamageToEachElm += elmDamageDone[e];
+        if (elmDamageDone[e as keyof BattleElements] > 0) {
+          sumElmDamageToEachElm += elmDamageDone[e as keyof BattleElements];
           elmCount += 1;
         }
       }
@@ -194,9 +217,9 @@ function _calcElementDamage(attacker, receiver, evaded) {
       const average = sumElmDamageToEachElm / elmCount;
       //console.log('AVERAGE - ', average);
       const { reduction, netDamage } = _calcTurnMirrorReduction(average, receiverElms[mirror[0]]);
-      turnElmDamageDone[elm] = Math.floor(netDamage);
+      turnElmDamageDone[elm as keyof DamageReductionObj] = Math.floor(netDamage);
       turnElmDamageDone.total += Math.floor(netDamage);
-      turnElmDamagePrevented[elm] = Math.floor(reduction);
+      turnElmDamagePrevented[elm as keyof DamageReductionObj] = Math.floor(reduction);
       turnElmDamagePrevented.total += Math.floor(reduction);
     }
   }
@@ -226,21 +249,24 @@ function _calcElementDamage(attacker, receiver, evaded) {
 }
 
 // Calculates damage done against an element's counter element (F on E)
-function _calcArmorDR(aPower, rArmor) {
+function _calcArmorDR(aPower: number, rArmor: number, battleAbility?: BattlePassiveAbility) {
+  const armorType = battleAbility?.name.includes("Corundum") ? battleAbility.name : "default";
+  let armorDRF = ARMOR_DRF[armorType as keyof typeof ARMOR_DRF];
   let d = aPower;
   let r = rArmor;
   if (r === 0) {
     return { reduction: r, netDamage: d };
   }
+
   // Reduced damage based on amount of resistance
-  const dr = (r * 10) / (r * 10 + ARMOR_DRF * d);
+  const dr = (r * 10) / (r * 10 + armorDRF * d);
   return {
     reduction: parseFloat((d * dr).toFixed(2)),
     netDamage: Math.floor(d - d * dr),
   };
 }
 
-function _calcDamage(aPower, rArmor, evaded) {
+function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbility?: BattlePassiveAbility) {
   if (evaded) {
     return { physicalDamage: 0, physicalReduction: 0 };
   }
@@ -258,7 +284,7 @@ function _calcDamage(aPower, rArmor, evaded) {
     fixed: 2,
   });
 
-  const { reduction, netDamage } = _calcArmorDR(power, armor);
+  const { reduction, netDamage } = _calcArmorDR(power, armor, battleAbility);
 
   return {
     physicalDamage: Math.floor(netDamage),
@@ -266,7 +292,7 @@ function _calcDamage(aPower, rArmor, evaded) {
   };
 }
 
-function _determineOutcome(winner) {
+function _determineOutcome(winner: BattleOutcome): OutcomeData {
   if (winner === "Avatar") {
     return {
       outcome: "Avatar Wins",
@@ -294,11 +320,11 @@ function _determineOutcome(winner) {
   }
 }
 
-function _checkIfElemental({ fire, water, earth, air }) {
-  const contenderElms = { fire, water, earth, air };
+function _checkIfElemental({ fire, water, earth, air }: BattleElements) {
+  const contenderElms: BattleElements = { fire, water, earth, air };
   let hasElementalPower = false;
   for (let elm in contenderElms) {
-    if (contenderElms[elm] !== 0) {
+    if (contenderElms[elm as keyof BattleElements] !== 0) {
       hasElementalPower = true;
     }
   }
@@ -306,52 +332,110 @@ function _checkIfElemental({ fire, water, earth, air }) {
   return hasElementalPower ? true : false;
 }
 
-function _calcHealthLoss(health, damage) {
-  return Math.floor(health - damage);
+function _calcHealthLoss(health: number, damage: number, bonusDamage = 0) {
+  return Math.floor(health - damage - bonusDamage);
 }
 
-function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, totals) {
+function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: GrandTotals, battleAbility: BattlePassiveAbility) {
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
-  // IF AVATAR ROUND
-  if (aggressorString === "Avatar") {
+  // Calc physical damage, get back damage done and how much was prevented
+  const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+  // Calc elm damage, get back damage done and how much was prevented
+  const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
+
+  // Add to totals done for damage and reduction
+  totals.aPhyDamage += physicalDamage;
+  totals.fPhyReduction += physicalReduction;
+  // Add to totals done for damage and reduction
+  for (let elm in totals.aElmDamage) {
+    totals.aElmDamage[elm as keyof DamageReductionObj] += turnElmDamageDone[elm as keyof DamageReductionObj];
+  }
+  for (let elm in totals.fElmReduction) {
+    totals.fElmReduction[elm as keyof DamageReductionObj] += turnElmDamagePrevented[elm as keyof DamageReductionObj];
+  }
+
+  const elementalProcs = {
+    fire: fireProc,
+    air: airProc,
+    earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + totals.aPhyDamage),
+    water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage),
+  };
+
+  // Only adjust Health for Thorns & VampTouch IF evasion did not happen
+  if (!airProc.evaded) {
+    // EARTH - Deal damage back to attacker based on earthProc
+    totals.avHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+    // WATER - Heal based on waterProc
+    totals.avHealthRemaining += elementalProcs.water.amountHealed;
+  }
+  // Adjust for hero DOT passive (Compost Creature)
+  const bonusDamage = battleAbility?.name === "Olfactory Overload" ? Math.floor(physicalDamage * 0.1) : 0;
+  totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total + physicalDamage, bonusDamage);
+
+  return {
+    defenderHealthLeft: totals.foeHealthRemaining,
+    aggressorHealthLeft: totals.avHealthRemaining,
+    physicalDamageDealt: physicalDamage,
+    elementalDamageDealt: turnElmDamageDone,
+    physicalReduction,
+    elementalReduction: turnElmDamagePrevented,
+    totals,
+    elementalProcs,
+  };
+}
+
+function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
+  // Now determining evasion here to prevent physical damage
+  const airProc = determineAirEvade(defender.air);
+
+  let physicalDamage,
+    physicalReduction,
+    turnElmDamageDone = { total: 0 } as DamageReductionObj,
+    turnElmDamagePrevented = { total: 0 } as DamageReductionObj;
+
+  let elementalProcs: BattleElementalProcs = {
+    fire: null,
+    water: null,
+    air: null,
+    earth: null,
+  };
+
+  // If foe has no elemental power, calc physical damage twice instead of physical + elemental
+  if (!foeIsElemental) {
     // Calc physical damage, get back damage done and how much was prevented
-    const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
-    // Calc elm damage, get back damage done and how much was prevented
-    const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
+    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+    const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+    physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
+    physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
 
     // Add to totals done for damage and reduction
-    totals.aPhyDamage += physicalDamage;
-    totals.fPhyReduction += physicalReduction;
-    // Add to totals done for damage and reduction
-    for (let elm in totals.aElmDamage) {
-      totals.aElmDamage[elm] += turnElmDamageDone[elm];
-    }
-    for (let elm in totals.fElmReduction) {
-      totals.fElmReduction[elm] += turnElmDamagePrevented[elm];
-    }
+    totals.fPhyDamage += physicalDamage;
+    totals.aPhyReduction += physicalReduction;
 
-    const elementalProcs = {
-      fire: fireProc,
-      air: airProc,
-      earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + totals.aPhyDamage),
-      water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage),
-    };
+    // FIRE and WATER deal with attacks, so a non elemental foe wont use these
+    // AIR and EARTH deal with defender's stats,  so they are included here because foe is not defender here
+    elementalProcs.air = airProc;
+    elementalProcs.earth = determineEarthThorns(defender.earth, physicalDamage);
 
     // Only adjust Health for Thorns & VampTouch IF evasion did not happen
     if (!airProc.evaded) {
       // EARTH - Deal damage back to attacker based on earthProc
-      totals.avHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
-      // WATER - Heal based on waterProc
-      totals.avHealthRemaining += elementalProcs.water.amountHealed;
+      totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
     }
 
-    totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total + physicalDamage);
+    totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
+
+    // Adjust for hero DOT passive (Compost Creature)
+    if (battleAbility?.name === "Olfactory Overload") {
+      const bonusDamage = Math.floor(physicalDamage * 0.1);
+      totals.foeHealthRemaining -= bonusDamage;
+    }
 
     return {
-      defenderHealthLeft: totals.foeHealthRemaining,
-      aggressorHealthLeft: totals.avHealthRemaining,
+      defenderHealthLeft: totals.avHealthRemaining,
+      aggressorHealthLeft: totals.foeHealthRemaining,
       physicalDamageDealt: physicalDamage,
       elementalDamageDealt: turnElmDamageDone,
       physicalReduction,
@@ -359,117 +443,82 @@ function _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental
       totals,
       elementalProcs,
     };
-
-    // IF FOE ROUND
   } else {
-    let physicalDamage,
-      physicalReduction,
-      turnElmDamageDone = { total: 0 },
-      turnElmDamagePrevented = { total: 0 };
+    // Calc physical damage, get back damage done and how much was prevented
+    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+    physicalDamage = damageAndReduction1.physicalDamage;
+    physicalReduction = damageAndReduction1.physicalReduction;
+    // Calc elm damage, get back damage done and how much was prevented
+    const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
+    //console.log('FOE ELM DAMAGE THIS ROUND = ', turnElmDamageDone, 'was evaded? ', airProc.evaded);
+    // Add to totals done for damage and reduction
+    totals.fPhyDamage += physicalDamage;
+    totals.aPhyReduction += physicalReduction;
 
-    let elementalProcs = {
-      fire: null,
-      water: null,
-      air: null,
-      earth: null,
-    };
-    // If foe has no elemental power, calc physical damage twice instead of physical + elemental
-    if (!foeIsElemental) {
-      // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
-      const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
-      physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
-      physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
-
-      // Add to totals done for damage and reduction
-      totals.fPhyDamage += physicalDamage;
-      totals.aPhyReduction += physicalReduction;
-
-      elementalProcs = {
-        // FIRE and WATER deal with attacks, so a non elemental foe wont use these
-        //fire : 0,
-        //water : 0,
-        // AIR and EARTH deal with defender's stats,  so they are included here because foe is not defender here
-        air: airProc,
-        earth: determineEarthThorns(defender.earth, physicalDamage),
-      };
-
-      // Only adjust Health for Thorns & VampTouch IF evasion did not happen
-      if (!airProc.evaded) {
-        // EARTH - Deal damage back to attacker based on earthProc
-        totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
-      }
-
-      totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
-      return {
-        defenderHealthLeft: totals.avHealthRemaining,
-        aggressorHealthLeft: totals.foeHealthRemaining,
-        physicalDamageDealt: physicalDamage,
-        elementalDamageDealt: turnElmDamageDone,
-        physicalReduction,
-        elementalReduction: turnElmDamagePrevented,
-        totals,
-        elementalProcs,
-      };
-    } else {
-      // Calc physical damage, get back damage done and how much was prevented
-      const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded);
-      physicalDamage = damageAndReduction1.physicalDamage;
-      physicalReduction = damageAndReduction1.physicalReduction;
-      // Calc elm damage, get back damage done and how much was prevented
-      const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
-      //console.log('FOE ELM DAMAGE THIS ROUND = ', turnElmDamageDone, 'was evaded? ', airProc.evaded);
-      // Add to totals done for damage and reduction
-      totals.fPhyDamage += physicalDamage;
-      totals.aPhyReduction += physicalReduction;
-
-      // Add to totals done for damage and reduction
-      for (let elm in totals.fElmDamage) {
-        totals.fElmDamage[elm] += turnElmDamageDone[elm];
-      }
-      for (let elm in totals.aElmReduction) {
-        totals.aElmReduction[elm] += turnElmDamagePrevented[elm];
-      }
-
-      elementalProcs = {
-        fire: fireProc,
-        air: airProc,
-        earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + physicalDamage),
-        water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + physicalDamage),
-      };
-
-      // Only adjust Health for Thorns & VampTouch IF evasion did not happen
-      if (!airProc.evaded) {
-        // EARTH - Deal damage back to attacker based on earthProc
-        totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
-        // WATER - Heal based on waterProc
-        totals.foeHealthRemaining += elementalProcs.water.amountHealed;
-      }
-
-      totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
-      return {
-        defenderHealthLeft: totals.avHealthRemaining,
-        aggressorHealthLeft: totals.foeHealthRemaining,
-        physicalDamageDealt: physicalDamage,
-        elementalDamageDealt: turnElmDamageDone,
-        physicalReduction,
-        elementalReduction: turnElmDamagePrevented,
-        totals,
-        elementalProcs,
-      };
+    // Add to totals done for damage and reduction
+    for (let elm in totals.fElmDamage) {
+      totals.fElmDamage[elm as keyof DamageReductionObj] += turnElmDamageDone[elm as keyof DamageReductionObj];
     }
+    for (let elm in totals.aElmReduction) {
+      totals.aElmReduction[elm as keyof DamageReductionObj] += turnElmDamagePrevented[elm as keyof DamageReductionObj];
+    }
+
+    elementalProcs = {
+      fire: fireProc,
+      air: airProc,
+      earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + physicalDamage),
+      water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + physicalDamage),
+    };
+
+    // Only adjust Health for Thorns & VampTouch IF evasion did not happen
+    if (!airProc.evaded) {
+      // EARTH - Deal damage back to attacker based on earthProc
+      totals.foeHealthRemaining -= elementalProcs.earth.thornsDamageToAttacker;
+      // WATER - Heal based on waterProc
+      totals.foeHealthRemaining += elementalProcs.water.amountHealed;
+    }
+
+    totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
+
+    // Adjust for hero DOT passive (Compost Creature)
+    if (battleAbility?.name === "Olfactory Overload") {
+      const bonusDamage = Math.floor(physicalDamage * 0.1);
+      //console.log("BONUS DAMAGE", bonusDamage);
+      totals.foeHealthRemaining -= bonusDamage;
+    }
+
+    return {
+      defenderHealthLeft: totals.avHealthRemaining,
+      aggressorHealthLeft: totals.foeHealthRemaining,
+      physicalDamageDealt: physicalDamage,
+      elementalDamageDealt: turnElmDamageDone,
+      physicalReduction,
+      elementalReduction: turnElmDamagePrevented,
+      totals,
+      elementalProcs,
+    };
   }
 }
 
-function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound) {
-  // IDS round is a bonus round for the Avatar based on Aether value
-  if (idsRound) {
+function _computeBattleTurn(aggressor: HeroOrFoe, defender: HeroOrFoe, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
+  // IF HERO ROUND
+  if ("character" in aggressor) {
+    return _computeHeroRound(aggressor, defender as BattleFoe, totals, battleAbility);
+    // IF FOE ROUND
+  } else {
+    return _computeFoeRound(aggressor, defender as BattleHero, foeIsElemental, totals, battleAbility);
+  }
+}
+
+function _determineAggressorDefender(turnIsOdd: boolean, avatar: BattleHero, foe: BattleFoe, goesFirst: AvatarOrFoeString, tdRound: boolean) {
+  // Temporal Distortion round is a bonus round for the Avatar based on Aether value
+  if (tdRound) {
     return {
-      aggressorString: "Avatar",
+      aggressorString: "Avatar" as const,
       aggressor: avatar,
-      defenderString: "Foe",
+      defenderString: "Foe" as const,
       defender: foe,
-      goesFirst: "Avatar",
+      goesFirst: "Avatar" as const,
     };
   }
 
@@ -485,21 +534,21 @@ function _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, idsRound
 }
 
 // Temporal Distortion has a chance to repeat rounds by Avatar
-function _testForTemporalDistortion(aggressorString, aether, nextRoundIDS, goesFirst) {
-  // Round must be avatar as aggressor, av must have aether, and round must not already be an IDS round
-  if (aggressorString === "Avatar" && aether && !nextRoundIDS) {
-    return determineIDS(aether, goesFirst);
+function _testForTemporalDistortion(aggressorString: AvatarOrFoeString, aether: number, nextRoundIsTD: boolean, goesFirst: AvatarOrFoeString) {
+  // Round must be avatar as aggressor, av must have aether, and round must not already be an TD round
+  if (aggressorString === "Avatar" && aether && !nextRoundIsTD) {
+    return determineTD(aether, goesFirst);
   }
-  return { ids: false, gf: goesFirst };
+  return { td: false, gf: goesFirst };
 }
 
-function doBattle(avatar, foe, goesFirst) {
+function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", battleAbility?: BattlePassiveAbility) {
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
+  //console.log("1pa", battleAbility);
   const foeIsElemental = _checkIfElemental(foe);
-  const roundBreakdown = [];
+  const roundBreakdown: BattleRound[] = [];
 
   var grandTotals = {
     aElmDamage: { fire: 0, earth: 0, air: 0, water: 0, total: 0 },
@@ -513,9 +562,9 @@ function doBattle(avatar, foe, goesFirst) {
     avHealthRemaining: avatar.health,
     foeHealthRemaining: foe.health,
   };
-  let winnerString = null;
+  let winnerString: BattleOutcome = null;
   let i;
-  let nextRoundIDS = false;
+  let nextRoundIsTD = false;
   let winner,
     loser = null;
   for (i = 0; i < battleTurns.length; i++) {
@@ -525,13 +574,13 @@ function doBattle(avatar, foe, goesFirst) {
 
     // because zero-based, if the turn is odd, goesFirst actually doesn't attack, but the other player
     const turnIsOdd = battleTurns[i] % 2 === 0 ? false : true;
-    const { aggressorString, aggressor, defenderString, defender } = _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, nextRoundIDS);
+    const { aggressorString, aggressor, defenderString, defender } = _determineAggressorDefender(turnIsOdd, avatar, foe, goesFirst, nextRoundIsTD);
 
     // LATE GAME ELEMENTAL TRAIT - Determine if IDS round, if so, set variable to flag it for next round and change whoGoes first in order to reverse the turn order
-    ({ ids: nextRoundIDS, gf: goesFirst } = _testForTemporalDistortion(aggressorString, avatar.aether, nextRoundIDS, goesFirst));
+    ({ td: nextRoundIsTD, gf: goesFirst } = _testForTemporalDistortion(aggressorString, avatar.aether, nextRoundIsTD, goesFirst));
 
     // Compute battle turn and add results to total
-    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressorString, aggressor, defender, foeIsElemental, grandTotals);
+    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressor, defender, foeIsElemental, grandTotals, battleAbility);
 
     grandTotals = totals;
     roundBreakdown.push({
@@ -591,9 +640,17 @@ function doBattle(avatar, foe, goesFirst) {
   // }));
 
   const outcomeData = _determineOutcome(winnerString);
-  //console.log('RB=', roundBreakdown, outcomeData);
-  //console.log("AV LEVEL", avatar.level);
-  const results = {
+  // console.log('RB=', roundBreakdown, outcomeData);
+  // console.log("FOE HEALTH REMAINING", grandTotals.foeHealthRemaining);
+
+  interface BattleResults {
+    aHealthRemaining: number;
+    fHealthRemaining: number;
+    outcomeData: OutcomeData;
+    roundBreakdown: HF.BattleRound[];
+  }
+
+  const results: BattleResults = {
     aHealthRemaining: grandTotals.avHealthRemaining,
     fHealthRemaining: grandTotals.foeHealthRemaining,
     outcomeData,
@@ -604,4 +661,10 @@ function doBattle(avatar, foe, goesFirst) {
   return results;
 }
 
-module.exports = doBattle;
+export default doBattle;
+
+export function unitTestExporter() {
+  return {
+    _calcArmorDR,
+  };
+}

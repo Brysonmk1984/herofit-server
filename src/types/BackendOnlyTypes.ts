@@ -210,4 +210,97 @@ interface BackendActivity extends HF.Activity {
 
 interface QpSpentStats extends Partial<HF.Stats> {}
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats };
+interface BattleHero {
+  id: number;
+  qp: number;
+  air: number;
+  fire: number;
+  name: string;
+  armor: number;
+  earth: number;
+  owner: string;
+  power: number;
+  water: number;
+  aether: number;
+  health: number;
+  status: string;
+  battleXP: number;
+  equipped: Item[];
+  character: string;
+  maxHealth: number;
+  activityXP: number;
+  battleDkos: number;
+  battleWins: number;
+  statusFade: number;
+  battleDraws: number;
+  battleLosses: number;
+  photonTokens: number;
+}
+
+type BattleFoe = HF.BattleFoe;
+type BattleRound = HF.BattleRound;
+
+interface BattleElements {
+  fire: number;
+  earth: number;
+  water: number;
+  air: number;
+}
+
+type BattleOutcome = "Avatar" | "Foe" | "DKO" | "Draw";
+
+type AvatarOrFoeString = "Avatar" | "Foe";
+
+interface Scenario {
+  id: number;
+  description: string;
+  avatarPowerMod: number;
+  avatarHealthMod: number;
+  foePowerMod: number;
+  foeHealthMod: number;
+}
+
+type GamePhase = "postbattle" | "battle" | "prebattle" | "hourly" | "activity upgrade";
+
+interface BackendEffectProcs extends Omit<HF.BattleEffectProc, "type"> {
+  type?: Exclude<GamePhase, "hourly" | "activity upgrade">;
+}
+
+interface PassiveAbility {
+  name: string;
+  type: GamePhase;
+}
+interface BattlePassiveAbility {
+  name: string;
+  aggressor: "either" | "hero" | "foe";
+}
+
+interface BattleElementalProcs {
+  air: {
+    evaded: boolean;
+  };
+  earth: {
+    thornsDamageToAttacker: number;
+    thornsFactor: number;
+  };
+  fire: {
+    critChance: number;
+    critDamage: number;
+  };
+  water: {
+    amountHealed: number;
+    healingFactor: number;
+  };
+}
+
+interface OutcomeData {
+  outcome: "Avatar Wins" | "Foe Wins" | "Double KO" | "Draw";
+  avatarStatus: "Knocked Out" | "Recovering";
+  foeStatus: "Knocked Out" | "Recovering";
+}
+
+interface HeroChoice extends HF.HeroChoice {
+  passive: PassiveAbility;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice };
