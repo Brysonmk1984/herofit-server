@@ -1,10 +1,12 @@
 import runAllBattles from "../game/battle/runAllBattles";
+import { HeroChoice } from "../types/BackendOnlyTypes";
+import HF from "../types/herofit";
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const { authenticateAdminJWT } = require("../jwt/validateJWT");
 const router = express.Router();
 const { Avatar, AvatarItems, Items, Battle } = require("../config/db");
-const { Op, col } = require("sequelize");
+const { Op, col, literal } = require("sequelize");
 const { parseStats } = require("../lib/helperFunctions");
 const { REVIVE_AMOUNT, RECOVER_EARLY_MOD, RECOVERY_EFFECTIVENESS_MOD } = require("../game/CONSTANTS");
 const { selectFoeTemplate } = require("../game/prebattle/foeFunctions");
@@ -16,107 +18,92 @@ const { sendCronErrorEmail } = require("../mail");
 const chance = require("chance")();
 
 // FORCE A CYCLE OF HEALTH REGEN FOR ALL ALLIES
-router.get("/regenerate-health", authenticateAdminJWT, (req, res) => {
+router.get("/regenerate-health", authenticateAdminJWT, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /regenerate-health endpoint");
   }
 
-  //Get all avatars who aren't at full health
-  return Avatar.findAll({
-    //where: { health : { [Op.lt] : col('maxHealth') } },
-    where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } },
-    raw: true,
-    attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade", "character", "photonTokens"],
-  })
-    .then(results => {
-      const allPromises = [];
-      // Loop over each avatar and either regen health if recovering or other status effects
-      results.forEach(avatar => {
-        avatar = parseStats(avatar);
-        //console.log("AVV", avatar);
-        let avatarHealth = avatar.health;
-        const maxHealth = avatar.maxHealth;
-        const recovery = avatar.recovery;
-        const recoveryRetarder = recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
-        const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
-        let avatarStatus = avatar.status;
-        let avatarStatusFade = avatar.statusFade;
-        let photonTokens = avatar.photonTokens;
-        const passiveAbility = heroList.find(h => h.character === avatar.character).passive;
+  try {
+    // UPDATER FOR SOLAR WARRIOR TRAIT ONLY
+    await Avatar.update({ photonTokens: literal(`"photonTokens" + ${chance.bool({ likelihood: 50 }) ? 2 : 1}`) }, { where: { character: "Solar Celeste", health: { [Op.eq]: col("maxHealth") } } });
 
-        // Check avatar status and run appropriate action
-        switch (avatarStatus) {
-          case "Infected":
-            const infectAmount = Math.floor(adjRegenRate / 2);
-            // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
-            if (avatarHealth - infectAmount <= 0) {
-              avatarStatus = "Knocked Out";
-              avatarHealth = 0;
-              avatarStatusFade = 0;
-              break;
-              // Otherwise, if no more counters, set to recovering and no break statement - the hero will recover health this round
-            } else if (avatarStatusFade === 0) {
-              avatarStatus = "Recovering";
-
-              // If Fade counter is greater than zero AND hero wont be KO from 1 more proc, reduce health of avatar by infect amount and decrement counter. BREAK statement
-            } else {
-              avatarHealth = avatarHealth - infectAmount;
-              --avatarStatusFade;
-              break;
-            }
-          case "Recovering":
-          // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
-          case "Rested":
-            // If one tick of health recovery is over maxHealth, just assign maxHealth
-            if (avatarHealth + adjRegenRate > maxHealth) {
-              avatarHealth = maxHealth;
-              // Otherwise add one tick of health back to avatar's health
-            } else {
-              avatarHealth += passiveAbility.name === "Rampant Regeneration" ? adjRegenRate * 1.33 : adjRegenRate;
-            }
-            // Update status to 'Rested' if at max health
-            if (avatarHealth >= maxHealth) {
-              avatarStatus = "Rested";
-              // If Solar Warrior, forge photon token
-              if (avatar.character === "Solar Celeste") {
-                photonTokens += 1;
-              }
-            } else if (avatar.status !== "Infected") {
-              avatarStatus = "Recovering";
-            }
-            break;
-          default:
-            break;
-        }
-
-        allPromises.push(
-          Avatar.update(
-            {
-              health: avatarHealth,
-              status: avatarStatus,
-              statusFade: avatarStatusFade,
-              photonTokens,
-            },
-            {
-              where: { owner: avatar.owner },
-              returning: true,
-              raw: true,
-              plain: true,
-            },
-          ),
-        );
-      });
-      return Promise.allSettled(allPromises);
-    })
-    .then(results => {
-      //results.forEach(result => console.log("All Regenerate Results - ", result.status));
-      res.formatter.ok(null, "Successfully ran /regenerate-health");
-    })
-    .catch(error => {
-      console.log("ERROR DOING BULK HEALTH UPDATE", error);
-      res.formatter.serverError(error.toString(), `Error running /regenerate-health`);
+    // UPDATER FOR HEALTH & STATUS HOURLY REGENERATION
+    const heroes: HF.Hero[] = await Avatar.findAll({
+      where: { status: { [Op.or]: ["Infected", "Recovering"] } },
+      raw: true,
+      attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade", "character", "name"],
     });
+
+    console.log("HEROES TO BE UPDATED: ", heroes.map(h => h.name).join());
+
+    // Loop over each avatar and either regen health if recovering or other status effects
+    const updatedHeroes = heroes.map(hero => {
+      const h = { ...parseStats(hero) } as HF.Hero;
+
+      const recoveryRetarder = h.recovery / (h.recovery + RECOVERY_EFFECTIVENESS_MOD);
+      const adjRegenRate = h.recovery - Math.round(h.recovery * recoveryRetarder);
+
+      const passiveAbility = heroList.find((heroInList: HeroChoice) => heroInList.character === h.character).passive;
+
+      // Check avatar status and run appropriate action
+      switch (h.status) {
+        case "Infected":
+          const infectAmount = Math.floor(adjRegenRate / 2);
+          // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
+          if (h.health - infectAmount <= 0) {
+            h.status = "Knocked Out";
+            h.health = 0;
+            h.statusFade = 0;
+            // Otherwise, if no more counters, set to recovering and no break statement - the hero will recover health this round
+          } else if (h.statusFade === 0) {
+            h.status = "Recovering";
+            // If Fade counter is greater than zero AND hero wont be KO from 1 more proc, reduce health of avatar by infect amount and decrement counter. BREAK statement
+          } else {
+            h.health = h.health - infectAmount;
+            --h.statusFade;
+          }
+          break;
+        case "Recovering":
+          // If one tick of health recovery is over maxHealth, just assign maxHealth
+          if (h.health + adjRegenRate > h.maxHealth) {
+            h.health = h.maxHealth;
+            // Otherwise add one tick of health back to avatar's health
+          } else {
+            h.health += passiveAbility.name === "Rampant Regeneration" ? adjRegenRate * 1.33 : adjRegenRate;
+          }
+
+          // Update status to 'Rested' if at max health
+          if (h.health >= h.maxHealth) {
+            h.status = "Rested";
+          }
+
+          break;
+        default:
+          break;
+      }
+
+      return h;
+    });
+
+    // If I upgrade to Seqeulize 5, I could use this instead of many promises
+    // await Avatar.bulkCreate(updatedHeroes, { updateOnDuplicate : [ "health", "status", "statusFade" ] } ),
+    const heroUpdatePromises = updatedHeroes.map((h: HF.Hero) => {
+      return Avatar.update({ health: h.health, status: h.status, statusFade: h.statusFade }, { where: { owner: h.owner } });
+    });
+
+    await Promise.all(heroUpdatePromises);
+
+    // UPDATER JUST IN CASE STATUS FALLS OUT OF SYNC
+    // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
+    await Avatar.update({ status: "Recovering" }, { where: { status: "Rested", health: { [Op.lt]: col("maxHealth") } } });
+
+    console.log("Successfully ran /regenerate-health");
+    res.formatter.ok(null, "Successfully ran /regenerate-health");
+  } catch (error) {
+    console.log("ERROR DOING BULK HEALTH UPDATE", error);
+    res.formatter.serverError(error.toString(), `Error running /regenerate-health`);
+  }
 });
 
 // FORCE A CYCLE OF KO RECOVERY CHECK FOR KOED AVATARS

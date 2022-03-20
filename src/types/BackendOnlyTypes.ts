@@ -299,4 +299,8 @@ interface OutcomeData {
   foeStatus: "Knocked Out" | "Recovering";
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData };
+interface HeroChoice extends HF.HeroChoice {
+  passive: PassiveAbility;
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice };
