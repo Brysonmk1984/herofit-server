@@ -1,17 +1,19 @@
-const { User, UserActivity, UserTotal, Avatar, Items } = require("../../config/db");
-const db = require("../../config/db").db;
-const { Op } = require("sequelize");
-const moment = require("moment");
-const crypto = require("crypto");
-const { parseStats, range } = require("../../lib/helperFunctions");
-const { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL } = require("../CONSTANTS");
-const utCalc = require("../upgrades/utCalc");
-const avCalc = require("../upgrades/avCalc");
-const xpCalc = require("../upgrades/xpCalc");
-const { activityItemFind, insertItemsFromItemFind } = require("./activityItemFind");
-const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("./activityRewards");
-const activityHeal = require("./activityHeal");
-const { sendBackendOnlyEmail } = require("../../mail");
+import { User, UserActivity, UserTotal, Avatar, Items } from "../../config/db";
+import { db } from "../../config/db";
+import { Op, Transaction } from "sequelize";
+import moment from "moment";
+import crypto from "crypto";
+import { parseStats, range } from "../../lib/helperFunctions";
+import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL, THRIFTY_SALVAGE_PERCENT } from "../CONSTANTS";
+import utCalc from "../upgrades/utCalc";
+import avCalc from "../upgrades/avCalc";
+import xpCalc from "../upgrades/xpCalc";
+import { activityItemFind, insertItemsFromItemFind } from "./activityItemFind";
+import { activityStatRewards, activityLevelRewards, determineStatImprovements } from "./activityRewards";
+import activityHeal from "./activityHeal";
+import { sendBackendOnlyEmail } from "../../mail";
+import HF from "../../types/herofit";
+import { BackendUserTotals } from "../../types/BackendOnlyTypes";
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
 function _determineActivityId(id, source) {
@@ -24,9 +26,9 @@ function _determineActivityId(id, source) {
 }
 
 // Need to adjust the date and activityId, and add email in preparation for DB insertion
-function _prepareActivitiesForDb(email, activities) {
+function _prepareActivitiesForDb(email: string, activities: HF.Activity[]): { activityEntries: HF.Activity[]; latestActivityUpdate: string } {
   // Need latest Activity to be added to user's account
-  let latestActivityUpdate;
+  let latestActivityUpdate: string;
   const activityEntries = activities.map(activity => {
     const activityDate = moment.utc(activity.start_date);
     const activityId = _determineActivityId(activity.id, activity.source);
@@ -53,32 +55,28 @@ function _prepareActivitiesForDb(email, activities) {
   return { activityEntries, latestActivityUpdate };
 }
 
-function _dedupActivities(activities, t) {
+async function _dedupActivities(activities: HF.Activity[], t: Transaction) {
   const actIdArray = activities.map(act => act.activityId.toString());
-  return UserActivity.findAll({
-    attributes: ["activityId"],
-    where: { activityId: { [Op.in]: actIdArray } },
-    transaction: t,
-  })
-    .then(duplicateActivities => {
-      const duplicateActivityIds = duplicateActivities.map(act => act.activityId);
-      //console.log('THE activityIds of the duplicate activities', duplicateActivityIds);
 
-      // duplicateActivityIds is an array of activities that are confirmed already in the DB
-      // we want to exclude all 'activities' that match these ids.
-      return activities.filter(act => {
-        // Only return activities that are not in the duplicateActivityId array
-        return !duplicateActivityIds.includes(act.activityId);
-      });
-    })
-    .catch(error => {
-      console.log("ERROR-", error);
-      throw error;
+  try {
+    const duplicateActivities = await UserActivity.findAll({ attributes: ["activityId"], where: { activityId: { [Op.in]: actIdArray } }, transaction: t });
+    const duplicateActivityIds = duplicateActivities.map(act => act.activityId);
+    //console.log('THE activityIds of the duplicate activities', duplicateActivityIds);
+
+    // duplicateActivityIds is an array of activities that are confirmed already in the DB
+    // we want to exclude all 'activities' that match these ids.
+    return activities.filter(act => {
+      // Only return activities that are not in the duplicateActivityId array
+      return !duplicateActivityIds.includes(act.activityId);
     });
+  } catch (error) {
+    console.log("ERROR-", error);
+    throw error;
+  }
 }
 
 // UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
-async function _insertActivityData(email, activities, t) {
+async function _insertActivityData(email: string, activities: HF.Activity[], t: Transaction) {
   // In the future, consider pushing back the latestActivityUpdate determination until after the dedup
   // Prepare activities for DB
   const { activityEntries, latestActivityUpdate } = _prepareActivitiesForDb(email, activities);
@@ -107,7 +105,7 @@ async function _insertActivityData(email, activities, t) {
     }),
   ];
 
-  return Promise.allSettled(allPromises);
+  return Promise.all(allPromises);
 }
 
 // UPDATE USER TOTALS
@@ -177,7 +175,7 @@ function _calcWeightedElms({ air, water, fire, earth }) {
 }
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
-function _calcProgress(avatar, ut) {
+function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
   const avStatSnapshot = parseStats(
     Object.assign(
       {},
@@ -194,12 +192,14 @@ function _calcProgress(avatar, ut) {
       },
     ),
   );
+
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
   const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);
 
   // Updated aXP
   const updatedAXP = calcNewActivityXPFromUt(ut);
+
   const aXPDiff = updatedAXP - avStatSnapshot.activityXP;
 
   const { leveledUp, startingLevel, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
@@ -254,13 +254,15 @@ function _calcProgress(avatar, ut) {
 }
 
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops) {
+function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar: HF.Hero, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
-  console.log(aXPDiff);
+
+  const itemFindStatBoost = updatedAvatar.character === "RePete" ? THRIFTY_SALVAGE_PERCENT : null;
+
+  // ITEMS & PT FOUND DURING ACTIVITIES
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
-  // Items & PT found during activity
-  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, null, null, possibleItemDrops);
+  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, itemFindStatBoost, null, possibleItemDrops);
 
   return {
     foundItems: items,
@@ -313,35 +315,24 @@ function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInf
 }
 
 // ROOT FUNCTION FOR UPGRADING HERO
-function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
+function upgradeProcess(email: string, activities: HF.Activity[], accountDate: string, hasBeenUpgraded: boolean) {
   return db.transaction(async t => {
     try {
       // Before inserting activities, do separate db check to remove duplicates
       // This is needed since Sequelize's 'ignoreDuplicates' sucks and doesn't behave as expected
-      const activityPromiseResults = await _insertActivityData(email, activities, t);
-      const promiseStatuses = [activityPromiseResults[0].status, activityPromiseResults[1].status, activityPromiseResults[2].status];
-      //console.log('PS=', activityPromiseResults[1]);
+      let [_, userActivities, userTotals] = await _insertActivityData(email, activities, t);
 
-      if (promiseStatuses.includes("rejected")) {
-        const activityInsertionError = new Error("Activity Insertion Failed");
-        sendBackendOnlyEmail({
-          message: `USER = ${email} failed an upgrade`,
-          error: activityInsertionError,
-        });
-        throw activityInsertionError;
-      }
+      userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, userActivities, accountDate, userTotals, t);
 
-      const updatedActivities = activityPromiseResults[1].value.map(actResult => {
-        return {
-          type: actResult.type,
-          duration: actResult.duration,
-        };
-      });
-      let userTotals = activityPromiseResults[2].value;
-
-      userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t);
-      const [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
-
+      let [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
+      possibleItemDrops = possibleItemDrops.map(i => ({
+        name: i.name,
+        dropRate: +i.dropRate,
+        levelRestriction: i.levelRestriction,
+        activityRestriction: i.activityRestriction,
+        disabled: i.disabled,
+      }));
+      //console.log('PSA', possibleItemDrops);
       // Determine all progress made with XP, levels, etc.
       let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
       // Shouldn't happen but throw error if negative xp from activity
@@ -386,9 +377,10 @@ function upgradeProcess(email, activities, accountDate, hasBeenUpgraded) {
       };
     } catch (error) {
       console.log("ERROR UPGRADING HERO", error);
+      sendBackendOnlyEmail(`USER = ${email} failed an upgrade`, error);
       throw error;
     }
   });
 }
 
-module.exports = upgradeProcess;
+export default upgradeProcess;

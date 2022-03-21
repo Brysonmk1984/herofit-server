@@ -1,14 +1,17 @@
-const { Items, AvatarItems } = require("../../config/db");
-const { Op } = require("sequelize");
-const chance = require("chance")();
-const { specialEvent } = require("../../appConfig").config;
-const { roundNumber, cloneObj } = require("../../lib/helperFunctions");
-const { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } = require("../CONSTANTS");
-const preventDuplicateItems = require("../items/preventDuplicateItems");
-const { sendBackendOnlyEmail } = require("../../mail");
+import { Items, AvatarItems } from "../../config/db";
+import { Op } from "sequelize";
+import { roundNumber } from "../../lib/helperFunctions";
+import { PTFIND_BASE_DROP_RATE, PTFIND_BASE_AMOUNT, PTFIND_EFFECTIVENESS_MOD } from "../CONSTANTS";
+import preventDuplicateItems from "../items/preventDuplicateItems";
+import { sendBackendOnlyEmail } from "../../mail";
+import Chance from "chance";
+import { config } from "../../appConfig";
+
+const chance = Chance();
+const { specialEvent } = config;
 
 //ptFindStatBoost
-function _calcPtBoost(ptFind) {
+function _calcPtBoost(ptFind: number) {
   if (!ptFind) {
     return {
       ptDropRate: PTFIND_BASE_DROP_RATE,
@@ -102,27 +105,30 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
         if (matchingItem) {
           //console.log('MATCH = ', item.name,item.dropRate, eventBonusObj.bonusPercent, (item.dropRate *(eventBonusObj.bonusPercent)));
           // adjust item find chance of this item by the percent bonus
-          item.dropRate += item.dropRate * eventBonusObj.bonusPercent;
+          item.dropRate += parseInt(item.dropRate * eventBonusObj.bonusPercent);
           //console.log('IC=',item.dropRate);
         }
       });
-
       // Item Find - the stat bonus modifier
       // itemFindStatBoost is a percent (not decimal)
       if (itemFindStatBoost) {
-        item.dropRate += item.dropRate * (itemFindStatBoost * 0.01);
+        //console.log('has boost = ', itemFindStatBoost, `previous= ${item.dropRate}`, `total ; ${ item.dropRate + ((itemFindStatBoost * 0.01) * item.dropRate)}`);
+        // .09% drop rate = .1197
+        // 6.5% drop rate = 8.645
+        item.dropRate += itemFindStatBoost * 0.01 * parseInt(item.dropRate);
       }
 
       // Further modify drop chance by activity ELM resitriction
       // Should take into account 2 things for drop chance: weightedElms (if activity restricted) & item.dropRate
-      if (item.activityRestriction && item.activityRestriction.length) {
+      if (item.activityRestriction?.length) {
         // ACTIVITY RESTRICTED, INSERT ITEM BASED ON ITEM CHANCE * WEIGHT OF WORKOUT WITHIN ACTIVITY ELM TYPE
         let chanceToFind = 0;
         // an array of elms that the hero could possibly find items from
         item.activityRestriction.forEach(elm => {
           // Total the possible chance from each element multiplied by item chance
-          chanceToFind += weightedElms[elm] * 0.01 * item.dropRate;
+          chanceToFind += roundNumber(weightedElms[elm] * 0.01 * item.dropRate, 3);
         });
+
         //console.log('ACT RESTRICTED ', item.name, roundNumber(chanceToFind, 4));
         generalItemTuple[1].push(roundNumber(chanceToFind, 4));
       } else {
@@ -233,10 +239,4 @@ function insertItemsFromItemFind(avatarID, itemsToInsert, t) {
 }
 
 // private functions exported for tests
-module.exports = {
-  _callXTimes,
-  _itemFind,
-  _chancePTFind,
-  activityItemFind,
-  insertItemsFromItemFind,
-};
+export { _callXTimes, _itemFind, _chancePTFind, activityItemFind, insertItemsFromItemFind };

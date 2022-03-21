@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["Afterburn", "ALLPBAs", "camo", "Clast", "crossfit", "DEFEATEDFOE", "GOTOBATTLE", "Grabbler", "helloween", "herofit", "Matchups", "Plaguebringer", "Plagueling", "postbattle", "prebattle", "Procs", "PTFIND", "randomizer", "Recaptcha", "Regen", "Retrocausal", "Seqeulize", "strava", "typeguards", "WINSTREAK", "WINTOTAL"],
+  "cSpell.words": ["Afterburn", "ALLPBAs", "camo", "Clast", "crossfit", "dedup", "deduped", "DEFEATEDFOE", "GOTOBATTLE", "Grabbler", "helloween", "herofit", "Matchups", "Plaguebringer", "Plagueling", "postbattle", "prebattle", "Procs", "PTFIND", "randomizer", "Recaptcha", "Regen", "Retrocausal", "Seqeulize", "strava", "typeguards", "WINSTREAK", "WINTOTAL"],
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

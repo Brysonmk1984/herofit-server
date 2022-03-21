@@ -1,23 +1,26 @@
-const express = require("express");
-const router = express.Router();
-const db = require("../config/db").db;
-const { body, validationResult } = require("express-validator");
-const { authenticateJWT } = require("../jwt/validateJWT");
-const { Avatar, AvatarItems, User, UserTotal } = require("../config/db");
+import express, { Request, Response } from "express";
+import { db } from "../config/db";
+import { body, validationResult } from "express-validator";
+import { authenticateJWT } from "../jwt/validateJWT";
+import { Avatar, AvatarItems, User, UserTotal } from "../config/db";
+import { literal, Op, Transaction } from "sequelize";
+import { parseStats, paginate, range } from "../lib/helperFunctions";
+import xpCalc from "../game/upgrades/xpCalc";
+import { activityStatRewards } from "../game/activities/activityRewards";
+import { sendBackendOnlyEmail } from "../mail";
+import heroList from "../heroList.json";
+import upgradeProcess from "../game/activities/upgradeProcess";
+import { config } from "../appConfig";
+import { TypedRequestBody } from "../types/BackendOnlyTypes";
+import HF from "../types/herofit";
 
-const { literal, Op } = require("sequelize");
-const { parseStats, paginate, range } = require("../lib/helperFunctions");
-const xpCalc = require("../game/upgrades/xpCalc");
-const { activityStatRewards, activityLevelRewards, determineStatImprovements } = require("../game/activities/activityRewards");
-const { sendBackendOnlyEmail } = require("../mail");
-const RANKING_FILTER_ACTIVITIES = ["ride", "weightTraining", "hike", "yoga", "walk", "rowing", "stairStepper", "elliptical", "swim", "crossfit", "run", "kayaking"];
-const heroList = require("../heroList.json");
-const upgradeProcess = require("../game/activities/upgradeProcess");
+const { specialEvent } = config;
+const router = express.Router();
 const AVATAR_COUNT_PER_PAGE = 20;
-const { specialEvent } = require("../appConfig").config;
+const RANKING_FILTER_ACTIVITIES = ["ride", "weightTraining", "hike", "yoga", "walk", "rowing", "stairStepper", "elliptical", "swim", "crossfit", "run", "kayaking"];
 
 // App signup award item
-async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null) {
+async function appSignupAward(avatarID: number, itemID: number, checkForDuplicate: boolean, t: Transaction = null) {
   const item = { avatarID, itemID };
   try {
     if (checkForDuplicate) {
@@ -29,7 +32,8 @@ async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null) {
         return;
       }
     }
-    const result = await AvatarItems.create(item, t ? { transaction: t } : null);
+
+    await AvatarItems.create(item, t ? { transaction: t } : null);
     return "Received the Snowshoe Hare pet as a reward for signing up!";
   } catch (error) {
     sendBackendOnlyEmail("Couldn't perform signupAward!", error.toString());
@@ -38,7 +42,7 @@ async function appSignupAward(avatarID, itemID, checkForDuplicate, t = null) {
 }
 
 // Create Avatar in DB after Signup
-router.post("/insert-avatar", body("avatar").isObject(), body("userId").isNumeric(), body("email").isEmail(), authenticateJWT, async (req, res) => {
+router.post("/insert-avatar", body("avatar").isObject(), body("userId").isNumeric(), body("email").isEmail(), authenticateJWT, async (req: TypedRequestBody<{}>, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.formatter.badRequest(errors.array(), "Validation Error - for POST /insert-avatar Endpoint");
@@ -157,45 +161,50 @@ router.post("/update-avatar-stats", body("avatar").isObject(), body("email").isE
     });
 });
 
+interface UpgradeSequenceRequestBody {
+  email: string;
+  activities: HF.Activity[];
+  accountDate: string;
+  hasBeenUpgraded: boolean;
+}
+
 // When a user applies their latest Strava activities, adjust avatar
 router.post(
   "/upgrade-sequence",
   body("email").isEmail(),
   body("activities").isArray(),
-  body("activities").custom(activities => {
+  body("activities").custom((activities: HF.Activity[]) => {
     const invalidActivities = activities.find(act => !act.id && act.source === "strava");
-    // In case the activities are invalid... this should eventually be moved to the validation middleware.
-    return invalidActivities ? res.formatter.serverError(error.toString(), `Error updating latest activity to user table for user  ${email} - POST /upgrade-sequence Endpoint, One or more activities are invalid: ACT - ${invalidActivities}`) : true;
+    if (invalidActivities) {
+      throw new Error("Error updating latest activity to user table for user");
+    }
+    return true;
   }),
   body("accountDate").isString(),
   body("hasBeenUpgraded").isBoolean(),
   authenticateJWT,
-  (req, res) => {
+  async (req: TypedRequestBody<UpgradeSequenceRequestBody>, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.formatter.badRequest(errors.array(), "Validation Error - for POST /upgrade-sequence Endpoint");
     }
 
     const { email, activities, accountDate, hasBeenUpgraded } = req.body;
-    //console.log('HEREREERRERER', email, activities, accountDate, hasBeenUpgraded);
 
-    // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
-    upgradeProcess(email, activities, accountDate, hasBeenUpgraded)
-      .then(returnPackage => {
-        //console.log('return package!', returnPackage.activities);
-        // Transaction has been committed
-        // result is whatever the result of the promise chain returned to the transaction callback
-        return res.formatter.ok(returnPackage);
-      })
-      .catch(error => {
-        const errorString = error.toString();
-        // Transaction has been rolled back
-        console.log("INSIDE transaction", errorString);
-        if (errorString === "Error: Duplicate Activity Entry, couldn't update Hero!") {
-          return res.formatter.badRequest(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
-        }
-        return res.formatter.serverError(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
-      });
+    try {
+      // Runs entire upgrade sequence, returns { activities, avatar, improvements, reachedLevel, qpEarned, xpGain, items, rewards }
+      const returnPackage = await upgradeProcess(email, activities, accountDate, hasBeenUpgraded);
+
+      //console.log('return package!', returnPackage.activities);
+      res.formatter.ok(returnPackage);
+    } catch (error) {
+      const errorString = error.toString();
+      console.log("ERROR: ", errorString);
+      if (errorString === "Error: Duplicate Activity Entry, couldn't update Hero!") {
+        return res.formatter.badRequest(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
+      }
+      return res.formatter.serverError(errorString, `Transaction error for ${email} for POST /upgrade-sequence Endpoint`);
+    }
   },
 );
 
@@ -534,37 +543,4 @@ router.post("/fetch-avatars-by-page-and-ranking-type-battle", body("rankingType"
     });
 });
 
-/*
-  MIGRATION
-*/
-
-// Write code to reset all avatars that hasResetStats = false
-// router.get('/reset-migration', (req, res) => {
-//   Avatar.findAll({where:{ hasResetStats : false }, raw : true})
-//   .then((results)=> {
-//     const allPromises = [];
-//     for(let i = 0; i< results.length; i++){
-//       allPromises.push(itemEffects([{ name : 'Reset Hero' }], results[i].id, results[i].owner ));
-//     }
-//     return Promise.allSettled(allPromises);
-//   }).then((results) =>{
-//     AvatarItems.destroy({ where : { itemID : 31 } })
-//   }).then(() =>{
-//     res.formatter.ok('Success!');
-//   }).catch((error) =>{
-//     res.formatter.serverError(error.toString());
-//   });
-// });
-
-// router.get('/test-item-check', async (req, res) => {
-//   try{
-//     const result = specialEvent && specialEvent.eventName === "App Welcome" && await appSignupAward(288, specialEvent.actionTypes[0].itemID, true);
-//     console.log(result);
-//     res.formatter.ok(result);
-//   }catch(error){
-//     console.log(error);
-//     res.formatter.serverError(error.toString());
-//   }
-// });
-
-module.exports = router;
+export default router;
