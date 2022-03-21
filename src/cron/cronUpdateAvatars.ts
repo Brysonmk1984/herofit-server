@@ -13,10 +13,10 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
 (async () => {
   try {
-    // UPDATER FOR SOLAR WARRIOR TRAIT ONLY
+    // 1. UPDATER FOR SOLAR WARRIOR TRAIT ONLY
     await Avatar.update({ photonTokens: literal(`"photonTokens" + ${chance.bool({ likelihood: 50 }) ? 2 : 1}`) }, { where: { character: "Solar Celeste", health: { [Op.eq]: col("maxHealth") } } });
 
-    // UPDATER FOR HEALTH & STATUS HOURLY REGENERATION
+    // 2. UPDATER FOR HEALTH & STATUS HOURLY REGENERATION
     const heroes: HF.Hero[] = await Avatar.findAll({
       where: { status: { [Op.or]: ["Infected", "Recovering"] } },
       raw: true,
@@ -82,8 +82,8 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
 
     await Promise.all(heroUpdatePromises);
 
-    // UPDATER JUST IN CASE STATUS FALLS OUT OF SYNC
-    // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
+    // 3. UPDATER JUST IN CASE STATUS FALLS OUT OF SYNC
+    // Shouldn't ever have any results, but there was a bug in the past where status would somehow be Rested but their health was below max.
     await Avatar.update({ status: "Recovering" }, { where: { status: "Rested", health: { [Op.lt]: col("maxHealth") } } });
   } catch (error) {
     console.log("ERROR DOING BULK HEALTH UPDATE", error);
@@ -92,96 +92,3 @@ console.log("*** RUNNING CRON HEALTH UPDATE AVATARS ***");
     process.exit();
   }
 })();
-
-// (async () => {
-//   try {
-//     // Update all heroes who aren't at full health and aren't Knocked Out
-//     const results: HF.Hero[] = await Avatar.findAll({ where: { status: { [Op.or]: ["Infected", "Recovering", "Rested"] } }, raw: true, attributes: ["health", "maxHealth", "recovery", "status", "owner", "statusFade", "character", "photonTokens"] });
-//     const allPromises: Promise<any>[] = [];
-
-//     // Loop over each hero and either regen health if recovering or other status effects
-//     results.forEach((hero: HF.Hero) => {
-//       hero = parseStats(hero);
-//       let heroHealth = hero.health;
-//       const maxHealth = hero.maxHealth;
-//       const recovery = hero.recovery;
-//       const recoveryRetarder = recovery / (recovery + RECOVERY_EFFECTIVENESS_MOD);
-//       const adjRegenRate = recovery - Math.round(recovery * recoveryRetarder);
-//       let heroStatus = hero.status;
-//       let heroStatusFade = hero.statusFade;
-//       let photonTokens = hero.photonTokens;
-//       const passiveAbility = heroList.find(h => h.character === hero.character).passive;
-//       //console.log('PA=',passiveAbility);
-//       // Check hero status and run appropriate action
-//       switch (heroStatus) {
-//         case "Infected":
-//           const infectAmount = Math.floor(adjRegenRate / 2);
-//           // First check if this infect proc will KO hero, if so set him to KOed and health to zero. BREAK so he doesn't regain health
-//           if (heroHealth - infectAmount <= 0) {
-//             heroStatus = "Knocked Out";
-//             heroHealth = 0;
-//             heroStatusFade = 0;
-//             break;
-//             // Otherwise, if no more counters, set to recovering and no break statement - the hero will recover health this round
-//           } else if (heroStatusFade === 0) {
-//             heroStatus = "Recovering";
-
-//             // If Fade counter is greater than zero AND hero wont be KO from 1 more proc, reduce health of hero by infect amount and decrement counter. BREAK statement
-//           } else {
-//             heroHealth = heroHealth - infectAmount;
-//             --heroStatusFade;
-//             break;
-//           }
-//         case "Recovering":
-//         // Shouldn't happen, but there's a bug where sometimes heroes are rested too early
-//         case "Rested":
-//           // If one tick of health recovery is over maxHealth, just assign maxHealth
-//           if (heroHealth + adjRegenRate > maxHealth) {
-//             heroHealth = maxHealth;
-//             // Otherwise add one tick of health back to hero's health
-//           } else {
-//             heroHealth += passiveAbility.name === "Rampant Regeneration" ? adjRegenRate * 1.33 : adjRegenRate;
-//           }
-//           // Update status to 'Rested' if at max health
-//           if (heroHealth >= maxHealth) {
-//             heroStatus = "Rested";
-//             // If Solar Warrior, forge photon token
-//             if (hero.character === "Solar Celeste") {
-//               photonTokens += 1;
-//             }
-//           } else if (hero.status !== "Infected") {
-//             heroStatus = "Recovering";
-//           }
-
-//           break;
-//         default:
-//           break;
-//       }
-
-//       allPromises.push(
-//         Avatar.update(
-//           {
-//             health: heroHealth,
-//             status: heroStatus,
-//             statusFade: heroStatusFade,
-//             photonTokens,
-//           },
-//           {
-//             where: { owner: hero.owner },
-//             returning: true,
-//             raw: true,
-//             plain: true,
-//           },
-//         ),
-//       );
-//     });
-
-//     await Promise.allSettled(allPromises);
-//     process.exit();
-//   } catch (error) {
-//     console.log("ERROR DOING BULK HEALTH UPDATE", error);
-
-//     await sendCronErrorEmail(error, "Error running Cron Update Avatar Script");
-//     process.exit();
-//   }
-// })();
