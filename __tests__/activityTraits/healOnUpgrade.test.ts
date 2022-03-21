@@ -1,4 +1,4 @@
-import activityHeal from "../../src/game/activities/activityHeal";
+import { activityHeal } from "../../src/game/activities/activityHeal";
 
 describe("Healing based on different Stats", () => {
   it("Should Heal 180 health up to 480", () => {

@@ -4,13 +4,13 @@ import { Op, Transaction } from "sequelize";
 import moment from "moment";
 import crypto from "crypto";
 import { parseStats, range } from "../../lib/helperFunctions";
-import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL, THRIFTY_SALVAGE_PERCENT } from "../CONSTANTS";
+import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL, THRIFTY_SALVAGE_PERCENT, WILDLY_RESOURCEFUL_PT_PERCENT, WILDLY_RESOURCEFUL_HEAL_PERCENT } from "../CONSTANTS";
 import utCalc from "../upgrades/utCalc";
 import avCalc from "../upgrades/avCalc";
 import xpCalc from "../upgrades/xpCalc";
 import { activityItemFind, insertItemsFromItemFind } from "./activityItemFind";
 import { activityStatRewards, activityLevelRewards, determineStatImprovements } from "./activityRewards";
-import activityHeal from "./activityHeal";
+import { activityHeal } from "./activityHeal";
 import { sendBackendOnlyEmail } from "../../mail";
 import HF from "../../types/herofit";
 import { BackendUserTotals } from "../../types/BackendOnlyTypes";
@@ -200,7 +200,7 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
   // Updated aXP
   const updatedAXP = calcNewActivityXPFromUt(ut);
 
-  const aXPDiff = updatedAXP - avStatSnapshot.activityXP;
+  let aXPDiff = updatedAXP - avStatSnapshot.activityXP;
 
   const { leveledUp, startingLevel, endingLevel, qpEarned } = checkLevelUp(aXPDiff);
   const lvlUp = leveledUp;
@@ -230,8 +230,14 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
     },
     avatar.createdAt,
   );
+
   // For users with Aether, heal a portion of health based on activity time and aether
   updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
+
+  // For users with Aether, heal a portion of health based on activity time and aether
+  if (avatar.character === "Wilhelm the Wild") {
+    updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, WILDLY_RESOURCEFUL_HEAL_PERCENT, aXPDiff);
+  }
 
   return {
     avStatSnapshot,
@@ -257,12 +263,14 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
 function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar: HF.Hero, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
 
+  // Bonuses for Hero Passives
   const itemFindStatBoost = updatedAvatar.character === "RePete" ? THRIFTY_SALVAGE_PERCENT : null;
+  const ptFindStatBoost = updatedAvatar.character === "Wilhelm the Wild" ? WILDLY_RESOURCEFUL_PT_PERCENT : null;
 
   // ITEMS & PT FOUND DURING ACTIVITIES
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
-  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, itemFindStatBoost, null, possibleItemDrops);
+  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
 
   return {
     foundItems: items,

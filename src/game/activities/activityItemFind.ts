@@ -63,7 +63,7 @@ function _chanceItemFind(itemTuples, remainderPercent) {
 }
 
 // chance over an hour to find Photon Tokens within a range of values
-function _chancePTFind(remainderPercent = null, ptDropRate, ptDropAmount) {
+function _chancePTFind(remainderPercent: number = null, ptDropRate: number, ptDropAmount: number): number | null {
   const percentChance = remainderPercent ? remainderPercent * 0.01 * (ptDropRate * 0.01) * 100 : ptDropRate;
 
   //console.log('IN PTFIND=', remainderPercent, 'PERCENT CHANCE', percentChance);
@@ -143,6 +143,7 @@ function _itemFind(level, remainderPercent, weightedElms, itemFindStatBoost, ptF
 
   // Figures out the heroes adjusted pt drop rate and amount based on their ptFind stat
   const { ptDropRate, ptDropAmount } = _calcPtBoost(ptFindStatBoost);
+
   const ptFind = _chancePTFind(remainderPercent, ptDropRate, ptDropAmount);
 
   return {
@@ -182,7 +183,7 @@ function _callXTimes(func, integer, remainderPercent, level, weightedElms, itemF
   };
 }
 
-function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops, t) {
+function activityItemFind(xpGain, level, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops) {
   const activityItemSessions = xpGain / 60;
   const integer = Math.floor(activityItemSessions);
   const remainder = activityItemSessions % 1;
