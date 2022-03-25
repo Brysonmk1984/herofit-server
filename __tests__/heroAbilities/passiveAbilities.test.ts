@@ -47,11 +47,11 @@ describe("Passive Hero Abilities", () => {
     const heroesOfType = avatarProfiles.filter(a => a.character === "Empath Aurelia");
     const heroTemplate = heroesOfType[Math.floor(Math.random() * heroesOfType.length)];
 
-    it('Should be added to eProcs(effectProcs) - "Healing Waters"', () => {
-      const passiveAbility = { name: "Healing Waters", type: "prebattle" } as PassiveAbility;
+    it('Should be added to eProcs(effectProcs) - "Cleansing Waters"', () => {
+      const passiveAbility = { name: "Cleansing Waters", type: "prebattle" } as PassiveAbility;
       const { avatar, pAbilityProcs, eProcs } = doHeroPassiveAbilities(heroTemplate as unknown as BattleHero, [], [], passiveAbility);
 
-      expect(eProcs).toEqual(expect.arrayContaining([{ effect: "Healing Waters", heroStatsEffected: ["water"], type: "prebattle" }]));
+      expect(eProcs).toEqual(expect.arrayContaining([{ effect: "Cleansing Waters", heroStatsEffected: ["water"], type: "prebattle" }]));
       expect(avatar.water).toBe(heroTemplate.water + Math.floor(heroTemplate.health / 6));
     });
   });

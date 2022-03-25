@@ -418,7 +418,7 @@ function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string
       case "Naturally Stealthy":
         pAbilityProcs.push("Naturally Stealthy");
         break;
-      case "Healing Waters":
+      case "Cleansing Waters":
         // Adjust Hero's water amount based on their health
         const healingWatersBonus = Math.floor(avatar.health / 6);
         const newWaterAmount = avatar.water + healingWatersBonus;
@@ -426,7 +426,7 @@ function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string
 
         // Add to eProcs(effectProcs) array since it always procs
         eProcs.push({
-          effect: "Healing Waters",
+          effect: "Cleansing Waters",
           heroStatsEffected: ["water"],
           type: "prebattle",
         });

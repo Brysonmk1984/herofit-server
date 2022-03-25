@@ -332,6 +332,11 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
 
       userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, userActivities, accountDate, userTotals, t);
 
+      /*
+        COMING SOON:
+        FOR ELEMENT TRANSMUTATION, NEED TO EITHER FETCH EQUIPPED PET OR PASS IT IN FROM THE FRONT END
+      */
+
       let [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
       possibleItemDrops = possibleItemDrops.map(i => ({
         name: i.name,

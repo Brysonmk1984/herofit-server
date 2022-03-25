@@ -75,7 +75,7 @@
     "skills": ["Intuitive Teamwork", "Toroidal Force Field", "Reflect Inner Demons", "Hold the Space", "Funnel of Forgiveness"],
     "ultimate": "Gift of Divine Love",
     "passive": {
-      "name": "Healing Waters",
+      "name": "Cleansing Waters",
       "type": "prebattle"
     },
     "colors": ["#7D0110", "#F9F18E"],

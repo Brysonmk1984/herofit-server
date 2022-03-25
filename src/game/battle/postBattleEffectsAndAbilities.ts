@@ -209,7 +209,7 @@ function postBattleAbilities(a: Partial<HF.Hero>, f: BattleFoe, outcomeData: Out
       break;
     case "Rewrite History":
       if (outcomeData.outcome === "Foe Wins") {
-        const abilityWorked = chance.bool({ likelihood: 33 });
+        const abilityWorked = chance.bool({ likelihood: 100 });
         if (abilityWorked) {
           outcomeStatus = "Draw";
           avatar = Object.assign({}, a, {
