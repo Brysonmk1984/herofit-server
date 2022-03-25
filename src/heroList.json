@@ -152,7 +152,7 @@
     "passive": {
       "name": "Thrifty Salvage",
       "type": "activity upgrade",
-      "description": "Bonus chance to Find Items during a physical activity",
+      "description": "25% Bonus chance to Find Items during a physical activity",
       "icon": "fedora"
     },
     "colors": ["#9B9B9B", "#232323"],
@@ -221,7 +221,7 @@
     "passive": {
       "name": "Wildly Resourceful",
       "type": "activity upgrade",
-      "description": "Bonus photon tokens (in-game currency) and health recovery from activities",
+      "description": "20% Bonus photon tokens (in-game currency) and health recovery from activities",
       "icon": "love-howl"
     },
     "colors": ["#533B27", "#272920"],
