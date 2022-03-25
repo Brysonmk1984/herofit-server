@@ -13,7 +13,9 @@
     "ultimate": "Timeline Shift",
     "passive": {
       "name": "Rewrite History",
-      "type": "postbattle"
+      "type": "postbattle",
+      "description": "Chance to turn a loss into a draw and revive to 1 health, or turn a draw/DKO into a win",
+      "icon": "gift-of-knowledge"
     },
     "colors": ["#4B4B4B", "#E25926"],
     "image": "../../../assets/images/heroes/chrono_guy/chrono_guy.webp",
@@ -34,7 +36,9 @@
     "ultimate": "Purge, Plant & Propagate",
     "passive": {
       "name": "Olfactory Overload",
-      "type": "battle"
+      "type": "battle",
+      "description": "Bonus damage dealt every round as a percentage of attacker's physical damage dealt",
+      "icon": "gluttony"
     },
     "colors": ["#796D20", "#E0E393"],
     "image": "../../../assets/images/heroes/compost_creature/compost_creature.webp",
@@ -55,7 +59,9 @@
     "ultimate": "Reverse Osmosis Psychosis",
     "passive": {
       "name": "Auxiliary Systems",
-      "type": "postbattle"
+      "type": "postbattle",
+      "description": "Moderate Chance to revive immediately after defeat to 50%, or small chance to recover to 75% from win or draw",
+      "icon": "artificial-intelligence"
     },
     "colors": ["#EBEBEB", "#FF0000"],
     "image": "../../../assets/images/heroes/filtron_five/filtron_five.webp",
@@ -76,7 +82,9 @@
     "ultimate": "Gift of Divine Love",
     "passive": {
       "name": "Cleansing Waters",
-      "type": "prebattle"
+      "type": "prebattle",
+      "description": "Bonus water points equal to 60% of max health",
+      "icon": "at-sea"
     },
     "colors": ["#7D0110", "#F9F18E"],
     "image": "../../../assets/images/heroes/the_empath/the_empath.webp",
@@ -97,7 +105,9 @@
     "ultimate": "The Aggro Crag",
     "passive": {
       "name": "Corundum-Clast Armor",
-      "type": "battle"
+      "type": "battle",
+      "description": "Effectiveness of armor is increased by 40%",
+      "icon": "shoulder-scales"
     },
     "colors": ["#986634", "#110B05"],
     "image": "../../../assets/images/heroes/boulder_bro/boulder_bro.webp",
@@ -118,7 +128,9 @@
     "ultimate": "Fermentation Frenzy",
     "passive": {
       "name": "Naturally Stealthy",
-      "type": "prebattle"
+      "type": "prebattle",
+      "description": "15% bonus chance to attack unprepared foe (big advantage in battles)",
+      "icon": "ninja-heroic-stance"
     },
     "colors": ["#0C2613", "#93C64B"],
     "image": "../../../assets/images/heroes/natural_ninja/natural_ninja.webp",
@@ -139,7 +151,9 @@
     "ultimate": "Mini RePete Multiplicity",
     "passive": {
       "name": "Thrifty Salvage",
-      "type": "activity upgrade"
+      "type": "activity upgrade",
+      "description": "Bonus chance to Find Items during a physical activity",
+      "icon": "fedora"
     },
     "colors": ["#9B9B9B", "#232323"],
     "image": "../../../assets/images/heroes/repete/repete.webp",
@@ -160,7 +174,9 @@
     "ultimate": "Purify by Chlorophyll",
     "passive": {
       "name": "Rampant Regeneration",
-      "type": "hourly"
+      "type": "hourly",
+      "description": "33% bonus hourly health regeneration",
+      "icon": "coiling-curl"
     },
     "colors": ["#3D2A18", "#E8F1E3"],
     "image": "../../../assets/images/heroes/timber_terror/timber_terror.webp",
@@ -181,7 +197,9 @@
     "ultimate": "Avatar of the Sun",
     "passive": {
       "name": "Photon Forge",
-      "type": "hourly"
+      "type": "hourly",
+      "description": "Passively gain 1 - 2 photon tokens (in-game currency) every hour when at full health",
+      "icon": "sunrise"
     },
     "colors": ["#EBDD49", "#000000"],
     "image": "../../../assets/images/heroes/solar_celeste/solar_celeste.webp",
@@ -202,7 +220,9 @@
     "ultimate": "Every Beast Stampede",
     "passive": {
       "name": "Wildly Resourceful",
-      "type": "activity upgrade"
+      "type": "activity upgrade",
+      "description": "Bonus photon tokens (in-game currency) and health recovery from activities",
+      "icon": "love-howl"
     },
     "colors": ["#533B27", "#272920"],
     "image": "../../../assets/images/heroes/wilhelm_the_wild/wilhelm_the_wild.webp",

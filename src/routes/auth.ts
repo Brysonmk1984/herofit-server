@@ -427,6 +427,7 @@ router.get("/hero-list", (req: Request, res: Response) => {
       image: heroData.image,
       elms: heroData.elms,
       colors: heroData.colors,
+      passive: heroData.passive,
     };
   });
   res.formatter.ok(heroListForApp);
