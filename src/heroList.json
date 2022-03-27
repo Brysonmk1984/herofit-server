@@ -175,7 +175,7 @@
     "passive": {
       "name": "Rampant Regeneration",
       "type": "hourly",
-      "description": "33% bonus hourly health regeneration",
+      "description": "33% bonus health regeneration & chance to revive early from KO status",
       "icon": "coiling-curl"
     },
     "colors": ["#3D2A18", "#E8F1E3"],

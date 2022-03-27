@@ -117,7 +117,7 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
   return Avatar.findAll({
     where: { status: "Knocked Out" },
     raw: true,
-    attributes: ["health", "recovery", "status", "owner"],
+    attributes: ["character","health", "recovery", "status", "owner"],
   })
     .then(results => {
       console.log("all KO results", results);
@@ -126,18 +126,19 @@ router.get("/try-recovery", authenticateAdminJWT, (req, res) => {
       if (results.length) {
         // Loop over each Recovering Avatar and add up to default regen + avatar's regen to health
         results.forEach((result, i) => {
-          const avatar = parseStats(result);
-
-          const recovery = avatar.recovery;
-          const recoverEarlyChance = (recovery / (recovery + RECOVER_EARLY_MOD)) * 100;
+          const h = parseStats(result);
+          const passiveAbility = (heroList as HeroChoice[]).find((heroInList: HeroChoice) => heroInList.character === h.character)?.passive;
+          const recovery = h.recovery;
+          const recoverEarlyMod = passiveAbility.name === "Rampant Regeneration" ? RECOVER_EARLY_MOD * .666 : RECOVER_EARLY_MOD;
+          const recoverEarlyChance = (recovery / (recovery + recoverEarlyMod)) * 100;
           const recoveredEarly = chance.bool({
             likelihood: recoverEarlyChance,
           });
           //console.log('REC - ', recovery, 'REC EARLY CHANCE - ', recoverEarlyChance, recoveredEarly);
           // Revive avatar to the REVIVE_AMOUNT in constants.ts
           if (recoveredEarly) {
-            console.log("Recovering!", avatar.owner);
-            return recoveredAvatars.push(avatar.owner);
+            console.log("Recovering!", h.owner);
+            return recoveredAvatars.push(h.owner);
           }
           return null;
         });
