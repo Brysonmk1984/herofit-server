@@ -46,5 +46,8 @@
     "titleBar.inactiveForeground": "#e7e7e799"
   },
   "peacock.color": "#215732",
-  "workbench.settings.openDefaultSettings": true
+  "workbench.settings.openDefaultSettings": true,
+  "terminal.integrated.shell.linux": "/bin/zsh",
+  "terminal.integrated.shell.osx": "/bin/zsh",
+  "terminal.integrated.defaultProfile.osx": "zsh"
 }

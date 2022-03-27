@@ -83,7 +83,7 @@
     "passive": {
       "name": "Cleansing Waters",
       "type": "prebattle",
-      "description": "Bonus water points equal to 60% of max health",
+      "description": "Bonus water points equal to about 16% of max health",
       "icon": "at-sea"
     },
     "colors": ["#7D0110", "#F9F18E"],
