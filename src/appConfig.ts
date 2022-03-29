@@ -15,10 +15,10 @@ const config: Config = {
   mode: appState[0],
   specialEvent: appWelcome,
   disableErrorEmailReporting: false,
-  // globalMessage: [
-  //   { type: "info", persist: false, message: "HeroFit needs reviews, especially on iOS. Click here to leave one in the app store.", link: "https://apps.apple.com/app/id1592847717" },
-  //   //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }
-  // ],
+  globalMessage: [
+    { type: "info", persist: false, message: "Unique hero passive abilities are now live, click here to find out more.", link: "https://www.reddit.com/r/herofit/comments/to4fsf/great_news_herofit_fam/" },
+    //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }
+  ],
 };
 
 export { config };
