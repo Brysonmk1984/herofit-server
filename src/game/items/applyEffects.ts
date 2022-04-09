@@ -104,6 +104,18 @@ async function setToHalfHealth(avatarID: number): Promise<HF.Hero> {
   }
 }
 
+// Smelling Salts
+async function reviveToOneHealth(avatarID: number): Promise<HF.Hero> {
+  try {
+    const data = await Avatar.update({ health: 1, status: "Recovering" }, { where: { id: avatarID }, returning: true });
+    //RETURN UPDATED AVATAR
+    return data[1][0];
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 async function itemEffects(effects: HF.Effect[], avatarID: number, email: string, t: Transaction): Promise<HF.Hero> {
   /* 
     Still need to pass a transaction here after I refactor inventory.js
@@ -122,6 +134,9 @@ async function itemEffects(effects: HF.Effect[], avatarID: number, email: string
           effectPromises.push(removeInfected(avatarID));
         case "Distasteful Temptation":
           effectPromises.push(setToHalfHealth(avatarID));
+          break;
+        case "Revive":
+          effectPromises.push(reviveToOneHealth(avatarID));
           break;
         case "Summon Storming Oni":
           effectPromises.push(instantiateBattle(avatarID, "Storming Oni", t));
