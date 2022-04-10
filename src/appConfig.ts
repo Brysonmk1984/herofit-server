@@ -15,10 +15,10 @@ const config: Config = {
   mode: appState[0],
   specialEvent: appWelcome,
   disableErrorEmailReporting: false,
-  // globalMessage: [
-  //   { type: "info", persist: false, message: "Unique hero passive abilities are now live, click here to find out more.", link: "https://www.reddit.com/r/herofit/comments/to4fsf/great_news_herofit_fam/" },
-  //   //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }
-  // ],
+  globalMessage: [
+    { type: "info", persist: false, message: "Smelling Salts - New item Revives your Hero! click here to read about it.", link: "https://www.reddit.com/r/herofit/comments/u0lhfa/introducing_a_new_highly_requested_item/" },
+    //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }
+  ],
 };
 
 export { config };
