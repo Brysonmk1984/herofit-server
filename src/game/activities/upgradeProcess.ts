@@ -1,10 +1,10 @@
-import { User, UserActivity, UserTotal, Avatar, Items } from "../../config/db";
+import { User, UserActivity, UserTotal, Avatar, Items, AvatarItems } from "../../config/db";
 import { db } from "../../config/db";
 import { Op, Transaction } from "sequelize";
 import moment from "moment";
 import crypto from "crypto";
 import { parseStats, range } from "../../lib/helperFunctions";
-import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL, THRIFTY_SALVAGE_PERCENT, WILDLY_RESOURCEFUL_PT_PERCENT, WILDLY_RESOURCEFUL_HEAL_PERCENT } from "../CONSTANTS";
+import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, MAX_LEVEL, THRIFTY_SALVAGE_PERCENT, WILDLY_RESOURCEFUL_PT_PERCENT, WILDLY_RESOURCEFUL_HEAL_PERCENT, TRANSMUTATION_EFFECTS } from "../CONSTANTS";
 import utCalc from "../upgrades/utCalc";
 import avCalc from "../upgrades/avCalc";
 import xpCalc from "../upgrades/xpCalc";
@@ -141,8 +141,19 @@ function _getAvatarAndItems(email, t) {
   ]);
 }
 
+interface Improvements {
+  power : number
+  "max health" : number
+  health : number
+  air : number
+  water : number
+  fire : number
+  earth : number
+  aether : number
+}
+
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }) {
+function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }) : Improvements {
   // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
   // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
   // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
@@ -160,6 +171,39 @@ function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air
     earth: minZero(Number((earth - avStatSnapshot.earth).toFixed(2))),
     aether: minZero(Number((aether - avStatSnapshot.aether).toFixed(2))),
   };
+}
+
+async function _determineElementTransmutations(improvements : Improvements, avatarID : number, t : Transaction){
+  const rows = await AvatarItems.findAll({
+    attributes: ["id", "avatarID", "itemID"],
+    where: { avatarID, equipped : true },
+    include: [
+      {
+        model: Items,
+        as: "item",
+        attributes: ["type", "name","effects"],
+      },
+    ],
+    raw: undefined,
+    nest: true,
+    transaction: t,
+  });
+
+  interface AvatarItemItem {
+    id : number
+    avatarID : number
+    itemID : number
+    item : { [val : string] : Record<string, unknown> & { dataValues : Array<HF.Item> } }
+  }
+
+  const inventory = rows.map(({id, avatarID, itemID, item} : AvatarItemItem) => ({ id, avatarID, itemID, ...item.dataValues }))
+  const itemEffectNamesArray = Object.values(inventory.map((item : HF.Item) => item.effects)).map(effect => effect.name);
+  if(itemEffectNamesArray.includes(TRANSMUTATION_EFFECTS)){
+    console.log('TODO - handle switching the improvements here!');
+  }
+  console.log({itemEffectsArray});
+
+  return improvements;
 }
 
 // DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
@@ -274,8 +318,8 @@ function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedA
 
   return {
     foundItems: items,
-    improvements: Object.assign(improvements, { "Photon Tokens": pt }),
-    updatedAvatar: Object.assign(updatedAvatar, {
+    improvementsAfterPt: Object.assign(improvements, { "Photon Tokens": pt }),
+    avatarAfterPt: Object.assign(updatedAvatar, {
       photonTokens: updatedAvatar.photonTokens + improvements["Photon Tokens"],
     }),
   };
@@ -336,6 +380,8 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
         COMING SOON:
         FOR ELEMENT TRANSMUTATION, NEED TO EITHER FETCH EQUIPPED PET OR PASS IT IN FROM THE FRONT END
       */
+      
+      
 
       let [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
       possibleItemDrops = possibleItemDrops.map(i => ({
@@ -347,31 +393,38 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       }));
       //console.log('PSA', possibleItemDrops);
       // Determine all progress made with XP, levels, etc.
-      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
+      const { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
       // Shouldn't happen but throw error if negative xp from activity
       if (levelInfo.aXPDiff < 0) {
         throw new Error("Negative XP");
       }
 
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
-      let improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
+      const improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
+
+      /*
+      // NEW - Check for equipped item that transmutes elements
+      */
+
+      let improvementsAfterTransmutation = await _determineElementTransmutations(improvements, updatedAvatar.id, t);
+
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
-      const weightedElms = _calcWeightedElms(improvements);
+      const weightedElms = _calcWeightedElms(improvementsAfterTransmutation);
 
-      let foundItems;
+
       // Run activity find module to see if any items were found from latest upgrade
-      ({ foundItems, improvements, updatedAvatar } = _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar, possibleItemDrops));
+      const { foundItems, improvementsAfterPt, avatarAfterPt } = _handleActivityItemFind(weightedElms, improvementsAfterTransmutation, levelInfo, updatedAvatar, possibleItemDrops);
 
       // Save new Av to DB
-      await _updateAvatar(email, updatedAvatar, t);
+      await _updateAvatar(email, avatarAfterPt, t);
 
       // assign adjusted level-related properties to avatar
-      updatedAvatar = _appendLevelInfo(updatedAvatar);
+      const avatarAfterLevelInfo = _appendLevelInfo(avatarAfterPt);
 
       // Returns all promise results from itemFind, activityStatRewards, activityLevelRewards
       // Destructures into itemsFromItemFind, rewards, and a possible levelReward (will be undefined unless a user earned a level up)
-      const [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] = await _handleAllItemAwarding(avatar.id, improvements, avStatSnapshot, levelInfo, foundItems, t);
+      const [{ value: itemsFromItemFind }, { value: rewards }, levelRewards] = await _handleAllItemAwarding(avatarAfterLevelInfo.id, improvementsAfterPt, avStatSnapshot, levelInfo, foundItems, t);
 
       if (levelRewards) {
         rewards.push(...levelRewards.value);
@@ -380,8 +433,8 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       // Return package to be used on the frontend
       return {
         activities,
-        avatar: parseStats(updatedAvatar, true),
-        improvements: parseStats(improvements, true),
+        avatar: parseStats(avatarAfterLevelInfo, true),
+        improvements: parseStats(improvementsAfterPt, true),
         reachedLevel: levelInfo.lvlUp ? levelInfo.lvlAfterBuff : null,
         qpEarned: levelInfo.qpEarned,
         xpGain: levelInfo.aXPDiff,
