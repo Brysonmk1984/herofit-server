@@ -237,15 +237,25 @@ interface BattleHero {
   photonTokens: number;
 }
 
+interface UpgradeStats extends Partial<HF.Stats> {
+  maxHealth : number
+}
+
+interface ActivitySnapshot extends UpgradeStats{
+  activityXP : number
+}
+
+
 type BattleFoe = HF.BattleFoe;
 type BattleRound = HF.BattleRound;
 
-interface BattleElements {
+interface BaseElements {
   fire: number;
   earth: number;
   water: number;
   air: number;
 }
+type BattleElements = BaseElements;
 
 type BattleOutcome = "Avatar" | "Foe" | "DKO" | "Draw";
 
@@ -303,4 +313,10 @@ interface HeroChoice extends HF.HeroChoice {
   passive: PassiveAbility;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice };
+type TransmutationType = 'fireToWater' | 'fireToEarth' | 'fireToAir' | 'waterToAir' | 'waterToEarth' | 'waterToFire' | 'airToEarth' | 'airToFire' | 'airToWater' | 'earthToWater' | 'earthToAir' | 'earthToFire';
+
+type HeroWithTransmutations = HF.Hero & {
+  [key in TransmutationType ] : string
+}
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, UpgradeStats, ActivitySnapshot, BattleHero, BattleFoe, BattleRound, BaseElements, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice, TransmutationType, HeroWithTransmutations };

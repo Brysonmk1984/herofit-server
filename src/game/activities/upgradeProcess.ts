@@ -13,7 +13,7 @@ import { activityStatRewards, activityLevelRewards, determineStatImprovements } 
 import { activityHeal } from "./activityHeal";
 import { sendBackendOnlyEmail } from "../../mail";
 import HF from "../../types/herofit";
-import { BackendUserTotals } from "../../types/BackendOnlyTypes";
+import { ActivitySnapshot, BackendUserTotals, BaseElements, UpgradeStats } from "../../types/BackendOnlyTypes";
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
 function _determineActivityId(id, source) {
@@ -109,7 +109,7 @@ async function _insertActivityData(email: string, activities: HF.Activity[], t: 
 }
 
 // UPDATE USER TOTALS
-async function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities, accountDate, userTotals, t) {
+async function _handleUserTotalsUpdate(email : string, hasBeenUpgraded : boolean, updatedActivities, accountDate, userTotals, t) {
   if (!userTotals) {
     throw new Error(`No User Totals for user ${email}`);
   }
@@ -124,11 +124,11 @@ async function _handleUserTotalsUpdate(email, hasBeenUpgraded, updatedActivities
 }
 
 // RETRIEVE AVATAR AND ITEMS FROM DB
-function _getAvatarAndItems(email, t) {
+function _getAvatarAndItems(email : string, t : Transaction) {
   return Promise.all([
     Avatar.findOne({
       where: { owner: email },
-      attributes: ["id", "character", "createdAt", "activityXP", "battleXP", "power", "health", "maxHealth", "fire", "earth", "water", "air", "aether", "qpFire", "qpEarth", "qpWater", "qpAir", "qpPower", "qpHealth", "qpAether", "qp", "photonTokens", "status"],
+      attributes: ["id", "character", "createdAt", "activityXP", "battleXP", "power", "health", "maxHealth", "fire", "earth", "water", "air", "aether", "qpFire", "qpEarth", "qpWater", "qpAir", "qpPower", "qpHealth", "qpAether", "qp", "photonTokens", "status", 'fireToWater','fireToEarth','fireToAir','waterToAir','waterToEarth','waterToFire','airToEarth','airToFire','airToWater','earthToWater','earthToAir','earthToFire'],
       raw: true,
       transaction: t,
     }),
@@ -141,23 +141,17 @@ function _getAvatarAndItems(email, t) {
   ]);
 }
 
-interface Improvements {
-  power : number
+interface UpgradeImprovements extends Omit<UpgradeStats, 'maxHealth'>{
   "max health" : number
-  health : number
-  air : number
-  water : number
-  fire : number
-  earth : number
-  aether : number
 }
 
+
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(avStatSnapshot, { power, maxHealth, health, air, water, fire, earth, aether }) : Improvements {
+function _calcAvatarImprovements(avStatSnapshot : UpgradeStats, { power, maxHealth, health, air, water, fire, earth, aether } : Partial<HF.Hero>) : UpgradeImprovements {
   // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
   // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
   // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
-  function minZero(val) {
+  function minZero(val : number) {
     return val < 0 ? 0 : val;
   }
 
@@ -207,7 +201,7 @@ async function _determineElementTransmutations(improvements : Improvements, avat
 }
 
 // DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
-function _calcWeightedElms({ air, water, fire, earth }) {
+function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) {
   // Needed for activity-specific items
   const totalElmImprove = air + water + fire + earth;
   return {
@@ -219,7 +213,7 @@ function _calcWeightedElms({ air, water, fire, earth }) {
 }
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
-function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
+function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals, transmute : keyof BaseElements) {
   const avStatSnapshot = parseStats(
     Object.assign(
       {},
@@ -234,13 +228,15 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
         aether: avatar.aether,
         health: avatar.health,
       },
-    ),
-  );
+    )
+  ) as ActivitySnapshot;
 
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
-  const { updatePower, updateHealth, updateAether, updateElements, updateStatus } = avCalc(ut);
-
+  const { updatePower, updateHealth, updateAether, updateElements, updateStatus, transmuteElements } = avCalc(ut);
+    
+  
+      
   // Updated aXP
   const updatedAXP = calcNewActivityXPFromUt(ut);
 
@@ -264,7 +260,7 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
   const updatedAether = updateAether(endingLevel, avatar.qpAether);
   let { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
   const updatedStatus = updateStatus(avatar.status, lvlUp);
-  const { fire, earth, water, air } = updateElements(
+  const updatedElements = updateElements(
     avatar.character,
     {
       qpFire: avatar.qpFire,
@@ -274,6 +270,9 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals) {
     },
     avatar.createdAt,
   );
+  console.log('UPDATED ELEMENTS', updatedElements.fire, updatedElements.earth, updatedElements.air, updatedElements.water);
+  const { fire, earth, air, water } = transmuteElements(updatedElements, avatar, transmute);
+    console.log('ALLDONE', fire, earth, air, water);
 
   // For users with Aether, heal a portion of health based on activity time and aether
   updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
@@ -393,7 +392,7 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       }));
       //console.log('PSA', possibleItemDrops);
       // Determine all progress made with XP, levels, etc.
-      const { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals);
+      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals, 'earthToWater');
       // Shouldn't happen but throw error if negative xp from activity
       if (levelInfo.aXPDiff < 0) {
         throw new Error("Negative XP");

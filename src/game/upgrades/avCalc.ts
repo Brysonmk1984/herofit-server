@@ -1,8 +1,8 @@
-import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL } from "../CONSTANTS";
+import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL, TRANSMUTATION_TYPE_LIST } from "../CONSTANTS";
 import moment from "moment";
 import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
 import avatarList from "../../heroList.json";
-import { QpSpentStats, UserTotals } from "../../types/BackendOnlyTypes";
+import { BaseElements, HeroWithTransmutations, QpSpentStats, TransmutationType, UserTotals } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 
 interface ElementObject {
@@ -127,6 +127,141 @@ function avCalc(userTotals?: UserTotals) {
 
       return updatedElms;
     },
+
+    transmuteElements: function (elements : BaseElements, avatar : HeroWithTransmutations, transmute : TransmutationType){
+      const adjustedElements = {...elements};
+      // 1. loop over every transmutation type, adjust elements locally as needed - This is for all existing points in each transmutation
+      TRANSMUTATION_TYPE_LIST.forEach((transmutation : TransmutationType) => {
+        console.log(transmutation, avatar[transmutation], typeof avatar[transmutation]);
+        const transTotal = parseFloat(avatar[transmutation]);
+        if(avatar[transmutation]){
+          switch(transmutation){
+            case 'fireToWater':
+              adjustedElements.fire -= transTotal;
+              adjustedElements.water += transTotal;
+              break;
+            case 'fireToEarth':
+              adjustedElements.fire -= transTotal;
+              adjustedElements.earth += transTotal;
+              break;
+            case 'fireToAir':
+              adjustedElements.fire -= transTotal;
+              adjustedElements.air += transTotal;
+              break;
+            case 'waterToAir':
+              adjustedElements.water -= transTotal;
+              adjustedElements.air += transTotal;
+              break;
+            case 'waterToEarth':
+              adjustedElements.water -= transTotal;
+              adjustedElements.earth += transTotal;
+              break;
+            case 'waterToFire':
+              adjustedElements.water -= transTotal;
+              adjustedElements.fire += transTotal;
+              break;
+            case 'airToEarth':
+              adjustedElements.air -= transTotal;
+              adjustedElements.earth += transTotal;
+              break;
+            case 'airToFire':
+              adjustedElements.air -= transTotal;
+              adjustedElements.fire += transTotal;
+              break;
+            case 'airToWater':
+              adjustedElements.air -= transTotal;
+              adjustedElements.water += transTotal;
+              break;
+            case 'earthToWater':
+              adjustedElements.earth -= transTotal;
+              adjustedElements.water += transTotal;
+              break;
+            case 'earthToAir':
+              adjustedElements.earth -= transTotal;
+              adjustedElements.air += transTotal;
+              break;
+            case 'earthToFire':
+              adjustedElements.earth -= transTotal;
+              adjustedElements.fire += transTotal;
+              break;
+            default:
+              throw new Error('No Matching Transmutation');
+          }
+        }
+      })
+
+
+      // 2. based on the transmutation type, transfer the element transmutation from this upgrade.
+      // switch(transmute){
+      //   case 'fireToWater': {
+      //     const diff = elements.fire - avatar.fire;
+      //     adjustedElements.fire -= diff;
+      //     adjustedElements.water+= diff;
+      //     break;}
+      //   case 'fireToEarth':{
+      //     const diff = elements.fire - avatar.fire;
+      //     adjustedElements.fire -= diff;
+      //     adjustedElements.earth += diff;
+      //     break;}
+      //   case 'fireToAir':{
+      //     const diff = elements.fire - avatar.fire;
+      //     adjustedElements.fire -= diff;
+      //     adjustedElements.air+= diff;
+      //     break;}
+      //   case 'waterToAir':{
+      //     const diff = elements.water - avatar.water;
+      //     adjustedElements.water -= diff;
+      //     adjustedElements.air += diff;
+      //     break;}
+      //   case 'waterToEarth':{
+      //     const diff = elements.water - avatar.water;
+      //     adjustedElements.water -= diff;
+      //     adjustedElements.earth += diff;
+      //     break;}
+      //   case 'waterToFire':{
+      //     const diff = elements.water - avatar.water;
+      //     adjustedElements.water -= diff;
+      //     adjustedElements.fire += diff;
+      //     break;}
+      //   case 'airToEarth':{
+      //     const diff = elements.air - avatar.air;
+      //     adjustedElements.air -= diff;
+      //     adjustedElements.earth += diff;
+      //     break;}
+      //   case 'airToFire':{
+      //     const diff = elements.air - avatar.air;
+      //     adjustedElements.air -= diff;
+      //     adjustedElements.fire += diff;
+      //     break;}
+      //   case 'airToWater':{
+      //     const diff = elements.air - avatar.air;
+          
+      //     adjustedElements.air -= diff;
+      //     adjustedElements.water += diff;
+      //     break;}
+      //   case 'earthToWater':{
+      //     const diff = elements.earth - avatar.earth;
+      //     console.log('DIFFF', diff);
+      //     adjustedElements.earth -= diff;
+      //     adjustedElements.water+= diff;
+      //     break;}
+      //   case 'earthToAir':{
+      //     const diff = elements.earth - avatar.earth;
+      //     adjustedElements.earth -= diff;
+      //     adjustedElements.air += diff;
+      //     break;}
+      //   case 'earthToFire':{  
+      //     const diff = elements.earth - avatar.earth;
+      //     adjustedElements.earth -= diff;
+      //     adjustedElements.fire += diff;
+      //     break;}
+      //   default:
+      //     throw new Error('No Matching Transmutation for this activity');
+      // }
+      
+      return adjustedElements;
+    },
+
     updateStatus: function (oldStatus: HF.HeroStatus, lvlUp: boolean) {
       if (lvlUp) {
         switch (oldStatus) {
