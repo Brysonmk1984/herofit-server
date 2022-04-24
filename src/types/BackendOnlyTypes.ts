@@ -237,14 +237,6 @@ interface BattleHero {
   photonTokens: number;
 }
 
-interface UpgradeStats extends Partial<HF.Stats> {
-  maxHealth : number
-}
-
-interface ActivitySnapshot extends UpgradeStats{
-  activityXP : number
-}
-
 
 type BattleFoe = HF.BattleFoe;
 type BattleRound = HF.BattleRound;
@@ -319,4 +311,35 @@ type HeroWithTransmutations = HF.Hero & {
   [key in TransmutationType ] : string
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, UpgradeStats, ActivitySnapshot, BattleHero, BattleFoe, BattleRound, BaseElements, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice, TransmutationType, HeroWithTransmutations };
+type ActivityRecordSource = 'herofit' | 'strava';
+
+interface UpgradeStats extends Partial<HF.Stats> {
+  maxHealth : number
+}
+
+interface HeroSnapshot extends UpgradeStats{
+  activityXP : number
+}
+
+interface UpgradeImprovements extends Omit<UpgradeStats, 'maxHealth'>{
+  "max health" : number
+}
+
+interface UpgradeLevelInfo {
+   aXPDiff : number,
+   startingLevel : number,
+   endingLevel :number,
+}
+
+interface UpgradeItem {
+  name: string,
+  dropRate: number,
+  levelRestriction: number,
+  activityRestriction: keyof BaseElements[],
+  disabled: boolean,
+}
+
+type UpgradeWeightedElements = BaseElements;
+
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, UpgradeStats, HeroSnapshot, BattleHero, BattleFoe, BattleRound, BaseElements, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice, TransmutationType, HeroWithTransmutations, ActivityRecordSource, UpgradeImprovements, UpgradeLevelInfo, UpgradeItem, UpgradeWeightedElements };

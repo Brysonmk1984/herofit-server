@@ -13,10 +13,11 @@ import { activityStatRewards, activityLevelRewards, determineStatImprovements } 
 import { activityHeal } from "./activityHeal";
 import { sendBackendOnlyEmail } from "../../mail";
 import HF from "../../types/herofit";
-import { ActivitySnapshot, BackendUserTotals, BaseElements, UpgradeStats } from "../../types/BackendOnlyTypes";
+import { HeroSnapshot, BackendUserTotals, BaseElements, UpgradeStats, UserTotals, BackendActivity, ActivityRecordSource, UpgradeLevelInfo, UpgradeImprovements, UpgradeItem, UpgradeWeightedElements, HeroWithTransmutations, TransmutationType } from "../../types/BackendOnlyTypes";
+
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
-function _determineActivityId(id, source) {
+function _determineActivityId(id : number, source : ActivityRecordSource) {
   if (source === "herofit") {
     return `hf-${crypto.randomBytes(5).toString("hex")}`;
   } else if (id) {
@@ -75,7 +76,7 @@ async function _dedupActivities(activities: HF.Activity[], t: Transaction) {
   }
 }
 
-// UPDATE USER, USERACTIVIES, & GET USERTOTALS BEFORE ANYTHING ELSE
+// UPDATE USER, USER_ACTIVITIES, & GET USER_TOTALS BEFORE ANYTHING ELSE
 async function _insertActivityData(email: string, activities: HF.Activity[], t: Transaction) {
   // In the future, consider pushing back the latestActivityUpdate determination until after the dedup
   // Prepare activities for DB
@@ -109,7 +110,7 @@ async function _insertActivityData(email: string, activities: HF.Activity[], t: 
 }
 
 // UPDATE USER TOTALS
-async function _handleUserTotalsUpdate(email : string, hasBeenUpgraded : boolean, updatedActivities, accountDate, userTotals, t) {
+async function _handleUserTotalsUpdate(email : string, hasBeenUpgraded : boolean, updatedActivities : BackendActivity[], accountDate : string, userTotals : UserTotals, t : Transaction) : Promise<UserTotals> {
   if (!userTotals) {
     throw new Error(`No User Totals for user ${email}`);
   }
@@ -141,13 +142,8 @@ function _getAvatarAndItems(email : string, t : Transaction) {
   ]);
 }
 
-interface UpgradeImprovements extends Omit<UpgradeStats, 'maxHealth'>{
-  "max health" : number
-}
-
-
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(avStatSnapshot : UpgradeStats, { power, maxHealth, health, air, water, fire, earth, aether } : Partial<HF.Hero>) : UpgradeImprovements {
+function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, { power, maxHealth, health, air, water, fire, earth, aether } : Partial<HF.Hero>) : UpgradeImprovements {
   // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
   // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
   // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
@@ -167,7 +163,7 @@ function _calcAvatarImprovements(avStatSnapshot : UpgradeStats, { power, maxHeal
   };
 }
 
-async function _determineElementTransmutations(improvements : Improvements, avatarID : number, t : Transaction){
+async function _determineElementTransmutations(improvements : UpgradeImprovements, avatarID : number, t : Transaction){
   const rows = await AvatarItems.findAll({
     attributes: ["id", "avatarID", "itemID"],
     where: { avatarID, equipped : true },
@@ -201,7 +197,7 @@ async function _determineElementTransmutations(improvements : Improvements, avat
 }
 
 // DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
-function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) {
+function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) : UpgradeWeightedElements {
   // Needed for activity-specific items
   const totalElmImprove = air + water + fire + earth;
   return {
@@ -213,7 +209,7 @@ function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) {
 }
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
-function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals, transmute : keyof BaseElements) {
+function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, transmute : TransmutationType) {
   const avStatSnapshot = parseStats(
     Object.assign(
       {},
@@ -229,7 +225,7 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals, transmute : keyof
         health: avatar.health,
       },
     )
-  ) as ActivitySnapshot;
+  ) as HeroSnapshot;
 
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
@@ -303,7 +299,7 @@ function _calcProgress(avatar: HF.Hero, ut: BackendUserTotals, transmute : keyof
 }
 
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedAvatar: HF.Hero, possibleItemDrops) {
+function _handleActivityItemFind(weightedElms : UpgradeWeightedElements, improvements : UpgradeImprovements, levelInfo : UpgradeLevelInfo, updatedAvatar: HF.Hero, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
 
   // Bonuses for Hero Passives
@@ -313,7 +309,7 @@ function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedA
   // ITEMS & PT FOUND DURING ACTIVITIES
   // the last param is an array of possible items drops
   // the second to Last two params are itemFind and ptFind stats (percentages that boost base of each)
-  const { items, pt } = activityItemFind(aXPDiff, endingLevel, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
+  const { items, pt } : {items : string[], pt : number} = activityItemFind(aXPDiff, endingLevel, weightedElms, itemFindStatBoost, ptFindStatBoost, possibleItemDrops);
 
   return {
     foundItems: items,
@@ -325,12 +321,12 @@ function _handleActivityItemFind(weightedElms, improvements, levelInfo, updatedA
 }
 
 // UPDATE HERO IN DB
-function _updateAvatar(email, updatedAvatar, t) {
+function _updateAvatar(email : string, updatedAvatar : HF.Hero, t : Transaction) {
   return Avatar.update({ ...updatedAvatar }, { where: { owner: email }, transaction: t });
 }
 
 // APPEND ALL EXTRA INFO NEEDED FOR HERO ON FRONTEND
-function _appendLevelInfo(updatedAvatar) {
+function _appendLevelInfo(updatedAvatar : HF.Hero) {
   const { activityXP, battleXP, recovery, health, maxHealth } = updatedAvatar;
   const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(activityXP, battleXP);
   const { level, albedo } = getCurrentLevel();
@@ -346,7 +342,7 @@ function _appendLevelInfo(updatedAvatar) {
 }
 
 // RUN FUNCTIONS FOR ITEM FIND & REWARDS
-function _handleAllItemAwarding(avatarID, improvements, avStatSnapshot, levelInfo, foundItems, t) {
+function _handleAllItemAwarding(avatarID : number, improvements : UpgradeImprovements, avStatSnapshot : HeroSnapshot, levelInfo : UpgradeLevelInfo, foundItems : string[], t : Transaction) {
   const { startingLevel, endingLevel } = levelInfo;
   const statObjForUpgrade = determineStatImprovements(improvements, avStatSnapshot);
   const allItemPromises = [
@@ -382,7 +378,7 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       
       
 
-      let [avatar, possibleItemDrops] = await _getAvatarAndItems(email, t);
+      let [avatar, possibleItemDrops] : [HF.Hero, UpgradeItem[]] = await _getAvatarAndItems(email, t);
       possibleItemDrops = possibleItemDrops.map(i => ({
         name: i.name,
         dropRate: +i.dropRate,
