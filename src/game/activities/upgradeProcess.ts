@@ -13,7 +13,7 @@ import { activityStatRewards, activityLevelRewards, determineStatImprovements } 
 import { activityHeal } from "./activityHeal";
 import { sendBackendOnlyEmail } from "../../mail";
 import HF from "../../types/herofit";
-import { HeroSnapshot, BackendUserTotals, BaseElements, UpgradeStats, UserTotals, BackendActivity, ActivityRecordSource, UpgradeLevelInfo, UpgradeImprovements, UpgradeItem, UpgradeWeightedElements, HeroWithTransmutations, TransmutationType } from "../../types/BackendOnlyTypes";
+import { HeroSnapshot, BackendUserTotals, UserTotals, BackendActivity, ActivityRecordSource, UpgradeLevelInfo, UpgradeImprovements, UpgradeItem, UpgradeWeightedElements, HeroWithTransmutations, TransmutationType, BaseElements } from "../../types/BackendOnlyTypes";
 
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
@@ -142,8 +142,26 @@ function _getAvatarAndItems(email : string, t : Transaction) {
   ]);
 }
 
+function _subtractTransmutedAwayValues(element : Lowercase<HF.PrimaryElement>, avatar){
+  const {fireToWater, fireToEarth, fireToAir, earthToWater, earthToFire, earthToAir, airToWater, airToEarth, airToFire, waterToFire, waterToEarth, waterToAir } = avatar;
+  switch(element){
+    case 'fire':
+      return avatar.fire - (fireToWater, fireToEarth, fireToAir);
+    case 'earth':
+      console.log('EARTH',avatar.earth, avatar.earth - (earthToWater + earthToFire + earthToAir), earthToWater, earthToFire, earthToAir);
+      return avatar.earth - (earthToWater + earthToFire + earthToAir);
+    case 'air':
+      return avatar.air - (airToWater + airToEarth +airToFire);
+    case 'water':
+      return avatar.water - (waterToFire + waterToEarth + waterToAir);
+    default:
+      throw new Error ('No matching Element');
+  }
+}
+
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
-function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, { power, maxHealth, health, air, water, fire, earth, aether } : Partial<HF.Hero>) : UpgradeImprovements {
+function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, avatar : Partial<HF.Hero>) : UpgradeImprovements {
+  const { power, maxHealth, health, air, water, fire, earth, aether } = avatar;
   // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
   // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
   // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
@@ -158,8 +176,9 @@ function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, { power, maxHeal
     air: minZero(Number((air - avStatSnapshot.air).toFixed(2))),
     water: minZero(Number((water - avStatSnapshot.water).toFixed(2))),
     fire: minZero(Number((fire - avStatSnapshot.fire).toFixed(2))),
-    earth: minZero(Number((earth - avStatSnapshot.earth).toFixed(2))),
+    earth: minZero(Number((earth - avStatSnapshot.earth - (avStatSnapshot.earthToWater + avStatSnapshot.earthToAir + avStatSnapshot.earthToFire)).toFixed(2))),
     aether: minZero(Number((aether - avStatSnapshot.aether).toFixed(2))),
+
   };
 }
 
@@ -186,12 +205,12 @@ async function _determineElementTransmutations(improvements : UpgradeImprovement
     item : { [val : string] : Record<string, unknown> & { dataValues : Array<HF.Item> } }
   }
 
-  const inventory = rows.map(({id, avatarID, itemID, item} : AvatarItemItem) => ({ id, avatarID, itemID, ...item.dataValues }))
-  const itemEffectNamesArray = Object.values(inventory.map((item : HF.Item) => item.effects)).map(effect => effect.name);
-  if(itemEffectNamesArray.includes(TRANSMUTATION_EFFECTS)){
-    console.log('TODO - handle switching the improvements here!');
-  }
-  console.log({itemEffectsArray});
+  // const inventory = rows.map(({id, avatarID, itemID, item} : AvatarItemItem) => ({ id, avatarID, itemID, ...item.dataValues }))
+  // const itemEffectNamesArray = Object.values(inventory.map((item : HF.Item) => item.effects)).map(effect => effect.name);
+  // if(itemEffectNamesArray.includes(TRANSMUTATION_EFFECTS)){
+  //   console.log('TODO - handle switching the improvements here!');
+  // }
+  // console.log({itemEffectsArray});
 
   return improvements;
 }
@@ -209,8 +228,8 @@ function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) : 
 }
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
-function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, transmute : TransmutationType) {
-  const avStatSnapshot = parseStats(
+function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals) {
+  const avStatSnapshot = 
     Object.assign(
       {},
       {
@@ -223,9 +242,20 @@ function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, tr
         air: avatar.air,
         aether: avatar.aether,
         health: avatar.health,
-      },
-    )
-  ) as HeroSnapshot;
+        'fireToWater':avatar.fireToWater,
+        'fireToEarth':avatar.fireToEarth,
+        'fireToAir':avatar.fireToAir,
+        'waterToAir':avatar.waterToAir,
+        'waterToEarth':avatar.waterToEarth,
+        'waterToFire':avatar.waterToFire,
+        'airToEarth':avatar.airToEarth,
+        'airToFire':avatar.airToFire,
+        'airToWater':avatar.airToWater,
+        'earthToWater':avatar.earthToWater,
+        'earthToAir':avatar.earthToAir,
+        'earthToFire':avatar.earthToFire
+      }
+    )as HeroSnapshot;
 
   const { checkLevelUp, calcNewActivityXPFromUt } = xpCalc(avatar.activityXP, avatar.battleXP);
 
@@ -256,7 +286,7 @@ function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, tr
   const updatedAether = updateAether(endingLevel, avatar.qpAether);
   let { updatedHealth, updatedMaxHealth } = updateHealth(endingLevel, avatar.qpHealth, avatar.health, avatar.maxHealth, avatar.status, lvlUp);
   const updatedStatus = updateStatus(avatar.status, lvlUp);
-  const updatedElements = updateElements(
+  const {fire,earth,air,water} = updateElements(
     avatar.character,
     {
       qpFire: avatar.qpFire,
@@ -266,9 +296,6 @@ function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, tr
     },
     avatar.createdAt,
   );
-  console.log('UPDATED ELEMENTS', updatedElements.fire, updatedElements.earth, updatedElements.air, updatedElements.water);
-  const { fire, earth, air, water } = transmuteElements(updatedElements, avatar, transmute);
-    console.log('ALLDONE', fire, earth, air, water);
 
   // For users with Aether, heal a portion of health based on activity time and aether
   updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);
@@ -294,12 +321,14 @@ function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals, tr
       activityXP: updatedAXP,
       qp: updatedQP,
       hasBeenUpgraded: true,
+
     }),
+    transmuteElements
   };
 }
 
 // RUN FUNCTION TO CHECK FOR FOUND ITEMS
-function _handleActivityItemFind(weightedElms : UpgradeWeightedElements, improvements : UpgradeImprovements, levelInfo : UpgradeLevelInfo, updatedAvatar: HF.Hero, possibleItemDrops) {
+function _handleActivityItemFind(weightedElms : UpgradeWeightedElements, improvements : UpgradeImprovements, levelInfo : UpgradeLevelInfo, updatedAvatar: HeroWithTransmutations, possibleItemDrops) {
   const { aXPDiff, endingLevel } = levelInfo;
 
   // Bonuses for Hero Passives
@@ -321,7 +350,7 @@ function _handleActivityItemFind(weightedElms : UpgradeWeightedElements, improve
 }
 
 // UPDATE HERO IN DB
-function _updateAvatar(email : string, updatedAvatar : HF.Hero, t : Transaction) {
+function _updateAvatar(email : string, updatedAvatar : HeroWithTransmutations, t : Transaction) {
   return Avatar.update({ ...updatedAvatar }, { where: { owner: email }, transaction: t });
 }
 
@@ -379,6 +408,7 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       
 
       let [avatar, possibleItemDrops] : [HF.Hero, UpgradeItem[]] = await _getAvatarAndItems(email, t);
+      const parsedAvatar = parseStats(avatar);
       possibleItemDrops = possibleItemDrops.map(i => ({
         name: i.name,
         dropRate: +i.dropRate,
@@ -388,28 +418,29 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       }));
       //console.log('PSA', possibleItemDrops);
       // Determine all progress made with XP, levels, etc.
-      let { avStatSnapshot, levelInfo, updatedAvatar } = _calcProgress(avatar, userTotals, 'earthToWater');
+      let { avStatSnapshot, levelInfo, updatedAvatar, transmuteElements } = _calcProgress(parsedAvatar, userTotals);
       // Shouldn't happen but throw error if negative xp from activity
       if (levelInfo.aXPDiff < 0) {
         throw new Error("Negative XP");
       }
-
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
       const improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
+      console.log('IMPRO', improvements);
 
-      /*
-      // NEW - Check for equipped item that transmutes elements
-      */
+      const { transmutedImprovements, avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, 'earthToWater');
 
-      let improvementsAfterTransmutation = await _determineElementTransmutations(improvements, updatedAvatar.id, t);
+      console.log('TRANS_IMPRO', transmutedImprovements);
+
+      console.log('snap::', avStatSnapshot, 'afterTrans::',avatarAfterTransmutation);
+
 
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
-      const weightedElms = _calcWeightedElms(improvementsAfterTransmutation);
+      const weightedElms = _calcWeightedElms(transmutedImprovements);
 
 
       // Run activity find module to see if any items were found from latest upgrade
-      const { foundItems, improvementsAfterPt, avatarAfterPt } = _handleActivityItemFind(weightedElms, improvementsAfterTransmutation, levelInfo, updatedAvatar, possibleItemDrops);
+      const { foundItems, improvementsAfterPt, avatarAfterPt } = _handleActivityItemFind(weightedElms, transmutedImprovements, levelInfo, avatarAfterTransmutation, possibleItemDrops);
 
       // Save new Av to DB
       await _updateAvatar(email, avatarAfterPt, t);

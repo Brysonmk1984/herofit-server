@@ -2,7 +2,7 @@ import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND
 import moment from "moment";
 import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
 import avatarList from "../../heroList.json";
-import { BaseElements, HeroWithTransmutations, QpSpentStats, TransmutationType, UserTotals } from "../../types/BackendOnlyTypes";
+import { BaseElements, HeroSnapshot, HeroWithTransmutations, QpSpentStats, TransmutationType, UpgradeImprovements, UserTotals } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 
 interface ElementObject {
@@ -11,6 +11,8 @@ interface ElementObject {
   air: number;
   earth: number;
 }
+
+interface TransmuteElementReturnType{ transmutedImprovements : UpgradeImprovements, avatarAfterTransmutation : HeroWithTransmutations}
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
 function avCalc(userTotals?: UserTotals) {
@@ -127,139 +129,36 @@ function avCalc(userTotals?: UserTotals) {
 
       return updatedElms;
     },
+    // Improvements are accurate, except they haven't been transmuted
+    transmuteElements: function (improvements : UpgradeImprovements, avatar : HF.Hero, transmutation : TransmutationType) : TransmuteElementReturnType{
+      const transmutedImprovements = {...improvements};
+      const avatarAfterTransmutation = {...avatar} as HeroWithTransmutations;
+      const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = avatarAfterTransmutation;
+        console.log('TTT', transmutation, avatar.water);
 
-    transmuteElements: function (elements : BaseElements, avatar : HeroWithTransmutations, transmute : TransmutationType){
-      const adjustedElements = {...elements};
-      // 1. loop over every transmutation type, adjust elements locally as needed - This is for all existing points in each transmutation
-      TRANSMUTATION_TYPE_LIST.forEach((transmutation : TransmutationType) => {
-        console.log(transmutation, avatar[transmutation], typeof avatar[transmutation]);
-        const transTotal = parseFloat(avatar[transmutation]);
-        if(avatar[transmutation]){
-          switch(transmutation){
-            case 'fireToWater':
-              adjustedElements.fire -= transTotal;
-              adjustedElements.water += transTotal;
-              break;
-            case 'fireToEarth':
-              adjustedElements.fire -= transTotal;
-              adjustedElements.earth += transTotal;
-              break;
-            case 'fireToAir':
-              adjustedElements.fire -= transTotal;
-              adjustedElements.air += transTotal;
-              break;
-            case 'waterToAir':
-              adjustedElements.water -= transTotal;
-              adjustedElements.air += transTotal;
-              break;
-            case 'waterToEarth':
-              adjustedElements.water -= transTotal;
-              adjustedElements.earth += transTotal;
-              break;
-            case 'waterToFire':
-              adjustedElements.water -= transTotal;
-              adjustedElements.fire += transTotal;
-              break;
-            case 'airToEarth':
-              adjustedElements.air -= transTotal;
-              adjustedElements.earth += transTotal;
-              break;
-            case 'airToFire':
-              adjustedElements.air -= transTotal;
-              adjustedElements.fire += transTotal;
-              break;
-            case 'airToWater':
-              adjustedElements.air -= transTotal;
-              adjustedElements.water += transTotal;
-              break;
-            case 'earthToWater':
-              adjustedElements.earth -= transTotal;
-              adjustedElements.water += transTotal;
-              break;
-            case 'earthToAir':
-              adjustedElements.earth -= transTotal;
-              adjustedElements.air += transTotal;
-              break;
-            case 'earthToFire':
-              adjustedElements.earth -= transTotal;
-              adjustedElements.fire += transTotal;
-              break;
-            default:
-              throw new Error('No Matching Transmutation');
-          }
+        switch(transmutation){
+         
+          case 'earthToWater':{
+            //const diff = improvements.earth - avatarAfterTransmutation.earthToWater;
+            console.log('actEarthImpro:', improvements.earth, 'actWaterImpro:', improvements.water, 'EtW:',avatarAfterTransmutation.earthToWater);
+            //console.log('DIFF!', diff);
+            transmutedImprovements.water += improvements.earth;
+            transmutedImprovements.earth -= improvements.earth;
+
+            avatarAfterTransmutation.water += (improvements.earth + avatarAfterTransmutation.earthToWater + avatarAfterTransmutation.earthToAir + avatarAfterTransmutation.earthToFire);
+            avatarAfterTransmutation.earth -= (improvements.earth + avatarAfterTransmutation.earthToWater + avatarAfterTransmutation.earthToAir + avatarAfterTransmutation.earthToFire);
+            avatarAfterTransmutation.earthToWater += improvements.earth;
+            break;}
+          default:
+            avatarAfterTransmutation.earth += (fireToEarth, airToEarth, waterToEarth) - (earthToWater + earthToAir + earthToFire);
+            avatarAfterTransmutation.fire += (earthToFire, airToFire, waterToFire) - (fireToWater + fireToAir + fireToEarth);
+            avatarAfterTransmutation.air += (earthToAir, fireToAir, waterToAir) - (airToWater + airToFire + airToEarth);
+            avatarAfterTransmutation.water += (fireToWater, airToWater, earthToWater) - (waterToEarth + waterToFire + waterToAir);
         }
-      })
 
 
-      // 2. based on the transmutation type, transfer the element transmutation from this upgrade.
-      // switch(transmute){
-      //   case 'fireToWater': {
-      //     const diff = elements.fire - avatar.fire;
-      //     adjustedElements.fire -= diff;
-      //     adjustedElements.water+= diff;
-      //     break;}
-      //   case 'fireToEarth':{
-      //     const diff = elements.fire - avatar.fire;
-      //     adjustedElements.fire -= diff;
-      //     adjustedElements.earth += diff;
-      //     break;}
-      //   case 'fireToAir':{
-      //     const diff = elements.fire - avatar.fire;
-      //     adjustedElements.fire -= diff;
-      //     adjustedElements.air+= diff;
-      //     break;}
-      //   case 'waterToAir':{
-      //     const diff = elements.water - avatar.water;
-      //     adjustedElements.water -= diff;
-      //     adjustedElements.air += diff;
-      //     break;}
-      //   case 'waterToEarth':{
-      //     const diff = elements.water - avatar.water;
-      //     adjustedElements.water -= diff;
-      //     adjustedElements.earth += diff;
-      //     break;}
-      //   case 'waterToFire':{
-      //     const diff = elements.water - avatar.water;
-      //     adjustedElements.water -= diff;
-      //     adjustedElements.fire += diff;
-      //     break;}
-      //   case 'airToEarth':{
-      //     const diff = elements.air - avatar.air;
-      //     adjustedElements.air -= diff;
-      //     adjustedElements.earth += diff;
-      //     break;}
-      //   case 'airToFire':{
-      //     const diff = elements.air - avatar.air;
-      //     adjustedElements.air -= diff;
-      //     adjustedElements.fire += diff;
-      //     break;}
-      //   case 'airToWater':{
-      //     const diff = elements.air - avatar.air;
-          
-      //     adjustedElements.air -= diff;
-      //     adjustedElements.water += diff;
-      //     break;}
-      //   case 'earthToWater':{
-      //     const diff = elements.earth - avatar.earth;
-      //     console.log('DIFFF', diff);
-      //     adjustedElements.earth -= diff;
-      //     adjustedElements.water+= diff;
-      //     break;}
-      //   case 'earthToAir':{
-      //     const diff = elements.earth - avatar.earth;
-      //     adjustedElements.earth -= diff;
-      //     adjustedElements.air += diff;
-      //     break;}
-      //   case 'earthToFire':{  
-      //     const diff = elements.earth - avatar.earth;
-      //     adjustedElements.earth -= diff;
-      //     adjustedElements.fire += diff;
-      //     break;}
-      //   default:
-      //     throw new Error('No Matching Transmutation for this activity');
-      // }
-      
-      return adjustedElements;
+   
+      return {transmutedImprovements, avatarAfterTransmutation };
     },
 
     updateStatus: function (oldStatus: HF.HeroStatus, lvlUp: boolean) {

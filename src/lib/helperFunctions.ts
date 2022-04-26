@@ -48,7 +48,7 @@ const shuffleArray = function (array: any[]) {
 
 // Converts some Hero Properties from strings to floating point numbers
 function parseStats(obj: ObjectWithAnyProperties, wholeNumbers = false) {
-  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether", "health", "power"];
+  const attrsToBeParsed: Lowercase<HF.Stat>[] = ["fire", "earth", "air", "water", "armor", "recovery", "aether", "health", "power", 'fireToWater','fireToEarth','fireToAir','waterToAir','waterToEarth','waterToFire','airToEarth','airToFire','airToWater','earthToWater','earthToAir','earthToFire'];
   for (let attr in obj) {
     let toBeParsed = attrsToBeParsed.includes(attr as Lowercase<HF.Stat>);
     if (typeof attr === "string" && toBeParsed) {
