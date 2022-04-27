@@ -305,10 +305,11 @@ interface HeroChoice extends HF.HeroChoice {
   passive: PassiveAbility;
 }
 
+type TransmutableElement = Lowercase<HF.PrimaryElement>;
 type TransmutationType = 'fireToWater' | 'fireToEarth' | 'fireToAir' | 'waterToAir' | 'waterToEarth' | 'waterToFire' | 'airToEarth' | 'airToFire' | 'airToWater' | 'earthToWater' | 'earthToAir' | 'earthToFire';
 
 type HeroWithTransmutations = HF.Hero & {
-  [key in TransmutationType ] : string
+  [key in TransmutationType ] : number
 }
 
 type ActivityRecordSource = 'herofit' | 'strava';
@@ -342,4 +343,4 @@ interface UpgradeItem {
 type UpgradeWeightedElements = BaseElements;
 
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, UpgradeStats, HeroSnapshot, BattleHero, BattleFoe, BattleRound, BaseElements, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice, TransmutationType, HeroWithTransmutations, ActivityRecordSource, UpgradeImprovements, UpgradeLevelInfo, UpgradeItem, UpgradeWeightedElements };
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, UpgradeStats, HeroSnapshot, BattleHero, BattleFoe, BattleRound, BaseElements, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice, TransmutableElement, TransmutationType, HeroWithTransmutations, ActivityRecordSource, UpgradeImprovements, UpgradeLevelInfo, UpgradeItem, UpgradeWeightedElements };

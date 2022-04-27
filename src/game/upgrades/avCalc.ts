@@ -2,7 +2,7 @@ import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND
 import moment from "moment";
 import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
 import avatarList from "../../heroList.json";
-import { BaseElements, HeroSnapshot, HeroWithTransmutations, QpSpentStats, TransmutationType, UpgradeImprovements, UserTotals } from "../../types/BackendOnlyTypes";
+import { BaseElements, HeroSnapshot, HeroWithTransmutations, QpSpentStats, TransmutableElement, TransmutationType, UpgradeImprovements, UserTotals } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 
 interface ElementObject {
@@ -12,7 +12,7 @@ interface ElementObject {
   earth: number;
 }
 
-interface TransmuteElementReturnType{ transmutedImprovements : UpgradeImprovements, avatarAfterTransmutation : HeroWithTransmutations}
+interface TransmuteElementReturnType{ transmutedImprovements : UpgradeImprovements, heroAfterTransmutation : HeroWithTransmutations}
 
 // PRIMARY FUNCTIONS FOR HANDLING AVATAR POWER AND ELEMENT ADJUSTMENTS
 function avCalc(userTotals?: UserTotals) {
@@ -130,35 +130,56 @@ function avCalc(userTotals?: UserTotals) {
       return updatedElms;
     },
     // Improvements are accurate, except they haven't been transmuted
-    transmuteElements: function (improvements : UpgradeImprovements, avatar : HF.Hero, transmutation : TransmutationType) : TransmuteElementReturnType{
+    transmuteElements: function (improvements : UpgradeImprovements, hero : HeroWithTransmutations, transmuteTo : TransmutableElement) : TransmuteElementReturnType{
       const transmutedImprovements = {...improvements};
-      const avatarAfterTransmutation = {...avatar} as HeroWithTransmutations;
-      const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = avatarAfterTransmutation;
-        console.log('TTT', transmutation, avatar.water);
+      const heroAfterTransmutation = {...hero};
+      const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = heroAfterTransmutation;
+      const { transFire, transEarth, transAir, transWater} = avReturn._determineElementalPowerWithTransmutations(hero);
+      console.log('TTT', transmuteTo, hero.water);
 
-        switch(transmutation){
-         
-          case 'earthToWater':{
-            //const diff = improvements.earth - avatarAfterTransmutation.earthToWater;
-            console.log('actEarthImpro:', improvements.earth, 'actWaterImpro:', improvements.water, 'EtW:',avatarAfterTransmutation.earthToWater);
-            //console.log('DIFF!', diff);
-            transmutedImprovements.water += improvements.earth;
-            transmutedImprovements.earth -= improvements.earth;
+        const tranmustations = TRANSMUTATION_TYPE_LIST;
 
-            avatarAfterTransmutation.water += (improvements.earth + avatarAfterTransmutation.earthToWater + avatarAfterTransmutation.earthToAir + avatarAfterTransmutation.earthToFire);
-            avatarAfterTransmutation.earth -= (improvements.earth + avatarAfterTransmutation.earthToWater + avatarAfterTransmutation.earthToAir + avatarAfterTransmutation.earthToFire);
-            avatarAfterTransmutation.earthToWater += improvements.earth;
-            break;}
-          default:
-            avatarAfterTransmutation.earth += (fireToEarth, airToEarth, waterToEarth) - (earthToWater + earthToAir + earthToFire);
-            avatarAfterTransmutation.fire += (earthToFire, airToFire, waterToFire) - (fireToWater + fireToAir + fireToEarth);
-            avatarAfterTransmutation.air += (earthToAir, fireToAir, waterToAir) - (airToWater + airToFire + airToEarth);
-            avatarAfterTransmutation.water += (fireToWater, airToWater, earthToWater) - (waterToEarth + waterToFire + waterToAir);
+        // These account for the past transmutations to the hero
+        heroAfterTransmutation.fire += transFire;
+        heroAfterTransmutation.earth += transEarth;
+        heroAfterTransmutation.air += transAir;
+        heroAfterTransmutation.water += transWater;
+
+
+        // These account for this upgrade's transmutations to the hero
+
+        // Loop over improvements and check to see if any of the three remaining elements not equal to the transmuteTo parameter (eg: fire, earth, air)
+        // have values greater than zero. For each of these non zero elements, adjust the hero accordingly
+     
+        const basicElements = ['fire', 'earth', 'air', 'water'];
+        const improvedElementsToBeTransmuted = Object.fromEntries(Object.entries(improvements).filter((entry) => basicElements.includes(entry[0]) && entry[0] !== transmuteTo && entry[1] > 0));
+
+        let elm : keyof Pick<UpgradeImprovements , 'fire' |'earth' |'air' |'water'>;
+        for(elm in improvedElementsToBeTransmuted){
+          transmutedImprovements[transmuteTo] += improvements[elm];
+          transmutedImprovements[elm] -= improvements[elm];
+
+          heroAfterTransmutation[transmuteTo] += improvements[elm];
+          heroAfterTransmutation[elm] -= improvements[elm];
+
+          // Need logic to figure out transmutation type
+          heroAfterTransmutation.earthToWater += improvements[elm];
         }
 
-
    
-      return {transmutedImprovements, avatarAfterTransmutation };
+      return {transmutedImprovements, heroAfterTransmutation };
+    },
+
+    // Determines how much elemental power was transmuted to or from  each element
+    _determineElementalPowerWithTransmutations : function (hero : HeroWithTransmutations){
+      const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = hero;
+      
+      return {
+        transFire : (earthToFire, airToFire, waterToFire) - (fireToWater + fireToAir + fireToEarth),
+        transEarth : (fireToEarth, airToEarth, waterToEarth) - (earthToWater + earthToAir + earthToFire),
+        transAir : (earthToAir, fireToAir, waterToAir) - (airToWater + airToFire + airToEarth),
+        transWater : (fireToWater, airToWater, earthToWater) - (waterToEarth + waterToFire + waterToAir),
+      }
     },
 
     updateStatus: function (oldStatus: HF.HeroStatus, lvlUp: boolean) {

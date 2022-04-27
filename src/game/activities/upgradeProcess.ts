@@ -427,12 +427,7 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       const improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
       console.log('IMPRO', improvements);
 
-      const { transmutedImprovements, avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, 'earthToWater');
-
-      console.log('TRANS_IMPRO', transmutedImprovements);
-
-      console.log('snap::', avStatSnapshot, 'afterTrans::',avatarAfterTransmutation);
-
+      const { transmutedImprovements, heroAfterTransmutation : avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, 'water');
 
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
