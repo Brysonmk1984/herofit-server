@@ -1,6 +1,6 @@
 import { BASE_POWER, BASE_HEALTH, MINUTES_PER_ELM, MINUTES_PER_ALL_ELM, TIME_AND_HALF_ACTIVITIES, MAX_LEVEL, TRANSMUTATION_TYPE_LIST } from "../CONSTANTS";
 import moment from "moment";
-import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
+import { cloneObj, adjustActivityMinutes, capitalize } from "../../lib/helperFunctions";
 import avatarList from "../../heroList.json";
 import { BaseElements, HeroSnapshot, HeroWithTransmutations, QpSpentStats, TransmutableElement, TransmutationType, UpgradeImprovements, UserTotals } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
@@ -133,11 +133,8 @@ function avCalc(userTotals?: UserTotals) {
     transmuteElements: function (improvements : UpgradeImprovements, hero : HeroWithTransmutations, transmuteTo : TransmutableElement) : TransmuteElementReturnType{
       const transmutedImprovements = {...improvements};
       const heroAfterTransmutation = {...hero};
-      const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = heroAfterTransmutation;
       const { transFire, transEarth, transAir, transWater} = avReturn._determineElementalPowerWithTransmutations(hero);
-      console.log('TTT', transmuteTo, hero.water);
 
-        const tranmustations = TRANSMUTATION_TYPE_LIST;
 
         // These account for the past transmutations to the hero
         heroAfterTransmutation.fire += transFire;
@@ -147,26 +144,29 @@ function avCalc(userTotals?: UserTotals) {
 
 
         // These account for this upgrade's transmutations to the hero
-
-        // Loop over improvements and check to see if any of the three remaining elements not equal to the transmuteTo parameter (eg: fire, earth, air)
-        // have values greater than zero. For each of these non zero elements, adjust the hero accordingly
-     
         const basicElements = ['fire', 'earth', 'air', 'water'];
         const improvedElementsToBeTransmuted = Object.fromEntries(Object.entries(improvements).filter((entry) => basicElements.includes(entry[0]) && entry[0] !== transmuteTo && entry[1] > 0));
 
-        let elm : keyof Pick<UpgradeImprovements , 'fire' |'earth' |'air' |'water'>;
-        for(elm in improvedElementsToBeTransmuted){
-          transmutedImprovements[transmuteTo] += improvements[elm];
-          transmutedImprovements[elm] -= improvements[elm];
+        // Loop over each of the improved elements and handle transmutations
+        for(const element in improvedElementsToBeTransmuted){
+          let elm = element as keyof Pick<UpgradeImprovements , 'fire' |'earth' |'air' |'water'>;
+          
+          // Only transmute elements that are not of the corresponding activity type, eg: don't transmute to earth for bike rides
+          if(elm !== transmuteTo){
+            // Modify 'improvement' values to be displayed to user
+            transmutedImprovements[transmuteTo] += improvements[elm];
+            transmutedImprovements[elm] -= improvements[elm];
 
-          heroAfterTransmutation[transmuteTo] += improvements[elm];
-          heroAfterTransmutation[elm] -= improvements[elm];
+            // Modify Hero
+            heroAfterTransmutation[transmuteTo] += improvements[elm];
+            heroAfterTransmutation[elm] -= improvements[elm];
 
-          // Need logic to figure out transmutation type
-          heroAfterTransmutation.earthToWater += improvements[elm];
+            // Modify the specific TransmutationType field
+            const transmuteField = `${elm}To${capitalize(transmuteTo)}` as TransmutationType;
+            heroAfterTransmutation[transmuteField] += improvements[elm];
+          }
         }
 
-   
       return {transmutedImprovements, heroAfterTransmutation };
     },
 
@@ -175,10 +175,10 @@ function avCalc(userTotals?: UserTotals) {
       const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = hero;
       
       return {
-        transFire : (earthToFire, airToFire, waterToFire) - (fireToWater + fireToAir + fireToEarth),
-        transEarth : (fireToEarth, airToEarth, waterToEarth) - (earthToWater + earthToAir + earthToFire),
-        transAir : (earthToAir, fireToAir, waterToAir) - (airToWater + airToFire + airToEarth),
-        transWater : (fireToWater, airToWater, earthToWater) - (waterToEarth + waterToFire + waterToAir),
+        transFire : (earthToFire + airToFire + waterToFire) - (fireToWater + fireToAir + fireToEarth),
+        transEarth : (fireToEarth + airToEarth +  waterToEarth) - (earthToWater + earthToAir + earthToFire),
+        transAir : (earthToAir + fireToAir + waterToAir) - (airToWater + airToFire + airToEarth),
+        transWater : (fireToWater + airToWater + earthToWater) - (waterToEarth + waterToFire + waterToAir),
       }
     },
 

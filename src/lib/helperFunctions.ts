@@ -173,4 +173,8 @@ function includes<T extends U, U>(arr: ReadonlyArray<T>, el: U): el is T {
   return arr.includes(el as T);
 }
 
-export { cloneObj, parseStats, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem, includes };
+function capitalize(val : string) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
+export { cloneObj, parseStats, parseActivityData, arrayChunker, getRandomNumber, paginate, adjustActivityMinutes, stackItems, scrambleStats, roundNumber, range, arrayGroupBy, pickRandomArrayItem, includes, capitalize };
