@@ -168,39 +168,6 @@ function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, avatar : Partial
   };
 }
 
-async function _determineElementTransmutations(improvements : UpgradeImprovements, avatarID : number, t : Transaction){
-  const rows = await AvatarItems.findAll({
-    attributes: ["id", "avatarID", "itemID"],
-    where: { avatarID, equipped : true },
-    include: [
-      {
-        model: Items,
-        as: "item",
-        attributes: ["type", "name","effects"],
-      },
-    ],
-    raw: undefined,
-    nest: true,
-    transaction: t,
-  });
-
-  interface AvatarItemItem {
-    id : number
-    avatarID : number
-    itemID : number
-    item : { [val : string] : Record<string, unknown> & { dataValues : Array<HF.Item> } }
-  }
-
-  // const inventory = rows.map(({id, avatarID, itemID, item} : AvatarItemItem) => ({ id, avatarID, itemID, ...item.dataValues }))
-  // const itemEffectNamesArray = Object.values(inventory.map((item : HF.Item) => item.effects)).map(effect => effect.name);
-  // if(itemEffectNamesArray.includes(TRANSMUTATION_EFFECTS)){
-  //   console.log('TODO - handle switching the improvements here!');
-  // }
-  // console.log({itemEffectsArray});
-
-  return improvements;
-}
-
 // DETERMINE HOW HEAVILY USER WORKED OUT IN DIFFERENT ELEMENTS, USED FOR ITEM FIND LATER
 function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) : UpgradeWeightedElements {
   // Needed for activity-specific items
@@ -283,6 +250,7 @@ function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals) {
     },
     avatar.createdAt,
   );
+  
 
   // For users with Aether, heal a portion of health based on activity time and aether
   updatedHealth = activityHeal(updatedHealth, updatedMaxHealth, avatar.aether, aXPDiff);

@@ -133,7 +133,7 @@ function avCalc(userTotals?: UserTotals) {
     transmuteElements: function (improvements : UpgradeImprovements, hero : HeroWithTransmutations, transmuteTo : TransmutableElement) : TransmuteElementReturnType{
       const transmutedImprovements = {...improvements};
       const heroAfterTransmutation = {...hero};
-      const { transFire, transEarth, transAir, transWater} = avReturn._determineElementalPowerWithTransmutations(hero);
+      const { transFire, transEarth, transAir, transWater} = avReturn.determineNetTransmutedElementalValues(hero);
 
 
         // These account for the past transmutations to the hero
@@ -175,9 +175,8 @@ function avCalc(userTotals?: UserTotals) {
     },
 
     // Determines how much elemental power was transmuted to or from  each element
-    _determineElementalPowerWithTransmutations : function (hero : HeroWithTransmutations){
+    determineNetTransmutedElementalValues : function (hero : HeroWithTransmutations){
       const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire } = hero;
-      
       return {
         transFire : (earthToFire + airToFire + waterToFire) - (fireToWater + fireToAir + fireToEarth),
         transEarth : (fireToEarth + airToEarth +  waterToEarth) - (earthToWater + earthToAir + earthToFire),

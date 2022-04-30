@@ -5,14 +5,15 @@ import avCalc from "../upgrades/avCalc";
 import { COMPETITIVE_ACTIVITIES, NONCOMPETITIVE_ACTIVITIES, BASE_RECOVERY } from "../CONSTANTS";
 import instantiateBattle from "../prebattle/instantiateBattle";
 import HF from "../../types/herofit";
-import { BackendUserTotals } from "../../types/BackendOnlyTypes";
+import { BackendUserTotals, HeroWithTransmutations, TransmutationType } from "../../types/BackendOnlyTypes";
+import { parseStats } from "../../lib/helperFunctions";
 
 // Retrocausal Capsule
 async function resetHero(avatarID: number, email: string): Promise<HF.Hero> {
   try {
     const userTotals: BackendUserTotals = await UserTotal.findOne({ where: { user: email }, attributes: [...COMPETITIVE_ACTIVITIES, ...NONCOMPETITIVE_ACTIVITIES], raw: true });
 
-    interface AvatarAttrs {
+    type AvatarAttrs =  { [x : TransmutationType] } & {
       health: number;
       maxHealth: number;
       activityXP: number;
@@ -22,14 +23,24 @@ async function resetHero(avatarID: number, email: string): Promise<HF.Hero> {
     }
 
     // GET AVATAR
-    const { health, maxHealth, activityXP, battleXP, character, createdAt }: AvatarAttrs = await Avatar.findOne({ attributes: ["health", "maxHealth", "activityXP", "battleXP", "character", "createdAt", "owner"], where: { id: avatarID } });
+    const avatar: AvatarAttrs = await Avatar.findOne({ attributes: ["health", "maxHealth", "activityXP", "battleXP", "character", "createdAt", "owner", "fireToWater","fireToEarth","fireToAir","waterToAir","waterToEarth","waterToFire","airToEarth","airToFire","airToWater","earthToWater","earthToAir","earthToFire" ], where: { id: avatarID } });
+    const { health, maxHealth, activityXP, battleXP, character, createdAt } = avatar;
 
     const { getCurrentLevel } = xpCalc(activityXP, battleXP);
     const { total: heroLevel } = getCurrentLevel();
 
     // CALCULATE ATTRIBUTES BASED ON XP CURVE.
-    const { updatePower, updateHealth, updateAether, updateElements } = avCalc(userTotals);
-    const { fire: updatedFire, earth: updatedEarth, water: updatedWater, air: updatedAir } = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
+    const { updatePower, updateHealth, updateAether, updateElements, determineNetTransmutedElementalValues } = avCalc(userTotals);
+    const updatedElms = updateElements(character, { qpFire: 0, qpEarth: 0, qpWater: 0, qpAir: 0 }, createdAt);
+    const {transAir, transEarth, transFire, transWater} = determineNetTransmutedElementalValues(parseStats(avatar) as HeroWithTransmutations);
+
+    const finalElms = {
+      fire : updatedElms.fire + transFire,
+      earth : updatedElms.earth + transEarth,
+      air : updatedElms.air + transAir,
+      water : updatedElms.water + transWater,
+    }
+
     const updatedPower = updatePower(heroLevel, 0);
     const updatedAether = updateAether(heroLevel, 0);
     const { updatedMaxHealth, updatedHealth } = updateHealth(heroLevel, 0, health, maxHealth, "Rested", false, true);
@@ -42,10 +53,10 @@ async function resetHero(avatarID: number, email: string): Promise<HF.Hero> {
       maxHealth: updatedMaxHealth,
       armor: 0,
       recovery: BASE_RECOVERY,
-      fire: updatedFire,
-      earth: updatedEarth,
-      air: updatedAir,
-      water: updatedWater,
+      fire: finalElms.fire,
+      earth: finalElms.earth,
+      air: finalElms.air,
+      water: finalElms.water,
       aether: updatedAether,
       qpPower: 0,
       qpHealth: 0,
