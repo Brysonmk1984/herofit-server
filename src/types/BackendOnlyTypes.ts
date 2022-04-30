@@ -318,8 +318,8 @@ interface UpgradeStats extends Partial<HF.Stats> {
   maxHealth : number
 }
 
-interface HeroSnapshot extends UpgradeStats{
-  activityXP : number
+type HeroSnapshot = UpgradeStats & {activityXP : number} & {
+  [key in TransmutationType ] : number
 }
 
 interface UpgradeImprovements extends Omit<UpgradeStats, 'maxHealth'>{

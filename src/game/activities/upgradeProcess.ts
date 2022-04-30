@@ -14,6 +14,7 @@ import { activityHeal } from "./activityHeal";
 import { sendBackendOnlyEmail } from "../../mail";
 import HF from "../../types/herofit";
 import { HeroSnapshot, BackendUserTotals, UserTotals, BackendActivity, ActivityRecordSource, UpgradeLevelInfo, UpgradeImprovements, UpgradeItem, UpgradeWeightedElements, HeroWithTransmutations, TransmutationType, BaseElements } from "../../types/BackendOnlyTypes";
+import { determineTransmutation } from "./activityEffects";
 
 
 // If id Is passed in, use it, but if it's a herofit source, then we need to create a new id for the activity
@@ -126,13 +127,16 @@ async function _handleUserTotalsUpdate(email : string, hasBeenUpgraded : boolean
 
 // RETRIEVE AVATAR AND ITEMS FROM DB
 function _getAvatarAndItems(email : string, t : Transaction) {
+
+  const q = `
+  SELECT avatars.*, equipped 
+  FROM avatars
+  LEFT OUTER JOIN (SELECT "avatarID", array_agg(json_build_object('equipped', equipped, 'itemID', "itemID")) AS equipped
+    FROM avatar_items WHERE avatar_items.equipped=true group by 1) AS equipped ON(id="avatarID")
+  WHERE avatars.owner = $1
+`;
   return Promise.all([
-    Avatar.findOne({
-      where: { owner: email },
-      attributes: ["id", "character", "createdAt", "activityXP", "battleXP", "power", "health", "maxHealth", "fire", "earth", "water", "air", "aether", "qpFire", "qpEarth", "qpWater", "qpAir", "qpPower", "qpHealth", "qpAether", "qp", "photonTokens", "status", 'fireToWater','fireToEarth','fireToAir','waterToAir','waterToEarth','waterToFire','airToEarth','airToFire','airToWater','earthToWater','earthToAir','earthToFire'],
-      raw: true,
-      transaction: t,
-    }),
+    db.query(q, { bind: [email], transaction : t}),
     Items.findAll({
       where: { dropRate: { [Op.ne]: null }, disabled: false },
       attributes: ["name", "dropRate", "levelRestriction", "activityRestriction", "disabled"],
@@ -142,41 +146,23 @@ function _getAvatarAndItems(email : string, t : Transaction) {
   ]);
 }
 
-function _subtractTransmutedAwayValues(element : Lowercase<HF.PrimaryElement>, avatar){
-  const {fireToWater, fireToEarth, fireToAir, earthToWater, earthToFire, earthToAir, airToWater, airToEarth, airToFire, waterToFire, waterToEarth, waterToAir } = avatar;
-  switch(element){
-    case 'fire':
-      return avatar.fire - (fireToWater, fireToEarth, fireToAir);
-    case 'earth':
-      console.log('EARTH',avatar.earth, avatar.earth - (earthToWater + earthToFire + earthToAir), earthToWater, earthToFire, earthToAir);
-      return avatar.earth - (earthToWater + earthToFire + earthToAir);
-    case 'air':
-      return avatar.air - (airToWater + airToEarth +airToFire);
-    case 'water':
-      return avatar.water - (waterToFire + waterToEarth + waterToAir);
-    default:
-      throw new Error ('No matching Element');
-  }
-}
-
 // CALCULATE HOW MUCH THE HERO HAS IMPROVED IN THE DIFFERENT STATS
 function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, avatar : Partial<HF.Hero>) : UpgradeImprovements {
   const { power, maxHealth, health, air, water, fire, earth, aether } = avatar;
-  // minZero necessary because of rounding of the snapshot vs not rounding actual improvements. Sometimes, the actual improvements would be less than the snapshot
-  // and cause an apparent negative improvement. It might be a good idea to look at the snapshot in the future and decide if I really should be rounding it.
-  // in the mean time, this effective solves the itemFind error where items would sometimes have a negative chance to find.
+  const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire} = avStatSnapshot;
   function minZero(val : number) {
     return val < 0 ? 0 : val;
   }
 
+  // Since the avatar value coming in was just adjusted from new user totals, we need to account for previous transmutations here
   return {
     power: minZero(power - avStatSnapshot.power),
     "max health": minZero(maxHealth - avStatSnapshot.maxHealth),
     health: minZero(health - avStatSnapshot.health),
-    air: minZero(Number((air - avStatSnapshot.air).toFixed(2))),
-    water: minZero(Number((water - avStatSnapshot.water).toFixed(2))),
-    fire: minZero(Number((fire - avStatSnapshot.fire).toFixed(2))),
-    earth: minZero(Number((earth - avStatSnapshot.earth - (avStatSnapshot.earthToWater + avStatSnapshot.earthToAir + avStatSnapshot.earthToFire)).toFixed(2))),
+    air: minZero(Number((air - avStatSnapshot.air - (airToWater + airToEarth + airToFire)).toFixed(2))),
+    water: minZero(Number((water - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)).toFixed(2))),
+    fire: minZero(Number((fire - avStatSnapshot.fire - (fireToWater + fireToAir + fireToEarth)).toFixed(2))),
+    earth: minZero(Number((earth - avStatSnapshot.earth - (earthToWater + earthToAir + earthToFire)).toFixed(2))),
     aether: minZero(Number((aether - avStatSnapshot.aether).toFixed(2))),
 
   };
@@ -229,6 +215,7 @@ function _calcWeightedElms({ air, water, fire, earth } : UpgradeImprovements) : 
 
 // CALCULATE XP & LEVELS BASED ON USER ACTIVITIES
 function _calcProgress(avatar: HeroWithTransmutations, ut: BackendUserTotals) {
+
   const avStatSnapshot = 
     Object.assign(
       {},
@@ -400,15 +387,26 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
 
       userTotals = await _handleUserTotalsUpdate(email, hasBeenUpgraded, userActivities, accountDate, userTotals, t);
 
-      /*
-        COMING SOON:
-        FOR ELEMENT TRANSMUTATION, NEED TO EITHER FETCH EQUIPPED PET OR PASS IT IN FROM THE FRONT END
-      */
-      
       
 
-      let [avatar, possibleItemDrops] : [HF.Hero, UpgradeItem[]] = await _getAvatarAndItems(email, t);
-      const parsedAvatar = parseStats(avatar);
+      let [results, possibleItemDrops] : [any, UpgradeItem[]] = await _getAvatarAndItems(email, t);
+      const parsedAvatar = parseStats(results[0][0]);
+      const equippedItems = await Items.findAll({
+        where: { id: { [Op.in]: parsedAvatar.equipped.map(i => i.itemID) }},
+        attributes: ["name", "effects"],
+        raw: true,
+        transaction: t,
+      });
+
+      /* TODO: In the future, need to account for more than one activity effect  */
+
+      const activityEffect = equippedItems.map(item => item.effects).flat().find(e => e !== null && e.type === 'activity');
+
+
+      const transmuteTo = determineTransmutation(activityEffect);
+      
+      console.log('itemEffects',  transmuteTo);
+      
       possibleItemDrops = possibleItemDrops.map(i => ({
         name: i.name,
         dropRate: +i.dropRate,
@@ -427,7 +425,7 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       const improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
       console.log('IMPRO', improvements);
 
-      const { transmutedImprovements, heroAfterTransmutation : avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, 'earth');
+      const { transmutedImprovements, heroAfterTransmutation : avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, transmuteTo);
 
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step

@@ -143,6 +143,10 @@ function avCalc(userTotals?: UserTotals) {
         heroAfterTransmutation.water += transWater;
 
 
+        if(!transmuteTo){
+          return {transmutedImprovements, heroAfterTransmutation };
+        }
+
         // These account for this upgrade's transmutations to the hero
         const basicElements = ['fire', 'earth', 'air', 'water'];
         const improvedElementsToBeTransmuted = Object.fromEntries(Object.entries(improvements).filter((entry) => basicElements.includes(entry[0]) && entry[0] !== transmuteTo && entry[1] > 0));
