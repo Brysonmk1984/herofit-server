@@ -1,0 +1,19 @@
+[{
+  "activityXP": 35980,
+  "battleXP": 5242,
+  "air": 707,
+  "earth": 36,
+  "fire": 527,
+  "water": 0,
+  "power": 755,
+  "health": 366,
+  "armor": 230,
+  "recovery": 80,
+  "character": "Compost Creature",
+  "equipped": [],
+  "name": "Power + Balanced",
+  "description": "lvl 100 high Level, focused POWER",
+  "level": 103,
+  "aether": 15,
+  "fireToWater" : 10,"fireToEarth" : 0,"fireToAir" : 0,"waterToAir" : 0,"waterToEarth" : 0,"waterToFire" : 0,"airToEarth" : 0,"airToFire" : 0,"airToWater" : 10,"earthToWater" : 10,"earthToAir" : 0,"earthToFire" : 0
+}]

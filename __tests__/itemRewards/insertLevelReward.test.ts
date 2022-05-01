@@ -11,6 +11,7 @@ describe("Insert Level Reward Tests", () => {
   it("Should Insert the 2 items earned from reaching level 100", async () => {
     const levelsToCheck = range(99, 101);
     const data = await activityLevelRewards(254, levelsToCheck);
+
     const itemsNamesAwarded = [data[0].name, data[1].name];
     expect(data).toBeArrayOfSize(2);
 

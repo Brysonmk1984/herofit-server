@@ -5,7 +5,7 @@ module.exports = {
   verbose: true,
   watchPathIgnorePatterns: ["node_modules"],
   setupFilesAfterEnv: ["<rootDir>__tests__/setup/nullOrAny.setup.ts", "jest-extended"],
-  testPathIgnorePatterns: ["__tests__/setup", "__tests__/nonHookTests"],
+  testPathIgnorePatterns: ["__tests__/setup", "__tests__/nonHookTests", "__tests__/heroAbilities/battleContenderProfiles.ts"],
   globals: {
     "ts-jest": {
       diagnostics: false,

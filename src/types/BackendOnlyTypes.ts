@@ -314,15 +314,14 @@ type HeroWithTransmutations = HF.Hero & {
 
 type ActivityRecordSource = 'herofit' | 'strava';
 
-interface UpgradeStats extends Partial<HF.Stats> {
-  maxHealth : number
+interface UpgradeStats extends Pick<HF.Stats, 'power' | 'health' | 'aether' | 'air' | 'earth' | 'water' |'fire'>{
 }
 
 type HeroSnapshot = UpgradeStats & {activityXP : number} & {
   [key in TransmutationType ] : number
 }
 
-interface UpgradeImprovements extends Omit<UpgradeStats, 'maxHealth'>{
+interface UpgradeImprovements extends UpgradeStats{
   "max health" : number
 }
 

@@ -151,19 +151,22 @@ function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, avatar : Partial
   const { power, maxHealth, health, air, water, fire, earth, aether } = avatar;
   const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire} = avStatSnapshot;
   function minZero(val : number) {
+
+    console.log('VAL', val);
     return val < 0 ? 0 : val;
   }
 
+  console.log('WATWAT',water, avStatSnapshot.water, waterToEarth + waterToAir + waterToFire,  minZero(Number((water - avStatSnapshot.water).toFixed(2))),minZero(Number((water - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)).toFixed(2))),);
   // Since the avatar value coming in was just adjusted from new user totals, we need to account for previous transmutations here
   return {
     power: minZero(power - avStatSnapshot.power),
     "max health": minZero(maxHealth - avStatSnapshot.maxHealth),
     health: minZero(health - avStatSnapshot.health),
-    air: minZero(Number((air - avStatSnapshot.air - (airToWater + airToEarth + airToFire)).toFixed(2))),
-    water: minZero(Number((water - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)).toFixed(2))),
-    fire: minZero(Number((fire - avStatSnapshot.fire - (fireToWater + fireToAir + fireToEarth)).toFixed(2))),
-    earth: minZero(Number((earth - avStatSnapshot.earth - (earthToWater + earthToAir + earthToFire)).toFixed(2))),
-    aether: minZero(Number((aether - avStatSnapshot.aether).toFixed(2))),
+    air: minZero(Number((air - avStatSnapshot.air - (airToWater + airToEarth + airToFire)))),
+    water: minZero(Number(((water + (fireToWater + airToWater + earthToWater)) - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)))),
+    fire: minZero(Number(((fire + (earthToFire + airToFire + waterToFire)) - avStatSnapshot.fire - (fireToWater + fireToAir + fireToEarth)))),
+    earth: minZero(Number((earth - avStatSnapshot.earth - (earthToWater + earthToAir + earthToFire)))),
+    aether: minZero(Number((aether - avStatSnapshot.aether))),
 
   };
 }
