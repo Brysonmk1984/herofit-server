@@ -151,21 +151,22 @@ function _calcAvatarImprovements(avStatSnapshot : HeroSnapshot, avatar : Partial
   const { power, maxHealth, health, air, water, fire, earth, aether } = avatar;
   const { fireToWater,fireToEarth,fireToAir,waterToAir,waterToEarth,waterToFire,airToEarth,airToFire,airToWater,earthToWater,earthToAir,earthToFire} = avStatSnapshot;
   function minZero(val : number) {
-
-    console.log('VAL', val);
-    return val < 0 ? 0 : val;
+    if(val < 0){
+      //sendBackendOnlyEmail("There was a Hero Upgrade where a negative value was present.", JSON.stringify(avatar));
+      return 0;
+    }
+    return val;
   }
-
-  console.log('WATWAT',water, avStatSnapshot.water, waterToEarth + waterToAir + waterToFire,  minZero(Number((water - avStatSnapshot.water).toFixed(2))),minZero(Number((water - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)).toFixed(2))),);
+  
   // Since the avatar value coming in was just adjusted from new user totals, we need to account for previous transmutations here
   return {
     power: minZero(power - avStatSnapshot.power),
     "max health": minZero(maxHealth - avStatSnapshot.maxHealth),
     health: minZero(health - avStatSnapshot.health),
-    air: minZero(Number((air - avStatSnapshot.air - (airToWater + airToEarth + airToFire)))),
-    water: minZero(Number(((water + (fireToWater + airToWater + earthToWater)) - avStatSnapshot.water - (waterToEarth + waterToAir + waterToFire)))),
-    fire: minZero(Number(((fire + (earthToFire + airToFire + waterToFire)) - avStatSnapshot.fire - (fireToWater + fireToAir + fireToEarth)))),
-    earth: minZero(Number((earth - avStatSnapshot.earth - (earthToWater + earthToAir + earthToFire)))),
+    air: minZero(Number(((air + fireToAir + waterToAir + earthToAir) - (avStatSnapshot.air + airToWater + airToFire + airToEarth)))),
+    water: minZero(Number(((water + fireToWater + airToWater + earthToWater) - (avStatSnapshot.water + waterToEarth + waterToFire + waterToAir)))),
+    fire: minZero(Number(((fire + earthToFire + airToFire + waterToFire) - (avStatSnapshot.fire + fireToWater + fireToEarth + fireToAir)))),
+    earth: minZero(Number(((earth + fireToEarth + waterToEarth + airToEarth) - (avStatSnapshot.earth + earthToWater + earthToFire + earthToAir)))),
     aether: minZero(Number((aether - avStatSnapshot.aether))),
 
   };
@@ -376,7 +377,6 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
 
       const transmuteTo = determineTransmutation(activityEffect);
       
-      console.log('itemEffects',  transmuteTo);
       
       possibleItemDrops = possibleItemDrops.map(i => ({
         name: i.name,
@@ -394,14 +394,12 @@ function upgradeProcess(email: string, activities: HF.Activity[], accountDate: s
       }
       // Calc gains here to be used in weighted element item find calculations & to be displayed on frontend
       const improvements = _calcAvatarImprovements(avStatSnapshot, updatedAvatar);
-      console.log('IMPRO', improvements);
 
       const { transmutedImprovements, heroAfterTransmutation : avatarAfterTransmutation } = transmuteElements(improvements, updatedAvatar, transmuteTo);
 
 
       // determine weight for each element in upgrade, which is used for itemFind likelihood in the proceeding step
       const weightedElms = _calcWeightedElms(transmutedImprovements);
-
 
       // Run activity find module to see if any items were found from latest upgrade
       const { foundItems, improvementsAfterPt, avatarAfterPt } = _handleActivityItemFind(weightedElms, transmutedImprovements, levelInfo, avatarAfterTransmutation, possibleItemDrops);

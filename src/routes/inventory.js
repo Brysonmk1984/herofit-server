@@ -177,7 +177,7 @@ router.get("/get-default-items", (req, res) => {
     return res.formatter.badRequest(errors.array(), "Validation Error - for /get-default-items");
   }
 
-  Items.findAll()
+  Items.findAll({ where : { disabled : false } })
     .then(items => {
       res.formatter.ok({ items }, "Successfully ran /get-default-items");
     })

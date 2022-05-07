@@ -1,0 +1,25 @@
+[
+  {
+    "activityXP": 29082,
+    "power": 610,
+    "maxHealth": 610,
+    "fire": 100,
+    "earth": 100,
+    "water": 100,
+    "air": 100,
+    "aether": 15,
+    "health": 610,
+    "fireToWater": 10,
+    "fireToEarth": 10,
+    "fireToAir": 10,
+    "waterToAir": 10,
+    "waterToEarth": 10,
+    "waterToFire": 10,
+    "airToEarth": 10,
+    "airToFire": 10,
+    "airToWater": 10,
+    "earthToWater": 10,
+    "earthToAir": 10,
+    "earthToFire": 10
+  }
+]

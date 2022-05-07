@@ -24,7 +24,7 @@ function loadDb() {
     },
     query: { raw: true },
   };
-
+  
   const db = new Sequelize(process.env.DATABASE_URL, sequelizeSettings);
 
   const User = UserModel(db, Sequelize);

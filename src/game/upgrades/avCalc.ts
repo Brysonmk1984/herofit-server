@@ -142,21 +142,20 @@ function avCalc(userTotals?: UserTotals) {
         heroAfterTransmutation.air += transAir;
         heroAfterTransmutation.water += transWater;
 
-
         if(!transmuteTo){
           return {transmutedImprovements, heroAfterTransmutation };
         }
-        console.log('IMPRO', improvements);
+        
         // These account for this upgrade's transmutations to the hero
         const basicElements = ['fire', 'earth', 'air', 'water'];
         const improvedElementsToBeTransmuted = Object.fromEntries(Object.entries(improvements).filter((entry) => basicElements.includes(entry[0]) && entry[1] > 0));
-        console.log('LOOK', improvedElementsToBeTransmuted);
+
         // Loop over each of the improved elements and handle transmutations
         for(const element in improvedElementsToBeTransmuted){
           let elm = element as keyof Pick<UpgradeImprovements , 'fire' |'earth' |'air' |'water'>;
-          console.log(elm, transmuteTo);
+
           // Only transmute elements that are not of the corresponding activity type, eg: don't transmute to earth for bike rides
-          if(elm !== transmuteTo){console.log(1);
+          if(elm !== transmuteTo){
             // Modify 'improvement' values to be displayed to user
             transmutedImprovements[transmuteTo] += improvements[elm];
             transmutedImprovements[elm] -= improvements[elm];
@@ -169,7 +168,7 @@ function avCalc(userTotals?: UserTotals) {
             const transmuteField = `${elm}To${capitalize(transmuteTo)}` as TransmutationType;
             heroAfterTransmutation[transmuteField] += improvements[elm];
 
-          } else {console.log(2);
+          } else {
             // If a user has a transmutation pet equipped in the same element as their activity, just add the improvement
             heroAfterTransmutation[elm] += improvements[elm];
           }
