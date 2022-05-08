@@ -4,6 +4,10 @@ import heroProfiles from "./heroProfiles.json";
 
 describe('WATER TRANSMUTATION - All other elements to WATER', () =>{
   const { transmuteElements, determineNetTransmutedElementalValues } = avCalc();
+  // Heroes aren't identical to how they are when saved in DB. These hero mocks represent heroes who are midway through the upgrade process
+  // They just had their user totals adjusted but have yet to have the elements adjusted to match their previous and current transmutations
+  // So for instance, if 30 fire has been transmuted away previously, and this was a fire activity for 2, and we are transmuting to water, 
+  // then the hero mock would need at least 32 fire which will be subtracted away.
   const hero = heroProfiles[0] as unknown as HeroWithTransmutations;
   
 
