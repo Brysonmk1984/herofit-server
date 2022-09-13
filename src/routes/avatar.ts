@@ -236,7 +236,7 @@ router.post("/get-avatar", body("email").isEmail(), body("isMobileApp").isBoolea
 
     // Non-Whole numbers come out of DB as strings, so need to convert to numbers here
     const avatar = parseStats(results[0], true);
-
+    console.log({avatar: avatar.name})
     const { getCurrentLevel, getNextLevel, determineRecoveryPerHour } = xpCalc(avatar.activityXP, avatar.battleXP);
     const { level, albedo } = getCurrentLevel();
     avatar.level = level;
