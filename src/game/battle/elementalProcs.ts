@@ -5,7 +5,6 @@ const chance = Chance();
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire: number, d: number) {
-  console.log({fire, d});
   let critChance = Math.floor(+((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
   if (critChance > 60) {
     critChance = 60;
