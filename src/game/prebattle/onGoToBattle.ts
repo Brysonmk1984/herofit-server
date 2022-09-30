@@ -12,7 +12,7 @@ function determineItemEffects(equipment: HF.Item[]) {
     if (item.effects && item.effects.length) {
       // Determine if item effects are battle effects
       // AND map only the effect name
-      const battleItemEffects = item.effects.filter(effect => effect.type === "prebattle" || effect.type === "postbattle").map(effect => effect.name);
+      const battleItemEffects = item.effects.filter(effect => effect.type === "prebattle" || effect.type === "battle" || effect.type === "postbattle").map(effect => effect.name);
       //console.log('', battleItemEffects);
       filtered.push(...battleItemEffects);
     }

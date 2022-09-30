@@ -4,8 +4,9 @@ import preBattleSetup from "./preBattleSetup";
 import postBattleProcess from "./postBattleProcess";
 import { Op } from "sequelize";
 import xpCalc from "../upgrades/xpCalc";
-import { BattleHero, BattlePassiveAbility, GamePhase, PassiveAbility } from "../../types/BackendOnlyTypes";
+import { BattleHero, BattlePassiveAbilities, PassiveAbility } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
+import { PROC_FOR_EITHER, PROC_FOR_FOE } from "../CONSTANTS";
 
 /* 
   DEFAULT FUNCTION FOR SINGLE AND MULTIPLE BATTLES - Accepts the whole battle and avatar objects, returns the promise chain for updating Battle, Avatar, and AvatarItems
@@ -15,7 +16,7 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
   const battle = Object.assign({}, battleInstance);
   let avatar = Object.assign({}, avatarInstance);
 
-  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassiveSetup, prepareFoe, applyElementalBonus, determineAggressor, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
+  const { determineBeginnersLuck, doScenarioAndBonus, doPreBattleEffects, doPreBattleHeroPassiveSetup, prepareFoe, applyElementalBonus, determineAggressor, doItemBattlePassivesSetup, applyCheat, getPreBattlePackage } = preBattleSetup(avatar, battle.foe);
 
   // Beginners luck Makes unfavorable scenarios and foe goesFirst less common for players below level 15
   determineBeginnersLuck();
@@ -38,6 +39,8 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
   // PREBATTLE STEP 5 - DETERMINE WHO ATTACKS FIRST
   determineAggressor();
 
+  doItemBattlePassivesSetup(battle.effects)
+
   // FOR TESTING PURPOSES - APPLY CHEAT
   // Avatar Power, Foe Power, Avatar Health, Foe Health, Avatar Earth, Foe Earth
   //applyCheat(1,1,1,1,10000,10000)
@@ -49,17 +52,19 @@ function battleProcess(battleInstance: HF.Battle, avatarInstance: BattleHero, pa
   // BATTLE STEP - ALL ROUNDS RAN AND DAMAGE DEALT
   // BATTLE DETAILS RETURNED
   try {
-    // In the future, this will need to be able to handle an array of abilities
-    const battlePassive = effectProcs.find(e => e.type === "battle");
+    const battlePassives = effectProcs.filter(e => e.type === "battle");
+  
+    const battleAbilities = battlePassives.map(passive => {
+      const procForEither = PROC_FOR_EITHER.includes(passive.effect);
+      const procForFoe = PROC_FOR_FOE.includes(passive.effect);
 
-    const battleAbility: BattlePassiveAbility = battlePassive
-      ? {
-          name: battlePassive.effect,
-          aggressor: battlePassive.effect === "Olfactory Overload" ? "either" : battlePassive.effect === "Corundum Armor" ? "foe" : "hero",
-        }
-      : undefined;
+      return {
+        name: passive.effect,
+        aggressor: procForEither ? "either" : procForFoe ? "foe" : "hero",
+      }
+    }) as BattlePassiveAbilities;
 
-    const b = doBattle(BRA, BRF, goesFirst, battleAbility);
+    const b = doBattle(BRA, BRF, goesFirst, battleAbilities);
 
     const { doPostBattleEffects, doPostBattlePassiveAbilities, updateAvatarByOutcome, doAllPbas, getPostBattlePackage } = postBattleProcess(BRA, BRF, b.outcomeData, b.aHealthRemaining, b.fHealthRemaining);
 

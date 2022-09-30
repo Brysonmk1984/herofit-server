@@ -1,5 +1,5 @@
 import Chance from "chance";
-import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, BattlePassiveAbility, OutcomeData } from "../../types/BackendOnlyTypes";
+import { AvatarOrFoeString, BattleElementalProcs, BattleElements, BattleFoe, BattleHero, BattleOutcome, BattleRound, OutcomeData, BattlePassiveAbilities, ElementalTraitBoost } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
 import { ARMOR_DRF, DAMAGE_VARIANCE_RANGE, ELM_DAMAGE_VARIANCE_RANGE } from "../CONSTANTS";
 import { determineFireCrit, determineAirEvade, determineWaterHeal, determineEarthThorns, determineTD } from "./elementalProcs";
@@ -90,7 +90,7 @@ function _determineElmMatchups(elm: Lowercase<HF.PrimaryElement>) {
   return { mirror, weakVs, strongVs };
 }
 
-function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHero | BattleFoe, evaded: boolean) {
+function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHero | BattleFoe, evaded: boolean, firePassiveBoost? : ElementalTraitBoost) {
   // Using Ceil to benefit lower level players not having a single damage in elements
   const attackerElms: BattleElements = {
     fire: Math.ceil(
@@ -228,7 +228,7 @@ function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHe
     THIS IS WHERE WE NEED TO INSERT ELEMENTAL SPECIALTIES
   */
   // First value is total fire of attacker, second is the 'd' factor, which is all elemental power added together adjusted down for rounds, and then averaged together in the fireProc function
-  const fireProc = determineFireCrit(attacker.fire, attackerElms.fire + (attackerElms.earth || attackerElms.fire) + (attackerElms.water || attackerElms.fire) + (attackerElms.air || attackerElms.fire));
+  const fireProc = determineFireCrit(attacker.fire, attackerElms.fire + (attackerElms.earth || attackerElms.fire) + (attackerElms.water || attackerElms.fire) + (attackerElms.air || attackerElms.fire), firePassiveBoost);
   turnElmDamageDone.fire += fireProc.critDamage;
   turnElmDamageDone.total += fireProc.critDamage;
 
@@ -249,8 +249,8 @@ function _calcElementDamage(attacker: BattleHero | BattleFoe, receiver: BattleHe
 }
 
 // Calculates damage done against an element's counter element (F on E)
-function _calcArmorDR(aPower: number, rArmor: number, battleAbility?: BattlePassiveAbility) {
-  const armorType = battleAbility?.name.includes("Corundum") ? battleAbility.name : "default";
+function _calcArmorDR(aPower: number, rArmor: number, battleAbilities?: BattlePassiveAbilities) {
+  const armorType = battleAbilities.find(ability => ability.name === "Corundum Armor") ? "Corundum Armor" : "default";
   let armorDRF = ARMOR_DRF[armorType as keyof typeof ARMOR_DRF];
   let d = aPower;
   let r = rArmor;
@@ -266,7 +266,7 @@ function _calcArmorDR(aPower: number, rArmor: number, battleAbility?: BattlePass
   };
 }
 
-function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbility?: BattlePassiveAbility) {
+function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbilities?: BattlePassiveAbilities) {
   if (evaded) {
     return { physicalDamage: 0, physicalReduction: 0 };
   }
@@ -284,7 +284,7 @@ function _calcDamage(aPower: number, rArmor: number, evaded: boolean, battleAbil
     fixed: 2,
   });
 
-  const { reduction, netDamage } = _calcArmorDR(power, armor, battleAbility);
+  const { reduction, netDamage } = _calcArmorDR(power, armor, battleAbilities);
 
   return {
     physicalDamage: Math.floor(netDamage),
@@ -336,14 +336,19 @@ function _calcHealthLoss(health: number, damage: number, bonusDamage = 0) {
   return Math.floor(health - damage - bonusDamage);
 }
 
-function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: GrandTotals, battleAbility: BattlePassiveAbility) {
+function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: GrandTotals, battleAbilities: BattlePassiveAbilities) {
+  const battlePassivesNames = battleAbilities.map(ability => ability.name);
+  const firePassiveBoost = battlePassivesNames.includes('Inner Fire') ? [1.5, 1.15] as ElementalTraitBoost : undefined;
+  const waterPassiveBoost = battlePassivesNames.includes('High Tide') ? [1.3, 1.15] as ElementalTraitBoost : undefined;
+
+
   // Now determining evasion here to prevent physical damage
   const airProc = determineAirEvade(defender.air);
 
   // Calc physical damage, get back damage done and how much was prevented
-  const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+  const { physicalDamage, physicalReduction } = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbilities);
   // Calc elm damage, get back damage done and how much was prevented
-  const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded);
+  const { turnElmDamageDone, turnElmDamagePrevented, fireProc } = _calcElementDamage(aggressor, defender, airProc.evaded, firePassiveBoost);
 
   // Add to totals done for damage and reduction
   totals.aPhyDamage += physicalDamage;
@@ -360,7 +365,7 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
     fire: fireProc,
     air: airProc,
     earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + totals.aPhyDamage),
-    water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage),
+    water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + totals.aPhyDamage, waterPassiveBoost),
   };
 
   // Only adjust Health for Thorns & VampTouch IF evasion did not happen
@@ -371,7 +376,7 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
     totals.avHealthRemaining += elementalProcs.water.amountHealed;
   }
   // Adjust for hero DOT passive (Compost Creature)
-  const bonusDamage = battleAbility?.name === "Olfactory Overload" ? Math.floor(physicalDamage * 0.1) : 0;
+  const bonusDamage = battleAbilities.find(ability => ability.name === "Olfactory Overload") ? Math.floor(physicalDamage * 0.1) : 0;
   totals.foeHealthRemaining = _calcHealthLoss(totals.foeHealthRemaining, turnElmDamageDone.total + physicalDamage, bonusDamage);
 
   return {
@@ -386,9 +391,13 @@ function _computeHeroRound(aggressor: BattleHero, defender: BattleFoe, totals: G
   };
 }
 
-function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
+function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsElemental: boolean, totals: GrandTotals, battleAbilities?: BattlePassiveAbilities) {
+  const battlePassivesNames = battleAbilities.map(ability => ability.name);
+  const airPassiveBoost = battlePassivesNames.includes('Tailwind') ? [1.25, 1.1] as ElementalTraitBoost: undefined;
+  const earthPassiveBoost = battlePassivesNames.includes('Rock Slide') ? [1.5, 1.25] as ElementalTraitBoost: undefined;
+  
   // Now determining evasion here to prevent physical damage
-  const airProc = determineAirEvade(defender.air);
+  const airProc = determineAirEvade(defender.air, airPassiveBoost);
 
   let physicalDamage,
     physicalReduction,
@@ -405,8 +414,8 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
   // If foe has no elemental power, calc physical damage twice instead of physical + elemental
   if (!foeIsElemental) {
     // Calc physical damage, get back damage done and how much was prevented
-    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
-    const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbilities);
+    const damageAndReduction2 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbilities);
     physicalDamage = damageAndReduction1.physicalDamage + damageAndReduction2.physicalDamage;
     physicalReduction = damageAndReduction1.physicalReduction + damageAndReduction2.physicalReduction;
 
@@ -417,7 +426,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     // FIRE and WATER deal with attacks, so a non elemental foe wont use these
     // AIR and EARTH deal with defender's stats,  so they are included here because foe is not defender here
     elementalProcs.air = airProc;
-    elementalProcs.earth = determineEarthThorns(defender.earth, physicalDamage);
+    elementalProcs.earth = determineEarthThorns(defender.earth, physicalDamage, earthPassiveBoost);
 
     // Only adjust Health for Thorns & VampTouch IF evasion did not happen
     if (!airProc.evaded) {
@@ -428,7 +437,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
 
     // Adjust for hero DOT passive (Compost Creature)
-    if (battleAbility?.name === "Olfactory Overload") {
+    if (battleAbilities.find(ability => ability.name === "Olfactory Overload")) {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
       totals.foeHealthRemaining -= bonusDamage;
     }
@@ -445,7 +454,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     };
   } else {
     // Calc physical damage, get back damage done and how much was prevented
-    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbility);
+    const damageAndReduction1 = _calcDamage(aggressor.power, defender.armor, airProc.evaded, battleAbilities);
     physicalDamage = damageAndReduction1.physicalDamage;
     physicalReduction = damageAndReduction1.physicalReduction;
     // Calc elm damage, get back damage done and how much was prevented
@@ -466,7 +475,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     elementalProcs = {
       fire: fireProc,
       air: airProc,
-      earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + physicalDamage),
+      earth: determineEarthThorns(defender.earth, turnElmDamageDone.total + physicalDamage, earthPassiveBoost),
       water: determineWaterHeal(aggressor.water, turnElmDamageDone.total + physicalDamage),
     };
 
@@ -481,7 +490,7 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
     totals.avHealthRemaining = _calcHealthLoss(totals.avHealthRemaining, turnElmDamageDone.total + physicalDamage);
 
     // Adjust for hero DOT passive (Compost Creature)
-    if (battleAbility?.name === "Olfactory Overload") {
+    if (battleAbilities.find(ability => ability.name === "Olfactory Overload")) {
       const bonusDamage = Math.floor(physicalDamage * 0.1);
       //console.log("BONUS DAMAGE", bonusDamage);
       totals.foeHealthRemaining -= bonusDamage;
@@ -500,13 +509,13 @@ function _computeFoeRound(aggressor: BattleFoe, defender: BattleHero, foeIsEleme
   }
 }
 
-function _computeBattleTurn(aggressor: HeroOrFoe, defender: HeroOrFoe, foeIsElemental: boolean, totals: GrandTotals, battleAbility?: BattlePassiveAbility) {
+function _computeBattleTurn(aggressor: HeroOrFoe, defender: HeroOrFoe, foeIsElemental: boolean, totals: GrandTotals, battleAbilities: BattlePassiveAbilities) {
   // IF HERO ROUND
   if ("character" in aggressor) {
-    return _computeHeroRound(aggressor, defender as BattleFoe, totals, battleAbility);
+    return _computeHeroRound(aggressor, defender as BattleFoe, totals, battleAbilities);
     // IF FOE ROUND
   } else {
-    return _computeFoeRound(aggressor, defender as BattleHero, foeIsElemental, totals, battleAbility);
+    return _computeFoeRound(aggressor, defender as BattleHero, foeIsElemental, totals, battleAbilities);
   }
 }
 
@@ -542,11 +551,11 @@ function _testForTemporalDistortion(aggressorString: AvatarOrFoeString, aether: 
   return { td: false, gf: goesFirst };
 }
 
-function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", battleAbility?: BattlePassiveAbility) {
+function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe", battleAbilities: BattlePassiveAbilities) {
   //console.log("AV IN BATTLE=", avatar.name, "GF=", goesFirst);
   //goesFirst = 'avatar';
   const battleTurns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  //console.log("1pa", battleAbility);
+  //console.log("1pa", battleAbilities);
   const foeIsElemental = _checkIfElemental(foe);
   const roundBreakdown: BattleRound[] = [];
 
@@ -580,7 +589,7 @@ function doBattle(avatar: BattleHero, foe: BattleFoe, goesFirst: "Avatar" | "Foe
     ({ td: nextRoundIsTD, gf: goesFirst } = _testForTemporalDistortion(aggressorString, avatar.aether, nextRoundIsTD, goesFirst));
 
     // Compute battle turn and add results to total
-    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressor, defender, foeIsElemental, grandTotals, battleAbility);
+    const { defenderHealthLeft, aggressorHealthLeft, physicalDamageDealt, elementalDamageDealt, physicalReduction, elementalReduction, totals, elementalProcs } = _computeBattleTurn(aggressor, defender, foeIsElemental, grandTotals, battleAbilities);
 
     grandTotals = totals;
     roundBreakdown.push({

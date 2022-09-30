@@ -270,10 +270,10 @@ interface PassiveAbility {
   name: string;
   type: GamePhase;
 }
-interface BattlePassiveAbility {
+type BattlePassiveAbilities = {
   name: string;
   aggressor: "either" | "hero" | "foe";
-}
+}[]
 
 interface BattleElementalProcs {
   air: {
@@ -303,4 +303,6 @@ interface HeroChoice extends HF.HeroChoice {
   passive: PassiveAbility;
 }
 
-export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbility, BattleElementalProcs, OutcomeData, HeroChoice };
+type ElementalTraitBoost = [number, number];
+
+export { NodeEnvironments, ObjectWithAnyProperties, PreBattleObject, BasicUserContactInfo, PossibleFoeStat, FoeTemplate, FoeStats, VillainJsonStructure, SpecialEvent, SpecialEventActionType, StravaUpdateObj, TypedRequestBody, UserTotals, BackendUserTotals, ActivityType, PBAType, PostBattleActions, AllPbaTypes, BackendBattle, ActionTypeNames, BackendAvatarItems, BackendActivity, QpSpentStats, BattleHero, BattleFoe, BattleRound, BattleElements, BattleOutcome, AvatarOrFoeString, Scenario, GamePhase, BackendEffectProcs, PassiveAbility, BattlePassiveAbilities, BattleElementalProcs, OutcomeData, HeroChoice, ElementalTraitBoost };

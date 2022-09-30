@@ -1,4 +1,4 @@
-import { FOE_NON_ACTION } from "../CONSTANTS";
+import { BATTLE_ITEM_PASSIVES, FOE_NON_ACTION } from "../CONSTANTS";
 import Chance from "chance";
 import xpCalc from "../upgrades/xpCalc";
 import { scrambleStats } from "../../lib/helperFunctions";
@@ -471,4 +471,42 @@ function doHeroPassiveAbilities(avatar: BattleHero, possibleAbilityProcs: string
   };
 }
 
-export { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities };
+function doItemBattlePassives(effectProcs: BackendEffectProcs[], battleItemNames : string[]){
+  const eProcs = [...effectProcs];
+  
+  battleItemNames.forEach((itemName) => {
+    switch(itemName){
+      case 'High Tide':
+        eProcs.push({
+          effect: itemName,
+          heroStatsEffected: ["water"],
+          type: "battle",
+        });
+        break;
+      case 'Rock Slide':
+        eProcs.push({
+          effect: itemName,
+          heroStatsEffected: ["earth"],
+          type: "battle",
+        });
+        break;
+      case 'Inner Fire':
+        eProcs.push({
+          effect: itemName,
+          heroStatsEffected: ["fire"],
+          type: "battle",
+        });
+        break;
+      case 'Tailwind':
+        eProcs.push({
+          effect: itemName,
+          heroStatsEffected: ["air"],
+          type: "battle",
+        });
+      default:
+        break;
+    }
+  })
+  return eProcs;
+}
+export { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities, doItemBattlePassives };

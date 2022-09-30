@@ -1,6 +1,6 @@
 import { BEGINNERS_LUCK_MAX_XP, BEGINNERS_LUCK_LIKELIHOOD } from "../CONSTANTS";
 import { determineScenario, calcScenarioBonuses } from "./scenario";
-import { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities } from "./doBattlePrep";
+import { doAvatarBattlePrep, doFoeBattlePrep, doHeroPassiveAbilities, doItemBattlePassives } from "./doBattlePrep";
 import { parseStats } from "../../lib/helperFunctions";
 import avCalc from "../upgrades/avCalc";
 import { AvatarOrFoeString, BackendEffectProcs, BattleElements, BattleFoe, BattleHero, PassiveAbility, Scenario } from "../../types/BackendOnlyTypes";
@@ -17,7 +17,12 @@ const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
   // Only used to help determine Ninja passive
   let possibleAbilityProcs: string[] = [];
 
-  // Only appears on Battle Report, no other uses
+  // effect procs have the shape:
+  /*{
+    effect: string,
+    type: "prebattle" | "battle" | "postbattle",
+  }*/
+
   let effectProcs: BackendEffectProcs[] = [];
 
   return {
@@ -72,7 +77,7 @@ const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
       } else if (scenario.id === 3) {
         goesFirst = "Foe";
       } else {
-        // 66% Chance the Avatar will go first if below level 15
+        // 50% Chance the Avatar will go first if below level 12
         if (beginnersLuck) {
           goesFirst = "Avatar";
         } else {
@@ -80,6 +85,11 @@ const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
           const avIsFirst = chance.bool({ likelihood: 50 });
           goesFirst = avIsFirst ? "Avatar" : "Foe";
         }
+      }
+    },
+    doItemBattlePassivesSetup: (battleItemNames : string[] | null) => {
+      if (battleItemNames && battleItemNames.length) {
+        effectProcs =  doItemBattlePassives(effectProcs, battleItemNames);
       }
     },
     applyCheat: (avPowerBoost = 1, foePowerBoost = 1, avHealthBoost = 1, foeHealthBoost = 1, avatarEarthBoost = 1, foeEarthBoost = 1) => {
