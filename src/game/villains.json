@@ -3,7 +3,7 @@
     {
       "class": "Spirits",
       "type": "Shade",
-      "difficultyLevel": "medium",
+      "difficultyLevel": "low",
       "foe": ["Kerrim", "Thames", "Kedron", "Sidero", "Kshipa", "Marduk"],
       "ability": {
         "name": "From the Shadows",
@@ -22,7 +22,7 @@
     {
       "class": "Spirits",
       "type": "Apparition",
-      "difficultyLevel": "medium",
+      "difficultyLevel": "low",
       "foe": ["Githinji", "Mardochaios", "Medeia", "Edana", "Tamisra", "Colvin"],
       "ability": {
         "name": "Intimidation",
@@ -60,7 +60,7 @@
     {
       "class": "Spirits",
       "type": "Phantom",
-      "difficultyLevel": "medium",
+      "difficultyLevel": "low",
       "foe": ["Seth", "Ambrosia", "Laren", "Keres", "Chax", "Damian"],
       "ability": {
         "name": "Shadowy Influx",

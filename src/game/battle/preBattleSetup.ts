@@ -60,7 +60,8 @@ const preBattleSetup = function (avatar: BattleHero, foe: BattleFoe) {
     applyElementalBonus: () => {
       // Figure out which season it is, so a 25% bonus can be given to a & f
       const { determineAstrologySeason } = avCalc();
-      const { element } = determineAstrologySeason(Date.now().toString());
+      const { element } = determineAstrologySeason(Date.now());
+
       const seasonalBonusElement = element.toLowerCase();
       a[seasonalBonusElement as keyof BattleElements] *= 1.25;
       f[seasonalBonusElement as keyof BattleElements] *= 1.25;

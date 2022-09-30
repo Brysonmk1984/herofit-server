@@ -78,7 +78,6 @@ function selectFoeTemplate(level: number) {
 
   // Give Low level players a higher chance for an easier foe
   const beginnersLuckHappened = _determineBeginnersLuck(level);
-  //console.log("FOE ARRAYS - (low, medium)", low, medium);
   const finalFoeArray = beginnersLuckHappened ? low : [...low, ...medium];
 
   // Randomly select from final list of foes and return one

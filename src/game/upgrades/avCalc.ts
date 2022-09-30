@@ -4,6 +4,7 @@ import { cloneObj, adjustActivityMinutes } from "../../lib/helperFunctions";
 import avatarList from "../../heroList.json";
 import { QpSpentStats, UserTotals } from "../../types/BackendOnlyTypes";
 import HF from "../../types/herofit";
+import { sendBackendOnlyEmail } from "../../mail";
 
 interface ElementObject {
   fire: number;
@@ -153,8 +154,8 @@ function avCalc(userTotals?: UserTotals) {
     },
 
     // TODO: When refactoring to TS, make sure to return type of element is HF.PrimaryElement
-    determineAstrologySeason: function (dateOfCreation: string = null): { sign: string; element: "Fire" | "Water" | "Air" | "Earth" } {
-      const date = dateOfCreation ? moment(dateOfCreation) : moment();
+    determineAstrologySeason: function (dateOfCreation: string | number = null): { sign: string; element: "Fire" | "Water" | "Air" | "Earth" } {
+      const date = dateOfCreation ? moment(dateOfCreation) : moment(Date.now());
 
       const thisYear = date.year();
       const lastYear = date.year() - 1;
@@ -198,6 +199,7 @@ function avCalc(userTotals?: UserTotals) {
         case date.isAfter(`${thisYear}-11-21`) && date.isBefore(`${thisYear}-12-22`):
           return { sign: "Sagittarius", element: "Fire" };
         default:
+          sendBackendOnlyEmail('Error Determining Astrology Season/Element', 'In base case of "determineAstrologySeason()" - capricorn... should not be here!');
           return { sign: "Capricorn", element: "Earth" };
       }
     },
