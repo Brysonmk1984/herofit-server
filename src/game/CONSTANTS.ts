@@ -101,9 +101,9 @@ const FOE_NON_ACTION = 0;
 const AVATAR_NON_ACTION = 3;
 
 const FOE_MOD = {
-  HEALTH: 0.76,
-  QP: 0.86,
-  POWER: 0.74,
+  HEALTH: 0.77,
+  QP: 0.87,
+  POWER: 0.75,
 };
 
 const OUTCOME_XP = {
@@ -158,9 +158,9 @@ const LOW_LEVEL = 15;
 const HIGH_LEVEL = 100;
 
 // Applies to mid level +
-const LEVEL_DIFFICULTY_MOD = 1.41;
+const LEVEL_DIFFICULTY_MOD = 1.43;
 // Applies to high level (on top of mid level difficulty mod)
-const HIGH_LEVEL_DIFFICULTY_MOD = 1.55;
+const HIGH_LEVEL_DIFFICULTY_MOD = 1.56;
 
 // Photon Token find
 const PTFIND_BASE_DROP_RATE = 33;

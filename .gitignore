@@ -3,6 +3,7 @@ node_modules
 .DS_Store
 .env
 .pem
+.vscode/
 pg_upgrade_internal.log
 pg_upgrade_server.log
 pg_upgrade_utility.log
