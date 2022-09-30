@@ -4,10 +4,11 @@ import { AvatarOrFoeString } from "../../types/BackendOnlyTypes";
 const chance = Chance();
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
-function determineFireCrit(fire: number, d: number) {
-  let critChance = Math.floor(+((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
-  if (critChance > 60) {
-    critChance = 60;
+function determineFireCrit(fire: number, d: number, boost : [number, number] = [1,1]) {
+  let critChance = Math.floor(+((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * boost[0] * 100) ;
+  const maxCritChance = 60 * boost[1];
+  if (critChance > maxCritChance) {
+    critChance = maxCritChance;
   }
   const isCrit = chance.bool({ likelihood: critChance });
   const averageElms = Math.floor((d / 4) * 1.85);
@@ -15,27 +16,28 @@ function determineFireCrit(fire: number, d: number) {
   const thirdOfDamage = Math.floor(d/3);
   const bonusDamage = averageElms > thirdOfDamage ? averageElms : thirdOfDamage;
   const critDamage = isCrit ? bonusDamage : 0;
-
+  //console.log('FIRE - ', { critChance, critDamage });
   return { critChance, critDamage };
 }
 
 // AIR - defensive trait - takes in defender's air amount, and aggressors damage calculated on aggressors round
-function determineAirEvade(air: number) {
-  let evadeChance = Math.floor(+((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2) * 100);
-  //console.log(air, evadeChance);
-  if (evadeChance > 60) {
-    evadeChance = 60;
+function determineAirEvade(air: number, boost : [number, number] = [1,1]) {
+  let evadeChance = Math.floor(+((air * 5) / (air * 5 + AIR_EVASION_CHANCE_MOD)).toFixed(2)* boost[0] * 100) ;
+  const maxEvadeChance = 60 * boost[1];
+  if (evadeChance > maxEvadeChance) {
+    evadeChance = maxEvadeChance;
   }
   const evaded = chance.bool({ likelihood: evadeChance });
-
+  //console.log('AIR - ', { evadeChance, evaded });
   return { evaded };
 }
 
 // WATER - defensive trait but takes place on offensive rounds - takes in defender's water amount, calculated on attackers attacking round - healed after damage has been dealt (but will not allow death)
-function determineWaterHeal(water: number, d: number) {
-  let healingFactor = +((water * 5) / (water * 5 + WATER_HEAL_MOD)).toFixed(2);
-  if (healingFactor > 0.45) {
-    healingFactor = 0.45;
+function determineWaterHeal(water: number, d: number, boost : [number, number] = [1,1]) {
+  let healingFactor = +((water * 5) / (water * 5 + WATER_HEAL_MOD)).toFixed(2) * boost[0];
+  const maxHealingFactor = 0.45 * boost[1];
+  if (healingFactor > maxHealingFactor) {
+    healingFactor = maxHealingFactor;
   }
   const amountHealed = Math.floor(d * healingFactor);
   //console.log('WATER - ', { healingFactor, amountHealed });
@@ -43,10 +45,11 @@ function determineWaterHeal(water: number, d: number) {
 }
 
 // EARTH - defensive trait - takes in defender's earth amount, and aggressors damage calculated on aggressors attacking round
-function determineEarthThorns(earth: number, d: number) {
-  let thornsFactor = +((earth * 5) / (earth * 5 + EARTH_THORNS_MOD)).toFixed(2);
-  if (thornsFactor > 0.45) {
-    thornsFactor = 0.45;
+function determineEarthThorns(earth: number, d: number, boost : [number, number] = [1,1]) {
+  let thornsFactor = +(((earth * 5) / (earth * 5 + EARTH_THORNS_MOD))).toFixed(2) * boost[0];
+  const maxThornsFactor = 0.45 * boost[1];
+  if (thornsFactor > maxThornsFactor) {
+    thornsFactor = maxThornsFactor;
   }
   const thornsDamageToAttacker = Math.floor(thornsFactor * d);
   //console.log('EARTH - ', { thornsFactor, thornsDamageToAttacker });
