@@ -5,14 +5,18 @@ const chance = Chance();
 
 // FIRE - offensive trait - takes in aggressor's total element amount, and uses the average as the crit damage calculated on aggressors round
 function determineFireCrit(fire: number, d: number) {
+  console.log({fire, d});
   let critChance = Math.floor(+((fire * 3) / (fire * 3 + FIRE_CRIT_CHANCE_MOD)).toFixed(2) * 100);
   if (critChance > 60) {
     critChance = 60;
   }
   const isCrit = chance.bool({ likelihood: critChance });
   const averageElms = Math.floor((d / 4) * 1.85);
-  const critDamage = isCrit ? averageElms : 0;
-  //console.log('FIRE - ', { critChance, critDamage });
+  //fallback for low element amounts
+  const thirdOfDamage = Math.floor(d/3);
+  const bonusDamage = averageElms > thirdOfDamage ? averageElms : thirdOfDamage;
+  const critDamage = isCrit ? bonusDamage : 0;
+
   return { critChance, critDamage };
 }
 
