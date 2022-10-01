@@ -31,9 +31,9 @@ const testSpecificFoe: SpecialEvent = {
     },
     {
       type: "foeBonusToStats",
-      action: "Increase Air",
-      bonusPercent: 0.5,
-      stats: ["air"],
+      action: "Increase Fire",
+      bonusPercent: 10,
+      stats: ["fire"],
     },
   ],
 };
@@ -65,7 +65,7 @@ const attackOfTheElements: SpecialEvent = {
 
 const helloween: SpecialEvent = {
   eventName: "Helloween",
-  description: "Until Halloween, bonus chance to face the Guardian of the Depths",
+  description: "Until Halloween, bonus chance to face the Guardian of the Depths & other foes.",
   actionTypes: [
     {
       type: "foeLikelihood",
@@ -74,6 +74,57 @@ const helloween: SpecialEvent = {
       foe: "Guardian of the Depths",
       foeClass: "Titans",
       levelRequirement: 40,
+    },
+
+
+    {
+      type: "foeLikelihood",
+      action: "Increased Likelihood Foe",
+      odds: 6,
+      foe: "Poltergeist",
+      foeClass: "Spirits",
+      levelRequirement: 12,
+    },
+    {
+      type: "foeLikelihood",
+      action: "Increased Likelihood Foe",
+      odds: 6,
+      foe: "Wraith",
+      foeClass: "Spirits",
+      levelRequirement: 12,
+    },
+    {
+      type: "foeLikelihood",
+      action: "Increased Likelihood Foe",
+      odds: 6,
+      foe: "Banshee",
+      foeClass: "Spirits",
+      levelRequirement: 12,
+    },
+    {
+      type: "itemFind",
+      action: "Increased Likelihood Item",
+      bonusPercent: 6,
+      items: ["Obsidian Mirror"],
+    },
+    {
+      type: "xpBooster",
+      action: "Increase XP Reward",
+      bonusPercent: .5,
+      requirements: [{ foeType: "Guardian of the Depths" }, { foeType: "Poltergeist" }, { foeType: "Wraith" }, { foeType: "Banshee" }],
+    },
+    {
+      type: "ptBooster",
+      action: "Increase PT Reward",
+      bonusPercent: .5,
+      requirements: [{ foeType: "Guardian of the Depths" }, { foeType: "Poltergeist" }, { foeType: "Wraith" }, { foeType: "Banshee" }],
+    },
+
+    {
+      type: "foeBonusToStats",
+      action: "Increase Fire",
+      bonusPercent: .1,
+      stats: ["fire"],
     },
   ],
 };
