@@ -446,7 +446,7 @@ declare namespace HF {
     };
     earth: {
       thornsDamageToAttacker: number;
-      thornsFactor: string;
+      thornsFactor: string | number;
     };
     fire: {
       critChance: number;
@@ -454,7 +454,7 @@ declare namespace HF {
     };
     water: {
       amountHealed: number;
-      healingFactor: string;
+      healingFactor: string | number;
     };
   }
   interface BattleRound {
