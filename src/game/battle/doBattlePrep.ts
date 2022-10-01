@@ -87,6 +87,13 @@ function doAvatarBattlePrep(avatar: BattleHero, foe: BattleFoe, effects: string[
           heroStatsEffected: ["health"],
         });
         break;
+      case "Hero +10% Health":
+          eAvatar.health += Math.floor(eAvatar.health * 0.10);
+          effectProcs.push({
+            effect: "Hero +10% Health",
+            heroStatsEffected: ["health"],
+          });
+        break;
       case "Hero +33% Fire":
         eAvatar.fire += Math.floor(eAvatar.fire * 0.33);
         effectProcs.push({
