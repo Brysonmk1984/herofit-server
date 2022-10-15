@@ -259,10 +259,11 @@ function _calcArmorDR(aPower: number, rArmor: number, battleAbilities?: BattlePa
   }
 
   // Reduced damage based on amount of resistance
-  const dr = (r * 10) / (r * 10 + armorDRF * d);
+  const dr = (r * 10) / (r * 10 + armorDRF * d) * 1.3;
+  const finalDr = dr > .99 ? .99 : dr;
   return {
-    reduction: parseFloat((d * dr).toFixed(2)),
-    netDamage: Math.floor(d - d * dr),
+    reduction: parseFloat((d * finalDr).toFixed(2)),
+    netDamage: Math.floor(d - d * finalDr),
   };
 }
 
