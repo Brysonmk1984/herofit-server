@@ -10,15 +10,14 @@
     "allowJs": true,
     "moduleResolution": "node",
     "strictNullChecks": false,
-    "incremental": false,
     "types": ["node", "jest"],
     "lib": ["es2020"],
     "esModuleInterop": true,
+    "incremental": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": true,
     // Just switched this to true so we have to check if an error is indeed an error before proceeding
-    // Turn off if annoying
     "useUnknownInCatchVariables": true,
     "resolveJsonModule": true,
     // Don't think this is needed... using for tests in ts but doesnt seem to do anything

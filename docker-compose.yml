@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: ./
+    #volumes:
+    # mount app code from outside to the container for dev reloadin
+    #- .:/usr/src/app # same as WORKDIR in your Dockerfile
+    #command: npm run dev
+    command: npm run build
+    ports:
+      - "5913:3001"
+    environment:
+      NODE_ENV: development
+      DEBUG: nodejs-docker-express:*
+    links:
+      - db
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: graphic5
+      POSTGRES_DB: "herofit"
+    ports:
+      - "5914:5432"
+    volumes:
+      - herofit-postgres:/var/lib/postgresql/data
+
+volumes:
+  herofit-postgres:

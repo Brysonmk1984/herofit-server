@@ -14,6 +14,7 @@ let sequelizeSettings: Options = {
   operatorsAliases: false,
   query: { raw: true },
 };
+console.log("go faster 11");
 
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   // PRODUCTION, STAGING, or PROXY
@@ -39,7 +40,7 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
 } else {
   // DEVELOPMENT
   const envSpecificSettings = {
-    host: "localhost",
+    host: "db",
     pool: {
       max: 5,
       min: 0,
@@ -50,7 +51,6 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
 
   sequelizeSettings = { ...sequelizeSettings, ...envSpecificSettings };
 }
-
 db = new Sequelize(process.env.DATABASE_URL, sequelizeSettings);
 
 db.authenticate();
