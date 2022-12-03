@@ -3,22 +3,20 @@
     "target": "esnext",
     // Using TypeScript, node.js and the TypeScript compiler option "module": "esnext" together is next to impossible. So if you're building code that should be ran with node.js, in 2020, you should still choose "module": "commonjs".
     "module": "commonjs",
-    "outDir": "./build",
-    "rootDir": "./src",
+    "outDir": "build",
+    "rootDir": "src",
     "strict": true,
     "checkJs": false,
     "allowJs": true,
     "moduleResolution": "node",
     "strictNullChecks": false,
     "types": ["node", "jest"],
+    "incremental": true,
     "lib": ["es2020"],
     "esModuleInterop": true,
-    "incremental": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnreachableCode": true,
-    // Just switched this to true so we have to check if an error is indeed an error before proceeding
-    "useUnknownInCatchVariables": true,
     "resolveJsonModule": true,
     // Don't think this is needed... using for tests in ts but doesnt seem to do anything
     "allowSyntheticDefaultImports": true

@@ -3,24 +3,23 @@ services:
   web:
     build:
       context: ./
-    #volumes:
-    # mount app code from outside to the container for dev reloadin
-    #- .:/usr/src/app # same as WORKDIR in your Dockerfile
-    #command: npm run dev
-    command: npm run build
+    volumes:
+      # mount app code from outside to the container for dev reloadin
+      - .:/usr/src/app # same as WORKDIR in your Dockerfile
     ports:
       - "5913:3001"
     environment:
-      NODE_ENV: development
       DEBUG: nodejs-docker-express:*
+    depends_on:
+      - db
     links:
       - db
   db:
     image: postgres
-    restart: always
     environment:
       POSTGRES_PASSWORD: graphic5
-      POSTGRES_DB: "herofit"
+      POSTGRES_DB: herofit
+      POSTGRES_USER: admin
     ports:
       - "5914:5432"
     volumes:

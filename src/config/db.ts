@@ -7,19 +7,17 @@ import BattleModel from "../models/battle";
 import AvatarItemsModel from "../models/avatarItems";
 import ItemsModel from "../models/items";
 
-let db: Sequelize.Sequelize;
-let sequelizeSettings: Options = {
+let sequelizeSettings: Partial<Options> = {
   dialect: "postgres",
   protocol: "postgres",
   operatorsAliases: false,
   query: { raw: true },
 };
-console.log("go faster 11");
+let envSpecificSettings: Partial<Options>;
 
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
   // PRODUCTION, STAGING, or PROXY
-
-  const envSpecificSettings = {
+  envSpecificSettings = {
     dialectOptions: {
       ssl: {
         require: true,
@@ -27,7 +25,6 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
       },
     },
     timezone: "utc",
-    host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     pool: {
       max: 20,
       min: 0,
@@ -35,11 +32,9 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
       idle: 8000,
     },
   };
-
-  sequelizeSettings = { ...sequelizeSettings, ...envSpecificSettings };
 } else {
   // DEVELOPMENT
-  const envSpecificSettings = {
+  envSpecificSettings = {
     host: "db",
     pool: {
       max: 5,
@@ -48,10 +43,9 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
       idle: 10000,
     },
   };
-
-  sequelizeSettings = { ...sequelizeSettings, ...envSpecificSettings };
 }
-db = new Sequelize(process.env.DATABASE_URL, sequelizeSettings);
+
+const db = new Sequelize(process.env.DATABASE_URL, { ...sequelizeSettings, ...envSpecificSettings });
 
 db.authenticate();
 
