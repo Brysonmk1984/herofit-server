@@ -8,12 +8,11 @@
     "test:precommit": "jest --verbose --ci  --coverage --forceExit",
     "test:watch": "jest --watch --verbose ",
     "start": "NODE_ENV=production node build/start.js",
-    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/start.ts",
-    "prepare": "husky install",
+    "dev": "NODE_ENV=development ts-node-dev  --respawn --transpile-only --no-deps --exit-child --watch src  ./src/start.ts",
     "prettier": "prettier --check .",
     "lint": "eslint . --ext .ts",
     "build": "tsc-silent -p tsconfig.json --suppress @",
-    "heroku-postbuild": "tsc-silent -p tsconfig.json --suppress @ && mv -f src/jwt/id_rsa_priv.pem build/jwt/id_rsa_priv.pem && mv -f src/jwt/id_rsa_pub.pem build/jwt/id_rsa_pub.pem && rm -v -rf src"
+    "herofit-prod-build": "tsc-silent -p tsconfig.prod.json --suppress @ && mv -f src/jwt/id_rsa_priv.pem build/jwt/id_rsa_priv.pem && mv -f src/jwt/id_rsa_pub.pem build/jwt/id_rsa_pub.pem"
   },
   "author": "Bryson Kruk",
   "license": "MIT",
@@ -41,6 +40,7 @@
     "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
+    "tsc-watch": "^5.0.3",
     "typescript": "^4.5.4"
   },
   "dependencies": {
