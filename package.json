@@ -70,7 +70,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "4.44.4",
+    "sequelize": "6.27.0",
     "tsc-silent": "^1.2.1",
     "verify-cognito-token": "^1.2.2"
   },
