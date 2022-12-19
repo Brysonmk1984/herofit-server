@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "proxy") {
     },
     timezone: "utc",
     pool: {
-      max: 20,
+      max: 10,
       min: 0,
       acquire: 30000,
       idle: 8000,
