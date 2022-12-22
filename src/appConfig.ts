@@ -17,7 +17,7 @@ const config: Config = {
   disableErrorEmailReporting: false,
   globalMessage: [
     //{ type: "info", persist: false, message: "Smelling Salts - New item Revives your Hero! click here to read about it.", link: "https://www.reddit.com/r/herofit/comments/u0lhfa/introducing_a_new_highly_requested_item/" },
-    //{ type : 'info', persist : false, message : "You can now donate CAKE :)" }
+    //{ type: "info", persist: false, message: "Welcome to HeroFit!!!!" },
   ],
 };
 

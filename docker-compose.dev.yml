@@ -1,3 +1,7 @@
+# THIS IS THE DEV docker-compose FILE. It INHERITS FROM docker-compose.yml.
+# CALLING THE ALIAS dchf, which can be found in aliases.zsh yields this command:
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
 version: "3.8"
 services:
   web:
@@ -11,6 +15,8 @@ services:
       dockerfile: Dockerfile.dev
   db:
     image: postgres
+    environment:
+      PGUSER: postgres
     ports:
       - "5914:5432"
     volumes:
