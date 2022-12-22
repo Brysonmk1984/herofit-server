@@ -60,7 +60,7 @@
     "express-fileupload": "^1.2.0",
     "express-response-formatter": "^2.0.2",
     "express-validator": "^6.10.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwk-to-pem": "^2.0.4",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
