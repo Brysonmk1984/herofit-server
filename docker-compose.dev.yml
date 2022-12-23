@@ -8,7 +8,7 @@ services:
     volumes:
       # mount app code from outside to the container for dev reloadin
       - .:/usr/src/app # same as WORKDIR in your Dockerfile
-    command: npm run dev
+    command: npm run dev:docker
     environment:
       NODE_ENV: development
     build:
